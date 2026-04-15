@@ -271,7 +271,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 **Lo que NO se puede paralelizar:** F0.4 necesita F0.3 armado; F0.7 necesita F0.3+F0.5+F0.6 porque configura los 3 en el workflow.
 
 ### F0.1 — Migrar npm → pnpm
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: 18:05]
 - **Por qué:** El CLAUDE.md lo exige; pnpm es más rápido y deduplicado.
 - **Entregable:** `pnpm-lock.yaml` en el repo, `package-lock.json` borrado, scripts `pnpm dev/build/start` funcionando.
 - **Archivos:** `package.json`, `.gitignore`, `package-lock.json` (borrar).
