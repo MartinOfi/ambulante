@@ -334,7 +334,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.6 — Playwright config + smoke test
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: f0-6]
 - **Por qué:** Infraestructura E2E.
 - **Entregable:** `playwright.config.ts`, un test que visite `/` y verifique que la landing renderiza el hero.
 - **Archivos:** `playwright.config.ts`, `e2e/landing.spec.ts`.
