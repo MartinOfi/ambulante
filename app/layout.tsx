@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { ThemeProvider } from "./_components/theme/ThemeProvider";
+import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],

@@ -16,37 +16,67 @@
 
 ---
 
-## Convención de entradas
-
-Cada entrada sigue este formato:
-
-```
-### <Nombre>
-- **Ruta:** `shared/<path>`
-- **Descripción:** Una línea sobre qué hace.
-- **API:** firma / props principales.
-- **Usado en:** features/lugares donde se consume (para saber el impacto de cambiarlo).
-```
-
----
-
 ## 1. Componentes UI (`shared/components/ui/`)
 
 > Primitivas de shadcn/ui. Se añaden con `pnpm dlx shadcn@latest add <component>`.
 
-*(vacío — agregar entradas a medida que se instalen)*
+### Button
+- **Ruta:** `shared/components/ui/button.tsx`
+- **Descripción:** Botón shadcn con variantes (default, destructive, outline, secondary, ghost, link) y tamaños.
+- **API:** `<Button variant size asChild />`
+- **Usado en:** `features/landing/*`, cualquier CTA.
+
+### Card
+- **Ruta:** `shared/components/ui/card.tsx`
+- **Descripción:** Contenedor shadcn con `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`.
+- **Usado en:** `radial-orbital-timeline`.
+
+### Badge
+- **Ruta:** `shared/components/ui/badge.tsx`
+- **Descripción:** Pastilla pequeña con variantes (default, secondary, destructive, outline).
+- **Usado en:** `radial-orbital-timeline`.
+
+### Popover
+- **Ruta:** `shared/components/ui/popover.tsx`
+- **Descripción:** Popover radix-ui. Exporta `Popover`, `PopoverTrigger`, `PopoverContent`.
+- **Usado en:** `features/landing/components/LandingNav/MobileNav`.
+
+### NavigationMenu
+- **Ruta:** `shared/components/ui/navigation-menu.tsx`
+- **Descripción:** Menú de navegación radix-ui con sublistas y viewport.
+- **Usado en:** `features/landing/components/LandingNav/*`.
+
+### RadialOrbitalTimeline
+- **Ruta:** `shared/components/ui/radial-orbital-timeline.tsx`
+- **Descripción:** Timeline radial animado (shadcn/magicui) para mostrar pasos con conexiones orbitales.
+- **API:** `<RadialOrbitalTimeline timelineData={TimelineItem[]} />`
+- **Usado en:** `features/landing/components/HowItWorks`.
+- **⚠️ Excepción §6.5:** 323 líneas — supera el límite de 300. Es una primitiva externa de shadcn/magicui; tocar su estructura interna rompe el contrato del componente. Tratar como dependencia de terceros.
 
 ---
 
 ## 2. Componentes compuestos (`shared/components/`)
 
-*(vacío)*
+### ThemeProvider
+- **Ruta:** `shared/components/theme/ThemeProvider.tsx`
+- **Descripción:** Provider de `next-themes` que envuelve la app para soportar dark/light mode.
+- **Usado en:** `app/layout.tsx`.
+
+### ThemeToggle
+- **Ruta:** `shared/components/theme/ThemeToggle.tsx`
+- **Descripción:** Botón que alterna entre light/dark.
+- **Usado en:** `features/landing/components/LandingNav/LandingNav`.
 
 ---
 
 ## 3. Hooks (`shared/hooks/`)
 
-*(vacío — ejemplos previstos: `useGeolocation`, `useDebounce`, `useMediaQuery`, `useLocalStorage`)*
+### useGeolocation
+- **Ruta:** `shared/hooks/useGeolocation.ts`
+- **Descripción:** Obtiene la posición actual del navegador con filtrado de precisión (PRD §7.1). Retorna un discriminated union `GeoState`.
+- **API:** `useGeolocation(): GeoState & { request: () => void }`
+- **Estados:** `idle | loading | granted | denied | error`
+- **Usado en:** `features/map/components/MapScreen.container`.
 
 ---
 
@@ -54,7 +84,11 @@ Cada entrada sigue este formato:
 
 > Clientes de datos. Hoy devuelven mocks; mañana apuntarán a la API real. Los componentes consumen services, nunca mocks directos.
 
-*(vacío — ejemplos previstos: `storesService`, `ordersService`, `authService`)*
+### storesService
+- **Ruta:** `shared/services/stores.ts`
+- **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Implementación actual: `MockStoresService`. Swap a Supabase sin tocar consumers.
+- **API:** `findNearby({ coords, radiusMeters })`, `findById(id)`
+- **Usado en:** `features/map/hooks/useNearbyStores`.
 
 ---
 
@@ -62,13 +96,29 @@ Cada entrada sigue este formato:
 
 > Funciones puras genéricas. Sin efectos secundarios.
 
-*(vacío — ejemplos previstos: `formatDistance`, `haversine`, `formatCurrency`, `formatRelativeTime`)*
+### cn
+- **Ruta:** `shared/utils/cn.ts`
+- **Descripción:** Combina clases de Tailwind con `clsx` + `tailwind-merge`.
+- **API:** `cn(...inputs: ClassValue[]): string`
+- **Usado en:** prácticamente todos los componentes con Tailwind.
+
+### formatDistance
+- **Ruta:** `shared/utils/format.ts`
+- **Descripción:** Formatea metros a "320 m" o "1.2 km".
+- **API:** `formatDistance(meters: number): string`
+- **Usado en:** `features/map/components/StoreCard`.
+
+### formatPrice
+- **Ruta:** `shared/utils/format.ts`
+- **Descripción:** Formatea a moneda `es-AR` (default ARS).
+- **API:** `formatPrice(amount: number, currency?: string): string`
+- **Usado en:** `features/map/components/StoreCard`.
 
 ---
 
 ## 6. Styles (`shared/styles/`)
 
-*(vacío — ejemplos previstos: `tokens.css`, `themes.ts`)*
+*(vacío — globals viven en `app/globals.css`)*
 
 ---
 
@@ -76,7 +126,10 @@ Cada entrada sigue este formato:
 
 > Tipos compartidos del dominio. Los tipos específicos de una feature van en su carpeta, no acá.
 
-*(vacío — ejemplos previstos: `Order`, `OrderStatus`, `Store`, `Product`, `Client`, `Coordinates`)*
+### Store, StoreKind, StoreStatus, Coordinates
+- **Ruta:** `shared/types/store.ts`
+- **Descripción:** Modelo de tienda ambulante y tipos asociados. `Coordinates` es genérico para cualquier punto geo.
+- **Usado en:** `features/map/*`, `shared/services/stores`, `shared/hooks/useGeolocation`.
 
 ---
 
@@ -84,7 +137,15 @@ Cada entrada sigue este formato:
 
 > Reemplazan magic strings / numbers. Todo lo de dominio con significado semántico.
 
-*(vacío — ejemplos previstos: `ORDER_STATUS`, `USER_ROLES`, `GEO_REFRESH_INTERVAL_MS`, `ORDER_EXPIRATION_MINUTES`, `DEFAULT_SEARCH_RADIUS_KM`)*
+### RADIUS_OPTIONS, RadiusValue, DEFAULT_RADIUS
+- **Ruta:** `shared/constants/radius.ts`
+- **Descripción:** Opciones del filtro de radio (1km, 2km, 5km) y default.
+- **Usado en:** `features/map/*`.
+
+### MIN_ACCURACY_METERS, POOR_ACCURACY_FACTOR, GEO_TIMEOUT_MS, GEO_MAX_AGE_MS, STORE_LOCATION_REFRESH_MS, STORE_LOCATION_STALE_MS
+- **Ruta:** `shared/constants/geo.ts`
+- **Descripción:** Timings y tolerancias de geolocalización definidos en PRD §7.1.
+- **Usado en:** `shared/hooks/useGeolocation`.
 
 ---
 
@@ -93,3 +154,4 @@ Cada entrada sigue este formato:
 | Fecha | Cambio | Autor |
 |---|---|---|
 | 2026-04-15 | Creación del registry | — |
+| 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | — |
