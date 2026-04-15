@@ -17,10 +17,7 @@ export interface UseNearbyStoresInput {
   readonly radius: RadiusValue;
 }
 
-export function useNearbyStores({
-  coords,
-  radius,
-}: UseNearbyStoresInput): UseNearbyStoresResult {
+export function useNearbyStores({ coords, radius }: UseNearbyStoresInput): UseNearbyStoresResult {
   const [stores, setStores] = useState<readonly Store[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,8 +40,7 @@ export function useNearbyStores({
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        const message =
-          err instanceof Error ? err.message : "Error cargando tiendas";
+        const message = err instanceof Error ? err.message : "Error cargando tiendas";
         setError(message);
         setStores([]);
       })

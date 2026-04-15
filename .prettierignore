@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+public/
+pnpm-lock.yaml
+package-lock.json
+.env
+.env.*
+next-env.d.ts
+
+# Docs are edited manually; avoid noisy reformatting of dense markdown
+docs/
+*.md
+!shared/REGISTRY.md

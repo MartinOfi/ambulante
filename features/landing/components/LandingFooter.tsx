@@ -29,9 +29,7 @@ const COLUMNS: FooterColumn[] = [
   },
   {
     title: "Recursos",
-    links: [
-      { label: "Preguntas frecuentes", href: "#faq" },
-    ],
+    links: [{ label: "Preguntas frecuentes", href: "#faq" }],
   },
 ];
 
@@ -59,9 +57,8 @@ export function LandingFooter() {
             </Link>
 
             <p className="mt-6 max-w-md text-sm leading-relaxed text-muted">
-              Coordinación de encuentros físicos en tiempo real. Conectamos
-              clientes con tiendas ambulantes sin procesar pagos ni intermediar
-              la venta. La calle sigue siendo la calle.
+              Coordinación de encuentros físicos en tiempo real. Conectamos clientes con tiendas
+              ambulantes sin procesar pagos ni intermediar la venta. La calle sigue siendo la calle.
             </p>
           </div>
 

@@ -306,14 +306,14 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:** Implementado como trío: `env.mjs` (schema Zod + `parseEnv` puro, import-safe), `env.runtime.mjs` (side-effect `env = parseEnv(process.env)` para fail-fast al build), `env.ts` (re-export TS con tipo `Env`). Split necesario porque Next 14 `next.config.mjs` no puede importar `.ts` y porque los tests necesitan importar el schema sin disparar el side-effect. `next.config.mjs` importa `env.runtime.mjs` al tope. Schema actual: `NODE_ENV` (enum) + `NEXT_PUBLIC_APP_URL` (url). Dep `zod@^3.23.8` agregada. Tests en `shared/config/env.test.ts` (5 casos) listos para F0.5; validados vía smoke-run Node con 5/5 GREEN. REGISTRY actualizado con sección 9. Config.
 
 ### F0.3 — ESLint + Prettier
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Enforce coding style (CLAUDE.md §6) en cada commit. Hoy no corre porque ESLint no está configurado.
 - **Entregable:** `.eslintrc.json` con config `next/core-web-vitals` + `@typescript-eslint` strict + regla `no-restricted-imports` que prohíba imports cruzados entre features (`features/x/*` no puede importar `features/y/*`). `.prettierrc`. `pnpm lint` pasa limpio.
 - **Archivos:** `.eslintrc.json`, `.prettierrc`, `.prettierignore`.
 - **Depends on:** F0.1
 - **Continues with:** F0.4 (cadena C-F0-eslint)
 - **Estimación:** M
-- **Notas:**
+- **Notas:** ESLint 8 (legacy `.eslintrc.json`) con `next/core-web-vitals` + `@typescript-eslint/recommended` + `eslint-config-prettier` (desactiva reglas de estilo que chocan con Prettier). Reglas duras: `@typescript-eslint/no-explicit-any: error`, `@typescript-eslint/consistent-type-imports: error`, `no-console: warn (allow warn/error)`, `no-restricted-imports` bloqueando imports `../*` (fuerza alias `@/`). Cross-feature isolation: overrides explícitos por feature (`features/landing/**` no puede importar `@/features/map/**` y viceversa). Cuando entren features nuevas, agregar su override al final del array. Next lint configurado con `eslint.dirs: ["app","features","shared"]` en `next.config.mjs` (por default next solo mira app/pages/components/lib/src). Prettier: `printWidth 100`, `semi true`, double quotes, `trailingComma all`. Scripts nuevos: `lint:fix`, `typecheck`, `format`, `format:check`. `.prettierignore` excluye docs/ y *.md del root (densos, edición manual) con excepción explícita para `shared/REGISTRY.md`. Fixes aplicados al codebase existente: 4 imports `../...` en `features/map/components/{EmptyRadius,MapScreen.container,NearbyBottomSheet}` convertidos a `@/features/map/...`; `shared/config/env.ts` ya no usa `typeof import()` (ahora importa `env` como value y exporta `type Env = typeof env`). Prettier auto-formateó 28 archivos de código (comillas dobles, trailing commas). Verificado: `pnpm lint` 0/0, `pnpm format:check` clean, `pnpm build` verde (8 páginas estáticas).
 
 ### F0.4 — Husky + lint-staged + commitlint
 - **Estado:** ⚪ pending

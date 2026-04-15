@@ -43,18 +43,9 @@ export function MapScreen({
 
       <RecenterFAB onClick={onRecenter} disabled={isRecentering} />
 
-      <NearbyBottomSheet
-        stores={stores}
-        radius={radius}
-        onExpandRadius={onExpandRadius}
-      />
+      <NearbyBottomSheet stores={stores} radius={radius} onExpandRadius={onExpandRadius} />
 
-      {isDenied && (
-        <LocationDenied
-          onRetry={onRetryGeolocation}
-          onManualSearch={onManualSearch}
-        />
-      )}
+      {isDenied && <LocationDenied onRetry={onRetryGeolocation} onManualSearch={onManualSearch} />}
     </main>
   );
 }
