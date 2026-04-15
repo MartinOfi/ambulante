@@ -149,9 +149,23 @@
 
 ---
 
+## 9. Config (`shared/config/`)
+
+> Configuración validada al arranque. Fail-fast si el ambiente es inválido.
+
+### env, parseEnv, Env
+- **Ruta:** `shared/config/env.ts` (re-export TS) + `shared/config/env.mjs` (schema puro) + `shared/config/env.runtime.mjs` (side-effect de validación al boot).
+- **Descripción:** Variables de entorno tipadas con Zod. `parseEnv(raw)` valida un objeto arbitrario; `env` es el resultado congelado de parsear `process.env` al import.
+- **Schema actual:** `NODE_ENV` (enum dev/test/prod, default dev) + `NEXT_PUBLIC_APP_URL` (url).
+- **Usado en:** `next.config.mjs` (import side-effect para validar al build). Consumers TS deben importar `env` desde `@/shared/config/env`.
+- **⚠️ Por qué dos archivos `.mjs`:** Next 14 no puede importar `.ts` desde `next.config.mjs`. El schema vive en ESM puro para ser consumible por ambos mundos. Cuando F0.8 suba a Next 15, se puede unificar en `.ts`.
+
+---
+
 ## Changelog del registry
 
 | Fecha | Cambio | Autor |
 |---|---|---|
 | 2026-04-15 | Creación del registry | — |
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | — |
+| 2026-04-15 | F0.2: agregada sección 9. Config con `env` | — |

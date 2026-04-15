@@ -281,13 +281,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.2 — Configurar env vars tipadas con Zod
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Fallar fast al arranque si faltan vars, y tipar `process.env` en todo el código.
 - **Entregable:** `shared/config/env.ts` con `z.object(...).parse(process.env)`; `.env.example` con todas las keys necesarias; import obligatorio desde `next.config.mjs` para validar en build.
 - **Archivos:** `shared/config/env.ts` (nuevo), `.env.example` (nuevo), `next.config.mjs`.
 - **Depends on:** —
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Implementado como trío: `env.mjs` (schema Zod + `parseEnv` puro, import-safe), `env.runtime.mjs` (side-effect `env = parseEnv(process.env)` para fail-fast al build), `env.ts` (re-export TS con tipo `Env`). Split necesario porque Next 14 `next.config.mjs` no puede importar `.ts` y porque los tests necesitan importar el schema sin disparar el side-effect. `next.config.mjs` importa `env.runtime.mjs` al tope. Schema actual: `NODE_ENV` (enum) + `NEXT_PUBLIC_APP_URL` (url). Dep `zod@^3.23.8` agregada. Tests en `shared/config/env.test.ts` (5 casos) listos para F0.5; validados vía smoke-run Node con 5/5 GREEN. REGISTRY actualizado con sección 9. Config.
 
 ### F0.3 — ESLint + Prettier
 - **Estado:** ⚪ pending
