@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand — orange dominates as street food identity */
+    --brand-primary: 21 90% 48%;        /* #EA580C */
+    --brand-primary-hover: 21 90% 40%;  /* #C2410C */
+    --brand-accent: 221 83% 53%;        /* #2563EB — reserved for user location only */
+
+    /* Surfaces — warm cream, not clinical white */
+    --surface: 33 100% 96%;             /* #FFF7ED */
+    --surface-elevated: 0 0% 100%;      /* #FFFFFF */
+
+    /* Text */
+    --foreground: 222 47% 11%;          /* #0F172A */
+    --muted: 215 16% 47%;               /* #64748B */
+
+    /* Always-dark accent (hero, product showcase) — stays dark in both modes */
+    --ink: 222 47% 11%;                 /* #0F172A */
+
+    /* Semantic */
+    --success: 142 71% 45%;             /* #16A34A */
+    --border: 24 75% 94%;               /* #FCEAE1 */
+    --destructive: 0 72% 51%;           /* #DC2626 */
+
+    /* Typography */
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-sans: "Inter", system-ui, sans-serif;
+  }
+
+  .dark {
+    /* Dark mode — keep brand orange identical, swap surfaces and text */
+    --surface: 222 47% 6%;              /* #070A12 body */
+    --surface-elevated: 222 35% 12%;    /* #141B2D cards */
+    --foreground: 33 100% 96%;          /* warm off-white, mirrors cream */
+    --muted: 215 16% 65%;               /* #94A3B8 */
+    --border: 222 25% 18%;              /* #252C3A */
+    /* Ink goes deeper so hero/howitworks still pop as the darkest block */
+    --ink: 222 60% 3%;                  /* near-black */
+  }
+
+  html,
+  body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background-color: hsl(var(--surface));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Tabular nums for distances & prices — no layout shift on update */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Landing entrance + marquee — shared across hero sections */
+  @keyframes amb-fade-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes amb-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .amb-fade-in {
+    animation: amb-fade-slide-in 0.8s ease-out forwards;
+    opacity: 0;
+  }
+  .amb-marquee {
+    animation: amb-marquee 40s linear infinite;
+  }
+  .amb-delay-100 { animation-delay: 0.1s; }
+  .amb-delay-200 { animation-delay: 0.2s; }
+  .amb-delay-300 { animation-delay: 0.3s; }
+  .amb-delay-400 { animation-delay: 0.4s; }
+  .amb-delay-500 { animation-delay: 0.5s; }
+
+  /* Respect reduced motion — kill pulses and FAB spring */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 16px);
+  }
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 16px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
