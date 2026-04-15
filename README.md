@@ -1,17 +1,27 @@
-![Ambulante banner](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=260&section=header&text=Ambulante&fontSize=84&fontColor=ffffff&fontAlignY=38&desc=Tiendas%20ambulantes%20en%20tiempo%20real&descAlignY=58&descSize=18&animation=fadeIn)
+<!-- lang: es-AR -->
 
-![Typing pitch](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3500&pause=800&color=F97316&center=true&vCenter=true&width=720&lines=Encontr%C3%A1+food+trucks+cerca+tuyo.;Coordin%C3%A1+sin+pagar+por+adelantado.;PWA+dise%C3%B1ada+para+colaborar+con+agentes+de+IA.)
+![Ambulante — PWA para encontrar food trucks y tiendas ambulantes en tiempo real](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=260&section=header&text=Ambulante&fontSize=84&fontColor=ffffff&fontAlignY=38&desc=Tiendas%20ambulantes%20en%20tiempo%20real&descAlignY=58&descSize=18&animation=fadeIn)
+
+![](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=3500&pause=800&color=F97316&center=true&vCenter=true&width=720&lines=Encontr%C3%A1+food+trucks+cerca+tuyo.;Coordin%C3%A1+sin+pagar+por+adelantado.;PWA+dise%C3%B1ada+para+colaborar+con+agentes+de+IA.)
+
+# Ambulante — PWA de food trucks y tiendas ambulantes en tiempo real
+
+**Ambulante** es una Progressive Web App (PWA) que conecta clientes con **food trucks**, puestos callejeros y **tiendas ambulantes** mediante **geolocalización en tiempo real**. Construida con **Next.js 14**, **React 18**, **TypeScript strict** y **MapLibre GL JS**, permite a los clientes ver qué tiendas están operando cerca ahora mismo y enviar una intención de compra sin pagar por adelantado. El producto está pensado inicialmente para **Argentina** (Buenos Aires, CABA y GBA), donde el circuito de comida ambulante es difícil de descubrir en tiempo real.
+
+Ambulante **no es un marketplace transaccional**: no procesa pagos, no gestiona stock, no tiene ratings ni chat. Solo coordina la intención de compra para facilitar el encuentro físico entre oferta y demanda. Además, el repo está **diseñado desde cero para colaborar con agentes de IA** (Claude Code como primario) mediante un contrato operativo explícito en [`CLAUDE.md`](./CLAUDE.md).
+
+🌐 **Demo en vivo:** _próximamente en Vercel_ · 📄 [PRD completo](./docs/PRD.md) · 🤖 [Contrato con agentes (CLAUDE.md)](./CLAUDE.md) · 📚 [Registry de reutilizables](./shared/REGISTRY.md)
 
 ---
 
-### 🎖️ Badges principales
+**🎖️ Estado del proyecto**
 
 ![Status](https://img.shields.io/badge/status-pre--MVP-F97316?style=for-the-badge&labelColor=0a0a0a)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A67D8?style=for-the-badge&logo=pwa&logoColor=white&labelColor=0a0a0a)
 ![AI-first](https://img.shields.io/badge/AI--first-development-10B981?style=for-the-badge&logo=anthropic&logoColor=white&labelColor=0a0a0a)
 ![License](https://img.shields.io/badge/license-private-555?style=for-the-badge&labelColor=0a0a0a)
 
-### 🏷️ Stack
+**🏷️ Stack técnico**
 
 ![Next.js](https://img.shields.io/badge/Next.js_14.2-000?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -105,12 +115,12 @@ _Landing con el claim del producto, CTA dual (**Registrá tu tienda** / **Ver qu
 
 | 🗺️ Mapa de tiendas cercanas | 🛒 Flujo de pedido |
 | :-: | :-: |
-| ![Mapa](./public/screenshots/landing-hero.png) | ![Pedido](https://placehold.co/720x480/0a0a0a/F97316?text=🛒+Intenci%C3%B3n+de+compra) |
+| ![Captura del mapa de Ambulante con food trucks y tiendas ambulantes cercanos](./public/screenshots/landing-hero.png) | ![Flujo de intención de compra en Ambulante sin procesar pagos](https://placehold.co/720x480/0a0a0a/F97316?text=🛒+Intenci%C3%B3n+de+compra) |
 | _Landing hero con mini-mapa en vivo, pines de tiendas activas y lista de cercanas_ | _Snapshot del producto y seguimiento de estado (placeholder)_ |
 
 | 🚚 Dashboard de tienda | 🔔 Push notifications |
 | :-: | :-: |
-| ![Store](https://placehold.co/720x480/0a0a0a/5A67D8?text=🚚+Inbox+de+pedidos) | ![Push](https://placehold.co/720x480/0a0a0a/10B981?text=🔔+Cambios+de+estado) |
+| ![Dashboard del vendedor ambulante con inbox de pedidos y máquina de estados](https://placehold.co/720x480/0a0a0a/5A67D8?text=🚚+Inbox+de+pedidos) | ![Notificaciones push de cambios de estado de pedidos en Ambulante](https://placehold.co/720x480/0a0a0a/10B981?text=🔔+Cambios+de+estado) |
 | _Inbox de pedidos con máquina de estados_ | _Notificaciones de aceptación y cambios_ |
 
 ---
@@ -276,7 +286,7 @@ export function StoreCardContainer({ storeId }: { readonly storeId: string }) {
 
 ## 🤖 Desarrollo con IA
 
-![AI typing](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3000&pause=600&color=8B5CF6&center=true&vCenter=true&width=720&lines=Dise%C3%B1ado+desde+cero+para+colaborar+con+agentes;CLAUDE.md+es+el+contrato+operativo;Reglas+ejecutables+%3E+conocimiento+impl%C3%ADcito)
+![](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3000&pause=600&color=8B5CF6&center=true&vCenter=true&width=720&lines=Dise%C3%B1ado+desde+cero+para+colaborar+con+agentes;CLAUDE.md+es+el+contrato+operativo;Reglas+ejecutables+%3E+conocimiento+impl%C3%ADcito)
 
 > [!IMPORTANT]
 > Este repo está **diseñado desde cero para colaborar con agentes de IA** (Claude Code como primario). La mayor parte del código se escribe en un loop humano↔agente con reglas y contexto explícitos.
@@ -432,14 +442,60 @@ flowchart LR
 
 ---
 
+## ❓ FAQ
+
+### ¿Ambulante cobra por los pedidos o por transacción?
+
+No. Ambulante **no procesa pagos** ni cobra comisión sobre la venta. La transacción ocurre físicamente entre cliente y tienda, igual que hoy en la vereda. La app solo coordina el encuentro para que el cliente no camine sin certeza y la tienda no pierda ventas por falta de visibilidad.
+
+### ¿Cómo sé si un food truck está realmente cerca y operando?
+
+Las tiendas transmiten su ubicación cada **30–60 segundos** mientras están marcadas como activas. Si pasan más de 2 minutos sin actualización, la app marca la ubicación como desactualizada y la oculta del mapa. Así evitamos pines fantasma.
+
+### ¿La tienda ve mi ubicación exacta desde el principio?
+
+No. La ubicación exacta del cliente **nunca** se expone a la tienda antes del estado `ACEPTADO` del pedido. Es una invariante del sistema (no una configuración que se pueda cambiar), documentada en [`docs/PRD.md §7.2`](./docs/PRD.md) y [`CLAUDE.md §7.2`](./CLAUDE.md).
+
+### ¿Funciona en iPhone / iOS Safari?
+
+Sí, pero las **push notifications requieren que instales la PWA** en tu pantalla de inicio — es una limitación de iOS Safari, no de Ambulante. Sin instalar, el fallback es polling cada cierto tiempo. Todos los demás flujos funcionan igual en iOS y Android.
+
+### ¿Está en producción?
+
+**Pre-MVP.** Hoy el repo es solo frontend con datos mockeados. El backend (Supabase + Postgres + PostGIS + Realtime) llega en la Fase 3 del [roadmap](#️-roadmap). Los servicios de datos ya están abstraídos detrás de interfaces en `shared/services/` para que el swap a Supabase sea trivial.
+
+### ¿Por qué Next.js 14 si CLAUDE.md dice Next 15?
+
+CLAUDE.md define el **stack objetivo**, no el actual. El repo se migra por ventanas: hoy corre en Next 14.2 estable, y la migración a Next 15 + Tailwind v4 + pnpm está planeada como un bloque único para evitar inconsistencias parciales.
+
+### ¿Puedo contribuir?
+
+Sí. Antes de tocar código, leé [`CLAUDE.md`](./CLAUDE.md) — define las reglas de código invariantes (TypeScript strict, no magic strings, container/presentational, máximo 200 líneas por componente) y el flujo de trabajo humano↔agente que usamos en el repo. Después mirá [`shared/REGISTRY.md`](./shared/REGISTRY.md) para verificar si lo que querés crear ya existe.
+
+### ¿Qué significa "diseñado para colaborar con agentes de IA"?
+
+Que las reglas del repo están escritas en formato **ejecutable por máquina**: invariantes de dominio, máquina de estados del pedido, límites de líneas por archivo, flujo TDD obligatorio, etc. Un agente (Claude Code, Copilot, Cursor) puede leer [`CLAUDE.md`](./CLAUDE.md) + [`shared/REGISTRY.md`](./shared/REGISTRY.md) y generar código consistente sin pedirle al humano decisiones ya tomadas.
+
+---
+
 ## 📜 Estado del proyecto
 
 ![Pre-MVP](https://img.shields.io/badge/fase-Pre--MVP-F97316?style=for-the-badge)
-![Frontend only](https://img.shields.io/badge/scope-Frontend_only-06B6D4?style=for-the-badge)
-![Mocked data](https://img.shields.io/badge/data-Mocked-8B5CF6?style=for-the-badge)
+![Frontend only](https://img.shields.io/badge/scope-Solo_frontend-06B6D4?style=for-the-badge)
+![Mocked data](https://img.shields.io/badge/data-Mockeada-8B5CF6?style=for-the-badge)
 
 **Solo frontend, datos mockeados, sin backend todavía.** El foco actual es cerrar los flujos de Cliente (mapa, búsqueda, intención de compra) antes de integrar Supabase.
 
 ---
 
-![Footer wave](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=140&section=footer&text=Hecho%20con%20%E2%9D%A4%EF%B8%8F%20y%20agentes&fontSize=22&fontColor=ffffff&animation=twinkling)
+## 👤 Mantenedor
+
+Construido por [**@martinOfi**](https://github.com/martinOfi) en **Buenos Aires, Argentina**. ¿Preguntas, feedback o querés probar el MVP? Abrí un [issue](../../issues) o mandame un mensaje por GitHub.
+
+## 📄 Licencia
+
+Privado — todos los derechos reservados. Se evaluará una licencia open source cuando el producto llegue a producción.
+
+---
+
+![](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=140&section=footer&text=Hecho%20con%20%E2%9D%A4%EF%B8%8F%20y%20agentes&fontSize=22&fontColor=ffffff&animation=twinkling)
