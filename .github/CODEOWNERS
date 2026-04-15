@@ -1,0 +1,56 @@
+# CODEOWNERS — Ambulante
+#
+# GitHub usa este archivo para asignar reviewers automáticamente a cada PR
+# según los paths que toca. La última regla que matchea gana.
+#
+# Referencia: https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Convención actual: equipo de 1 — todo cae en @martinOfi.
+# Cuando escale el equipo, reemplazar los placeholders `# TODO(team)` por
+# los handles de GitHub del equipo correspondiente (ej. @ambulante/frontend).
+
+# -----------------------------------------------------------------------------
+# Fallback global — cualquier cosa no cubierta por reglas más específicas.
+# -----------------------------------------------------------------------------
+*                               @martinOfi
+
+# -----------------------------------------------------------------------------
+# Shared — hot path, cualquier cambio afecta a todas las features.
+# TODO(team): @ambulante/core
+# -----------------------------------------------------------------------------
+/shared/                        @martinOfi
+/shared/REGISTRY.md             @martinOfi
+
+# -----------------------------------------------------------------------------
+# App Router — rutas, layouts, páginas.
+# TODO(team): @ambulante/frontend
+# -----------------------------------------------------------------------------
+/app/                           @martinOfi
+
+# -----------------------------------------------------------------------------
+# Features — islas independientes (ver CLAUDE.md §4).
+# TODO(team): owner por feature cuando haya squads dedicados.
+# -----------------------------------------------------------------------------
+/features/landing/              @martinOfi
+/features/map/                  @martinOfi
+
+# -----------------------------------------------------------------------------
+# Documentación — PRD y arquitectura son fuente de verdad del producto.
+# TODO(team): @ambulante/product
+# -----------------------------------------------------------------------------
+/docs/                          @martinOfi
+/docs/PRD.md                    @martinOfi
+/docs/EPIC-ARCHITECTURE.md      @martinOfi
+/CLAUDE.md                      @martinOfi
+
+# -----------------------------------------------------------------------------
+# Infra del repo — tocarlos afecta a todo el mundo, review obligatoria.
+# TODO(team): @ambulante/devex
+# -----------------------------------------------------------------------------
+/.github/                       @martinOfi
+/package.json                   @martinOfi
+/pnpm-lock.yaml                 @martinOfi
+/tsconfig.json                  @martinOfi
+/next.config.mjs                @martinOfi
+/tailwind.config.ts             @martinOfi
+/postcss.config.mjs             @martinOfi
