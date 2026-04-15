@@ -287,14 +287,14 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 **Lo que NO se puede paralelizar:** F0.4 necesita F0.3 armado; F0.7 necesita F0.3+F0.5+F0.6 porque configura los 3 en el workflow.
 
 ### F0.1 — Migrar npm → pnpm
-- **Estado:** 🟡 in-progress [owner: chat-f0-1-worktree, started: 18:25]
+- **Estado:** ✅ done
 - **Por qué:** El CLAUDE.md lo exige; pnpm es más rápido y deduplicado.
 - **Entregable:** `pnpm-lock.yaml` en el repo, `package-lock.json` borrado, scripts `pnpm dev/build/start` funcionando.
 - **Archivos:** `package.json`, `.gitignore`, `package-lock.json` (borrar).
 - **Depends on:** —
 - **Continues with:** F0.3 (cadena C-F0-eslint)
 - **Estimación:** S
-- **Notas:**
+- **Notas:** pnpm activado vía `corepack enable && corepack prepare pnpm@latest --activate` (pnpm 10.33.0). Agregado `"packageManager": "pnpm@10.33.0"` a `package.json` para lockear versión en Corepack. `package-lock.json` borrado, `pnpm-lock.yaml` generado (181 KB). Smoke test: `pnpm build` verde (8 páginas estáticas renderizadas). `.gitignore` ya listaba `node_modules/` y `.env*.local`, no hubo que tocarlo. Ejecutado desde worktree aislado `../ambulante-f0-1` para evitar race conditions con F0.2/F0.9. Nota transversal: F0.2 (env vars Zod) requiere `.env.local` con `NEXT_PUBLIC_APP_URL` para que el build no falle al arranque — documentar en F0.3/F0.7 si el CI necesita fake env vars.
 
 ### F0.2 — Configurar env vars tipadas con Zod
 - **Estado:** ✅ done
