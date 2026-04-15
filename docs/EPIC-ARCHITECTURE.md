@@ -132,6 +132,22 @@ Wave 2 (después que terminen las de wave 1):
 
 Cuando dos chats trabajan al mismo tiempo:
 
+0. **🚨 OBLIGATORIO — cada chat paralelo corre en su propio `git worktree`. Cero excepciones.**
+   - **Por qué:** un repo git tiene un único `.git/HEAD`. Si dos chats comparten el mismo directorio físico (`~/Desktop/ambulante/`), cada `git checkout -b` de un chat le mueve la branch al otro y los commits aterrizan en branches equivocadas. Es un race condition determinístico, no mala suerte.
+   - **Setup desde el worktree principal (`~/Desktop/ambulante/`, branch `main`):**
+     ```bash
+     git worktree add ../ambulante-<task-id> -b feat/<task-id>-<slug>
+     ```
+     Ejemplo concreto:
+     ```bash
+     git worktree add ../ambulante-f0-1 -b feat/f0-1-pnpm-migration
+     git worktree add ../ambulante-f0-2 -b feat/f0-2-env-vars-zod
+     git worktree add ../ambulante-f0-9 -b feat/f0-9-codeowners
+     ```
+   - **Cada chat de Claude se abre con `cd` al worktree correspondiente** *antes* de empezar a trabajar (`cd ~/Desktop/ambulante-f0-1 && claude`). Nunca trabajen 2 chats en el mismo cwd.
+   - **Aislamiento garantizado por git:** worktrees comparten `.git/objects` y `.git/refs`, pero cada uno tiene su propio `HEAD` e índice. Git incluso bloquea checkear la misma branch en dos worktrees a la vez — el race condition se vuelve estructuralmente imposible.
+   - **Bonus:** cada worktree tiene su propio `node_modules/` (está en `.gitignore`), lo que permite que F0.1 (migración a pnpm) corra en aislamiento total sin chocar con otros chats.
+   - **Cleanup al terminar la tarea:** desde el worktree principal, `git worktree remove ../ambulante-<task-id>`.
 1. **Archivos compartidos críticos** (lockearlos a un solo chat):
    - `package.json` / `pnpm-lock.yaml`
    - `tailwind.config.ts`
