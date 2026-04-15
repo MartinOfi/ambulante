@@ -306,7 +306,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:** Implementado como trío: `env.mjs` (schema Zod + `parseEnv` puro, import-safe), `env.runtime.mjs` (side-effect `env = parseEnv(process.env)` para fail-fast al build), `env.ts` (re-export TS con tipo `Env`). Split necesario porque Next 14 `next.config.mjs` no puede importar `.ts` y porque los tests necesitan importar el schema sin disparar el side-effect. `next.config.mjs` importa `env.runtime.mjs` al tope. Schema actual: `NODE_ENV` (enum) + `NEXT_PUBLIC_APP_URL` (url). Dep `zod@^3.23.8` agregada. Tests en `shared/config/env.test.ts` (5 casos) listos para F0.5; validados vía smoke-run Node con 5/5 GREEN. REGISTRY actualizado con sección 9. Config.
 
 ### F0.3 — ESLint + Prettier
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f0-1-worktree, started: 18:50]
 - **Por qué:** Enforce coding style (CLAUDE.md §6) en cada commit. Hoy no corre porque ESLint no está configurado.
 - **Entregable:** `.eslintrc.json` con config `next/core-web-vitals` + `@typescript-eslint` strict + regla `no-restricted-imports` que prohíba imports cruzados entre features (`features/x/*` no puede importar `features/y/*`). `.prettierrc`. `pnpm lint` pasa limpio.
 - **Archivos:** `.eslintrc.json`, `.prettierrc`, `.prettierignore`.
