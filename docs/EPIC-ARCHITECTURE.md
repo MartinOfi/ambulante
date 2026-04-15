@@ -316,13 +316,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:** ESLint 8 (legacy `.eslintrc.json`) con `next/core-web-vitals` + `@typescript-eslint/recommended` + `eslint-config-prettier` (desactiva reglas de estilo que chocan con Prettier). Reglas duras: `@typescript-eslint/no-explicit-any: error`, `@typescript-eslint/consistent-type-imports: error`, `no-console: warn (allow warn/error)`, `no-restricted-imports` bloqueando imports `../*` (fuerza alias `@/`). Cross-feature isolation: overrides explícitos por feature (`features/landing/**` no puede importar `@/features/map/**` y viceversa). Cuando entren features nuevas, agregar su override al final del array. Next lint configurado con `eslint.dirs: ["app","features","shared"]` en `next.config.mjs` (por default next solo mira app/pages/components/lib/src). Prettier: `printWidth 100`, `semi true`, double quotes, `trailingComma all`. Scripts nuevos: `lint:fix`, `typecheck`, `format`, `format:check`. `.prettierignore` excluye docs/ y *.md del root (densos, edición manual) con excepción explícita para `shared/REGISTRY.md`. Fixes aplicados al codebase existente: 4 imports `../...` en `features/map/components/{EmptyRadius,MapScreen.container,NearbyBottomSheet}` convertidos a `@/features/map/...`; `shared/config/env.ts` ya no usa `typeof import()` (ahora importa `env` como value y exporta `type Env = typeof env`). Prettier auto-formateó 28 archivos de código (comillas dobles, trailing commas). Verificado: `pnpm lint` 0/0, `pnpm format:check` clean, `pnpm build` verde (8 páginas estáticas).
 
 ### F0.4 — Husky + lint-staged + commitlint
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Bloquear commits que rompan lint/format; enforzar conventional commits.
 - **Entregable:** `husky/pre-commit` corre `lint-staged`; `husky/commit-msg` corre `commitlint`. Conventional commits obligatorios.
 - **Archivos:** `.husky/*`, `commitlint.config.cjs`, `package.json` scripts.
 - **Depends on:** F0.3
 - **Estimación:** S
-- **Notas:**
+- **Notas:** `husky@9.1.7` inicializado con `pnpm exec husky init`; `prepare` script en package.json lo auto-activa en `pnpm install`. `.husky/pre-commit` ejecuta `pnpm exec lint-staged`. `.husky/commit-msg` ejecuta `pnpm exec commitlint --edit "$1"`. `commitlint.config.cjs` extends `@commitlint/config-conventional` con header-max-length 100 y body/footer-max-line-length 200 para permitir descripciones largas en commits de epic. `lint-staged` config en `package.json`: `*.{ts,tsx,js,jsx,mjs,cjs}` → `eslint --fix` + `prettier --write`; `*.{json,css,yml,yaml}` → `prettier --write`. Sanity verificado en vivo: (1) commit con mensaje sin type fue rechazado por commitlint con `subject-empty` + `type-empty`; (2) commit `feat(f0.4): ...` pasó, lint-staged corrió eslint/prettier sobre staged files y el commit llegó. Con esto, cualquier commit futuro queda blindado: no podés commitear con magic strings/any/imports malos, ni con mensajes fuera de conventional commits.
 
 ### F0.5 — Vitest config + primer test sanity
 - **Estado:** ⚪ pending
