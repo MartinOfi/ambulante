@@ -325,7 +325,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.5 — Vitest config + primer test sanity
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: 18:30]
 - **Por qué:** Infraestructura de unit/component testing.
 - **Entregable:** `vitest.config.ts`, `vitest.setup.ts` con testing-library, script `pnpm test`, un test dummy para `formatDistance` que corra verde.
 - **Archivos:** `vitest.config.ts`, `vitest.setup.ts`, `shared/utils/format.test.ts`.
