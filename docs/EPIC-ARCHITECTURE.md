@@ -352,7 +352,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.8 — Upgrade a Next.js 15
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: worktree ambulante-f0-8]
 - **Por qué:** CLAUDE.md §2 pide Next 15. Hoy estamos en 14.2.5. Cuanto antes, menos deuda de async params.
 - **Entregable:** Next 15 instalado, async params de rutas adaptados, build verde.
 - **Archivos:** `package.json`, rutas que usen `params`.
