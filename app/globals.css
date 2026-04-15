@@ -92,6 +92,65 @@
   .amb-delay-400 { animation-delay: 0.4s; }
   .amb-delay-500 { animation-delay: 0.5s; }
 
+  /* Live mini-map — radar ripple from the user's position */
+  @keyframes amb-radar {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+  .amb-radar {
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: amb-radar 2.8s ease-out infinite;
+  }
+  .amb-radar-delay {
+    animation-delay: 1.4s;
+  }
+
+  /* Active vendor pin — subtle pulse */
+  @keyframes amb-pin-pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+  }
+  .amb-pin-pulse {
+    animation: amb-pin-pulse 1.8s ease-in-out infinite;
+  }
+
+  /* Vendor that's about to close — fades out and in slowly */
+  @keyframes amb-pin-fade {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.25;
+    }
+  }
+  .amb-pin-fade {
+    animation: amb-pin-fade 3.2s ease-in-out infinite;
+  }
+
+  /* Live dot next to "EN VIVO" label */
+  @keyframes amb-live-blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+  .amb-live-blink {
+    animation: amb-live-blink 1.6s ease-in-out infinite;
+  }
+
   /* Respect reduced motion — kill pulses and FAB spring */
   @media (prefers-reduced-motion: reduce) {
     *,

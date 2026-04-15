@@ -1,11 +1,8 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  MapPin,
   Sparkles,
   Radio,
-  Clock,
-  Navigation,
   UtensilsCrossed,
   Coffee,
   IceCream,
@@ -13,6 +10,7 @@ import {
   Palette,
   BookOpen,
 } from "lucide-react";
+import { LiveMiniMap } from "./LiveMiniMap";
 
 interface ActiveVendor {
   name: string;
@@ -51,10 +49,29 @@ export function Hero() {
           backgroundSize: "28px 28px",
         }}
       />
+      {/* Street grid — subtle city metaphor, reinforces "you are on a map" */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 text-foreground opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+          backgroundSize: "120px 120px",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 text-foreground opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(115deg, transparent 49.5%, currentColor 49.5%, currentColor 50.5%, transparent 50.5%)",
+          backgroundSize: "320px 320px",
+        }}
+      />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 md:pb-24 md:pt-32 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 md:pb-24 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
-          <div className="flex flex-col justify-center space-y-8 pt-8 lg:col-span-7">
+          <div className="flex flex-col justify-center space-y-8 lg:col-span-7">
             <div className="amb-fade-in amb-delay-100">
               <div className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-foreground/10">
                 <LiveDot />
@@ -101,58 +118,8 @@ export function Hero() {
           </div>
 
           <div className="space-y-6 lg:col-span-5 lg:mt-12">
-            <div className="amb-fade-in amb-delay-500 relative overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/5 p-8 shadow-2xl backdrop-blur-xl">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute right-0 top-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-brand/20 blur-3xl"
-              />
-
-              <div className="relative z-10">
-                <div className="mb-8 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand/20 ring-1 ring-brand/40">
-                    <MapPin className="h-6 w-6 text-brand" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <div className="font-display text-3xl font-bold tabular tracking-tight text-foreground">
-                      2 km
-                    </div>
-                    <div className="text-sm text-muted">
-                      Radio de búsqueda por default
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-8 space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Actualización en vivo</span>
-                    <span className="font-medium text-foreground">&lt; 5 seg</span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-foreground/10">
-                    <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-brand to-brand/50" />
-                  </div>
-                </div>
-
-                <div className="mb-6 h-px w-full bg-foreground/10" />
-
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <MiniStat icon={Navigation} value="GPS" label="Tiempo real" />
-                  <div aria-hidden="true" className="mx-auto h-full w-px bg-foreground/10" />
-                  <MiniStat icon={Clock} value="24/7" label="Siempre activa" />
-                  <div aria-hidden="true" className="mx-auto h-full w-px bg-foreground/10" />
-                  <MiniStat icon={Radio} value="$0" label="Para tiendas" />
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-2">
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1 text-[10px] font-medium tracking-wide text-muted">
-                    <LiveDot />
-                    SIN PAGOS
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1 text-[10px] font-medium tracking-wide text-muted">
-                    <Sparkles className="h-3 w-3 text-brand" aria-hidden="true" />
-                    PWA INSTALABLE
-                  </div>
-                </div>
-              </div>
+            <div className="amb-fade-in amb-delay-500">
+              <LiveMiniMap />
             </div>
 
             <div className="amb-fade-in amb-delay-500 relative overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/5 py-8 backdrop-blur-xl">
@@ -202,25 +169,5 @@ function LiveDot() {
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
       <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
     </span>
-  );
-}
-
-interface MiniStatProps {
-  icon: React.ComponentType<{ className?: string }>;
-  value: string;
-  label: string;
-}
-
-function MiniStat({ icon: Icon, value, label }: MiniStatProps) {
-  return (
-    <div className="flex cursor-default flex-col items-center justify-center gap-1 transition-transform hover:-translate-y-1">
-      <Icon className="mb-1 h-3.5 w-3.5 text-brand" />
-      <span className="font-display text-base font-bold text-foreground sm:text-lg">
-        {value}
-      </span>
-      <span className="text-[10px] font-medium uppercase tracking-wider text-muted">
-        {label}
-      </span>
-    </div>
   );
 }
