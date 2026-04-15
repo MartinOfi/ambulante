@@ -334,13 +334,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.6 — Playwright config + smoke test
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: f0-6]
+- **Estado:** ✅ done
 - **Por qué:** Infraestructura E2E.
 - **Entregable:** `playwright.config.ts`, un test que visite `/` y verifique que la landing renderiza el hero.
 - **Archivos:** `playwright.config.ts`, `e2e/landing.spec.ts`.
 - **Depends on:** F0.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creados `playwright.config.ts` (chromium only, webServer con `pnpm dev --port 3100` para aislar del puerto 3000 que usan otros worktrees), `e2e/landing.spec.ts` (visita `/` y verifica `h1` con texto "Todo lo ambulante"). Scripts `test:e2e` y `test:e2e:ui` agregados a `package.json`. `.gitignore` actualizado con `test-results/`, `playwright-report/`, `playwright/.cache/`, `blob-report/`. `webServer.env` inyecta `NEXT_PUBLIC_APP_URL` para cumplir con el schema Zod de F0.2. Test GREEN (1 passed).
 
 ### F0.7 — GitHub Actions CI
 - **Estado:** ⚪ pending
