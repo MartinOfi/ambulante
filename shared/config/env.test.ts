@@ -13,6 +13,7 @@ describe("parseEnv", () => {
 
     expect(parsed.NODE_ENV).toBe("development");
     expect(parsed.NEXT_PUBLIC_APP_URL).toBe("http://localhost:3000");
+    expect(Object.isFrozen(parsed)).toBe(true);
   });
 
   it("defaults NODE_ENV to development when missing", () => {
