@@ -18,13 +18,7 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
       className="group flex w-full items-center gap-3 rounded-card bg-surface-elevated p-3 text-left shadow-sheet ring-1 ring-border transition-transform duration-200 active:scale-[0.98]"
     >
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-border">
-        <Image
-          src={store.photoUrl}
-          alt={store.name}
-          fill
-          sizes="80px"
-          className="object-cover"
-        />
+        <Image src={store.photoUrl} alt={store.name} fill sizes="80px" className="object-cover" />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">

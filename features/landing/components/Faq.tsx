@@ -49,10 +49,7 @@ export function Faq() {
 
         <div className="mt-12 divide-y divide-border/80 border-y-2 border-foreground">
           {FAQS.map(({ q, a }) => (
-            <details
-              key={q}
-              className="group py-5 [&_summary::-webkit-details-marker]:hidden"
-            >
+            <details key={q} className="group py-5 [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex cursor-pointer items-center justify-between gap-4 font-display text-base font-bold uppercase tracking-tight text-foreground sm:text-lg">
                 {q}
                 <span
@@ -62,9 +59,7 @@ export function Faq() {
                   +
                 </span>
               </summary>
-              <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
-                {a}
-              </p>
+              <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">{a}</p>
             </details>
           ))}
         </div>

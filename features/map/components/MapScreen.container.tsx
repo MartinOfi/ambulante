@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 import { useGeolocation } from "@/shared/hooks/useGeolocation";
 import { DEFAULT_RADIUS, type RadiusValue } from "@/shared/constants/radius";
-import { MAX_EXPAND_RADIUS } from "../constants";
-import { useNearbyStores } from "../hooks/useNearbyStores";
+import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
+import { useNearbyStores } from "@/features/map/hooks/useNearbyStores";
 import { MapScreen } from "./MapScreen";
 
 export function MapScreenContainer() {

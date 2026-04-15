@@ -10,8 +10,7 @@ const TIMELINE: TimelineItem[] = [
     id: 1,
     title: "Activá ubicación",
     date: "Paso 01",
-    content:
-      "Abrimos el mapa centrado en vos. Sin registro obligatorio para explorar tu zona.",
+    content: "Abrimos el mapa centrado en vos. Sin registro obligatorio para explorar tu zona.",
     category: "Cliente",
     icon: MapPinned,
     relatedIds: [2],
@@ -79,20 +78,16 @@ export function HowItWorks() {
         aria-hidden
         className="pointer-events-none absolute inset-0 text-foreground opacity-[0.06]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 50% 50%, currentColor 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle at 50% 50%, currentColor 1px, transparent 1px)",
           backgroundSize: "32px 32px",
         }}
       />
 
       <div className="relative mx-auto max-w-6xl">
-        <SectionHeader
-          eyebrow="Cómo funciona"
-          title="Cinco pasos. Cero fricción."
-        />
+        <SectionHeader eyebrow="Cómo funciona" title="Cinco pasos. Cero fricción." />
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
-          Un sistema de coordinación en tiempo real entre clientes y tiendas ambulantes.
-          Tocá un nodo para explorar cada paso.
+          Un sistema de coordinación en tiempo real entre clientes y tiendas ambulantes. Tocá un
+          nodo para explorar cada paso.
         </p>
 
         <div className="mt-8">
@@ -103,13 +98,7 @@ export function HowItWorks() {
   );
 }
 
-export function SectionHeader({
-  eyebrow,
-  title,
-}: {
-  eyebrow: string;
-  title: string;
-}) {
+export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="max-w-2xl">
       <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-brand">

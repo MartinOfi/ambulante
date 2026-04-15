@@ -49,8 +49,8 @@ export function ForVendors() {
             <span className="text-brand">visible</span> cuando importa.
           </h2>
           <p className="mt-6 max-w-md text-base leading-relaxed text-muted">
-            Subí tu catálogo, activá tu disponibilidad y recibí intenciones de
-            compra de clientes en tu zona. Sin apps separadas ni hardware extra.
+            Subí tu catálogo, activá tu disponibilidad y recibí intenciones de compra de clientes en
+            tu zona. Sin apps separadas ni hardware extra.
           </p>
           <Link
             href="/map"

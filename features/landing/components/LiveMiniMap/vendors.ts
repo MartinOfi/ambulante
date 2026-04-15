@@ -1,10 +1,4 @@
-import {
-  Coffee,
-  Flower2,
-  IceCream,
-  Palette,
-  UtensilsCrossed,
-} from "lucide-react";
+import { Coffee, Flower2, IceCream, Palette, UtensilsCrossed } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type VendorState = "active" | "pulsing" | "fading";

@@ -44,8 +44,7 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 text-foreground opacity-[0.06]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+          backgroundImage: "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
           backgroundSize: "28px 28px",
         }}
       />
@@ -93,9 +92,9 @@ export function Hero() {
             </h1>
 
             <p className="amb-fade-in amb-delay-300 max-w-xl text-lg leading-relaxed text-muted">
-              Aparecen y desaparecen. Ambulante te muestra qué tiendas están
-              activas hoy, para que no camines en vano. No procesamos pagos,
-              no manejamos stock — solo el mapa que te dice quién está ahí.
+              Aparecen y desaparecen. Ambulante te muestra qué tiendas están activas hoy, para que
+              no camines en vano. No procesamos pagos, no manejamos stock — solo el mapa que te dice
+              quién está ahí.
             </p>
 
             <div className="amb-fade-in amb-delay-400 flex flex-col gap-4 sm:flex-row">
@@ -112,7 +111,10 @@ export function Hero() {
                 className="group inline-flex items-center justify-center gap-2 rounded-full border border-foreground/15 bg-foreground/5 px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-foreground backdrop-blur-sm transition-colors hover:border-foreground/30 hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
                 Ver quién está activo
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
           </div>
@@ -123,9 +125,7 @@ export function Hero() {
             </div>
 
             <div className="amb-fade-in amb-delay-500 relative overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/5 py-8 backdrop-blur-xl">
-              <p className="mb-6 px-8 text-sm font-medium text-muted">
-                Activas ahora en tu zona
-              </p>
+              <p className="mb-6 px-8 text-sm font-medium text-muted">Activas ahora en tu zona</p>
 
               <div
                 className="relative flex overflow-hidden"
@@ -137,22 +137,18 @@ export function Hero() {
                 }}
               >
                 <div className="amb-marquee flex gap-8 whitespace-nowrap px-4">
-                  {[...ACTIVE_VENDORS, ...ACTIVE_VENDORS, ...ACTIVE_VENDORS].map(
-                    (vendor, i) => (
-                      <div
-                        key={`${vendor.name}-${i}`}
-                        className="flex items-center gap-2.5 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-2 transition-all hover:scale-105 hover:border-brand/40 hover:bg-brand/10"
-                      >
-                        <vendor.icon className="h-4 w-4 text-brand" />
-                        <span className="text-sm font-semibold tracking-tight text-foreground">
-                          {vendor.name}
-                        </span>
-                        <span className="text-xs text-muted">
-                          {vendor.distance}
-                        </span>
-                      </div>
-                    ),
-                  )}
+                  {[...ACTIVE_VENDORS, ...ACTIVE_VENDORS, ...ACTIVE_VENDORS].map((vendor, i) => (
+                    <div
+                      key={`${vendor.name}-${i}`}
+                      className="flex items-center gap-2.5 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-2 transition-all hover:scale-105 hover:border-brand/40 hover:bg-brand/10"
+                    >
+                      <vendor.icon className="h-4 w-4 text-brand" />
+                      <span className="text-sm font-semibold tracking-tight text-foreground">
+                        {vendor.name}
+                      </span>
+                      <span className="text-xs text-muted">{vendor.distance}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

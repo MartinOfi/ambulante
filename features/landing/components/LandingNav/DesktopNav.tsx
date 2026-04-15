@@ -12,11 +12,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@/shared/components/ui/navigation-menu";
-import {
-  NAVIGATION_LINKS,
-  type IconName,
-  type SubmenuLink,
-} from "./navigation-links";
+import { NAVIGATION_LINKS, type IconName, type SubmenuLink } from "./navigation-links";
 
 const ICON_MAP = {
   HelpCircle,
@@ -64,9 +60,7 @@ function DesktopSubmenu({ link }: { readonly link: SubmenuLink }) {
                 href={item.href}
                 className="block rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-border/60 focus:bg-border/60"
               >
-                <div className="text-sm font-medium leading-none text-foreground">
-                  {item.label}
-                </div>
+                <div className="text-sm font-medium leading-none text-foreground">{item.label}</div>
               </Link>
             </NavigationMenuLink>
           </li>
@@ -85,9 +79,7 @@ function DesktopSubmenu({ link }: { readonly link: SubmenuLink }) {
               className="flex items-center gap-2 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-border/60 focus:bg-border/60"
             >
               <SubmenuIcon name={item.icon} />
-              <span className="text-sm font-medium leading-none text-foreground">
-                {item.label}
-              </span>
+              <span className="text-sm font-medium leading-none text-foreground">{item.label}</span>
             </Link>
           </NavigationMenuLink>
         </li>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Store } from "@/shared/types/store";
 import type { RadiusValue } from "@/shared/constants/radius";
 import { cn } from "@/shared/utils/cn";
-import { BOTTOM_SHEET_SNAP, type BottomSheetSnap } from "../constants";
+import { BOTTOM_SHEET_SNAP, type BottomSheetSnap } from "@/features/map/constants";
 import { StoreCard } from "./StoreCard";
 import { EmptyRadius } from "./EmptyRadius";
 
@@ -55,9 +55,7 @@ export function NearbyBottomSheet({
       </button>
 
       <div className="flex items-baseline justify-between px-5 pb-3">
-        <h2 className="font-display text-2xl font-bold leading-none text-foreground">
-          Cerca tuyo
-        </h2>
+        <h2 className="font-display text-2xl font-bold leading-none text-foreground">Cerca tuyo</h2>
         <span className="tabular text-xs font-semibold text-muted">
           {stores.length} {stores.length === 1 ? "tienda" : "tiendas"}
         </span>

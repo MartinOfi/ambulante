@@ -156,59 +156,60 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
           {/* Orbit ring */}
           <div className="absolute w-[400px] h-[400px] rounded-full border border-foreground/10" />
 
-          {mounted && timelineData.map((item, index) => {
-            const position = calculateNodePosition(index, timelineData.length);
-            const isExpanded = expandedItems[item.id];
-            const isRelated = isRelatedToActive(item.id);
-            const isPulsing = pulseEffect[item.id];
-            const Icon = item.icon;
+          {mounted &&
+            timelineData.map((item, index) => {
+              const position = calculateNodePosition(index, timelineData.length);
+              const isExpanded = expandedItems[item.id];
+              const isRelated = isRelatedToActive(item.id);
+              const isPulsing = pulseEffect[item.id];
+              const Icon = item.icon;
 
-            const nodeStyle = {
-              transform: `translate(${position.x}px, ${position.y}px)`,
-              zIndex: isExpanded ? 200 : position.zIndex,
-              opacity: isExpanded ? 1 : position.opacity,
-            };
+              const nodeStyle = {
+                transform: `translate(${position.x}px, ${position.y}px)`,
+                zIndex: isExpanded ? 200 : position.zIndex,
+                opacity: isExpanded ? 1 : position.opacity,
+              };
 
-            return (
-              <div
-                key={item.id}
-                ref={(el) => {
-                  nodeRefs.current[item.id] = el;
-                }}
-                role="button"
-                tabIndex={0}
-                aria-expanded={isExpanded}
-                aria-label={`${item.title}. ${item.content}`}
-                className="absolute transition-all duration-700 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface rounded-full"
-                style={nodeStyle}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleItem(item.id);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
+              return (
+                <div
+                  key={item.id}
+                  ref={(el) => {
+                    nodeRefs.current[item.id] = el;
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
+                  aria-label={`${item.title}. ${item.content}`}
+                  className="absolute transition-all duration-700 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface rounded-full"
+                  style={nodeStyle}
+                  onClick={(e) => {
                     e.stopPropagation();
                     toggleItem(item.id);
-                  }
-                }}
-              >
-                <div
-                  className={`absolute rounded-full -inset-1 ${
-                    isPulsing ? "animate-pulse duration-1000" : ""
-                  }`}
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(234,88,12,0.35) 0%, rgba(234,88,12,0) 70%)",
-                    width: `${item.energy * 0.5 + 40}px`,
-                    height: `${item.energy * 0.5 + 40}px`,
-                    left: `-${(item.energy * 0.5) / 2}px`,
-                    top: `-${(item.energy * 0.5) / 2}px`,
                   }}
-                />
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleItem(item.id);
+                    }
+                  }}
+                >
+                  <div
+                    className={`absolute rounded-full -inset-1 ${
+                      isPulsing ? "animate-pulse duration-1000" : ""
+                    }`}
+                    style={{
+                      background:
+                        "radial-gradient(circle, rgba(234,88,12,0.35) 0%, rgba(234,88,12,0) 70%)",
+                      width: `${item.energy * 0.5 + 40}px`,
+                      height: `${item.energy * 0.5 + 40}px`,
+                      left: `-${(item.energy * 0.5) / 2}px`,
+                      top: `-${(item.energy * 0.5) / 2}px`,
+                    }}
+                  />
 
-                <div
-                  className={`
+                  <div
+                    className={`
                     w-12 h-12 rounded-full flex items-center justify-center
                     ${
                       isExpanded
@@ -228,94 +229,94 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
                     transition-all duration-300 transform
                     ${isExpanded ? "scale-150" : ""}
                   `}
-                >
-                  <Icon size={18} />
-                </div>
+                  >
+                    <Icon size={18} />
+                  </div>
 
-                <div
-                  className={`
+                  <div
+                    className={`
                     absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap
                     text-[11px] font-display font-bold uppercase tracking-[0.18em]
                     transition-all duration-300
                     ${isExpanded ? "text-foreground scale-110" : "text-muted"}
                   `}
-                >
-                  {item.title}
-                </div>
+                  >
+                    {item.title}
+                  </div>
 
-                {isExpanded && (
-                  <Card className="absolute top-24 left-1/2 -translate-x-1/2 w-72 bg-surface-elevated/95 backdrop-blur-lg border-border shadow-xl shadow-brand/20 overflow-visible">
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-foreground/50" />
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-center">
-                        <Badge className={`px-2 text-[10px] ${getStatusStyles(item.status)}`}>
-                          {item.status === "completed"
-                            ? "LISTO"
-                            : item.status === "in-progress"
-                              ? "EN CURSO"
-                              : "PRÓXIMO"}
-                        </Badge>
-                        <span className="text-[10px] font-mono text-muted">{item.date}</span>
-                      </div>
-                      <CardTitle className="text-base mt-2 text-foreground font-display uppercase tracking-tight">
-                        {item.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-xs text-foreground/80">
-                      <p className="leading-relaxed">{item.content}</p>
-
-                      <div className="mt-4 pt-3 border-t border-border">
-                        <div className="flex justify-between items-center text-[10px] mb-1">
-                          <span className="flex items-center text-muted">
-                            <Zap size={10} className="mr-1" />
-                            Intensidad
-                          </span>
-                          <span className="font-mono text-foreground">{item.energy}%</span>
+                  {isExpanded && (
+                    <Card className="absolute top-24 left-1/2 -translate-x-1/2 w-72 bg-surface-elevated/95 backdrop-blur-lg border-border shadow-xl shadow-brand/20 overflow-visible">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-foreground/50" />
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-center">
+                          <Badge className={`px-2 text-[10px] ${getStatusStyles(item.status)}`}>
+                            {item.status === "completed"
+                              ? "LISTO"
+                              : item.status === "in-progress"
+                                ? "EN CURSO"
+                                : "PRÓXIMO"}
+                          </Badge>
+                          <span className="text-[10px] font-mono text-muted">{item.date}</span>
                         </div>
-                        <div className="w-full h-1 bg-foreground/10 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-orange-400 to-brand"
-                            style={{ width: `${item.energy}%` }}
-                          />
-                        </div>
-                      </div>
+                        <CardTitle className="text-base mt-2 text-foreground font-display uppercase tracking-tight">
+                          {item.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-xs text-foreground/80">
+                        <p className="leading-relaxed">{item.content}</p>
 
-                      {item.relatedIds.length > 0 && (
                         <div className="mt-4 pt-3 border-t border-border">
-                          <div className="flex items-center mb-2">
-                            <LinkIcon size={10} className="text-muted mr-1" />
-                            <h4 className="text-[10px] uppercase tracking-wider font-medium text-muted">
-                              Pasos conectados
-                            </h4>
+                          <div className="flex justify-between items-center text-[10px] mb-1">
+                            <span className="flex items-center text-muted">
+                              <Zap size={10} className="mr-1" />
+                              Intensidad
+                            </span>
+                            <span className="font-mono text-foreground">{item.energy}%</span>
                           </div>
-                          <div className="flex flex-wrap gap-1">
-                            {item.relatedIds.map((relatedId) => {
-                              const relatedItem = timelineData.find((i) => i.id === relatedId);
-                              return (
-                                <Button
-                                  key={relatedId}
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex items-center h-6 px-2 py-0 text-[10px] rounded-full border-border bg-transparent hover:bg-foreground/10 text-muted hover:text-foreground transition-all"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleItem(relatedId);
-                                  }}
-                                >
-                                  {relatedItem?.title}
-                                  <ArrowRight size={8} className="ml-1 text-muted" />
-                                </Button>
-                              );
-                            })}
+                          <div className="w-full h-1 bg-foreground/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-orange-400 to-brand"
+                              style={{ width: `${item.energy}%` }}
+                            />
                           </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            );
-          })}
+
+                        {item.relatedIds.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-border">
+                            <div className="flex items-center mb-2">
+                              <LinkIcon size={10} className="text-muted mr-1" />
+                              <h4 className="text-[10px] uppercase tracking-wider font-medium text-muted">
+                                Pasos conectados
+                              </h4>
+                            </div>
+                            <div className="flex flex-wrap gap-1">
+                              {item.relatedIds.map((relatedId) => {
+                                const relatedItem = timelineData.find((i) => i.id === relatedId);
+                                return (
+                                  <Button
+                                    key={relatedId}
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex items-center h-6 px-2 py-0 text-[10px] rounded-full border-border bg-transparent hover:bg-foreground/10 text-muted hover:text-foreground transition-all"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleItem(relatedId);
+                                    }}
+                                  >
+                                    {relatedItem?.title}
+                                    <ArrowRight size={8} className="ml-1 text-muted" />
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>

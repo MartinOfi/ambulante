@@ -1,9 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   NEXT_PUBLIC_APP_URL: z.string().url(),
 });
 
@@ -22,9 +20,7 @@ export function parseEnv(rawEnv) {
     const issues = result.error.issues
       .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("; ");
-    throw new Error(
-      `Configuración inválida de variables de entorno: ${issues}`,
-    );
+    throw new Error(`Configuración inválida de variables de entorno: ${issues}`);
   }
 
   return Object.freeze(result.data);

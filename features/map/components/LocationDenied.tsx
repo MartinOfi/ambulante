@@ -26,8 +26,8 @@ export function LocationDenied({ onRetry, onManualSearch }: Props) {
           Necesitamos saber dónde estás
         </h1>
         <p className="text-sm text-muted">
-          Ambulante usa tu ubicación para mostrarte las tiendas que están cerca tuyo
-          ahora mismo. No la compartimos con nadie hasta que envíes un pedido.
+          Ambulante usa tu ubicación para mostrarte las tiendas que están cerca tuyo ahora mismo. No
+          la compartimos con nadie hasta que envíes un pedido.
         </p>
       </div>
 

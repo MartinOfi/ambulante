@@ -38,10 +38,7 @@ export function Features() {
   return (
     <section id="features" className="bg-surface-elevated px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          eyebrow="Por qué Ambulante"
-          title="Lo justo. Nada más."
-        />
+        <SectionHeader eyebrow="Por qué Ambulante" title="Lo justo. Nada más." />
 
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map(({ icon: Icon, title, body }) => (

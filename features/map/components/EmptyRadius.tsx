@@ -2,7 +2,7 @@
 
 import { PackageOpen } from "lucide-react";
 import type { RadiusValue } from "@/shared/constants/radius";
-import { MAX_EXPAND_RADIUS } from "../constants";
+import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
 
 interface EmptyRadiusProps {
   readonly radius: RadiusValue;
@@ -17,9 +17,7 @@ export function EmptyRadius({ radius, onExpandRadius }: EmptyRadiusProps) {
         <PackageOpen className="h-8 w-8 text-muted" strokeWidth={2} />
       </div>
       <div className="flex flex-col gap-1">
-        <p className="font-display text-lg font-bold text-foreground">
-          Nada por acá todavía
-        </p>
+        <p className="font-display text-lg font-bold text-foreground">Nada por acá todavía</p>
         <p className="max-w-[260px] text-sm text-muted">
           No hay tiendas activas en {radius / 1000} km.{" "}
           {canExpand ? "Probá ampliando el radio." : "Volvé a intentarlo en unos minutos."}

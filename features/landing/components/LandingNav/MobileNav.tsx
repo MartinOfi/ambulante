@@ -7,11 +7,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/shared/components/ui/navigation-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/components/ui/popover";
 import { NAVIGATION_LINKS, type NavLink } from "./navigation-links";
 
 function MobileNavLink({ link }: { readonly link: NavLink }) {
@@ -81,12 +77,7 @@ export function MobileNav() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          className="group md:hidden"
-          variant="ghost"
-          size="icon"
-          aria-label="Abrir menú"
-        >
+        <Button className="group md:hidden" variant="ghost" size="icon" aria-label="Abrir menú">
           <MobileMenuIcon />
         </Button>
       </PopoverTrigger>

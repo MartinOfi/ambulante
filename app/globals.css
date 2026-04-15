@@ -5,25 +5,25 @@
 @layer base {
   :root {
     /* Brand — orange dominates as street food identity */
-    --brand-primary: 21 90% 48%;        /* #EA580C */
-    --brand-primary-hover: 21 90% 40%;  /* #C2410C */
-    --brand-accent: 221 83% 53%;        /* #2563EB — reserved for user location only */
+    --brand-primary: 21 90% 48%; /* #EA580C */
+    --brand-primary-hover: 21 90% 40%; /* #C2410C */
+    --brand-accent: 221 83% 53%; /* #2563EB — reserved for user location only */
 
     /* Surfaces — warm cream, not clinical white */
-    --surface: 33 100% 96%;             /* #FFF7ED */
-    --surface-elevated: 0 0% 100%;      /* #FFFFFF */
+    --surface: 33 100% 96%; /* #FFF7ED */
+    --surface-elevated: 0 0% 100%; /* #FFFFFF */
 
     /* Text */
-    --foreground: 222 47% 11%;          /* #0F172A */
-    --muted: 215 16% 47%;               /* #64748B */
+    --foreground: 222 47% 11%; /* #0F172A */
+    --muted: 215 16% 47%; /* #64748B */
 
     /* Always-dark accent (hero, product showcase) — stays dark in both modes */
-    --ink: 222 47% 11%;                 /* #0F172A */
+    --ink: 222 47% 11%; /* #0F172A */
 
     /* Semantic */
-    --success: 142 71% 45%;             /* #16A34A */
-    --border: 24 75% 94%;               /* #FCEAE1 */
-    --destructive: 0 72% 51%;           /* #DC2626 */
+    --success: 142 71% 45%; /* #16A34A */
+    --border: 24 75% 94%; /* #FCEAE1 */
+    --destructive: 0 72% 51%; /* #DC2626 */
 
     /* Typography */
     --font-display: "Space Grotesk", system-ui, sans-serif;
@@ -32,13 +32,13 @@
 
   .dark {
     /* Dark mode — keep brand orange identical, swap surfaces and text */
-    --surface: 222 47% 6%;              /* #070A12 body */
-    --surface-elevated: 222 35% 12%;    /* #141B2D cards */
-    --foreground: 33 100% 96%;          /* warm off-white, mirrors cream */
-    --muted: 215 16% 65%;               /* #94A3B8 */
-    --border: 222 25% 18%;              /* #252C3A */
+    --surface: 222 47% 6%; /* #070A12 body */
+    --surface-elevated: 222 35% 12%; /* #141B2D cards */
+    --foreground: 33 100% 96%; /* warm off-white, mirrors cream */
+    --muted: 215 16% 65%; /* #94A3B8 */
+    --border: 222 25% 18%; /* #252C3A */
     /* Ink goes deeper so hero/howitworks still pop as the darkest block */
-    --ink: 222 60% 3%;                  /* near-black */
+    --ink: 222 60% 3%; /* near-black */
   }
 
   html,
@@ -86,11 +86,21 @@
   .amb-marquee {
     animation: amb-marquee 40s linear infinite;
   }
-  .amb-delay-100 { animation-delay: 0.1s; }
-  .amb-delay-200 { animation-delay: 0.2s; }
-  .amb-delay-300 { animation-delay: 0.3s; }
-  .amb-delay-400 { animation-delay: 0.4s; }
-  .amb-delay-500 { animation-delay: 0.5s; }
+  .amb-delay-100 {
+    animation-delay: 0.1s;
+  }
+  .amb-delay-200 {
+    animation-delay: 0.2s;
+  }
+  .amb-delay-300 {
+    animation-delay: 0.3s;
+  }
+  .amb-delay-400 {
+    animation-delay: 0.4s;
+  }
+  .amb-delay-500 {
+    animation-delay: 0.5s;
+  }
 
   /* Live mini-map — radar ripple from the user's position */
   @keyframes amb-radar {
@@ -114,7 +124,8 @@
 
   /* Active vendor pin — subtle pulse */
   @keyframes amb-pin-pulse {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1);
     }
     50% {
@@ -127,7 +138,8 @@
 
   /* Vendor that's about to close — fades out and in slowly */
   @keyframes amb-pin-fade {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -140,7 +152,8 @@
 
   /* Live dot next to "EN VIVO" label */
   @keyframes amb-live-blink {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
