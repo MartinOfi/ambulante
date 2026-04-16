@@ -668,7 +668,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 **Conflicto potencial:** F3.2 y F3.4 ambos referencian tipos en `shared/types/` — si F3.1 los dejó correctamente, no chocan.
 
 ### F3.1 — Schemas Zod base + tipos inferidos
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 11:00]
 - **Por qué:** Single source of truth para runtime validation + compile-time types.
 - **Entregable:** `shared/schemas/{store,product,user,coordinates}.ts` con Zod. Tipos inferidos en `shared/types/*` re-exportan desde schemas.
 - **Archivos:** `shared/schemas/*`, `shared/types/*`.
