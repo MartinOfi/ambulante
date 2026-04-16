@@ -687,7 +687,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:**
 
 ### F3.3 — Product snapshot invariante
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 13:00]
 - **Por qué:** PRD §9.2 / CLAUDE §7.4 — al crear un pedido se guarda snapshot inmutable del producto.
 - **Entregable:** `ProductSnapshot` como type `Readonly<Product>` con brand type para distinguirlo; helper `snapshot(product): ProductSnapshot`.
 - **Archivos:** `shared/domain/product-snapshot.ts`.
