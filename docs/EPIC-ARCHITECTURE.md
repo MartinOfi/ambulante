@@ -452,13 +452,13 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.6 — Zustand setup base
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
+- **Estado:** ✅ done
 - **Por qué:** El CLAUDE.md lista Zustand para client state global. Sin una convención armada, el equipo va a mezclar todo.
 - **Entregable:** `shared/stores/` con un store de ejemplo (ej. UI preferences) usando `create` + `persist` + slices pattern. Doc en REGISTRY.md con la convención.
 - **Archivos:** `shared/stores/ui.ts`.
 - **Depends on:** F0.1
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creado `shared/stores/ui.ts` (63 líneas) con `useUIStore` — Zustand 5 + `persist` middleware. Interfaces `UIPreferencesState` (readonly) + `UIPreferencesActions` separadas. `partialize` serializa solo state. `Theme` union type exportado. 10 tests, 100% coverage en el archivo. `REGISTRY.md` actualizado con sección 10 (Stores) + convención de uso.
 
 ### F1.7 — nuqs para URL state
 - **Estado:** ⚪ pending
