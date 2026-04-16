@@ -145,6 +145,16 @@
 
 > Feature-local query hooks live in `features/<name>/hooks/`. They follow the canonical `useXxxQuery` pattern documented in `docs/recipes/query-hook-pattern.md`.
 
+### useAcceptOrderMutation _(feature-local — orders)_
+
+- **Ruta:** `features/orders/hooks/useAcceptOrderMutation.ts`
+- **Descripción:** Canonical `useXxxMutation` hook. Accepts an order on behalf of the store using React Query v5 `useMutation` with optimistic updates. On `onMutate`, pre-emptively sets the order status to `ACEPTADO` in the cache; rolls back on `onError`; invalidates `orders.byId` and `orders.all` on `onSettled`.
+- **API:** `useAcceptOrderMutation()` — returns `useMutation` result; call `mutate(orderId)`.
+- **Returns:** `{ mutate, isPending, isError, isSuccess, data }`
+- **Service:** `features/orders/services/orders.mock.ts` — `ordersService.accept(orderId)` (stub; replace with real API).
+- **Pattern doc:** `docs/recipes/mutation-hook-pattern.md`
+- **Usado en:** F4.2 reference; future store-dashboard feature.
+
 ### useStoresNearbyQuery _(feature-local — map)_
 
 - **Ruta:** `features/map/hooks/useStoresNearbyQuery.ts`
@@ -570,3 +580,4 @@
 | 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |
 | 2026-04-16 | F2.7: `useUIStore` y `useSession` — "Usado en" actualizado con admin-shell container                  | —     |
 | 2026-04-16 | F2.8: agregados Input, Label, Form UI primitives en §1; loginSchema/registerSchema/forgotPasswordSchema/resetPasswordSchema en §7b; ROUTES actualizado con grupo `auth` | —     |
+| 2026-04-16 | F4.2: agregado useAcceptOrderMutation en §3 (feature-local — orders); optimistic update pattern     | —     |

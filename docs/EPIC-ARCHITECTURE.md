@@ -770,7 +770,7 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:** `useNearbyStores.ts` eliminado. `meta.onError` no funciona en RQ v5 — se usa `useEffect + isError` para logging. Recipe doc en `docs/recipes/query-hook-pattern.md`. 256/256 tests passing.
 
 ### F4.2 — Pattern para mutations con optimistic updates
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:15]
 - **Por qué:** Acciones del usuario (aceptar pedido, cancelar, etc.) deben sentirse instantáneas.
 - **Entregable:** Ejemplo canónico `features/orders/hooks/useAcceptOrderMutation.ts` con `onMutate`/`onError` rollback. Doc con la receta.
 - **Archivos:** ejemplo + doc.
