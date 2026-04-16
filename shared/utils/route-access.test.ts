@@ -18,6 +18,14 @@ describe("getRequiredRole", () => {
     expect(getRequiredRole("/store/order/abc-123")).toBe("store");
   });
 
+  it("returns store for /store exact match", () => {
+    expect(getRequiredRole("/store")).toBe("store");
+  });
+
+  it("returns admin for /admin exact match", () => {
+    expect(getRequiredRole("/admin")).toBe("admin");
+  });
+
   it("returns admin for /admin/dashboard", () => {
     expect(getRequiredRole("/admin/dashboard")).toBe("admin");
   });

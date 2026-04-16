@@ -1,7 +1,5 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
-
-const SESSION_COOKIE_NAME = "ambulante-session";
-const LOCALHOST_PORT = 3100;
+import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 
 function makeSessionCookie(role: "client" | "store" | "admin"): string {
   const session = {
@@ -31,20 +29,17 @@ async function setSessionCookie(context: BrowserContext, role: "client" | "store
 test.describe("middleware auth gating — unauthenticated redirects", () => {
   test("redirects /map to / without session cookie", async ({ page }) => {
     await page.goto("/map");
-    expect(page.url()).toContain("localhost:" + LOCALHOST_PORT + "/");
-    expect(page.url()).not.toContain("/map");
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 
   test("redirects /store/dashboard to / without session cookie", async ({ page }) => {
     await page.goto("/store/dashboard");
-    expect(page.url()).toContain("localhost:" + LOCALHOST_PORT + "/");
-    expect(page.url()).not.toContain("/store");
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 
   test("redirects /admin/dashboard to / without session cookie", async ({ page }) => {
     await page.goto("/admin/dashboard");
-    expect(page.url()).toContain("localhost:" + LOCALHOST_PORT + "/");
-    expect(page.url()).not.toContain("/admin");
+    expect(new URL(page.url()).pathname).toBe("/");
   });
 });
 

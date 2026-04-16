@@ -42,6 +42,12 @@ describe("parseSessionCookie", () => {
     const encoded = btoa(JSON.stringify(withBadRole));
     expect(parseSessionCookie(encoded)).toBeNull();
   });
+
+  it("returns null for an expired session", () => {
+    const expired = { ...VALID_SESSION, expiresAt: Math.floor(Date.now() / 1000) - 1 };
+    const encoded = btoa(JSON.stringify(expired));
+    expect(parseSessionCookie(encoded)).toBeNull();
+  });
 });
 
 describe("serializeSessionCookie", () => {

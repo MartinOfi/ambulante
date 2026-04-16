@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 import { parseSessionCookie } from "@/shared/utils/session-cookie";
-import { getRequiredRole } from "@/shared/utils/route-access";
+import { getRequiredRole, MIDDLEWARE_MATCHERS } from "@/shared/utils/route-access";
 import { ROUTES } from "@/shared/constants/routes";
 
 export function middleware(request: NextRequest): NextResponse {
@@ -23,5 +23,5 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/map/:path*", "/store/:path*", "/admin/:path*"],
+  matcher: MIDDLEWARE_MATCHERS,
 };
