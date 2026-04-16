@@ -142,18 +142,16 @@ describe("shouldRetry", () => {
 
 describe("QueryProvider — flaky network retries", () => {
   it("retries and succeeds when query fails then recovers", async () => {
-    let callCount = 0;
+    const queryFn = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Network Error"))
+      .mockRejectedValueOnce(new Error("Network Error"))
+      .mockResolvedValueOnce("recovered");
 
     function FlakyComponent() {
       const { data, status } = useQuery({
         queryKey: ["flaky"],
-        queryFn: () => {
-          callCount += 1;
-          if (callCount < 3) {
-            return Promise.reject(new Error("Network Error"));
-          }
-          return Promise.resolve("recovered");
-        },
+        queryFn,
         retryDelay: 0,
       });
 
@@ -170,7 +168,7 @@ describe("QueryProvider — flaky network retries", () => {
       timeout: 5_000,
     });
 
-    expect(callCount).toBe(3);
+    expect(queryFn).toHaveBeenCalledTimes(3);
   });
 
   it("does not retry a 4xx error", async () => {

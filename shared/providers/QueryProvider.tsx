@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+import { logger } from "@/shared/utils/logger";
 
 const STALE_TIME_MS = 30_000;
 const GC_TIME_MS = 5 * 60_000;
 const MAX_RETRY_COUNT = 3;
 const RETRY_DELAY_BASE_MS = 1_000;
 const RETRY_DELAY_CAP_MS = 30_000;
+const NETWORK_MODE = "offlineFirst" as const;
+
+function hasNumericStatus(value: unknown): value is { status: number } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "status" in value &&
+    typeof (value as Record<string, unknown>).status === "number"
+  );
+}
 
 export function isClientError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("status" in error)) {
-    return false;
-  }
-  const status = (error as { status: unknown }).status;
-  return typeof status === "number" && status >= 400 && status < 500;
+  if (!hasNumericStatus(error)) return false;
+  return error.status >= 400 && error.status < 500;
 }
 
 export function computeRetryDelay(attemptIndex: number): number {
@@ -36,13 +45,23 @@ export function QueryProvider({ children }: QueryProviderProps) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        queryCache: new QueryCache({
+          onError(error, query) {
+            logger.error("Query failed after all retries", {
+              queryKey: query.queryKey,
+              error,
+            });
+          },
+        }),
         defaultOptions: {
           queries: {
             staleTime: STALE_TIME_MS,
             gcTime: GC_TIME_MS,
             retry: shouldRetry,
             retryDelay: computeRetryDelay,
-            networkMode: "offlineFirst",
+            // PWA windows are frequently backgrounded on mobile; focus events are noisy
+            // and offlineFirst already handles reconnection refetches.
+            networkMode: NETWORK_MODE,
             refetchOnWindowFocus: false,
           },
         },
