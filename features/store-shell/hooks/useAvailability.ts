@@ -1,15 +1,14 @@
-import { useState } from "react";
+import { useAvailabilityStore } from "@/features/store-shell/stores/availability.store";
 
 export interface UseAvailabilityReturn {
   readonly isAvailable: boolean;
-  toggle: () => void;
-  setAvailable: (value: boolean) => void;
+  readonly toggle: () => void;
+  readonly setAvailable: (value: boolean) => void;
 }
 
 export function useAvailability(): UseAvailabilityReturn {
-  const [isAvailable, setIsAvailable] = useState(false);
-
-  const toggle = () => setIsAvailable((prev) => !prev);
-
-  return { isAvailable, toggle, setAvailable: setIsAvailable };
+  const isAvailable = useAvailabilityStore((s) => s.isAvailable);
+  const toggle = useAvailabilityStore((s) => s.toggleAvailability);
+  const setAvailable = useAvailabilityStore((s) => s.setAvailable);
+  return { isAvailable, toggle, setAvailable };
 }

@@ -1,9 +1,14 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
+import { useAvailabilityStore } from "@/features/store-shell/stores/availability.store";
 import { useAvailability } from "./useAvailability";
 
 describe("useAvailability", () => {
+  beforeEach(() => {
+    useAvailabilityStore.setState({ isAvailable: false });
+  });
+
   it("starts as unavailable", () => {
     const { result } = renderHook(() => useAvailability());
     expect(result.current.isAvailable).toBe(false);
