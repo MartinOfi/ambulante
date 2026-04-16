@@ -48,11 +48,11 @@ Antes de que cualquier fase dependiente se destrabe, estas decisiones deben toma
 
 - [x] **DP-1 · Backend stack:** ✅ Supabase (Postgres + Auth + Realtime + Storage + PostGIS). Decidido 2026-04-16.
 - [x] **DP-2 · Auth provider:** ✅ Supabase Auth. Decidido 2026-04-16.
-- [ ] **DP-3 · Observability stack:** Sentry + PostHog / Datadog / Grafana Cloud. Afecta F8.
+- [x] **DP-3 · Observability stack:** ✅ Sentry (solo, sin PostHog por ahora). Decidido 2026-04-16.
 - [ ] **DP-4 · Feature flags:** GrowthBook self-hosted / LaunchDarkly / Vercel Edge Config. Afecta F8.
-- [ ] **DP-5 · Tile provider del mapa:** MapTiler / Stadia Maps / OSM self-hosted. Afecta F11.
+- [x] **DP-5 · Tile provider del mapa:** ✅ OSM tiles directos vía MapLibre (ya funcionando, sin proveedor externo). Decidido 2026-04-16.
 - [ ] **DP-6 · Payments out-of-scope:** confirmar que nunca habrá pagos (PRD §2.3) — si cambia, replanificar F12.
-- [ ] **DP-7 · Multi-país:** ¿MVP solo Argentina o multi-mercado desde el inicio? Afecta F10, F16.
+- [x] **DP-7 · Multi-país:** ✅ MVP solo Argentina. Decidido 2026-04-16.
 - [ ] **DP-8 · Monorepo:** ¿quedarse en single repo o mover a Turborepo cuando entren apps paralelas (marketing, admin independiente)? Afecta F17.
 
 ---
