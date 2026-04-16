@@ -75,6 +75,20 @@
 - **Descripción:** Botón que alterna entre light/dark.
 - **Usado en:** `features/landing/components/LandingNav/LandingNav`.
 
+### Layout primitives (Stack, Row, Container, Screen, Spacer, Divider)
+
+- **Ruta barrel:** `shared/components/layout/index.ts`
+- **Rutas individuales:** `shared/components/layout/{Stack,Row,Container,Screen,Spacer,Divider}/`
+- **Descripción:** Primitivas de layout flexbox + contenedor. Todas polimórficas vía prop `as`.
+  - `Stack` — flex-col, props: `gap`, `align`, `justify`, `as`
+  - `Row` — flex-row, props: `gap`, `align`, `justify`, `wrap`, `as`
+  - `Container` — max-width centrado, props: `size` (sm/md/lg/xl/full), `padded`, `as`
+  - `Screen` — wrapper full-viewport `min-h-screen overflow-y-auto`, props: `className`
+  - `Spacer` — `aria-hidden` spacer, props: `size` (1–16), `axis` (vertical/horizontal)
+  - `Divider` — `<hr>` con `border-border`, props: `orientation` (horizontal/vertical)
+- **Tipo polimórfico compartido:** `shared/components/layout/polymorphic.types.ts` → `PolymorphicProps<T, Extra>`
+- **API:** `import { Stack, Row, Container, Screen, Spacer, Divider } from '@/shared/components/layout'`
+
 ---
 
 ## 3. Hooks (`shared/hooks/`)
@@ -194,3 +208,4 @@
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
 | 2026-04-16 | F1.8: agregado `shared/styles/tokens.ts` — design tokens tipados     | —     |
+| 2026-04-16 | F1.9: agregadas layout primitives (Stack, Row, Container, Screen, Spacer, Divider) + `polymorphic.types.ts` | —     |

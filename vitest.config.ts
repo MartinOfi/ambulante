@@ -5,6 +5,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
+  // Vite 8 uses oxc (rolldown) which reads tsconfig jsx:preserve — override for tests
+  // Shape matches what @vitejs/plugin-react sets for classic runtime in Vite 8
+  oxc: {
+    jsx: { runtime: "automatic" },
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL(".", import.meta.url)),

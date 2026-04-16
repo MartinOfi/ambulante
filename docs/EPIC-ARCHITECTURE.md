@@ -480,13 +480,13 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:** Creados `shared/styles/tokens.ts` (171 líneas) + `shared/styles/tokens.test.ts` (9 tests). `tailwind.config.ts` refactorizado para importar de tokens (34 líneas, -44 líneas). Agregada CSS var `--primary-foreground` en globals.css para mantener consistencia en cssVarRefs. 18/18 tests verdes. 0 errores TS.
 
 ### F1.9 — Layout primitives
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: now]
+- **Estado:** ✅ done
 - **Por qué:** Sin primitivas (`Stack`, `Row`, `Container`, `Screen`, `Spacer`), cada pantalla reinventa padding/gap.
 - **Entregable:** `shared/components/layout/` con `Stack`, `Row`, `Container`, `Screen`, `Spacer`, `Divider`. Props polimórficas (`as`).
 - **Archivos:** `shared/components/layout/*`.
 - **Depends on:** F1.8
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creados 6 componentes + `polymorphic.types.ts` + barrel `index.ts`. 42 tests verdes (6 suites). Fix de JSX parse error en Vite 8 vía `oxc.jsx: { runtime: "automatic" }` en `vitest.config.ts`. 60/60 tests totales verdes. 0 errores TS.
 
 ### F1.10 — Logger→Sentry stub
 - **Estado:** ⚪ pending
