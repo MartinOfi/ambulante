@@ -489,7 +489,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.10 — Logger→Sentry stub
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:35]
 - **Por qué:** Preparar el hook para cuando F8 instale Sentry real — evita refactor doble.
 - **Entregable:** `logger.error` tiene un side-effect hook noop que F8.1 reemplazará.
 - **Archivos:** `shared/utils/logger.ts`.
