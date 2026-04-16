@@ -8,8 +8,6 @@
 ## The pattern
 
 ```typescript
-"use client";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/query/keys";
 import { someService } from "@/features/some/services/some.mock";
@@ -140,8 +138,7 @@ useMutation({
 
 1. Create `features/<name>/services/<entity>.mock.ts` with the `<Entity>Service` interface and a mock that throws "not implemented".
 2. Create `features/<name>/hooks/use<Action><Entity>Mutation.ts` following the template above.
-3. Add `"use client"` at the top — all mutation hooks run client-side.
-4. Return `useMutation(...)` directly so consumers get `{ mutate, isPending, isError, isSuccess, data }`.
+3. Return `useMutation(...)` directly so consumers get `{ mutate, isPending, isError, isSuccess, data }`.
 5. Update `features/<name>/index.ts` barrel export.
 6. Update `shared/REGISTRY.md` if the hook is used in 2+ features (promote to `shared/hooks/`).
 
