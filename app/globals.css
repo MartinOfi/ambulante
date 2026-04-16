@@ -25,6 +25,9 @@
     --border: 24 75% 94%; /* #FCEAE1 */
     --destructive: 0 72% 51%; /* #DC2626 */
 
+    /* shadcn-compat: static colors that don't change between modes */
+    --primary-foreground: 0 0% 100%; /* pure white — button/badge text on brand-primary bg */
+
     /* Typography */
     --font-display: "Space Grotesk", system-ui, sans-serif;
     --font-sans: "Inter", system-ui, sans-serif;

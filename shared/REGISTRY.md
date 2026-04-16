@@ -131,7 +131,13 @@
 
 ## 6. Styles (`shared/styles/`)
 
-_(vacío — globals viven en `app/globals.css`)_
+### tokens
+
+- **Ruta:** `shared/styles/tokens.ts`
+- **Descripción:** Single source of truth de design tokens tipados. Exporta `COLORS` (raw HSL values por modo + CSS var refs para Tailwind), `RADIUS`, `SHADOWS`, `MOTION` (keyframes, durations, easings, animations), `TYPOGRAPHY`.
+- **API:** `import { COLORS, RADIUS, SHADOWS, MOTION, TYPOGRAPHY } from '@/shared/styles/tokens'`
+- **Usado en:** `tailwind.config.ts` (via import relativo — los path aliases no aplican en ese contexto Node.js)
+- **Nota:** `COLORS.raw.light` / `COLORS.raw.dark` son los valores crudos HSL para uso runtime. `COLORS.cssVarRefs` contiene las references `hsl(var(--token))` para el config de Tailwind.
 
 ---
 
@@ -187,3 +193,4 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
+| 2026-04-16 | F1.8: agregado `shared/styles/tokens.ts` — design tokens tipados     | —     |
