@@ -334,6 +334,25 @@
 
 ---
 
+## 11. Domain (`shared/domain/`)
+
+> Lógica de dominio pura — sin dependencias de framework. Funciones puras, tipos discriminados, invariantes de negocio.
+
+### order-state-machine
+
+- **Ruta:** `shared/domain/order-state-machine.ts`
+- **Descripción:** Máquina de estados tipada del pedido (PRD §6). Discriminated union `Order` con 8 variantes (`OrderEnviado` … `OrderFinalizado`). Función `transition({ order, event, actor })` retorna `Result<Order, TransitionError>` — sin excepciones. Estados terminales son inmutables. Toda transición registra timestamp.
+- **API:**
+  - `transition({ order, event, actor }): TransitionResult`
+  - `ORDER_ACTOR` — `{ CLIENTE, TIENDA, SISTEMA }` as const
+  - `ORDER_EVENT` — 8 eventos as const
+  - Tipos: `Order`, `OrderActor`, `OrderEvent`, `TransitionError`, `TransitionResult`, `Result<T,E>`
+  - Variantes: `OrderEnviado`, `OrderRecibido`, `OrderAceptado`, `OrderRechazado`, `OrderEnCamino`, `OrderFinalizado`, `OrderCancelado`, `OrderExpirado`
+- **Errores posibles:** `TERMINAL_STATE` | `INVALID_TRANSITION` | `UNAUTHORIZED_ACTOR`
+- **Usado en:** F3.5 (domain events), F3.6 (timeouts), F4.2 (mutation pattern), F12+ (features de pedido).
+
+---
+
 ## Changelog del registry
 
 | Fecha      | Cambio                                                              | Autor |
@@ -352,3 +371,4 @@
 | 2026-04-16 | F1.7: agregado NuqsProvider en sección 2c                            | —     |
 | 2026-04-16 | F3.1: agregada sección 7b. Schemas Zod base; actualizados tipos en §7 para re-exportar desde schemas | —     |
 | 2026-04-16 | F3.7: agregados ORDER_STATUS, USER_ROLES y constantes de timeout en sección 8 | —     |
+| 2026-04-16 | F3.2: agregada sección 11. Domain con `order-state-machine`                    | —     |
