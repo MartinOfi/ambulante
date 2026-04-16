@@ -427,7 +427,19 @@
   - `EventBus.publish(event)` · `EventBus.subscribe(type, handler): () => void` · `EventBus.registerSerializationHook(hook): () => void`
 - **Tipos exportados:** `OrderDomainEvent`, `OrderDomainEventType`, `SerializedDomainEvent`, `EventHandler<E>`, `SerializationHook`, `EventBus`
 - **Nota:** Los `ORDER_DOMAIN_EVENT` son *hechos* (algo ocurrió), distintos de `ORDER_EVENT` de `order-state-machine` que son *comandos* (algo se pide).
-- **Usado en:** F3.6 (timeouts publican eventos), F4.2 (mutations disparan eventos), F5 (realtime registra serialization hook), F12+ (features de pedido).
+- **Usado en:** F4.2 (mutations disparan eventos), F5 (realtime registra serialization hook), F12+ (features de pedido).
+
+### Timeout policies + scheduler (`shared/domain/timeouts.ts`)
+
+- **Ruta:** `shared/domain/timeouts.ts`
+- **Descripción:** Políticas declarativas de timeout por estado de pedido (PRD §7.6) + interfaz `TimeoutScheduler` + implementación mock con `setTimeout`.
+- **API:**
+  - `ORDER_TIMEOUT_POLICIES` — const frozen `Partial<Record<OrderStatus, TimeoutPolicy>>` (ENVIADO/RECIBIDO: 10min, ACEPTADO: 2h)
+  - `createSetTimeoutScheduler(): TimeoutScheduler` — factory mock (usa `setTimeout`; en producción se reemplaza por cron/Supabase)
+  - `TimeoutScheduler.schedule({ orderId, status, onFire }): () => void` — devuelve cleanup (cancela el timer)
+- **Tipos exportados:** `TimeoutPolicy`, `ScheduleInput`, `TimeoutScheduler`
+- **Nota:** Los estados sin política (terminales, EN_CAMINO) devuelven un no-op cleanup — el caller no necesita verificar si hay política.
+- **Usado en:** mock repositories (scheduleTimeout en create/transition), F5 (Supabase-side: cron reemplaza la implementación).
 
 ---
 

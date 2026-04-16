@@ -715,13 +715,13 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:** Creados `shared/domain/events.ts` (8 tipos discriminados `OrderSentDomainEvent`…`OrderExpiredDomainEvent`, union `OrderDomainEvent`, `SerializedDomainEvent`, `serializeEvent()`) y `shared/domain/event-bus.ts` (`createEventBus()` factory + singleton `eventBus`). Handler errors aislados (un handler fallando no bloquea otros). Serialization hook para F5. 14 tests, coverage events.ts 100%, event-bus.ts 95.83%. REGISTRY.md actualizado.
 
 ### F3.6 — Timeouts y jobs de sistema
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** PRD §7.6: `EXPIRADO` a los 10min sin respuesta, auto-cierre a las 2h. Estos son eventos del sistema, no del usuario.
 - **Entregable:** `shared/domain/timeouts.ts` con políticas declarativas por estado. Integrado en repository (Supabase-side: cron; mock-side: setTimeout con cleanup).
 - **Archivos:** `shared/domain/timeouts.ts`.
 - **Depends on:** F3.2, F3.5
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creado `shared/domain/timeouts.ts` — `ORDER_TIMEOUT_POLICIES` (ENVIADO/RECIBIDO: 600_000ms, ACEPTADO: 7_200_000ms), interfaz `TimeoutScheduler`, factory `createSetTimeoutScheduler()` con `setTimeout`. 13 tests, 100% coverage. REGISTRY.md actualizado.
 
 ### F3.7 — Constants del dominio
 - **Estado:** ✅ done
