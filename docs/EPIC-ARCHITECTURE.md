@@ -424,14 +424,14 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.3 — Logger abstraction
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
+- **Estado:** ✅ done
 - **Por qué:** `console.log` está prohibido (§TS hooks) pero no hay reemplazo. Cada catch hoy no sabe qué hacer con errores.
 - **Entregable:** `shared/utils/logger.ts` con interfaz `{ debug, info, warn, error }`; implementación dev = console, prod = pluggable (stub inicial para Sentry en F8).
 - **Archivos:** `shared/utils/logger.ts`.
 - **Depends on:** —
 - **Continues with:** F1.10 (cadena C-F1-logger)
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creado `shared/utils/logger.ts` (82 líneas). Patrón transport con `registerErrorHook` para swap Sentry sin tocar call sites. 10 tests, 94% coverage. REGISTRY.md actualizado.
 
 ### F1.4 — Routes tipadas
 - **Estado:** ⚪ pending
