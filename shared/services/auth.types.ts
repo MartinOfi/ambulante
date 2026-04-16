@@ -9,6 +9,7 @@ export interface SignUpInput {
   readonly email: string;
   readonly password: string;
   readonly role?: UserRole;
+  readonly displayName?: string;
 }
 
 export type AuthResult<T> =
