@@ -3,18 +3,21 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   resetPasswordSchema,
   type ResetPasswordValues,
 } from "@/features/auth/schemas/auth.schemas";
+import { ROUTES } from "@/shared/constants/routes";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export function ResetPasswordFormContainer() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -31,9 +34,16 @@ export function ResetPasswordFormContainer() {
 
   async function handleSubmit(_values: ResetPasswordValues): Promise<void> {
     setIsLoading(true);
-    await new Promise<void>((resolve) => setTimeout(resolve, 600));
-    setSubmitted(true);
-    setIsLoading(false);
+    setServerError(null);
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, 600));
+      setSubmitted(true);
+      router.push(ROUTES.auth.login);
+    } catch {
+      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -42,6 +52,7 @@ export function ResetPasswordFormContainer() {
       onSubmit={handleSubmit}
       isLoading={isLoading}
       submitted={submitted}
+      serverError={serverError}
     />
   );
 }

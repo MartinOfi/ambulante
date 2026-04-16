@@ -12,6 +12,7 @@ import { ForgotPasswordForm } from "./ForgotPasswordForm";
 export function ForgotPasswordFormContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -20,9 +21,15 @@ export function ForgotPasswordFormContainer() {
 
   async function handleSubmit(_values: ForgotPasswordValues): Promise<void> {
     setIsLoading(true);
-    await new Promise<void>((resolve) => setTimeout(resolve, 600));
-    setSubmitted(true);
-    setIsLoading(false);
+    setServerError(null);
+    try {
+      await new Promise<void>((resolve) => setTimeout(resolve, 600));
+      setSubmitted(true);
+    } catch {
+      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -31,6 +38,7 @@ export function ForgotPasswordFormContainer() {
       onSubmit={handleSubmit}
       isLoading={isLoading}
       submitted={submitted}
+      serverError={serverError}
     />
   );
 }

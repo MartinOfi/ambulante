@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
 describe("ForgotPasswordFormContainer", () => {
   beforeEach(() => {
     cleanup();
+    vi.clearAllMocks();
   });
 
   it("renders the email input and submit button", () => {

@@ -20,7 +20,7 @@ function mockToken(token: string | null) {
 describe("ResetPasswordFormContainer", () => {
   beforeEach(() => {
     cleanup();
-    mockToken("valid-token-abc");
+    mockToken("valid-reset-token-abcdef123");
   });
 
   afterEach(() => {
