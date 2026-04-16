@@ -705,7 +705,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:** `orderSchema` creado aquí (F3.1 solo cubría store/product/user/coordinates). `OrderRepository` y `ProductRepository` son `type` aliases (no `interface extends`) para evitar `@typescript-eslint/no-empty-object-type`. Imports en mocks usan alias `@/` (no relativos). 194 tests ✅, 0 errores TypeScript.
 
 ### F3.5 — Domain events + bus
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: session]
 - **Por qué:** Cuando un pedido cambia de estado, varias partes del sistema reaccionan (notificaciones, KPIs, audit log). Event bus desacopla.
 - **Entregable:** `shared/domain/events.ts` con tipos de evento (`OrderAccepted`, `OrderExpired`, etc.). `shared/domain/event-bus.ts` implementación local simple (pub/sub en memoria) con hook de serialización para F5 realtime.
 - **Archivos:** `shared/domain/events.ts`, `shared/domain/event-bus.ts`.
