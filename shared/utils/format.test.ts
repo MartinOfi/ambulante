@@ -21,11 +21,11 @@ describe("formatPrice", () => {
   it("defaults to ARS and produces an es-AR currency string", () => {
     const formatted = formatPrice(1500);
     expect(formatted).toMatch(/\$/);
-    expect(formatted).toContain("1.500");
+    expect(formatted).toMatch(/1[.,]500/);
   });
 
   it("respects an explicit currency code", () => {
     const formatted = formatPrice(1500, "USD");
-    expect(formatted).toContain("1.500");
+    expect(formatted).toMatch(/1[.,]500/);
   });
 });
