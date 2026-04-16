@@ -81,7 +81,10 @@ export function Hero() {
               </div>
             </div>
 
-            <h1 className="amb-fade-in amb-delay-200 font-display text-5xl font-bold uppercase leading-[0.9] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl xl:text-8xl">
+            <h1
+              data-testid="hero-heading"
+              className="amb-fade-in amb-delay-200 font-display text-5xl font-bold uppercase leading-[0.9] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl xl:text-8xl"
+            >
               Todo lo ambulante,
               <br />
               <span className="bg-gradient-to-br from-foreground via-foreground to-brand bg-clip-text text-transparent">
