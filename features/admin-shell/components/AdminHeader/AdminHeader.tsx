@@ -6,11 +6,12 @@ import type { User } from "@/shared/types/user";
 
 interface AdminHeaderProps {
   user: User;
+  isSidebarOpen: boolean;
   onToggleSidebar: () => void;
-  onSignOut: () => void;
+  onSignOut: () => void | Promise<void>;
 }
 
-export function AdminHeader({ user, onToggleSidebar, onSignOut }: AdminHeaderProps) {
+export function AdminHeader({ user, isSidebarOpen, onToggleSidebar, onSignOut }: AdminHeaderProps) {
   const displayLabel = user.displayName ?? user.email;
 
   return (
@@ -19,7 +20,8 @@ export function AdminHeader({ user, onToggleSidebar, onSignOut }: AdminHeaderPro
         <button
           type="button"
           onClick={onToggleSidebar}
-          aria-label="Abrir/cerrar menú"
+          aria-expanded={isSidebarOpen}
+          aria-label={isSidebarOpen ? "Cerrar menú" : "Abrir menú"}
           className="rounded-md p-1 hover:bg-zinc-100 transition-colors"
         >
           <Menu size={20} aria-hidden="true" />

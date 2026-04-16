@@ -5,6 +5,6 @@ export interface AdminShellProps {
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
   user: User;
-  onSignOut: () => void;
+  onSignOut: () => void | Promise<void>;
   children: ReactNode;
 }

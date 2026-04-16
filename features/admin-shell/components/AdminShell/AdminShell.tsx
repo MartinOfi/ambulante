@@ -1,7 +1,5 @@
-"use client";
-
-import { AdminSidebar } from "@/features/admin-shell/components/AdminSidebar/AdminSidebar";
-import { AdminHeader } from "@/features/admin-shell/components/AdminHeader/AdminHeader";
+import { AdminSidebar } from "@/features/admin-shell/components/AdminSidebar";
+import { AdminHeader } from "@/features/admin-shell/components/AdminHeader";
 import type { AdminShellProps } from "./AdminShell.types";
 
 export function AdminShell({
@@ -16,7 +14,12 @@ export function AdminShell({
       <AdminSidebar isOpen={isSidebarOpen} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <AdminHeader user={user} onToggleSidebar={onToggleSidebar} onSignOut={onSignOut} />
+        <AdminHeader
+          user={user}
+          isSidebarOpen={isSidebarOpen}
+          onToggleSidebar={onToggleSidebar}
+          onSignOut={onSignOut}
+        />
 
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>

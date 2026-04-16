@@ -140,7 +140,7 @@
 - **API:** `useSession(service?): SessionState & { signIn, signUp, signOut }`
 - **Estados:** `loading | authenticated | unauthenticated | error`
 - **Tipo discriminado:** `SessionState` — cuando `status === "authenticated"` expone `session: Session`.
-- **Usado en:** layouts de route groups protegidos (F2.4+), `middleware.ts`.
+- **Usado en:** layouts de route groups protegidos (F2.4+), `middleware.ts`, `features/admin-shell/components/AdminShell/AdminShell.container.tsx`.
 
 ### useGeolocation
 
@@ -402,7 +402,7 @@
   - Acciones: `setTheme(theme)`, `toggleSidebar()`, `setSidebarOpen(isOpen)`
 - **Persistencia:** `ambulante-ui-preferences` en localStorage (solo state, sin acciones).
 - **Tipo re-exportado:** `Theme = "light" | "dark" | "system"`
-- **Usado en:** ThemeProvider, layouts con sidebar.
+- **Usado en:** ThemeProvider, `features/admin-shell/components/AdminShell/AdminShell.container.tsx`.
 
 ---
 
@@ -520,3 +520,4 @@
 | 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |
 | 2026-04-16 | F2.5: ROUTES.client extendido con `orders` y `profile`; `afterEach(cleanup)` añadido al setup global | —     |
 | 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |
+| 2026-04-16 | F2.7: `useUIStore` y `useSession` — "Usado en" actualizado con admin-shell container                  | —     |

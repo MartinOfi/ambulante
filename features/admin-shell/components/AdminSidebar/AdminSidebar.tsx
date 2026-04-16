@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { LayoutDashboard } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
@@ -27,6 +25,7 @@ export function AdminSidebar({ isOpen }: AdminSidebarProps) {
             <li key={href}>
               <Link
                 href={href}
+                aria-label={isOpen ? undefined : label}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium",
                   "hover:bg-zinc-700 transition-colors",
