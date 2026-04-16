@@ -343,13 +343,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:** Creados `playwright.config.ts` (chromium only, webServer con `pnpm dev --port 3100` para aislar del puerto 3000 que usan otros worktrees), `e2e/landing.spec.ts` (visita `/` y verifica `h1` con texto "Todo lo ambulante"). Scripts `test:e2e` y `test:e2e:ui` agregados a `package.json`. `.gitignore` actualizado con `test-results/`, `playwright-report/`, `playwright/.cache/`, `blob-report/`. `webServer.env` inyecta `NEXT_PUBLIC_APP_URL` para cumplir con el schema Zod de F0.2. Test GREEN (1 passed).
 
 ### F0.7 — GitHub Actions CI
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Cada PR debe pasar lint + typecheck + test antes de merge.
 - **Entregable:** `.github/workflows/ci.yml` con jobs `lint`, `typecheck`, `test-unit`, `test-e2e`, `build`. Matrix node 20.
 - **Archivos:** `.github/workflows/ci.yml`.
 - **Depends on:** F0.3, F0.5, F0.6
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creado `.github/workflows/ci.yml` (137 líneas). 5 jobs paralelos (lint, typecheck, test-unit, build, test-e2e), todos con matrix node-version: [20] y pnpm 10. `NEXT_PUBLIC_APP_URL` inyectado a nivel workflow (Zod lo requiere al build); el job test-e2e lo overridea a puerto 3100 para alinear con playwright.config.ts. E2E instala solo chromium con `--with-deps`; Playwright report se sube como artifact solo en failure. Sin cadena de auto-continuación.
 
 ### F0.8 — Upgrade a Next.js 15
 - **Estado:** ✅ done
