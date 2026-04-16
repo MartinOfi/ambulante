@@ -797,13 +797,13 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:** Agregadas funciones exportadas `isClientError`, `computeRetryDelay`, `shouldRetry`. MAX_RETRY_COUNT=3, backoff exponencial 1s→30s, networkMode='offlineFirst'. 24 tests verdes. No hay `Continues with`.
 
 ### F4.5 — Error handling estándar con toast
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Cada mutation error debe mostrar feedback humano consistente.
 - **Entregable:** `shared/components/ui/toaster.tsx` (sonner o similar); `onError` default en QueryClient que extrae mensaje y muestra toast.
-- **Archivos:** `shared/components/ui/toaster.tsx`, provider.
+- **Archivos:** `shared/components/ui/toaster.tsx`, `shared/providers/QueryProvider.tsx`, `shared/utils/errorMessage.ts`, `shared/constants/ui-messages.ts`, `app/layout.tsx`.
 - **Depends on:** F1.1, F1.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `sonner` v2. `extractErrorMessage(error, context)` retorna `null` para 4xx (suprimidos), string español para 5xx/red. `QueryCache.onError` cubre queries; `defaultOptions.mutations.onError` cubre mutations. `<Toaster />` montado en `app/layout.tsx` dentro de `<ThemeProvider>`. 12 tests verdes. Sin `Continues with`.
 
 ---
 

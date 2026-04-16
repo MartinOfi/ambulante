@@ -4,6 +4,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
+import { Toaster } from "@/shared/components/ui/toaster";
 import { NuqsProvider } from "@/shared/providers/NuqsProvider";
 import { QueryProvider } from "@/shared/providers/QueryProvider";
 
@@ -143,7 +144,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Script>
         <NuqsProvider>
           <QueryProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider>
+              {children}
+              <Toaster />
+            </ThemeProvider>
           </QueryProvider>
         </NuqsProvider>
       </body>
