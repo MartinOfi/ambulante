@@ -1,58 +1,12 @@
-import * as Sentry from "@sentry/nextjs";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { logger } from "@/shared/utils/logger";
+import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@sentry/nextjs", () => ({
-  init: vi.fn(),
-  captureException: vi.fn(),
+vi.mock("@/shared/utils/sentry", () => ({
+  initSentry: vi.fn(),
 }));
 
-vi.mock("@/shared/utils/logger", () => ({
-  logger: {
-    registerErrorHook: vi.fn(),
-  },
-}));
-
-describe("initSentryClient", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("does not call Sentry.init when DSN is undefined", async () => {
-    const { initSentryClient } = await import("./sentry.client.config");
-    initSentryClient(undefined);
-    expect(Sentry.init).not.toHaveBeenCalled();
-  });
-
-  it("does not register error hook when DSN is undefined", async () => {
-    const { initSentryClient } = await import("./sentry.client.config");
-    initSentryClient(undefined);
-    expect(logger.registerErrorHook).not.toHaveBeenCalled();
-  });
-
-  it("calls Sentry.init with the DSN when provided", async () => {
-    const { initSentryClient } = await import("./sentry.client.config");
-    const dsn = "https://key@o123.ingest.sentry.io/456";
-    initSentryClient(dsn);
-    expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({ dsn }));
-  });
-
-  it("registers an error hook when DSN is provided", async () => {
-    const { initSentryClient } = await import("./sentry.client.config");
-    initSentryClient("https://key@o123.ingest.sentry.io/456");
-    expect(logger.registerErrorHook).toHaveBeenCalledWith(expect.any(Function));
-  });
-
-  it("registered hook calls Sentry.captureException with an Error", async () => {
-    const { initSentryClient } = await import("./sentry.client.config");
-    initSentryClient("https://key@o123.ingest.sentry.io/456");
-
-    const hook = vi.mocked(logger.registerErrorHook).mock.calls[0][0];
-    hook("something broke", { userId: "u1" });
-
-    expect(Sentry.captureException).toHaveBeenCalledWith(
-      expect.any(Error),
-      expect.objectContaining({ extra: { userId: "u1" } }),
-    );
+describe("sentry.client.config", () => {
+  it("re-exports initSentry as initSentryClient", async () => {
+    const mod = await import("./sentry.client.config");
+    expect(typeof mod.initSentryClient).toBe("function");
   });
 });

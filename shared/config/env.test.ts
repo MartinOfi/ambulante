@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseEnv } from "./env.mjs";
+import { parseEnv } from "./env.schema";
 
 describe("parseEnv", () => {
   const validRawEnv = {

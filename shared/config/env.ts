@@ -1,5 +1,5 @@
-import { env } from "./env.runtime.mjs";
+import { env } from "./env.runtime";
 
-export { parseEnv } from "./env.mjs";
+export { parseEnv } from "./env.schema";
 export { env };
-export type Env = typeof env;
+export type { Env } from "./env.schema";

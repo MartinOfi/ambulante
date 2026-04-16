@@ -1,3 +1,3 @@
-import { parseEnv } from "./env.mjs";
+import { parseEnv } from "./env.schema";
 
 export const env = parseEnv(process.env);

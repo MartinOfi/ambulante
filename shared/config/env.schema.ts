@@ -8,15 +8,9 @@ const envSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
 });
 
-/**
- * @typedef {z.infer<typeof envSchema>} Env
- */
+export type Env = z.infer<typeof envSchema>;
 
-/**
- * @param {Record<string, string | undefined>} rawEnv
- * @returns {Env}
- */
-export function parseEnv(rawEnv) {
+export function parseEnv(rawEnv: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(rawEnv);
 
   if (!result.success) {

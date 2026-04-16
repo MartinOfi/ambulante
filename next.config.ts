@@ -1,8 +1,8 @@
-import "./shared/config/env.runtime.mjs";
+import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import "./shared/config/env.runtime";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   eslint: {
     dirs: ["app", "features", "shared"],
