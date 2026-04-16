@@ -565,7 +565,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.2 — Modelo de User + roles
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 14:00]
 - **Por qué:** Necesitamos el tipo canónico antes de tocar session.
 - **Entregable:** `shared/types/user.ts` con `User`, `UserRole = "client" | "store" | "admin"`, `Session`. Schemas Zod en `shared/schemas/user.ts`.
 - **Archivos:** `shared/types/user.ts`, `shared/schemas/user.ts`.
