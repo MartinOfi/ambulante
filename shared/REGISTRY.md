@@ -343,9 +343,9 @@
 
 - **Ruta:** `shared/constants/routes.ts`
 - **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
-- **API:** `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **API:** `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `ROUTES.store.orders`, `ROUTES.store.catalog`, `ROUTES.store.profile`, `buildHref(ROUTES.store.order, { orderId: "x" })`
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
-- **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, cualquier `<Link>` o `router.push`.
+- **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, `features/store-shell/components/StoreNav`, cualquier `<Link>` o `router.push`.
 
 ### ORDER_STATUS, OrderStatus, TERMINAL_ORDER_STATUSES, ORDER_EXPIRATION_MINUTES, ORDER_AUTOCLOSE_HOURS
 
@@ -493,6 +493,24 @@
 
 ---
 
+## 13. Features (`features/`)
+
+> Shell de roles y bloques de UI específicos que no son candidatos a `shared/` porque pertenecen a un solo contexto de rol. Se documentan acá para evitar reimplementaciones.
+
+### store-shell — Shell del rol Tienda
+
+- **Ruta barrel:** `features/store-shell/index.ts`
+- **Componentes:**
+  - `StoreShell` (`features/store-shell/components/StoreShell/StoreShell.tsx`) — dumb, Server Component compatible. Props: `children`, `isAvailable: boolean`, `onToggleAvailability: () => void`, `isSidebarOpen: boolean`, `onToggleSidebar: () => void`. Layout responsive (bottom bar mobile / sidebar izquierdo desktop) con un único DOM tree.
+  - `StoreShellContainer` (`features/store-shell/components/StoreShell/StoreShell.container.tsx`) — `"use client"`, conecta `useUIStore` (sidebar) + `useAvailability`. Usado en `app/(store)/layout.tsx`.
+  - `StoreNav` (`features/store-shell/components/StoreNav/StoreNav.tsx`) — nav dumb con 4 items: Dashboard, Pedidos, Catálogo, Perfil. Props: `currentPath?: string` (resalta item activo).
+  - `AvailabilityToggle` (`features/store-shell/components/AvailabilityToggle/AvailabilityToggle.tsx`) — switch accesible (`role="switch"`, `aria-checked`). Props: `isAvailable: boolean`, `onToggle: () => void`.
+- **Hooks:**
+  - `useAvailability` (`features/store-shell/hooks/useAvailability.ts`) — estado local de disponibilidad. Retorna `{ isAvailable, toggle, setAvailable }`.
+- **Usado en:** `app/(store)/layout.tsx`.
+
+---
+
 ## Changelog del registry
 
 | Fecha      | Cambio                                                              | Autor |
@@ -515,9 +533,11 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F3.6: agregado timeout policies + scheduler en sección 12                      | —     |
 | 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
 | 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
 | 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |
 | 2026-04-16 | F2.5: ROUTES.client extendido con `orders` y `profile`; `afterEach(cleanup)` añadido al setup global | —     |
+| 2026-04-16 | F2.6: ROUTES.store expandido (orders/catalog/profile); agregada sección 13. Features con store-shell | —     |
 | 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |
 | 2026-04-16 | F2.7: `useUIStore` y `useSession` — "Usado en" actualizado con admin-shell container                  | —     |

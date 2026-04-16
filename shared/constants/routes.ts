@@ -22,6 +22,9 @@ export const ROUTES = {
   },
   store: {
     dashboard: "/store/dashboard",
+    orders: "/store/orders",
+    catalog: "/store/catalog",
+    profile: "/store/profile",
     order: "/store/order/:orderId",
   },
   admin: {
