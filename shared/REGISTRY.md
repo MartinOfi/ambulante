@@ -111,6 +111,13 @@
 - **API:** `<QueryProvider>{children}</QueryProvider>`
 - **Usado en:** `app/layout.tsx`.
 
+### NuqsProvider
+
+- **Ruta:** `shared/providers/NuqsProvider.tsx`
+- **Descripción:** Adaptador de `nuqs` para Next.js App Router. Necesario para que cualquier hook `useQueryState` / `useQueryStates` funcione. Envuelve toda la app en `app/layout.tsx`.
+- **API:** `<NuqsProvider>{children}</NuqsProvider>`
+- **Usado en:** `app/layout.tsx`, `features/map/hooks/useRadiusParam`.
+
 ---
 
 ## 3. Hooks (`shared/hooks/`)
@@ -274,3 +281,4 @@
 | 2026-04-16 | F1.8: agregado `shared/styles/tokens.ts` — design tokens tipados     | —     |
 | 2026-04-16 | F1.9: agregadas layout primitives (Stack, Row, Container, Screen, Spacer, Divider) + `polymorphic.types.ts` | —     |
 | 2026-04-16 | F1.4: agregada sección 8. Constants — ROUTES, Route, buildHref       | —     |
+| 2026-04-16 | F1.7: agregado NuqsProvider en sección 2c                            | —     |

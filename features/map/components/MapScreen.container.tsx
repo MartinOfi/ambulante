@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useGeolocation } from "@/shared/hooks/useGeolocation";
-import { DEFAULT_RADIUS, type RadiusValue } from "@/shared/constants/radius";
 import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
+import { useRadiusParam } from "@/features/map/hooks/useRadiusParam";
 import { useNearbyStores } from "@/features/map/hooks/useNearbyStores";
 import { MapScreen } from "./MapScreen";
 
 export function MapScreenContainer() {
-  const [radius, setRadius] = useState<RadiusValue>(DEFAULT_RADIUS);
+  const [radius, setRadius] = useRadiusParam();
   const geo = useGeolocation();
 
   const coords = geo.status === "granted" ? geo.coords : null;

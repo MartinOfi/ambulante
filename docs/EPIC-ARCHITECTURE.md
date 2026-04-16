@@ -444,7 +444,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:** Creados `shared/constants/routes.ts` (ROUTES as const + buildHref + tipo Route derivado) y `shared/constants/routes.test.ts` (8 tests, todos verdes). REGISTRY.md actualizado. Los consumers existentes (features/landing) aún usan strings hardcodeados — la migración es un refactor separado que no bloquea nada.
 
 ### F1.5 — Error boundaries y error/loading states globales
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-16]
 - **Por qué:** Un throw en cualquier service hoy rompe la app con pantalla blanca. Next tiene `error.tsx`, `loading.tsx`, `not-found.tsx`.
 - **Entregable:** `app/error.tsx`, `app/not-found.tsx`, `app/loading.tsx` globales con diseño consistente. Lo mismo por route group (ver F2.3+).
 - **Archivos:** `app/error.tsx`, `app/not-found.tsx`, `app/loading.tsx`.
@@ -462,7 +462,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:** Creado `shared/stores/ui.ts` (63 líneas) con `useUIStore` — Zustand 5 + `persist` middleware. Interfaces `UIPreferencesState` (readonly) + `UIPreferencesActions` separadas. `partialize` serializa solo state. `Theme` union type exportado. 10 tests, 100% coverage en el archivo. `REGISTRY.md` actualizado con sección 10 (Stores) + convención de uso.
 
 ### F1.7 — nuqs para URL state
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-16]
 - **Por qué:** El radio del mapa hoy es `useState` — se pierde al refrescar. Filtros que cambian la UI deben vivir en URL.
 - **Entregable:** `nuqs` instalado + provider; `features/map/hooks/useRadiusParam.ts` reemplaza el useState del radio. Refresh preserva estado.
 - **Archivos:** `shared/providers/NuqsProvider.tsx`, `features/map/hooks/useRadiusParam.ts`, container del mapa.
