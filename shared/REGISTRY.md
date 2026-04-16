@@ -163,6 +163,14 @@ _(vacío — globals viven en `app/globals.css`)_
 - **Descripción:** Timings y tolerancias de geolocalización definidos en PRD §7.1.
 - **Usado en:** `shared/hooks/useGeolocation`.
 
+### ROUTES, Route, buildHref
+
+- **Ruta:** `shared/constants/routes.ts`
+- **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
+- **API:** `ROUTES.client.map`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
+- **Usado en:** `features/landing/*` (migrables), cualquier `<Link>` o `router.push`.
+
 ---
 
 ## 9. Config (`shared/config/`)
@@ -187,3 +195,4 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
+| 2026-04-16 | F1.4: agregada sección ROUTES, Route, buildHref                      | —     |
