@@ -214,6 +214,14 @@
 - **Descripción:** Timings y tolerancias de geolocalización definidos en PRD §7.1.
 - **Usado en:** `shared/hooks/useGeolocation`.
 
+### ROUTES, Route, buildHref
+
+- **Ruta:** `shared/constants/routes.ts`
+- **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
+- **API:** `ROUTES.client.map`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
+- **Usado en:** `features/landing/*` (migrables), cualquier `<Link>` o `router.push`.
+
 ---
 
 ## 9. Config (`shared/config/`)
@@ -265,3 +273,4 @@
 | 2026-04-16 | F1.3/F1.10: agregado logger en sección 5                            | —     |
 | 2026-04-16 | F1.8: agregado `shared/styles/tokens.ts` — design tokens tipados     | —     |
 | 2026-04-16 | F1.9: agregadas layout primitives (Stack, Row, Container, Screen, Spacer, Divider) + `polymorphic.types.ts` | —     |
+| 2026-04-16 | F1.4: agregada sección 8. Constants — ROUTES, Route, buildHref       | —     |

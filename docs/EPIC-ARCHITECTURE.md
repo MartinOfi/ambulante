@@ -435,13 +435,13 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:** Creado `shared/utils/logger.ts` (82 líneas). Patrón transport con `registerErrorHook` para swap Sentry sin tocar call sites. 10 tests, 94% coverage. REGISTRY.md actualizado.
 
 ### F1.4 — Routes tipadas
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Hoy `"/map"` es un magic string repetido por 8 lugares. Cualquier rename rompe y el compilador no lo nota.
 - **Entregable:** `shared/constants/routes.ts` con `ROUTES.client.map`, `ROUTES.store.dashboard`, etc. Helper `href(route, params?)` tipado.
 - **Archivos:** `shared/constants/routes.ts`.
 - **Depends on:** —
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creados `shared/constants/routes.ts` (ROUTES as const + buildHref + tipo Route derivado) y `shared/constants/routes.test.ts` (8 tests, todos verdes). REGISTRY.md actualizado. Los consumers existentes (features/landing) aún usan strings hardcodeados — la migración es un refactor separado que no bloquea nada.
 
 ### F1.5 — Error boundaries y error/loading states globales
 - **Estado:** ⚪ pending

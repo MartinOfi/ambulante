@@ -5,8 +5,8 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
-  // Vite 8 uses oxc (rolldown) which reads tsconfig jsx:preserve — override for tests
-  // Shape matches what @vitejs/plugin-react sets for classic runtime in Vite 8
+  // Why: tsconfig has jsx:preserve (required by Next.js), but Vite 8's oxc bundler
+  // needs an explicit override. Remove when migrating tsconfig or upgrading the plugin.
   oxc: {
     jsx: { runtime: "automatic" },
   },
