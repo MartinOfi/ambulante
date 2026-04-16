@@ -797,7 +797,7 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:** Agregadas funciones exportadas `isClientError`, `computeRetryDelay`, `shouldRetry`. MAX_RETRY_COUNT=3, backoff exponencial 1s→30s, networkMode='offlineFirst'. 24 tests verdes. No hay `Continues with`.
 
 ### F4.5 — Error handling estándar con toast
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 16:00]
 - **Por qué:** Cada mutation error debe mostrar feedback humano consistente.
 - **Entregable:** `shared/components/ui/toaster.tsx` (sonner o similar); `onError` default en QueryClient que extrae mensaje y muestra toast.
 - **Archivos:** `shared/components/ui/toaster.tsx`, provider.
