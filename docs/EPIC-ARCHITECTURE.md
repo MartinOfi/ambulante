@@ -325,13 +325,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.5 — Vitest config + primer test sanity
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-15, started: 18:30]
+- **Estado:** ✅ done
 - **Por qué:** Infraestructura de unit/component testing.
 - **Entregable:** `vitest.config.ts`, `vitest.setup.ts` con testing-library, script `pnpm test`, un test dummy para `formatDistance` que corra verde.
 - **Archivos:** `vitest.config.ts`, `vitest.setup.ts`, `shared/utils/format.test.ts`.
 - **Depends on:** F0.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `vitest.config.ts` (30 líneas) con `@vitejs/plugin-react` (pineado a 4.7.0 — v6 usa sintaxis de .d.ts que TS 5.5 no parsea), `environment: "jsdom"`, alias `@/*` vía `fileURLToPath(new URL(".", import.meta.url))` para replicar `tsconfig.paths`, `setupFiles: ["./vitest.setup.ts"]`, `include: **/*.{test,spec}.{ts,tsx}`, `exclude: [node_modules, .next, e2e/**]` (e2e reservado para F0.6), coverage v8 con include `shared/**` + `features/**` excluyendo `shared/components/ui/**` (primitivas shadcn). `vitest.setup.ts`: 1 línea — `import "@testing-library/jest-dom/vitest"` (subpath `/vitest` registra matchers en expect de Vitest, no de Jest). Test `shared/utils/format.test.ts` (31 líneas, 4 casos formatDistance + 2 casos formatPrice) cubre 100% de `format.ts`. Env.test.ts preparado por F0.2 corre automáticamente con esta config (5 casos). Total: **9 tests verdes, 2 test files**. Deps agregadas: `@vitejs/plugin-react@4.7.0`, `jsdom@^25.0.1`, `@testing-library/react@^16.1.0`, `@testing-library/jest-dom@^6.6.3`, `@testing-library/user-event@^14.5.2`, `@vitest/coverage-v8@4.1.4`. Scripts nuevos en `package.json`: `test` (vitest run), `test:watch` (vitest), `test:coverage` (vitest run --coverage). Coverage global bajo a propósito (~9%) — se llena a medida que features/hooks/services ganan tests. Sin threshold gates en config para no bloquear el suite hasta que haya masa crítica. Peer warnings de pnpm aceptadas: plugin-react 4.x con vite 8 (runtime verde), @types/node 20.14 con vite 8 (compatible). Para F0.8/Next 15 se puede revisar upgrade a plugin-react 6 + TS 5.6+. Ejecutado desde worktree `../ambulante-f0-5`. Verificación: `pnpm typecheck` 0 err, `pnpm lint` 0 warn, `pnpm test` 9/9 GREEN.
 
 ### F0.6 — Playwright config + smoke test
 - **Estado:** ⚪ pending
