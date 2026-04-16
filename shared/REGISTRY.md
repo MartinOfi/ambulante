@@ -121,6 +121,19 @@
 - **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`
 - **Usado en:** hooks de data en `features/*/hooks/`.
 
+### parseResponse + ParseError
+
+- **Ruta:** `shared/query/parseResponse.ts`
+- **Descripción:** Helper de boundary que ejecuta `schema.safeParse()` sobre el resultado de una promesa antes de que los datos entren al cache de React Query. Si la validación falla, lanza `ParseError` con el `ZodError` como `cause` y loguea el error con contexto. Errores de red (upstream) se re-lanzan sin envoltura.
+- **API:** `parseResponse(schema, promise, options?)` → `Promise<z.infer<TSchema>>`
+  - `options.onError?` — inyección de dependencia para el logger (útil en tests)
+- **Tipos exportados:** `ParseError` (clase), `ParseResponseOptions` (interfaz)
+- **Uso canónico:**
+  ```ts
+  const store = await parseResponse(storeSchema, storesService.findById(id));
+  ```
+- **Usado en:** cualquier `queryFn` que consuma datos externos (features/*/hooks/).
+
 ---
 
 ## 2c. Providers (`shared/providers/`)
@@ -583,3 +596,4 @@
 | 2026-04-16 | F2.8: agregados Input, Label, Form UI primitives en §1; loginSchema/registerSchema/forgotPasswordSchema/resetPasswordSchema en §7b; ROUTES actualizado con grupo `auth` | —     |
 | 2026-04-16 | F4.2: agregado useAcceptOrderMutation en §3 (feature-local — orders); optimistic update pattern     | —     |
 | 2026-04-16 | F4.4: QueryProvider actualizado — retry inteligente (no 4xx), backoff exp., networkMode offlineFirst; exports auxiliares documentados | —     |
+| 2026-04-16 | F4.3: agregado parseResponse + ParseError en sección 2b. Query                 | —     |
