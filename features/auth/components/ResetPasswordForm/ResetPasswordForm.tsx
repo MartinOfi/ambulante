@@ -1,7 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { UseFormReturn } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -13,30 +12,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import {
-  resetPasswordSchema,
-  type ResetPasswordValues,
-} from "@/features/auth/schemas/auth.schemas";
+import type { ResetPasswordValues } from "@/features/auth/schemas/auth.schemas";
 import { ROUTES } from "@/shared/constants/routes";
 
 interface ResetPasswordFormProps {
+  readonly form: UseFormReturn<ResetPasswordValues>;
   readonly onSubmit: (values: ResetPasswordValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly submitted: boolean;
-  readonly token: string;
 }
 
 export function ResetPasswordForm({
+  form,
   onSubmit,
   isLoading,
   submitted,
-  token,
 }: ResetPasswordFormProps) {
-  const form = useForm<ResetPasswordValues>({
-    resolver: zodResolver(resetPasswordSchema),
-    defaultValues: { password: "", confirmPassword: "", token },
-  });
-
   if (submitted) {
     return (
       <div className="space-y-4 text-center">

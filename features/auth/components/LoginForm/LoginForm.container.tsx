@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/shared/hooks/useSession";
 import { authService as defaultAuthService } from "@/shared/services/auth";
 import type { AuthService } from "@/shared/services/auth.types";
 import { getRoleRedirect } from "@/features/auth/utils/role-redirect";
-import type { LoginValues } from "@/features/auth/schemas/auth.schemas";
+import { loginSchema, type LoginValues } from "@/features/auth/schemas/auth.schemas";
 import { LoginForm } from "./LoginForm";
 
 interface LoginFormContainerProps {
@@ -18,6 +20,11 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
   const sessionState = useSession(service);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
   const sessionRole =
     sessionState.status === "authenticated" ? sessionState.session.user.role : undefined;
@@ -43,5 +50,12 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
     }
   }
 
-  return <LoginForm onSubmit={handleSubmit} isLoading={isLoading} serverError={serverError} />;
+  return (
+    <LoginForm
+      form={form}
+      onSubmit={handleSubmit}
+      isLoading={isLoading}
+      serverError={serverError}
+    />
+  );
 }

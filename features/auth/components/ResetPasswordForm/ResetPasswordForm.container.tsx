@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
-import type { ResetPasswordValues } from "@/features/auth/schemas/auth.schemas";
+import {
+  resetPasswordSchema,
+  type ResetPasswordValues,
+} from "@/features/auth/schemas/auth.schemas";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export function ResetPasswordFormContainer() {
@@ -10,6 +15,11 @@ export function ResetPasswordFormContainer() {
   const token = searchParams.get("token") ?? "";
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const form = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: "", confirmPassword: "", token },
+  });
 
   if (!token) {
     return (
@@ -21,7 +31,6 @@ export function ResetPasswordFormContainer() {
 
   async function handleSubmit(_values: ResetPasswordValues): Promise<void> {
     setIsLoading(true);
-    // Mock: simulate network delay
     await new Promise<void>((resolve) => setTimeout(resolve, 600));
     setSubmitted(true);
     setIsLoading(false);
@@ -29,10 +38,10 @@ export function ResetPasswordFormContainer() {
 
   return (
     <ResetPasswordForm
+      form={form}
       onSubmit={handleSubmit}
       isLoading={isLoading}
       submitted={submitted}
-      token={token}
     />
   );
 }
