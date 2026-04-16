@@ -122,6 +122,17 @@
 
 ## 3. Hooks (`shared/hooks/`)
 
+> Feature-local query hooks live in `features/<name>/hooks/`. They follow the canonical `useXxxQuery` pattern documented in `docs/recipes/query-hook-pattern.md`.
+
+### useStoresNearbyQuery _(feature-local — map)_
+
+- **Ruta:** `features/map/hooks/useStoresNearbyQuery.ts`
+- **Descripción:** Canonical `useXxxQuery` hook. Fetches stores near given coordinates using React Query v5 `useQuery`. Disabled automatically when `coords` is `null` (`enabled: coords !== null`). Returns the full React Query result object; consumers destructure `{ data: stores = [], isLoading, isError }`.
+- **API:** `useStoresNearbyQuery({ coords: Coordinates | null, radius: RadiusValue })`
+- **Query key:** `queryKeys.stores.nearby(coords, radius)` when coords present; `queryKeys.stores.all()` when disabled.
+- **Replaces:** `features/map/hooks/useNearbyStores.ts` (manual `useState+useEffect` pattern — deprecated).
+- **Usado en:** `features/map/components/MapScreen.container.tsx`.
+
 ### useGeolocation
 
 - **Ruta:** `shared/hooks/useGeolocation.ts`
@@ -142,7 +153,7 @@
 - **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Delega a `storeRepository` (F3.4). Swap a Supabase → solo cambiar el repository, sin tocar consumers.
 - **API:** `findNearby({ coords, radiusMeters })`, `findById(id)`
 - **Tipos:** `StoresService`, `FindNearbyInput` re-exportados desde `shared/repositories/store`
-- **Usado en:** `features/map/hooks/useNearbyStores`.
+- **Usado en:** `features/map/hooks/useStoresNearbyQuery`.
 
 ---
 
@@ -465,3 +476,4 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |
