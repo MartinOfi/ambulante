@@ -32,7 +32,8 @@
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "tailwind-merge": "2.5.2",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

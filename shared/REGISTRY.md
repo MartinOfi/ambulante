@@ -179,6 +179,27 @@ _(vacío — globals viven en `app/globals.css`)_
 
 ---
 
+## 10. Stores (`shared/stores/`)
+
+> Estado global del cliente con Zustand. Usar **solo** cuando React state local no alcance (CLAUDE.md §2 Stack).
+>
+> **Convención de slices:** separar `State` (readonly) de `Actions` en interfaces distintas. Exportar el hook completo como `use<Name>Store`.
+> **Persistencia:** usar `persist` middleware con `partialize` para serializar solo el state, no las acciones.
+> **Selección granular:** `const value = useXStore((s) => s.field)` — nunca desestructurar el store entero para evitar re-renders innecesarios.
+
+### useUIStore
+
+- **Ruta:** `shared/stores/ui.ts`
+- **Descripción:** Preferencias de UI persistidas en localStorage. Incluye `theme` (light/dark/system) y `isSidebarOpen`.
+- **API:**
+  - Estado: `theme: Theme`, `isSidebarOpen: boolean`
+  - Acciones: `setTheme(theme)`, `toggleSidebar()`, `setSidebarOpen(isOpen)`
+- **Persistencia:** `ambulante-ui-preferences` en localStorage (solo state, sin acciones).
+- **Tipo re-exportado:** `Theme = "light" | "dark" | "system"`
+- **Usado en:** ThemeProvider, layouts con sidebar.
+
+---
+
 ## Changelog del registry
 
 | Fecha      | Cambio                                                              | Autor |
@@ -187,3 +208,4 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
+| 2026-04-16 | F1.6: agregada sección 10. Stores con `useUIStore`                   | —     |
