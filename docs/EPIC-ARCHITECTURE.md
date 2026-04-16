@@ -622,7 +622,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.8 — Páginas públicas de auth
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:15]
 - **Por qué:** Login, register, forgot-password, reset-password.
 - **Entregable:** `app/(auth)/login`, `app/(auth)/register`, `app/(auth)/forgot-password`, `app/(auth)/reset-password` — cada una con container/presentational.
 - **Archivos:** `app/(auth)/*`, `features/auth/*`.
