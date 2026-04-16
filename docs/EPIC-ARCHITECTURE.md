@@ -595,7 +595,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:** `getRequiredRole` extraída a `shared/utils/route-access.ts` (pure fn, unit-testable). `parseSessionCookie` en `shared/utils/session-cookie.ts` (Edge-safe atob+Zod). `SESSION_COOKIE_NAME` en `shared/constants/auth.ts`. 9 tests E2E Playwright (unauthenticated redirects + authorized access + wrong-role redirects). 299 unit tests GREEN. 0 typecheck errors.
 
 ### F2.5 — Layout del route group Cliente
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:00]
 - **Por qué:** Bottom nav mobile-first, shell específico del rol.
 - **Entregable:** `app/(client)/layout.tsx` con `<ClientShell>`: header mínimo, bottom nav, safe areas. Rutas de ejemplo vacías para `/orders`, `/profile`.
 - **Archivos:** `app/(client)/layout.tsx`, `features/client-shell/*`.
@@ -613,7 +613,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.7 — Layout del route group Admin
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 2026-04-16]
 - **Por qué:** Desktop-first, sidebar con secciones.
 - **Entregable:** `app/(admin)/layout.tsx` con `<AdminShell>`: sidebar izquierdo, header con user menu.
 - **Archivos:** `app/(admin)/layout.tsx`, `features/admin-shell/*`.
