@@ -470,7 +470,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.8 — Design tokens tipados
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: now]
 - **Por qué:** Hoy los tokens son solo CSS vars — no se pueden leer runtime ni tipar. Tailwind los tiene como strings.
 - **Entregable:** `shared/styles/tokens.ts` con objetos `colors`, `spacing`, `radius`, `shadows`, `motion` tipados. Single source of truth que también se re-exporta a `tailwind.config.ts`.
 - **Archivos:** `shared/styles/tokens.ts`, `tailwind.config.ts`.
