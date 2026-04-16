@@ -148,9 +148,11 @@ describe("QueryProvider — flaky network retries", () => {
       .mockRejectedValueOnce(new Error("Network Error"))
       .mockResolvedValueOnce("recovered");
 
+    const testKey = crypto.randomUUID();
+
     function FlakyComponent() {
       const { data, status } = useQuery({
-        queryKey: ["flaky"],
+        queryKey: ["flaky", testKey],
         queryFn,
         retryDelay: 0,
       });
@@ -173,10 +175,11 @@ describe("QueryProvider — flaky network retries", () => {
 
   it("does not retry a 4xx error", async () => {
     const queryFn = vi.fn().mockRejectedValue({ status: 404 });
+    const testKey = crypto.randomUUID();
 
     function ClientErrorComponent() {
       const { status } = useQuery({
-        queryKey: ["client-error"],
+        queryKey: ["client-error", testKey],
         queryFn,
         retryDelay: 0,
       });

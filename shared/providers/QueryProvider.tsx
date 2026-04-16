@@ -12,13 +12,14 @@ const GC_TIME_MS = 5 * 60_000;
 const MAX_RETRY_COUNT = 3;
 const RETRY_DELAY_BASE_MS = 1_000;
 const RETRY_DELAY_CAP_MS = 30_000;
-const NETWORK_MODE = "offlineFirst" as const;
+const NETWORK_MODE = "offlineFirst";
 
 function hasNumericStatus(value: unknown): value is { status: number } {
   return (
     typeof value === "object" &&
     value !== null &&
     "status" in value &&
+    // `in` guard confirms the property exists but TypeScript cannot narrow its type without a cast
     typeof (value as Record<string, unknown>).status === "number"
   );
 }
