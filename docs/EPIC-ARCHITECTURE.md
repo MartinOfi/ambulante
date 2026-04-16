@@ -603,13 +603,13 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.6 — Layout del route group Tienda
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:00]
+- **Estado:** ✅ done [owner: chat-2026-04-16, finished: 2026-04-16]
 - **Por qué:** Dashboard-style shell con toggle de disponibilidad siempre visible.
 - **Entregable:** `app/(store)/layout.tsx` con `<StoreShell>`: sidebar o tabbed nav, availability toggle persistente.
 - **Archivos:** `app/(store)/layout.tsx`, `features/store-shell/*`.
 - **Depends on:** F2.4, F1.9
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Implementado `StoreShell` (dumb) + `StoreShellContainer` (smart, `"use client"`), `StoreNav` con 4 items, `AvailabilityToggle` como switch accesible, `useAvailability` hook. Layout responsive: bottom nav mobile, sidebar izquierdo desktop vía CSS (un solo DOM tree para evitar problemas en tests jsdom). 275 tests pasando. `vitest.setup.ts` corregido con `afterEach(cleanup)` explícito. ROUTES.store expandido con `orders`, `catalog`, `profile`.
 
 ### F2.7 — Layout del route group Admin
 - **Estado:** ⚪ pending
