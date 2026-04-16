@@ -770,13 +770,13 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:** `useNearbyStores.ts` eliminado. `meta.onError` no funciona en RQ v5 — se usa `useEffect + isError` para logging. Recipe doc en `docs/recipes/query-hook-pattern.md`. 256/256 tests passing.
 
 ### F4.2 — Pattern para mutations con optimistic updates
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:15]
+- **Estado:** ✅ done
 - **Por qué:** Acciones del usuario (aceptar pedido, cancelar, etc.) deben sentirse instantáneas.
 - **Entregable:** Ejemplo canónico `features/orders/hooks/useAcceptOrderMutation.ts` con `onMutate`/`onError` rollback. Doc con la receta.
-- **Archivos:** ejemplo + doc.
+- **Archivos:** `features/orders/hooks/useAcceptOrderMutation.ts`, `features/orders/services/orders.service.ts`, `features/orders/services/orders.mock.ts`, `docs/recipes/mutation-hook-pattern.md`.
 - **Depends on:** F4.1, F3.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `useMutation.onError` ES un callback real en RQ v5 (a diferencia de `useQuery meta.onError`). Interfaz separada en `orders.service.ts`; mock importa desde ahí. 321/321 tests passing.
 
 ### F4.3 — Zod parsing en el boundary
 - **Estado:** ⚪ pending
@@ -788,13 +788,13 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:**
 
 ### F4.4 — Retry y offline policies
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-16, finished: 15:10]
 - **Por qué:** App móvil con conexión inestable necesita retry inteligente (backoff exponencial, no retry en 4xx).
 - **Entregable:** QueryClient config actualizada con `retry`, `retryDelay`, `networkMode`. Test con mock de red flaky.
 - **Archivos:** `shared/providers/QueryProvider.tsx`.
 - **Depends on:** F1.1
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Agregadas funciones exportadas `isClientError`, `computeRetryDelay`, `shouldRetry`. MAX_RETRY_COUNT=3, backoff exponencial 1s→30s, networkMode='offlineFirst'. 24 tests verdes. No hay `Continues with`.
 
 ### F4.5 — Error handling estándar con toast
 - **Estado:** ⚪ pending

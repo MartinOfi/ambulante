@@ -128,8 +128,9 @@
 ### QueryProvider
 
 - **Ruta:** `shared/providers/QueryProvider.tsx`
-- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry (1) y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
+- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry inteligente (backoff exponencial, sin retry en 4xx, máx 3 intentos), retryDelay exponencial acotado (1s→30s), `networkMode: 'offlineFirst'` para PWA, y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
 - **API:** `<QueryProvider>{children}</QueryProvider>`
+- **Exports auxiliares:** `isClientError(error)`, `computeRetryDelay(attemptIndex)`, `shouldRetry(failureCount, error)` — exportadas para testabilidad.
 - **Usado en:** `app/layout.tsx`.
 
 ### NuqsProvider
@@ -581,3 +582,5 @@
 | 2026-04-16 | F2.7: `useUIStore` y `useSession` — "Usado en" actualizado con admin-shell container                  | —     |
 | 2026-04-16 | F2.8: agregados Input, Label, Form UI primitives en §1; loginSchema/registerSchema/forgotPasswordSchema/resetPasswordSchema en §7b; ROUTES actualizado con grupo `auth` | —     |
 | 2026-04-16 | F4.2: agregado useAcceptOrderMutation en §3 (feature-local — orders); optimistic update pattern     | —     |
+| 2026-04-16 | F4.4: QueryProvider actualizado — retry inteligente (no 4xx), backoff exp., networkMode offlineFirst; exports auxiliares documentados | —     |
+>>>>>>> feat/f4-4-retry-offline-policies
