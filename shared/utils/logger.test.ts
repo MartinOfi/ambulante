@@ -20,11 +20,7 @@ describe("Logger — development transport", () => {
     const { createLogger } = await import("./logger");
     const logger = createLogger("development");
     logger.debug("test debug message");
-    expect(consoleSpy.debug).toHaveBeenCalledWith(
-      "[DEBUG]",
-      "test debug message",
-      undefined,
-    );
+    expect(consoleSpy.debug).toHaveBeenCalledWith("[DEBUG]", "test debug message", undefined);
   });
 
   it("forwards info calls to console.info with context", async () => {
@@ -50,11 +46,7 @@ describe("Logger — development transport", () => {
     const logger = createLogger("development");
     const cause = new Error("original cause");
     logger.error("something broke", { cause });
-    expect(consoleSpy.error).toHaveBeenCalledWith(
-      "[ERROR]",
-      "something broke",
-      { cause },
-    );
+    expect(consoleSpy.error).toHaveBeenCalledWith("[ERROR]", "something broke", { cause });
   });
 });
 
@@ -106,6 +98,28 @@ describe("Logger — production transport", () => {
     logger.registerErrorHook(vi.fn());
     logger.error("silent console in prod");
     expect(consoleSpy.error).not.toHaveBeenCalled();
+  });
+});
+
+describe("Logger — F1.10 Sentry stub contract", () => {
+  // The noop stub ensures logger.error in production is safe before F8.1
+  // registers the real Sentry hook. This test pins that contract.
+  it("does not throw when no error hook is registered in production", async () => {
+    const { createLogger } = await import("./logger");
+    const logger = createLogger("production");
+    expect(() => logger.error("no hook registered yet")).not.toThrow();
+  });
+
+  it("error hook can be replaced at runtime (F8.1 contract)", async () => {
+    const { createLogger } = await import("./logger");
+    const logger = createLogger("production");
+    const firstHook = vi.fn();
+    const secondHook = vi.fn();
+    logger.registerErrorHook(firstHook);
+    logger.registerErrorHook(secondHook);
+    logger.error("final hook only");
+    expect(secondHook).toHaveBeenCalledWith("final hook only", undefined);
+    expect(firstHook).not.toHaveBeenCalled();
   });
 });
 

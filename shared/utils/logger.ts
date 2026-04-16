@@ -60,6 +60,9 @@ function buildProdLogger(registeredHook: { current: ErrorHook | null }): Logger 
       // F8.1 registers the real implementation; until then this is a noop stub.
       registeredHook.current?.(message, context);
     },
+    // F8.1 contract: call logger.registerErrorHook(Sentry.captureException)
+    // once at app boot (e.g. in app/layout.tsx or instrumentation.ts).
+    // Calling it again replaces the previous hook — last registration wins.
     registerErrorHook(hook: ErrorHook): void {
       registeredHook.current = hook;
     },
@@ -76,7 +79,6 @@ export function createLogger(env: NodeEnv = "development"): Logger {
   return buildDevLogger(registeredHook);
 }
 
-const resolvedEnv =
-  (process.env.NODE_ENV as NodeEnv | undefined) ?? "development";
+const resolvedEnv = (process.env.NODE_ENV as NodeEnv | undefined) ?? "development";
 
 export const logger: Logger = createLogger(resolvedEnv);
