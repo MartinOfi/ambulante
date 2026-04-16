@@ -75,6 +75,20 @@
 - **Descripción:** Botón que alterna entre light/dark.
 - **Usado en:** `features/landing/components/LandingNav/LandingNav`.
 
+### Layout primitives (Stack, Row, Container, Screen, Spacer, Divider)
+
+- **Ruta barrel:** `shared/components/layout/index.ts`
+- **Rutas individuales:** `shared/components/layout/{Stack,Row,Container,Screen,Spacer,Divider}/`
+- **Descripción:** Primitivas de layout flexbox + contenedor. Todas polimórficas vía prop `as`.
+  - `Stack` — flex-col, props: `gap`, `align`, `justify`, `as`
+  - `Row` — flex-row, props: `gap`, `align`, `justify`, `wrap`, `as`
+  - `Container` — max-width centrado, props: `size` (sm/md/lg/xl/full), `padded`, `as`
+  - `Screen` — wrapper full-viewport `min-h-screen overflow-y-auto`, props: `className`
+  - `Spacer` — `aria-hidden` spacer, props: `size` (1–16), `axis` (vertical/horizontal)
+  - `Divider` — `<hr>` con `border-border`, props: `orientation` (horizontal/vertical)
+- **Tipo polimórfico compartido:** `shared/components/layout/polymorphic.types.ts` → `PolymorphicProps<T, Extra>`
+- **API:** `import { Stack, Row, Container, Screen, Spacer, Divider } from '@/shared/components/layout'`
+
 ---
 
 ## 2b. Query (`shared/query/`)
@@ -162,7 +176,13 @@
 
 ## 6. Styles (`shared/styles/`)
 
-_(vacío — globals viven en `app/globals.css`)_
+### tokens
+
+- **Ruta:** `shared/styles/tokens.ts`
+- **Descripción:** Single source of truth de design tokens tipados. Exporta `COLORS` (raw HSL values por modo + CSS var refs para Tailwind), `RADIUS`, `SHADOWS`, `MOTION` (keyframes, durations, easings, animations), `TYPOGRAPHY`.
+- **API:** `import { COLORS, RADIUS, SHADOWS, MOTION, TYPOGRAPHY } from '@/shared/styles/tokens'`
+- **Usado en:** `tailwind.config.ts` (via import relativo — los path aliases no aplican en ese contexto Node.js)
+- **Nota:** `COLORS.raw.light` / `COLORS.raw.dark` son los valores crudos HSL para uso runtime. `COLORS.cssVarRefs` contiene las references `hsl(var(--token))` para el config de Tailwind.
 
 ---
 
@@ -243,3 +263,5 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-16 | F1.2: agregado queryKeys en sección 2b                              | —     |
 | 2026-04-16 | F1.6: agregada sección 10. Stores con `useUIStore`                   | —     |
 | 2026-04-16 | F1.3/F1.10: agregado logger en sección 5                            | —     |
+| 2026-04-16 | F1.8: agregado `shared/styles/tokens.ts` — design tokens tipados     | —     |
+| 2026-04-16 | F1.9: agregadas layout primitives (Stack, Row, Container, Screen, Spacer, Divider) + `polymorphic.types.ts` | —     |
