@@ -3,6 +3,10 @@ import { Map, ShoppingBag, User } from "lucide-react";
 import { ROUTES } from "@/shared/constants/routes";
 import type { ClientBottomNavProps } from "./ClientBottomNav.types";
 
+function isPathActive(activePath: string, href: string): boolean {
+  return activePath === href || activePath.startsWith(`${href}/`);
+}
+
 const NAV_ITEMS = [
   { label: "Mapa", href: ROUTES.client.map, icon: Map },
   { label: "Pedidos", href: ROUTES.client.orders, icon: ShoppingBag },
@@ -17,7 +21,7 @@ export function ClientBottomNav({ activePath }: ClientBottomNavProps) {
     >
       <ul className="flex h-16 items-center justify-around">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const isActive = activePath === href || activePath.startsWith(href + "/");
+          const isActive = isPathActive(activePath, href);
           return (
             <li key={href}>
               <Link
