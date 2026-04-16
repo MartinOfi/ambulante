@@ -4,8 +4,10 @@ import { useState } from "react";
 
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { toast } from "sonner";
 
 import { logger } from "@/shared/utils/logger";
+import { extractErrorMessage } from "@/shared/utils/errorMessage";
 
 const STALE_TIME_MS = 30_000;
 const GC_TIME_MS = 5 * 60_000;
@@ -52,9 +54,17 @@ export function QueryProvider({ children }: QueryProviderProps) {
               queryKey: query.queryKey,
               error,
             });
+            const message = extractErrorMessage(error);
+            if (message) toast.error(message);
           },
         }),
         defaultOptions: {
+          mutations: {
+            onError(error) {
+              const message = extractErrorMessage(error, "mutation");
+              if (message) toast.error(message);
+            },
+          },
           queries: {
             staleTime: STALE_TIME_MS,
             gcTime: GC_TIME_MS,

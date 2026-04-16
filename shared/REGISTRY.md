@@ -72,6 +72,13 @@
 - **API:** `<Form><FormField control name render={({ field }) => <FormItem>...} /></Form>`
 - **Usado en:** LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm.
 
+### Toaster
+
+- **Ruta:** `shared/components/ui/toaster.tsx`
+- **Descripción:** Wrapper `"use client"` sobre `sonner`'s `<Toaster />`. Configurado con `position="bottom-center"`, `richColors`, `closeButton`. Montado en `app/layout.tsx` dentro de `<ThemeProvider>`.
+- **API:** `<Toaster />` — sin props. Para disparar toasts usar `import { toast } from "sonner"` directamente.
+- **Usado en:** `app/layout.tsx`.
+
 ### RadialOrbitalTimeline
 
 - **Ruta:** `shared/components/ui/radial-orbital-timeline.tsx`
@@ -226,6 +233,13 @@
 - **Mapeo:** `/map*` → `client` · `/store*` → `store` · `/admin*` → `admin` · resto → `null`
 - **Usado en:** `middleware.ts`.
 
+### extractErrorMessage
+
+- **Ruta:** `shared/utils/errorMessage.ts`
+- **Descripción:** Mapea un `unknown` error a un mensaje de texto en español (`string`) o `null`. Retorna `null` para errores 4xx (manejados en-feature). Retorna una cadena fallback para 5xx/red.
+- **API:** `extractErrorMessage(error: unknown, context?: "query" | "mutation"): string | null`
+- **Usado en:** `shared/providers/QueryProvider.tsx` (QueryCache.onError + mutations.onError).
+
 ### cn
 
 - **Ruta:** `shared/utils/cn.ts`
@@ -365,6 +379,12 @@
 ## 8. Constants (`shared/constants/`)
 
 > Reemplazan magic strings / numbers. Todo lo de dominio con significado semántico.
+
+### QUERY_ERROR_MESSAGE, MUTATION_ERROR_MESSAGE
+
+- **Ruta:** `shared/constants/ui-messages.ts`
+- **Descripción:** Mensajes de error en español para mostrar al usuario. `QUERY_ERROR_MESSAGE` para fallos de fetch; `MUTATION_ERROR_MESSAGE` para fallos de acción. Reemplaza magic strings en `extractErrorMessage`.
+- **Usado en:** `shared/utils/errorMessage.ts`.
 
 ### RADIUS_OPTIONS, RadiusValue, DEFAULT_RADIUS
 
@@ -583,3 +603,4 @@
 | 2026-04-16 | F2.8: agregados Input, Label, Form UI primitives en §1; loginSchema/registerSchema/forgotPasswordSchema/resetPasswordSchema en §7b; ROUTES actualizado con grupo `auth` | —     |
 | 2026-04-16 | F4.2: agregado useAcceptOrderMutation en §3 (feature-local — orders); optimistic update pattern     | —     |
 | 2026-04-16 | F4.4: QueryProvider actualizado — retry inteligente (no 4xx), backoff exp., networkMode offlineFirst; exports auxiliares documentados | —     |
+| 2026-04-16 | F4.5: agregado Toaster en §1; extractErrorMessage en §5; QUERY/MUTATION_ERROR_MESSAGE en §8; QueryProvider actualizado con toast en QueryCache.onError y mutations.onError | —     |
