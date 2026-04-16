@@ -778,7 +778,7 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:**
 
 ### F4.3 — Zod parsing en el boundary
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: now]
 - **Por qué:** Toda respuesta externa debe pasar por `schema.parse()` antes de entrar al store de React Query.
 - **Entregable:** Helper `shared/query/parseResponse.ts` que acepta schema + promise y retorna parseado o throw tipado. Convención documentada.
 - **Archivos:** `shared/query/parseResponse.ts`.
