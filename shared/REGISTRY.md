@@ -281,6 +281,22 @@
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
 - **Usado en:** `features/landing/*` (migrables), cualquier `<Link>` o `router.push`.
 
+### ORDER_STATUS, OrderStatus, TERMINAL_ORDER_STATUSES, ORDER_EXPIRATION_MINUTES, ORDER_AUTOCLOSE_HOURS
+
+- **Ruta:** `shared/constants/order.ts`
+- **Descripción:** Constantes del dominio de pedidos. `ORDER_STATUS` es un objeto frozen `as const` con los 8 estados de la máquina de estados (PRD §6.1). `TERMINAL_ORDER_STATUSES` es un array readonly de los 3 estados terminales. Los timeouts siguen §9.2 del PRD.
+- **API:** `ORDER_STATUS.ACEPTADO`, `TERMINAL_ORDER_STATUSES`, `ORDER_EXPIRATION_MINUTES` (10), `ORDER_AUTOCLOSE_HOURS` (2)
+- **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
+- **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
+
+### USER_ROLES, UserRole
+
+- **Ruta:** `shared/constants/user.ts`
+- **Descripción:** Roles de usuario del sistema (PRD §4). Objeto frozen `as const` con los 3 roles.
+- **API:** `USER_ROLES.CLIENTE`, `USER_ROLES.TIENDA`, `USER_ROLES.ADMIN`
+- **Tipo exportado:** `UserRole` = `"CLIENTE" | "TIENDA" | "ADMIN"`.
+- **Usado en:** guards de autorización, lógica de transición de estados (§7.3 aislamiento de roles).
+
 ---
 
 ## 9. Config (`shared/config/`)
@@ -335,3 +351,4 @@
 | 2026-04-16 | F1.4: agregada sección 8. Constants — ROUTES, Route, buildHref       | —     |
 | 2026-04-16 | F1.7: agregado NuqsProvider en sección 2c                            | —     |
 | 2026-04-16 | F3.1: agregada sección 7b. Schemas Zod base; actualizados tipos en §7 para re-exportar desde schemas | —     |
+| 2026-04-16 | F3.7: agregados ORDER_STATUS, USER_ROLES y constantes de timeout en sección 8 | —     |
