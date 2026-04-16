@@ -107,8 +107,9 @@
 ### QueryProvider
 
 - **Ruta:** `shared/providers/QueryProvider.tsx`
-- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry (1) y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
+- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry inteligente (backoff exponencial, sin retry en 4xx, máx 3 intentos), retryDelay exponencial acotado (1s→30s), `networkMode: 'offlineFirst'` para PWA, y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
 - **API:** `<QueryProvider>{children}</QueryProvider>`
+- **Exports auxiliares:** `isClientError(error)`, `computeRetryDelay(attemptIndex)`, `shouldRetry(failureCount, error)` — exportadas para testabilidad.
 - **Usado en:** `app/layout.tsx`.
 
 ### NuqsProvider
@@ -465,3 +466,4 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F4.4: QueryProvider actualizado — retry inteligente (no 4xx), backoff exp., networkMode offlineFirst; exports auxiliares documentados | —     |
