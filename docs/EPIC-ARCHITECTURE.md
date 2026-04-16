@@ -677,7 +677,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:** Creados 4 schemas Zod + barrel index. Actualizados tipos: `shared/types/store.ts` migrado a re-export; nuevos `shared/types/{coordinates,product,user}.ts`. `shared/types/store.ts` mantiene re-export de `Coordinates` para backward-compat con consumers existentes. 32 tests (RED→GREEN). REGISTRY actualizado.
 
 ### F3.2 — Order state machine tipada
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 13:00]
 - **Por qué:** PRD §6 define la máquina de estados del pedido — es **la invariante principal del producto**. Debe ser imposible compilar una transición inválida.
 - **Entregable:** `shared/domain/order-state-machine.ts` con discriminated union por estado, función `transition(order, event, actor)` que retorna `Result<Order, TransitionError>`. Test con todos los casos del §6.1 del PRD.
 - **Archivos:** `shared/domain/order-state-machine.ts`, `shared/domain/order-state-machine.test.ts`.
