@@ -343,7 +343,7 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:** Creados `playwright.config.ts` (chromium only, webServer con `pnpm dev --port 3100` para aislar del puerto 3000 que usan otros worktrees), `e2e/landing.spec.ts` (visita `/` y verifica `h1` con texto "Todo lo ambulante"). Scripts `test:e2e` y `test:e2e:ui` agregados a `package.json`. `.gitignore` actualizado con `test-results/`, `playwright-report/`, `playwright/.cache/`, `blob-report/`. `webServer.env` inyecta `NEXT_PUBLIC_APP_URL` para cumplir con el schema Zod de F0.2. Test GREEN (1 passed).
 
 ### F0.7 — GitHub Actions CI
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 12:53]
 - **Por qué:** Cada PR debe pasar lint + typecheck + test antes de merge.
 - **Entregable:** `.github/workflows/ci.yml` con jobs `lint`, `typecheck`, `test-unit`, `test-e2e`, `build`. Matrix node 20.
 - **Archivos:** `.github/workflows/ci.yml`.
