@@ -452,7 +452,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.6 — Zustand setup base
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
 - **Por qué:** El CLAUDE.md lista Zustand para client state global. Sin una convención armada, el equipo va a mezclar todo.
 - **Entregable:** `shared/stores/` con un store de ejemplo (ej. UI preferences) usando `create` + `persist` + slices pattern. Doc en REGISTRY.md con la convención.
 - **Archivos:** `shared/stores/ui.ts`.
