@@ -405,7 +405,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - F1.8 (tokens) y F9.1 (escala spacing) tocan `tailwind.config.ts`. F9.1 es de otra fase pero si se arranca antes de tiempo, choca.
 
 ### F1.1 — React Query provider + QueryClient config
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
 - **Por qué:** `useNearbyStores` hoy usa `useState+useEffect` — sin caché, sin dedupe. Toda feature de datos lo va a necesitar.
 - **Entregable:** `shared/providers/QueryProvider.tsx` con `QueryClient` tipado; integrado en `app/layout.tsx`. Devtools habilitadas en dev.
 - **Archivos:** `shared/providers/QueryProvider.tsx`, `app/layout.tsx`, `package.json`.
