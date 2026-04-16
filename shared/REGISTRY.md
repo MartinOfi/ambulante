@@ -77,7 +77,18 @@
 
 ---
 
-## 2b. Providers (`shared/providers/`)
+## 2b. Query (`shared/query/`)
+
+### queryKeys
+
+- **Ruta:** `shared/query/keys.ts`
+- **Descripción:** Registro centralizado de query key factories para React Query v5. Organizado por dominio con jerarquía para invalidación parcial.
+- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`
+- **Usado en:** hooks de data en `features/*/hooks/`.
+
+---
+
+## 2c. Providers (`shared/providers/`)
 
 ### QueryProvider
 
@@ -198,4 +209,5 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
-| 2026-04-16 | F1.1: agregado QueryProvider en sección 2b                          | —     |
+| 2026-04-16 | F1.1: agregado QueryProvider en sección 2c                          | —     |
+| 2026-04-16 | F1.2: agregado queryKeys en sección 2b                              | —     |
