@@ -352,13 +352,13 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 - **Notas:**
 
 ### F0.8 — Upgrade a Next.js 15
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** CLAUDE.md §2 pide Next 15. Hoy estamos en 14.2.5. Cuanto antes, menos deuda de async params.
 - **Entregable:** Next 15 instalado, async params de rutas adaptados, build verde.
 - **Archivos:** `package.json`, rutas que usen `params`.
 - **Depends on:** F0.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Bump a `next@15.5.15` + `react@19.2.5` + `react-dom@19.2.5` + `@types/react@19.2.14` + `@types/react-dom@19.2.3` + `eslint-config-next@15.5.15`. No hubo rutas dinámicas (`[param]`) ni uso de `cookies()/headers()/draftMode()/searchParams` en la base, así que la migración de async APIs fue no-op. `next-env.d.ts` se autoregeneró con la `reference path` a `.next/types/routes.d.ts` (typed routes). `.env.local` creado en el worktree desde `.env.example` para permitir build/lint (validador Zod de F0.2 lo exige; sigue gitignored). `next lint` quedó warning de deprecación — migración a ESLint CLI directa queda como sub-tarea futura (seguramente F0.3.1 o dentro de F0.7/CI). Gates verdes: typecheck 0, lint 0, build 8 páginas estáticas, vitest 5/5. Ejecutado desde worktree `../ambulante-f0-8` en branch `feat/f0-8`. Tarea standalone, sin `Continues with:`.
 
 ### F0.9 — Codeowners + PR template
 - **Estado:** ✅ done
