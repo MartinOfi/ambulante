@@ -3,6 +3,7 @@ import { z } from "zod";
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   NEXT_PUBLIC_APP_URL: z.string().url(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 });
 
 /**

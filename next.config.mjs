@@ -1,4 +1,5 @@
 import "./shared/config/env.runtime.mjs";
+import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -11,4 +12,9 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  disableLogger: true,
+  widenClientFileUpload: true,
+  automaticVercelMonitors: false,
+});
