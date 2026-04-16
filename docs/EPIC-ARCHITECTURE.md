@@ -778,13 +778,13 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 - **Notas:**
 
 ### F4.3 — Zod parsing en el boundary
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: now]
+- **Estado:** ✅ done
 - **Por qué:** Toda respuesta externa debe pasar por `schema.parse()` antes de entrar al store de React Query.
 - **Entregable:** Helper `shared/query/parseResponse.ts` que acepta schema + promise y retorna parseado o throw tipado. Convención documentada.
 - **Archivos:** `shared/query/parseResponse.ts`.
 - **Depends on:** F3.1
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creados `shared/query/parseResponse.ts` (41 líneas) + `shared/query/parseResponse.test.ts` (9 tests, 100% cobertura del helper). `ParseError` expone `cause: ZodError` y `schemaName`. Inyección de `onError` para tests sin mockear módulo. REGISTRY actualizado. Convención: `const data = await parseResponse(schema, service.fetchXxx())` en cualquier `queryFn`.
 
 ### F4.4 — Retry y offline policies
 - **Estado:** ⚪ pending
