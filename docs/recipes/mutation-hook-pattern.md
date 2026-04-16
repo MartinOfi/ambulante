@@ -32,7 +32,7 @@ export function useSomeMutation() {
       // 3. Apply optimistic update — always spread to produce a new object (never mutate)
       queryClient.setQueryData<SomeEntity>(queryKeys.some.byId(entityId), (old) => {
         if (old === undefined) return old;
-        return { ...old, status: "OPTIMISTIC_STATUS" } as SomeEntity;
+        return { ...old, status: SOME_STATUS.TARGET /* replace with status constant */ } as SomeEntity;
       });
       // 4. Return snapshot as context for potential rollback
       return { previous };
@@ -77,7 +77,7 @@ onMutate: async (entityId) => {
   const previous = queryClient.getQueryData<SomeEntity>(queryKeys.some.byId(entityId));
   queryClient.setQueryData<SomeEntity>(queryKeys.some.byId(entityId), (old) => ({
     ...old,
-    status: "OPTIMISTIC",
+    status: SOME_STATUS.TARGET /* replace with status constant */,
   }) as SomeEntity);
   return { previous };
 },
@@ -136,8 +136,9 @@ useMutation({
 
 ## How to wire a new mutation hook
 
-1. Create `features/<name>/services/<entity>.mock.ts` with the `<Entity>Service` interface and a mock that throws "not implemented".
-2. Create `features/<name>/hooks/use<Action><Entity>Mutation.ts` following the template above.
+1. Create `features/<name>/services/<entity>.service.ts` with the `<Entity>Service` interface only.
+2. Create `features/<name>/services/<entity>.mock.ts` importing from `<entity>.service.ts`; implement with a `MOCK_NETWORK_DELAY_MS` constant and throw "not implemented".
+3. Create `features/<name>/hooks/use<Action><Entity>Mutation.ts` following the template above.
 3. Return `useMutation(...)` directly so consumers get `{ mutate, isPending, isError, isSuccess, data }`.
 5. Update `features/<name>/index.ts` barrel export.
 6. Update `shared/REGISTRY.md` if the hook is used in 2+ features (promote to `shared/hooks/`).
