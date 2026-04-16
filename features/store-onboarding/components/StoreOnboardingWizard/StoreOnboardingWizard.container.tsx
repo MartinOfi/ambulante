@@ -14,6 +14,13 @@ import type { OnboardingStep } from "@/features/store-onboarding/types";
 import type { StoreOnboardingWizardContainerProps } from "./StoreOnboardingWizard.types";
 import { StoreOnboardingWizard } from "./StoreOnboardingWizard";
 
+const ONBOARDING_STEPS: readonly OnboardingStep[] = [1, 2, 3];
+
+function prevStep(current: OnboardingStep): OnboardingStep {
+  const idx = ONBOARDING_STEPS.indexOf(current);
+  return idx > 0 ? ONBOARDING_STEPS[idx - 1] : current;
+}
+
 export function StoreOnboardingWizardContainer({
   service = defaultService,
 }: StoreOnboardingWizardContainerProps) {
@@ -46,19 +53,22 @@ export function StoreOnboardingWizardContainer({
     }
 
     setIsSubmitting(true);
-    const result = await service.submit(parsed.data);
-    setIsSubmitting(false);
-
-    if (!result.success) {
-      setServerError(result.error ?? "Ocurrió un error. Intentá de nuevo.");
-      return;
+    try {
+      const result = await service.submit(parsed.data);
+      if (!result.success) {
+        setServerError(result.error ?? "Ocurrió un error. Intentá de nuevo.");
+        return;
+      }
+      router.push(ROUTES.store.pendingApproval);
+    } catch {
+      setServerError("Ocurrió un error de red. Intentá de nuevo.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    router.push(ROUTES.store.pendingApproval);
   }
 
   function handleBack(): void {
-    setStep((prev) => (prev > 1 ? ((prev - 1) as OnboardingStep) : prev));
+    setStep(prevStep);
   }
 
   return (

@@ -55,7 +55,7 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
           name="days"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel>Días de operación</FormLabel>
+              <label className="text-sm font-medium leading-none">Días de operación</label>
               <div className="flex flex-wrap gap-2">
                 {STORE_ONBOARDING_DAYS.map((day) => {
                   const selected = field.value.includes(day);

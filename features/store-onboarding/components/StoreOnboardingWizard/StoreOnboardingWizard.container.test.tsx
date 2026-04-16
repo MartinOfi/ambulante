@@ -16,12 +16,16 @@ const failingService: StoreOnboardingService = {
   submit: vi.fn().mockResolvedValue({ success: false, error: "Error de servidor" }),
 };
 
+const throwingService: StoreOnboardingService = {
+  submit: vi.fn().mockRejectedValue(new Error("Network error")),
+};
+
 function fillAndSubmitFiscal() {
   fireEvent.change(screen.getByPlaceholderText(/El Rincón del Sabor/i), {
     target: { value: "Mi Tienda" },
   });
   fireEvent.change(screen.getByPlaceholderText(/20304050607/i), {
-    target: { value: "20304050607" },
+    target: { value: "20304050609" },
   });
   fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
 }
@@ -102,5 +106,23 @@ describe("StoreOnboardingWizardContainer", () => {
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("Error de servidor");
     });
+  });
+
+  it("shows network error and resets isSubmitting when service throws", async () => {
+    render(<StoreOnboardingWizardContainer service={throwingService} />);
+    fillAndSubmitFiscal();
+    await waitFor(() => screen.getByText("Zona de operación"));
+    fillAndSubmitZone();
+    await waitFor(() => screen.getByText("Horarios"));
+
+    fireEvent.click(screen.getByRole("button", { name: /lun/i }));
+    fireEvent.click(screen.getByRole("button", { name: /enviar solicitud/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Ocurrió un error de red. Intentá de nuevo.",
+      );
+    });
+    expect(screen.getByRole("button", { name: /enviar solicitud/i })).not.toBeDisabled();
   });
 });

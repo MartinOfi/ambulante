@@ -12,7 +12,7 @@ describe("stepFiscalSchema", () => {
     const result = stepFiscalSchema.safeParse({
       businessName: "El Rincón del Sabor",
       kind: "food-truck",
-      cuit: "20304050607",
+      cuit: "20304050609",
     });
     expect(result.success).toBe(true);
   });
@@ -21,7 +21,7 @@ describe("stepFiscalSchema", () => {
     const result = stepFiscalSchema.safeParse({
       businessName: "",
       kind: "food-truck",
-      cuit: "20304050607",
+      cuit: "20304050609",
     });
     expect(result.success).toBe(false);
   });
@@ -30,7 +30,7 @@ describe("stepFiscalSchema", () => {
     const result = stepFiscalSchema.safeParse({
       businessName: "El Rincón",
       kind: "restaurant",
-      cuit: "20304050607",
+      cuit: "20304050609",
     });
     expect(result.success).toBe(false);
   });
@@ -51,6 +51,19 @@ describe("stepFiscalSchema", () => {
       cuit: "2030405060A",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects CUIT with invalid check digit", () => {
+    const result = stepFiscalSchema.safeParse({
+      businessName: "El Rincón",
+      kind: "food-truck",
+      cuit: "20304050607",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const message = result.error.issues[0].message;
+      expect(message).toBe("CUIT inválido");
+    }
   });
 });
 
@@ -118,6 +131,32 @@ describe("stepHoursSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects closeTime equal to openTime", () => {
+    const result = stepHoursSchema.safeParse({
+      days: ["lunes"],
+      openTime: "09:00",
+      closeTime: "09:00",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path.includes("closeTime"));
+      expect(issue?.message).toBe("El horario de cierre debe ser posterior al de apertura");
+    }
+  });
+
+  it("rejects closeTime earlier than openTime", () => {
+    const result = stepHoursSchema.safeParse({
+      days: ["lunes"],
+      openTime: "18:00",
+      closeTime: "09:00",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path.includes("closeTime"));
+      expect(issue?.message).toBe("El horario de cierre debe ser posterior al de apertura");
+    }
+  });
 });
 
 describe("storeOnboardingSchema", () => {
@@ -125,7 +164,7 @@ describe("storeOnboardingSchema", () => {
     const result = storeOnboardingSchema.safeParse({
       businessName: "El Rincón del Sabor",
       kind: "street-cart",
-      cuit: "20304050607",
+      cuit: "20304050609",
       neighborhood: "San Telmo",
       coverageNotes: "Plaza Dorrego los domingos",
       days: ["sabado", "domingo"],
@@ -139,7 +178,7 @@ describe("storeOnboardingSchema", () => {
     const result = storeOnboardingSchema.safeParse({
       businessName: "El Rincón",
       kind: "food-truck",
-      cuit: "20304050607",
+      cuit: "20304050609",
       neighborhood: "Palermo",
       days: ["lunes"],
       // missing openTime and closeTime
