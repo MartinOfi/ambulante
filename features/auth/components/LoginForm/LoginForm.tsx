@@ -1,7 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { UseFormReturn } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -13,21 +12,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { loginSchema, type LoginValues } from "@/features/auth/schemas/auth.schemas";
+import type { LoginValues } from "@/features/auth/schemas/auth.schemas";
 import { ROUTES } from "@/shared/constants/routes";
 
 interface LoginFormProps {
+  readonly form: UseFormReturn<LoginValues>;
   readonly onSubmit: (values: LoginValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly serverError: string | null;
 }
 
-export function LoginForm({ onSubmit, isLoading, serverError }: LoginFormProps) {
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
-  });
-
+export function LoginForm({ form, onSubmit, isLoading, serverError }: LoginFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

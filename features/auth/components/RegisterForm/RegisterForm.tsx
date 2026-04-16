@@ -1,7 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { UseFormReturn } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -13,22 +12,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { registerSchema, type RegisterValues } from "@/features/auth/schemas/auth.schemas";
+import type { RegisterValues } from "@/features/auth/schemas/auth.schemas";
 import { ROUTES } from "@/shared/constants/routes";
 import { USER_ROLES } from "@/shared/constants/user";
 
 interface RegisterFormProps {
+  readonly form: UseFormReturn<RegisterValues>;
   readonly onSubmit: (values: RegisterValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly serverError: string | null;
 }
 
-export function RegisterForm({ onSubmit, isLoading, serverError }: RegisterFormProps) {
-  const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "", role: USER_ROLES.client },
-  });
-
+export function RegisterForm({ form, onSubmit, isLoading, serverError }: RegisterFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

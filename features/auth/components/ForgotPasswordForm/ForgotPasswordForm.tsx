@@ -1,7 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { UseFormReturn } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -13,24 +12,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordValues,
-} from "@/features/auth/schemas/auth.schemas";
+import type { ForgotPasswordValues } from "@/features/auth/schemas/auth.schemas";
 import { ROUTES } from "@/shared/constants/routes";
 
 interface ForgotPasswordFormProps {
+  readonly form: UseFormReturn<ForgotPasswordValues>;
   readonly onSubmit: (values: ForgotPasswordValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly submitted: boolean;
 }
 
-export function ForgotPasswordForm({ onSubmit, isLoading, submitted }: ForgotPasswordFormProps) {
-  const form = useForm<ForgotPasswordValues>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: "" },
-  });
-
+export function ForgotPasswordForm({
+  form,
+  onSubmit,
+  isLoading,
+  submitted,
+}: ForgotPasswordFormProps) {
   if (submitted) {
     return (
       <div className="space-y-4 text-center">
