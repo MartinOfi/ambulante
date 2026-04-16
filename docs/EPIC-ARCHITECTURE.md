@@ -405,17 +405,18 @@ Wave 2 (paralelo, después que terminen dependencias):
 - F1.8 (tokens) y F9.1 (escala spacing) tocan `tailwind.config.ts`. F9.1 es de otra fase pero si se arranca antes de tiempo, choca.
 
 ### F1.1 — React Query provider + QueryClient config
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
+- **Estado:** ✅ done [owner: chat-2026-04-16, finished: 10:36]
 - **Por qué:** `useNearbyStores` hoy usa `useState+useEffect` — sin caché, sin dedupe. Toda feature de datos lo va a necesitar.
 - **Entregable:** `shared/providers/QueryProvider.tsx` con `QueryClient` tipado; integrado en `app/layout.tsx`. Devtools habilitadas en dev.
 - **Archivos:** `shared/providers/QueryProvider.tsx`, `app/layout.tsx`, `package.json`.
 - **Depends on:** F0.*
+- **Notas:** vitest.config.ts migrado a `@vitejs/plugin-react-oxc` por incompatibilidad de jsx:preserve con Vite 8 OXC. tsconfig.test.json creado para override de jsx en tests.
 - **Continues with:** F1.2 (cadena C-F1-query)
 - **Estimación:** M
 - **Notas:**
 
 ### F1.2 — Query keys registry
-- **Estado:** ⚪ pending
+- **Estado:** 🟢 ready
 - **Por qué:** Invalidaciones cruzadas necesitan keys centralizadas y tipadas. Sin esto, el caché se fragmenta.
 - **Entregable:** `shared/query/keys.ts` exportando `queryKeys` con factories tipadas por dominio (`stores.nearby(coords, radius)`, `orders.byUser(userId)`, etc.).
 - **Archivos:** `shared/query/keys.ts`.

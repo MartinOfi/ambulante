@@ -77,6 +77,17 @@
 
 ---
 
+## 2b. Providers (`shared/providers/`)
+
+### QueryProvider
+
+- **Ruta:** `shared/providers/QueryProvider.tsx`
+- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry (1) y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
+- **API:** `<QueryProvider>{children}</QueryProvider>`
+- **Usado en:** `app/layout.tsx`.
+
+---
+
 ## 3. Hooks (`shared/hooks/`)
 
 ### useGeolocation
@@ -187,3 +198,4 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
+| 2026-04-16 | F1.1: agregado QueryProvider en sección 2b                          | —     |
