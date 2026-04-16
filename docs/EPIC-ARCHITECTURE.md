@@ -46,8 +46,8 @@ Este archivo es un **documento vivo**. Cualquier chat o agente puede tomar una t
 
 Antes de que cualquier fase dependiente se destrabe, estas decisiones deben tomarse. Marcar con ✅ al resolver:
 
-- [ ] **DP-1 · Backend stack:** ¿Supabase (candidato default del CLAUDE.md) o alternativa? Afecta F2, F3, F4, F5.
-- [ ] **DP-2 · Auth provider:** Supabase Auth / NextAuth / Clerk / custom. Afecta F2.
+- [x] **DP-1 · Backend stack:** ✅ Supabase (Postgres + Auth + Realtime + Storage + PostGIS). Decidido 2026-04-16.
+- [x] **DP-2 · Auth provider:** ✅ Supabase Auth. Decidido 2026-04-16.
 - [ ] **DP-3 · Observability stack:** Sentry + PostHog / Datadog / Grafana Cloud. Afecta F8.
 - [ ] **DP-4 · Feature flags:** GrowthBook self-hosted / LaunchDarkly / Vercel Edge Config. Afecta F8.
 - [ ] **DP-5 · Tile provider del mapa:** MapTiler / Stadia Maps / OSM self-hosted. Afecta F11.
@@ -556,7 +556,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 **Tu ejemplo del login corresponde a esta fase exacta:** primero se construye la lógica (F2.3) y el interceptor (F2.4), recién después se puede paralelizar la página de login con los layouts.
 
 ### F2.1 — Decisión de auth provider
-- **Estado:** 🔴 blocked (DP-2)
+- **Estado:** ✅ done — Supabase Auth (ver DP-2)
 - **Por qué:** Todas las tareas de F2 dependen de saber si usamos Supabase Auth, NextAuth, Clerk, o propio.
 - **Entregable:** Decisión documentada acá mismo + ADR en `docs/adr/0001-auth-provider.md`.
 - **Depends on:** DP-2
@@ -832,7 +832,7 @@ Wave 4 (al final — requiere features):
 ```
 
 ### F5.1 — Decisión de transporte
-- **Estado:** 🔴 blocked (DP-1)
+- **Estado:** ✅ done — Supabase Realtime (ver DP-1)
 - **Por qué:** Supabase Realtime es el default, pero si se elige otro backend, cambia todo.
 - **Entregable:** ADR `docs/adr/0002-realtime-transport.md`.
 - **Depends on:** DP-1
