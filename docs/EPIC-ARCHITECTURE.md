@@ -759,7 +759,7 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 **⚠️ Conflicto estructural:** F4.4 y F4.5 ambos editan `shared/providers/QueryProvider.tsx`. **No van en paralelo** — F4.5 espera a F4.4 ✅. Esto es una serialización estructural, no solo una advertencia.
 
 ### F4.1 — Pattern para queries: `useXxxQuery` wrapping repository
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 14:42]
 - **Por qué:** Convención para que todos los hooks de data luzcan igual.
 - **Entregable:** Ejemplo canónico `features/map/hooks/useStoresNearbyQuery.ts` + doc con la receta. Reemplaza `useNearbyStores` actual.
 - **Archivos:** `features/map/hooks/useStoresNearbyQuery.ts`, `shared/REGISTRY.md`.
