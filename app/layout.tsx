@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
+import { QueryProvider } from "@/shared/providers/QueryProvider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -138,7 +139,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="ld-software-app" type="application/ld+json">
           {JSON.stringify(softwareAppSchema)}
         </Script>
-        <ThemeProvider>{children}</ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

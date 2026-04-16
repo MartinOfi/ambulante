@@ -77,6 +77,28 @@
 
 ---
 
+## 2b. Query (`shared/query/`)
+
+### queryKeys
+
+- **Ruta:** `shared/query/keys.ts`
+- **Descripción:** Registro centralizado de query key factories para React Query v5. Organizado por dominio con jerarquía para invalidación parcial.
+- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`
+- **Usado en:** hooks de data en `features/*/hooks/`.
+
+---
+
+## 2c. Providers (`shared/providers/`)
+
+### QueryProvider
+
+- **Ruta:** `shared/providers/QueryProvider.tsx`
+- **Descripción:** Envuelve la app con `QueryClientProvider` de React Query v5. Crea un `QueryClient` estable por instancia con defaults de staleTime (30s), gcTime (5min), retry (1) y `refetchOnWindowFocus: false`. Monta `ReactQueryDevtools` solo en `NODE_ENV === "development"`.
+- **API:** `<QueryProvider>{children}</QueryProvider>`
+- **Usado en:** `app/layout.tsx`.
+
+---
+
 ## 3. Hooks (`shared/hooks/`)
 
 ### useGeolocation
@@ -217,4 +239,7 @@ _(vacío — globals viven en `app/globals.css`)_
 | 2026-04-15 | Migración a estructura `features/` + `shared/` (Opción A auditoría) | —     |
 | 2026-04-15 | F0.2: agregada sección 9. Config con `env`                          | —     |
 | 2026-04-15 | F0.8: nota sobre `env.*.mjs` actualizada — Next 15 permite unificar | —     |
+| 2026-04-16 | F1.1: agregado QueryProvider en sección 2c                          | —     |
+| 2026-04-16 | F1.2: agregado queryKeys en sección 2b                              | —     |
 | 2026-04-16 | F1.6: agregada sección 10. Stores con `useUIStore`                   | —     |
+| 2026-04-16 | F1.3/F1.10: agregado logger en sección 5                            | —     |
