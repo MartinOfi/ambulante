@@ -632,7 +632,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.9 — Onboarding de tienda (multi-step)
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress
 - **Por qué:** Una tienda al registrarse queda en estado `pending-approval` hasta que admin valide (A1).
 - **Entregable:** Flow multi-step `app/(auth)/register/store/*` con datos fiscales, zona, horarios. Página `app/(store)/pending-approval`.
 - **Archivos:** `app/(auth)/register/store/*`, `features/store-onboarding/*`.

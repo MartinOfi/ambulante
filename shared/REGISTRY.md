@@ -317,6 +317,15 @@
 - **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional. `sessionSchema` valida sesiones de Supabase Auth (accessToken, refreshToken, expiresAt positivo, user anidado).
 - **API:** `userSchema.parse(raw)` → `User`; `sessionSchema.parse(raw)` → `Session`; `userRoleSchema.options` para iterar roles.
 
+### stepFiscalSchema, stepZoneSchema, stepHoursSchema, storeOnboardingSchema
+
+- **Ruta:** `features/store-onboarding/schemas/store-onboarding.schemas.ts`
+- **Descripción:** Schemas Zod para el wizard de onboarding de tienda (F2.9). `stepFiscalSchema` valida nombre del negocio, tipo (`storeKindSchema`) y CUIT (11 dígitos). `stepZoneSchema` valida barrio y notas opcionales. `stepHoursSchema` valida días (`STORE_ONBOARDING_DAYS`) y horarios `HH:MM`. `storeOnboardingSchema` es la fusión de los tres para validar el payload final antes de enviar.
+- **API:** `zodResolver(stepFiscalSchema)` en cada step form; `storeOnboardingSchema.safeParse({ ...fiscalDraft, ...zoneDraft, ...hoursDraft })` en el container antes de llamar al servicio.
+- **Tipos exportados:** `StepFiscalValues`, `StepZoneValues`, `StepHoursValues`, `StoreOnboardingData`, `OnboardingDay`
+- **Constante:** `STORE_ONBOARDING_DAYS` — array readonly de los 7 días en español.
+- **Nota:** esquema de feature — no en `shared/` porque solo lo consume `features/store-onboarding`.
+
 ### loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema
 
 - **Ruta:** `features/auth/schemas/auth.schemas.ts`
@@ -371,7 +380,7 @@
 
 - **Ruta:** `shared/constants/routes.ts`
 - **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `auth`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
-- **API:** `ROUTES.auth.login`, `ROUTES.auth.register`, `ROUTES.auth.forgotPassword`, `ROUTES.auth.resetPassword`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `ROUTES.store.orders`, `ROUTES.store.catalog`, `ROUTES.store.profile`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **API:** `ROUTES.auth.login`, `ROUTES.auth.register`, `ROUTES.auth.registerStore`, `ROUTES.auth.forgotPassword`, `ROUTES.auth.resetPassword`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `ROUTES.store.orders`, `ROUTES.store.catalog`, `ROUTES.store.profile`, `ROUTES.store.pendingApproval`, `buildHref(ROUTES.store.order, { orderId: "x" })`
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
 - **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, `features/store-shell/components/StoreNav`, cualquier `<Link>` o `router.push`.
 

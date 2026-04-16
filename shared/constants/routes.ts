@@ -18,6 +18,7 @@ export const ROUTES = {
   auth: {
     login: "/login",
     register: "/register",
+    registerStore: "/register/store",
     forgotPassword: "/forgot-password",
     resetPassword: "/reset-password",
   },
@@ -32,6 +33,7 @@ export const ROUTES = {
     catalog: "/store/catalog",
     profile: "/store/profile",
     order: "/store/order/:orderId",
+    pendingApproval: "/store/pending-approval",
   },
   admin: {
     dashboard: "/admin/dashboard",
