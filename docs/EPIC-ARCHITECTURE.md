@@ -434,7 +434,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.4 — Routes tipadas
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
 - **Por qué:** Hoy `"/map"` es un magic string repetido por 8 lugares. Cualquier rename rompe y el compilador no lo nota.
 - **Entregable:** `shared/constants/routes.ts` con `ROUTES.client.map`, `ROUTES.store.dashboard`, etc. Helper `href(route, params?)` tipado.
 - **Archivos:** `shared/constants/routes.ts`.
