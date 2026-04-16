@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { userRoleSchema, userSchema } from "./user";
+import { userRoleSchema, userSchema, sessionSchema } from "./user";
 
 describe("userRoleSchema", () => {
   it("accepts valid roles", () => {
@@ -45,5 +45,65 @@ describe("userSchema", () => {
   it("rejects invalid role", () => {
     const result = userSchema.safeParse({ ...validUser, role: "owner" });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("sessionSchema", () => {
+  const validUser = {
+    id: "user-1",
+    email: "store@example.com",
+    role: "store",
+  };
+
+  const validSession = {
+    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature",
+    refreshToken: "refresh-token-abc123",
+    expiresAt: 1800000000,
+    user: validUser,
+  };
+
+  it("accepts a valid session", () => {
+    const result = sessionSchema.safeParse(validSession);
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects empty accessToken", () => {
+    const result = sessionSchema.safeParse({ ...validSession, accessToken: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects empty refreshToken", () => {
+    const result = sessionSchema.safeParse({ ...validSession, refreshToken: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects negative expiresAt", () => {
+    const result = sessionSchema.safeParse({ ...validSession, expiresAt: -1 });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects zero expiresAt", () => {
+    const result = sessionSchema.safeParse({ ...validSession, expiresAt: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects invalid nested user", () => {
+    const result = sessionSchema.safeParse({
+      ...validSession,
+      user: { ...validUser, email: "bad-email" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects missing fields", () => {
+    const { accessToken: _at, ...withoutToken } = validSession;
+    const result = sessionSchema.safeParse(withoutToken);
+    expect(result.success).toBe(false);
+  });
+
+  it("infers Session type with correct shape", () => {
+    const parsed = sessionSchema.parse(validSession);
+    expect(parsed.user.role).toBe("store");
+    expect(typeof parsed.expiresAt).toBe("number");
   });
 });

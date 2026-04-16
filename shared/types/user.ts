@@ -1,1 +1,1 @@
-export type { UserRole, User } from "@/shared/schemas/user";
+export type { UserRole, User, Session } from "@/shared/schemas/user";

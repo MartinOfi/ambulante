@@ -216,10 +216,10 @@
 - **Descripción:** Producto del catálogo de una tienda.
 - **Usado en:** futuras features de pedido y catálogo.
 
-### User, UserRole
+### User, UserRole, Session
 
 - **Ruta:** `shared/types/user.ts` (re-export de `@/shared/schemas/user`)
-- **Descripción:** Usuario autenticado con rol (`client` | `store` | `admin`).
+- **Descripción:** Usuario autenticado con rol (`client` | `store` | `admin`). `Session` modela la sesión de Supabase Auth: `accessToken`, `refreshToken`, `expiresAt` (Unix timestamp positivo), `user`.
 - **Usado en:** features de auth, F2.x, dashboard.
 
 ---
@@ -246,11 +246,11 @@
 - **Descripción:** Producto del catálogo (precio, disponibilidad, storeId). `photoUrl` y `description` opcionales.
 - **API:** `productSchema.parse(raw)` → `Product`
 
-### userRoleSchema, userSchema
+### userRoleSchema, userSchema, sessionSchema
 
 - **Ruta:** `shared/schemas/user.ts`
-- **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional.
-- **API:** `userSchema.parse(raw)` → `User`; `userRoleSchema.options` para iterar roles.
+- **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional. `sessionSchema` valida sesiones de Supabase Auth (accessToken, refreshToken, expiresAt positivo, user anidado).
+- **API:** `userSchema.parse(raw)` → `User`; `sessionSchema.parse(raw)` → `Session`; `userRoleSchema.options` para iterar roles.
 
 ### orderStatusSchema, orderItemSchema, orderSchema, OrderItem, Order
 
@@ -311,12 +311,12 @@
 - **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
 - **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
 
-### USER_ROLES, UserRole
+### USER_ROLES
 
 - **Ruta:** `shared/constants/user.ts`
-- **Descripción:** Roles de usuario del sistema (PRD §4). Objeto frozen `as const` con los 3 roles.
-- **API:** `USER_ROLES.CLIENTE`, `USER_ROLES.TIENDA`, `USER_ROLES.ADMIN`
-- **Tipo exportado:** `UserRole` = `"CLIENTE" | "TIENDA" | "ADMIN"`.
+- **Descripción:** Roles de usuario del sistema (PRD §4). Objeto frozen `as const` con los 3 roles. Valores alineados con `UserRole` del schema Zod.
+- **API:** `USER_ROLES.client`, `USER_ROLES.store`, `USER_ROLES.admin`
+- **Tipo `UserRole`:** importar desde `@/shared/schemas/user` o `@/shared/types/user` — no re-exportado desde constants para evitar colisión.
 - **Usado en:** guards de autorización, lógica de transición de estados (§7.3 aislamiento de roles).
 
 ---
@@ -465,3 +465,4 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
