@@ -139,8 +139,9 @@
 ### storesService
 
 - **Ruta:** `shared/services/stores.ts`
-- **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Implementación actual: `MockStoresService`. Swap a Supabase sin tocar consumers.
+- **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Delega a `storeRepository` (F3.4). Swap a Supabase → solo cambiar el repository, sin tocar consumers.
 - **API:** `findNearby({ coords, radiusMeters })`, `findById(id)`
+- **Tipos:** `StoresService`, `FindNearbyInput` re-exportados desde `shared/repositories/store`
 - **Usado en:** `features/map/hooks/useNearbyStores`.
 
 ---
@@ -251,9 +252,16 @@
 - **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional.
 - **API:** `userSchema.parse(raw)` → `User`; `userRoleSchema.options` para iterar roles.
 
+### orderStatusSchema, orderItemSchema, orderSchema, OrderItem, Order
+
+- **Ruta:** `shared/schemas/order.ts`
+- **Descripción:** Schemas de pedido. `orderStatusSchema` usa `z.nativeEnum(ORDER_STATUS)` para preservar tipos literales. `orderItemSchema` captura el snapshot de producto al momento del pedido (invariante §7.4 del PRD). `orderSchema` une ambos con timestamps ISO.
+- **API:** `orderSchema.parse(raw)` → `Order`; tipos exportados: `OrderItem`, `Order`
+- **Nota:** el snapshot de producto (productId, productName, productPriceArs) en `orderItemSchema` es inmutable después de creado.
+
 ### Barrel `shared/schemas/index.ts`
 
-- Exporta todos los schemas: `import { coordinatesSchema, storeSchema, productSchema, userSchema } from '@/shared/schemas'`
+- Exporta todos los schemas: `import { coordinatesSchema, storeSchema, productSchema, userSchema, orderSchema } from '@/shared/schemas'`
 
 ---
 
@@ -334,6 +342,47 @@
 
 ---
 
+## 11. Repositories (`shared/repositories/`)
+
+> Capa de acceso a datos detrás de interfaces genéricas. Hoy: mocks en memoria. Mañana: Supabase. Nunca importar los mocks directamente — usar el singleton exportado desde `shared/repositories/index.ts`.
+
+### Repository\<Entity, CreateInput, UpdateInput, Filters\> (base interface)
+
+- **Ruta:** `shared/repositories/base.ts`
+- **Descripción:** Interface genérica con `findAll(filters?)`, `findById(id)`, `create(input)`, `update(id, input)`, `delete(id)`.
+- **API:** Extender para crear interfaces de dominio específicas.
+
+### StoreRepository / storeRepository
+
+- **Ruta interface:** `shared/repositories/store.ts` → `StoreRepository`, `StoreFilters`, `FindNearbyInput`, `CreateStoreInput`, `UpdateStoreInput`
+- **Ruta mock:** `shared/repositories/mock/store.mock.ts`
+- **Descripción:** Extiende `Repository<Store,...>` con `findNearby({ coords, radiusMeters })`. La implementación mock filtra por distancia haversiana y ordena por cercanía.
+- **Singleton:** `import { storeRepository } from '@/shared/repositories'`
+- **Usado en:** `shared/services/stores.ts`
+
+### OrderRepository / orderRepository
+
+- **Ruta interface:** `shared/repositories/order.ts` → `OrderRepository`, `OrderFilters`, `CreateOrderInput`, `UpdateOrderInput`
+- **Ruta mock:** `shared/repositories/mock/order.mock.ts`
+- **Descripción:** Acceso a pedidos. Filtros: `storeId`, `clientId`, `status`. `create` genera `id`, `createdAt`, `updatedAt` automáticamente. `update` actualiza `updatedAt`.
+- **Singleton:** `import { orderRepository } from '@/shared/repositories'`
+
+### UserRepository / userRepository
+
+- **Ruta interface:** `shared/repositories/user.ts` → `UserRepository`, `UserFilters`, `CreateUserInput`, `UpdateUserInput`
+- **Ruta mock:** `shared/repositories/mock/user.mock.ts`
+- **Descripción:** Extiende `Repository<User,...>` con `findByEmail(email)`. Filtros: `role`.
+- **Singleton:** `import { userRepository } from '@/shared/repositories'`
+
+### ProductRepository / productRepository
+
+- **Ruta interface:** `shared/repositories/product.ts` → `ProductRepository`, `ProductFilters`, `CreateProductInput`, `UpdateProductInput`
+- **Ruta mock:** `shared/repositories/mock/product.mock.ts`
+- **Descripción:** Acceso a productos del catálogo. Filtros: `storeId`, `isAvailable`.
+- **Singleton:** `import { productRepository } from '@/shared/repositories'`
+
+---
+
 ## Changelog del registry
 
 | Fecha      | Cambio                                                              | Autor |
@@ -352,3 +401,4 @@
 | 2026-04-16 | F1.7: agregado NuqsProvider en sección 2c                            | —     |
 | 2026-04-16 | F3.1: agregada sección 7b. Schemas Zod base; actualizados tipos en §7 para re-exportar desde schemas | —     |
 | 2026-04-16 | F3.7: agregados ORDER_STATUS, USER_ROLES y constantes de timeout en sección 8 | —     |
+| 2026-04-16 | F3.4: agregada sección 11. Repositories (StoreRepository, OrderRepository, UserRepository, ProductRepository + mocks); orderSchema en §7b; storesService actualizado a delegación via repository | —     |
