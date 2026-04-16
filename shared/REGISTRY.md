@@ -195,13 +195,65 @@
 
 ## 7. Types (`shared/types/`)
 
-> Tipos compartidos del dominio. Los tipos específicos de una feature van en su carpeta, no acá.
+> Tipos compartidos del dominio. **Los tipos son inferidos de los schemas Zod en `shared/schemas/`.** Los archivos en `shared/types/` solo re-exportan. Los tipos específicos de una feature van en su carpeta, no acá.
 
-### Store, StoreKind, StoreStatus, Coordinates
+### Store, StoreKind, StoreStatus
 
-- **Ruta:** `shared/types/store.ts`
-- **Descripción:** Modelo de tienda ambulante y tipos asociados. `Coordinates` es genérico para cualquier punto geo.
-- **Usado en:** `features/map/*`, `shared/services/stores`, `shared/hooks/useGeolocation`.
+- **Ruta:** `shared/types/store.ts` (re-export de `@/shared/schemas/store`)
+- **Descripción:** Modelo de tienda ambulante y tipos asociados.
+- **Usado en:** `features/map/*`, `shared/services/stores`.
+
+### Coordinates
+
+- **Ruta:** `shared/types/coordinates.ts` (re-export de `@/shared/schemas/coordinates`)
+- **Descripción:** Par lat/lng con validación de rangos geográficos válidos.
+- **Usado en:** `shared/hooks/useGeolocation`, `shared/query/keys`, `features/map/*`.
+
+### Product
+
+- **Ruta:** `shared/types/product.ts` (re-export de `@/shared/schemas/product`)
+- **Descripción:** Producto del catálogo de una tienda.
+- **Usado en:** futuras features de pedido y catálogo.
+
+### User, UserRole
+
+- **Ruta:** `shared/types/user.ts` (re-export de `@/shared/schemas/user`)
+- **Descripción:** Usuario autenticado con rol (`client` | `store` | `admin`).
+- **Usado en:** features de auth, F2.x, dashboard.
+
+---
+
+## 7b. Schemas Zod (`shared/schemas/`)
+
+> Single source of truth de validación runtime + tipos. Los tipos de `shared/types/` se infieren de estos schemas.
+
+### coordinatesSchema, Coordinates
+
+- **Ruta:** `shared/schemas/coordinates.ts`
+- **Descripción:** Coordenadas geográficas con validación de rangos (lat -90..90, lng -180..180).
+- **API:** `coordinatesSchema.parse(raw)` → `Coordinates`
+
+### storeKindSchema, storeStatusSchema, storeSchema
+
+- **Ruta:** `shared/schemas/store.ts`
+- **Descripción:** Schemas de tienda ambulante; usa `coordinatesSchema` para el campo `location`.
+- **API:** `storeSchema.parse(raw)` → `Store`; `storeKindSchema.options` para iterar valores.
+
+### productSchema, Product
+
+- **Ruta:** `shared/schemas/product.ts`
+- **Descripción:** Producto del catálogo (precio, disponibilidad, storeId). `photoUrl` y `description` opcionales.
+- **API:** `productSchema.parse(raw)` → `Product`
+
+### userRoleSchema, userSchema
+
+- **Ruta:** `shared/schemas/user.ts`
+- **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional.
+- **API:** `userSchema.parse(raw)` → `User`; `userRoleSchema.options` para iterar roles.
+
+### Barrel `shared/schemas/index.ts`
+
+- Exporta todos los schemas: `import { coordinatesSchema, storeSchema, productSchema, userSchema } from '@/shared/schemas'`
 
 ---
 
@@ -282,3 +334,4 @@
 | 2026-04-16 | F1.9: agregadas layout primitives (Stack, Row, Container, Screen, Spacer, Divider) + `polymorphic.types.ts` | —     |
 | 2026-04-16 | F1.4: agregada sección 8. Constants — ROUTES, Route, buildHref       | —     |
 | 2026-04-16 | F1.7: agregado NuqsProvider en sección 2c                            | —     |
+| 2026-04-16 | F3.1: agregada sección 7b. Schemas Zod base; actualizados tipos en §7 para re-exportar desde schemas | —     |

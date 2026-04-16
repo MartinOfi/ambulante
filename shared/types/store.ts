@@ -1,20 +1,3 @@
-export type StoreKind = "food-truck" | "street-cart" | "ice-cream";
-
-export type StoreStatus = "open" | "closed" | "stale";
-
-export interface Coordinates {
-  readonly lat: number;
-  readonly lng: number;
-}
-
-export interface Store {
-  readonly id: string;
-  readonly name: string;
-  readonly kind: StoreKind;
-  readonly photoUrl: string;
-  readonly location: Coordinates;
-  readonly distanceMeters: number;
-  readonly status: StoreStatus;
-  readonly priceFromArs: number;
-  readonly tagline: string;
-}
+export type { StoreKind, StoreStatus, Store } from "@/shared/schemas/store";
+// Coordinates re-exported here for backward-compat; canonical source is @/shared/types/coordinates
+export type { Coordinates } from "@/shared/schemas/coordinates";
