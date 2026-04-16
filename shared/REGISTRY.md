@@ -168,6 +168,21 @@
 
 > Funciones puras genéricas. Sin efectos secundarios.
 
+### parseSessionCookie, serializeSessionCookie
+
+- **Ruta:** `shared/utils/session-cookie.ts`
+- **Descripción:** Serializa/deserializa una `Session` como cookie value base64-encoded. Edge-safe (solo usa `atob`/`btoa` + Zod). `parseSessionCookie` retorna `null` si el valor está vacío, es base64 inválido, JSON inválido, o no satisface `sessionSchema`.
+- **API:** `parseSessionCookie(cookieValue: string): Session | null` · `serializeSessionCookie(session: Session): string`
+- **Usado en:** `middleware.ts`, `useSession` (al hacer signIn/signOut para escribir/limpiar la cookie).
+
+### getRequiredRole
+
+- **Ruta:** `shared/utils/route-access.ts`
+- **Descripción:** Función pura que mapea un `pathname` al `UserRole` requerido para accederlo. Retorna `null` para rutas públicas. Exportada por separado del middleware para ser unit-testable sin `NextRequest`.
+- **API:** `getRequiredRole(pathname: string): UserRole | null`
+- **Mapeo:** `/map*` → `client` · `/store*` → `store` · `/admin*` → `admin` · resto → `null`
+- **Usado en:** `middleware.ts`.
+
 ### cn
 
 - **Ruta:** `shared/utils/cn.ts`
@@ -329,6 +344,12 @@
 - **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
 - **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
 
+### SESSION_COOKIE_NAME, SESSION_COOKIE_MAX_AGE_SECONDS
+
+- **Ruta:** `shared/constants/auth.ts`
+- **Descripción:** Constantes de la cookie de sesión: nombre (`ambulante-session`) y max-age en segundos (3600 = 1h).
+- **Usado en:** `shared/utils/session-cookie.ts`, `middleware.ts`, futuros hooks de signIn/signOut.
+
 ### USER_ROLES
 
 - **Ruta:** `shared/constants/user.ts`
@@ -485,3 +506,4 @@
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
 | 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
 | 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
+| 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |

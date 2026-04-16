@@ -586,13 +586,13 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:** `AuthService` interface + mock en `shared/services/auth.types.ts` + `auth.ts`. Mock pre-seed 3 usuarios (client/store/admin @test.com). `onAuthStateChange` subscription para reactivity. `useSession` hook con discriminated union `loading|authenticated|unauthenticated|error`. 15 tests en auth service + 8 en useSession. 283/283 suite completa. 0 typecheck errors.
 
 ### F2.4 — middleware.ts con role gating
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** PRD §7.4 exige "permisos estrictamente separados". Gating debe ser edge-side.
 - **Entregable:** `middleware.ts` que lee sesión, matchea path contra role y redirige si no coincide. Test E2E por rol.
-- **Archivos:** `middleware.ts`, `e2e/auth.spec.ts`.
+- **Archivos:** `middleware.ts`, `e2e/auth.spec.ts`, `shared/constants/auth.ts`, `shared/utils/session-cookie.ts`, `shared/utils/route-access.ts`.
 - **Depends on:** F2.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `getRequiredRole` extraída a `shared/utils/route-access.ts` (pure fn, unit-testable). `parseSessionCookie` en `shared/utils/session-cookie.ts` (Edge-safe atob+Zod). `SESSION_COOKIE_NAME` en `shared/constants/auth.ts`. 9 tests E2E Playwright (unauthenticated redirects + authorized access + wrong-role redirects). 299 unit tests GREEN. 0 typecheck errors.
 
 ### F2.5 — Layout del route group Cliente
 - **Estado:** ⚪ pending
