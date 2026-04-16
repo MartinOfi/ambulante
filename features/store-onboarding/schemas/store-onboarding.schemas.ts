@@ -13,24 +13,37 @@ export const STORE_ONBOARDING_DAYS = [
 
 export type OnboardingDay = (typeof STORE_ONBOARDING_DAYS)[number];
 
+const CUIT_WEIGHTS = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2] as const;
+
+function isValidCuitCheckDigit(cuit: string): boolean {
+  const digits = cuit.split("").map(Number);
+  const sum = CUIT_WEIGHTS.reduce((acc, w, i) => acc + w * digits[i], 0);
+  const remainder = sum % 11;
+  const checkDigit = remainder === 0 ? 0 : 11 - remainder;
+  return checkDigit !== 10 && checkDigit === digits[10];
+}
+
 export const stepFiscalSchema = z.object({
   businessName: z
     .string({ required_error: "El nombre del negocio es obligatorio" })
-    .min(1, "El nombre del negocio no puede estar vacío"),
+    .min(1, "El nombre del negocio no puede estar vacío")
+    .max(100, "El nombre no puede superar los 100 caracteres"),
   kind: storeKindSchema,
   cuit: z
     .string({ required_error: "El CUIT es obligatorio" })
-    .regex(/^\d{11}$/, "El CUIT debe tener exactamente 11 dígitos"),
+    .regex(/^\d{11}$/, "El CUIT debe tener 11 dígitos")
+    .refine(isValidCuitCheckDigit, "CUIT inválido"),
 });
 
 export const stepZoneSchema = z.object({
   neighborhood: z
     .string({ required_error: "El barrio es obligatorio" })
-    .min(1, "El barrio no puede estar vacío"),
-  coverageNotes: z.string().optional(),
+    .min(1, "El barrio no puede estar vacío")
+    .max(100, "El barrio no puede superar los 100 caracteres"),
+  coverageNotes: z.string().max(300, "Las notas no pueden superar los 300 caracteres").optional(),
 });
 
-export const stepHoursSchema = z.object({
+const stepHoursBaseSchema = z.object({
   days: z.array(z.enum(STORE_ONBOARDING_DAYS)).min(1, "Seleccioná al menos un día de operación"),
   openTime: z
     .string({ required_error: "El horario de apertura es obligatorio" })
@@ -40,12 +53,20 @@ export const stepHoursSchema = z.object({
     .regex(/^\d{2}:\d{2}$/, "Formato de hora inválido (HH:MM)"),
 });
 
+const CLOSE_AFTER_OPEN_MESSAGE = "El horario de cierre debe ser posterior al de apertura";
+const CLOSE_AFTER_OPEN_PATH = ["closeTime"];
+
+export const stepHoursSchema = stepHoursBaseSchema.refine(
+  (data) => data.closeTime > data.openTime,
+  { message: CLOSE_AFTER_OPEN_MESSAGE, path: CLOSE_AFTER_OPEN_PATH },
+);
+
 export const storeOnboardingSchema = stepFiscalSchema
   .merge(stepZoneSchema)
-  .merge(stepHoursSchema)
-  .refine(({ openTime, closeTime }) => closeTime > openTime, {
-    message: "El horario de cierre debe ser posterior al de apertura",
-    path: ["closeTime"],
+  .merge(stepHoursBaseSchema)
+  .refine((data) => data.closeTime > data.openTime, {
+    message: CLOSE_AFTER_OPEN_MESSAGE,
+    path: CLOSE_AFTER_OPEN_PATH,
   });
 
 export type StepFiscalValues = z.infer<typeof stepFiscalSchema>;

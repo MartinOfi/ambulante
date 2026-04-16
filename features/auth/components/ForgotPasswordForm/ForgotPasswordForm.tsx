@@ -20,6 +20,7 @@ interface ForgotPasswordFormProps {
   readonly onSubmit: (values: ForgotPasswordValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly submitted: boolean;
+  readonly serverError: string | null;
 }
 
 export function ForgotPasswordForm({
@@ -27,6 +28,7 @@ export function ForgotPasswordForm({
   onSubmit,
   isLoading,
   submitted,
+  serverError,
 }: ForgotPasswordFormProps) {
   if (submitted) {
     return (
@@ -61,6 +63,12 @@ export function ForgotPasswordForm({
             </FormItem>
           )}
         />
+
+        {serverError && (
+          <p className="text-xs font-medium text-destructive" role="alert">
+            {serverError}
+          </p>
+        )}
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Enviando…" : "Enviar enlace"}

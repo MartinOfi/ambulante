@@ -25,7 +25,7 @@ function fillAndSubmitFiscal() {
     target: { value: "Mi Tienda" },
   });
   fireEvent.change(screen.getByPlaceholderText(/20304050607/i), {
-    target: { value: "20304050607" },
+    target: { value: "20304050609" },
   });
   fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
 }
@@ -108,7 +108,7 @@ describe("StoreOnboardingWizardContainer", () => {
     });
   });
 
-  it("shows error and re-enables submit when service throws", async () => {
+  it("shows network error and resets isSubmitting when service throws", async () => {
     render(<StoreOnboardingWizardContainer service={throwingService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
@@ -119,8 +119,10 @@ describe("StoreOnboardingWizardContainer", () => {
     fireEvent.click(screen.getByRole("button", { name: /enviar solicitud/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("alert")).toHaveTextContent(/inesperado/i);
-      expect(screen.getByRole("button", { name: /enviar solicitud/i })).not.toBeDisabled();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Ocurrió un error de red. Intentá de nuevo.",
+      );
     });
+    expect(screen.getByRole("button", { name: /enviar solicitud/i })).not.toBeDisabled();
   });
 });

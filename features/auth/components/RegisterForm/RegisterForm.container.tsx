@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/shared/hooks/useSession";
 import { authService as defaultAuthService } from "@/shared/services/auth";
-import type { AuthService } from "@/shared/services/auth.types";
+import type { AuthService, SignUpInput } from "@/shared/services/auth.types";
 import { getRoleRedirect } from "@/features/auth/utils/role-redirect";
 import { registerSchema, type RegisterValues } from "@/features/auth/schemas/auth.schemas";
 import { USER_ROLES } from "@/shared/constants/user";
@@ -41,12 +41,13 @@ export function RegisterFormContainer({
   async function handleSubmit(values: RegisterValues): Promise<void> {
     setIsLoading(true);
     setServerError(null);
+    const signUpPayload: SignUpInput = {
+      email: values.email,
+      password: values.password,
+      role: values.role,
+    };
     try {
-      const result = await service.signUp({
-        email: values.email,
-        password: values.password,
-        role: values.role,
-      });
+      const result = await service.signUp(signUpPayload);
       if (!result.success) {
         setServerError(result.error);
       }

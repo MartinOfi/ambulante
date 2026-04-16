@@ -14,6 +14,13 @@ import type { OnboardingStep } from "@/features/store-onboarding/types";
 import type { StoreOnboardingWizardContainerProps } from "./StoreOnboardingWizard.types";
 import { StoreOnboardingWizard } from "./StoreOnboardingWizard";
 
+const ONBOARDING_STEPS: readonly OnboardingStep[] = [1, 2, 3];
+
+function prevStep(current: OnboardingStep): OnboardingStep {
+  const idx = ONBOARDING_STEPS.indexOf(current);
+  return idx > 0 ? ONBOARDING_STEPS[idx - 1] : current;
+}
+
 export function StoreOnboardingWizardContainer({
   service = defaultService,
 }: StoreOnboardingWizardContainerProps) {
@@ -54,22 +61,15 @@ export function StoreOnboardingWizardContainer({
         return;
       }
       router.push(ROUTES.store.pendingApproval);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Error desconocido";
-      console.error("storeOnboardingService.submit failed", message);
-      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+    } catch {
+      setServerError("Ocurrió un error de red. Intentá de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   function handleBack(): void {
-    setStep((prev) => {
-      if (prev <= 1) return prev;
-      const next = prev - 1;
-      if (next === 1 || next === 2 || next === 3) return next;
-      return prev;
-    });
+    setStep(prevStep);
   }
 
   return (

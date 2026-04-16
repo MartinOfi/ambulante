@@ -75,7 +75,11 @@ describe("forgotPasswordSchema", () => {
 });
 
 describe("resetPasswordSchema", () => {
-  const valid = { password: "newpassword", confirmPassword: "newpassword", token: "some-token" };
+  const valid = {
+    password: "newpassword",
+    confirmPassword: "newpassword",
+    token: "valid-reset-token-abcdef123",
+  };
 
   it("accepts valid reset data", () => {
     expect(resetPasswordSchema.safeParse(valid).success).toBe(true);

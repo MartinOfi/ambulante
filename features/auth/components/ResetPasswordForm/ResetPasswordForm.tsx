@@ -20,6 +20,7 @@ interface ResetPasswordFormProps {
   readonly onSubmit: (values: ResetPasswordValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly submitted: boolean;
+  readonly serverError: string | null;
 }
 
 export function ResetPasswordForm({
@@ -27,6 +28,7 @@ export function ResetPasswordForm({
   onSubmit,
   isLoading,
   submitted,
+  serverError,
 }: ResetPasswordFormProps) {
   if (submitted) {
     return (
@@ -79,6 +81,12 @@ export function ResetPasswordForm({
             </FormItem>
           )}
         />
+
+        {serverError && (
+          <p className="text-xs font-medium text-destructive" role="alert">
+            {serverError}
+          </p>
+        )}
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Guardando…" : "Restablecer contraseña"}
