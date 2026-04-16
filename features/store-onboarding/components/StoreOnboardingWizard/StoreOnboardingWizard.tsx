@@ -1,6 +1,6 @@
-import { StepFiscal } from "@/features/store-onboarding/components/steps/StepFiscal";
-import { StepZone } from "@/features/store-onboarding/components/steps/StepZone";
-import { StepHours } from "@/features/store-onboarding/components/steps/StepHours";
+import { StepFiscal } from "@/features/store-onboarding/components/steps/StepFiscal.container";
+import { StepZone } from "@/features/store-onboarding/components/steps/StepZone.container";
+import { StepHours } from "@/features/store-onboarding/components/steps/StepHours.container";
 import type { StoreOnboardingWizardProps } from "./StoreOnboardingWizard.types";
 
 const STEP_TITLES: Record<1 | 2 | 3, string> = {
@@ -26,7 +26,7 @@ export function StoreOnboardingWizard({
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">Paso {step} de 3</p>
         <h2 className="text-lg font-semibold">{STEP_TITLES[step]}</h2>
-        <div className="flex gap-1" aria-hidden>
+        <div className="flex gap-1" aria-hidden="true">
           {([1, 2, 3] as const).map((n) => (
             <div
               key={n}

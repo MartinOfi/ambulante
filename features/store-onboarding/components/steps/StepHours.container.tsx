@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -49,8 +49,8 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onNext)} className="space-y-4">
-        <Controller
+      <form onSubmit={form.handleSubmit((data) => onNext(data))} className="space-y-4">
+        <FormField
           control={form.control}
           name="days"
           render={({ field, fieldState }) => (

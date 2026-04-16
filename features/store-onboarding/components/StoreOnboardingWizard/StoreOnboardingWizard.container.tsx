@@ -41,24 +41,35 @@ export function StoreOnboardingWizardContainer({
 
     const parsed = storeOnboardingSchema.safeParse({ ...fiscalDraft, ...zoneDraft, ...values });
     if (!parsed.success) {
-      setServerError("Datos inválidos. Revisá los pasos anteriores.");
+      const firstIssue = parsed.error.issues[0];
+      setServerError(firstIssue?.message ?? "Datos inválidos. Revisá los pasos anteriores.");
       return;
     }
 
     setIsSubmitting(true);
-    const result = await service.submit(parsed.data);
-    setIsSubmitting(false);
-
-    if (!result.success) {
-      setServerError(result.error ?? "Ocurrió un error. Intentá de nuevo.");
-      return;
+    try {
+      const result = await service.submit(parsed.data);
+      if (!result.success) {
+        setServerError(result.error ?? "Ocurrió un error. Intentá de nuevo.");
+        return;
+      }
+      router.push(ROUTES.store.pendingApproval);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Error desconocido";
+      console.error("storeOnboardingService.submit failed", message);
+      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    router.push(ROUTES.store.pendingApproval);
   }
 
   function handleBack(): void {
-    setStep((prev) => (prev > 1 ? ((prev - 1) as OnboardingStep) : prev));
+    setStep((prev) => {
+      if (prev <= 1) return prev;
+      const next = prev - 1;
+      if (next === 1 || next === 2 || next === 3) return next;
+      return prev;
+    });
   }
 
   return (

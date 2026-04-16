@@ -40,7 +40,13 @@ export const stepHoursSchema = z.object({
     .regex(/^\d{2}:\d{2}$/, "Formato de hora inválido (HH:MM)"),
 });
 
-export const storeOnboardingSchema = stepFiscalSchema.merge(stepZoneSchema).merge(stepHoursSchema);
+export const storeOnboardingSchema = stepFiscalSchema
+  .merge(stepZoneSchema)
+  .merge(stepHoursSchema)
+  .refine(({ openTime, closeTime }) => closeTime > openTime, {
+    message: "El horario de cierre debe ser posterior al de apertura",
+    path: ["closeTime"],
+  });
 
 export type StepFiscalValues = z.infer<typeof stepFiscalSchema>;
 export type StepZoneValues = z.infer<typeof stepZoneSchema>;

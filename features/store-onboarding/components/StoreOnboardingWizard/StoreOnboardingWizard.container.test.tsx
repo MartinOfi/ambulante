@@ -16,6 +16,10 @@ const failingService: StoreOnboardingService = {
   submit: vi.fn().mockResolvedValue({ success: false, error: "Error de servidor" }),
 };
 
+const throwingService: StoreOnboardingService = {
+  submit: vi.fn().mockRejectedValue(new Error("Network error")),
+};
+
 function fillAndSubmitFiscal() {
   fireEvent.change(screen.getByPlaceholderText(/El Rincón del Sabor/i), {
     target: { value: "Mi Tienda" },
@@ -101,6 +105,22 @@ describe("StoreOnboardingWizardContainer", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("Error de servidor");
+    });
+  });
+
+  it("shows error and re-enables submit when service throws", async () => {
+    render(<StoreOnboardingWizardContainer service={throwingService} />);
+    fillAndSubmitFiscal();
+    await waitFor(() => screen.getByText("Zona de operación"));
+    fillAndSubmitZone();
+    await waitFor(() => screen.getByText("Horarios"));
+
+    fireEvent.click(screen.getByRole("button", { name: /lun/i }));
+    fireEvent.click(screen.getByRole("button", { name: /enviar solicitud/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(/inesperado/i);
+      expect(screen.getByRole("button", { name: /enviar solicitud/i })).not.toBeDisabled();
     });
   });
 });

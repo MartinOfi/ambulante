@@ -6,7 +6,10 @@ export const metadata = { title: "Solicitud en revisión — Ambulante" };
 export default function PendingApprovalPage() {
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-3xl">
+      <div
+        aria-hidden="true"
+        className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-3xl"
+      >
         ⏳
       </div>
       <div className="max-w-sm space-y-2">
