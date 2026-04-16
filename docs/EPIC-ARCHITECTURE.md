@@ -724,7 +724,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:**
 
 ### F3.7 — Constants del dominio
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 11:00]
 - **Por qué:** CLAUDE §6.2 — prohibido magic strings/numbers. Todos los valores del PRD como constantes tipadas.
 - **Entregable:** `shared/constants/order.ts` (`ORDER_STATUS`, `ORDER_EXPIRATION_MINUTES`, `ORDER_AUTOCLOSE_HOURS`). `shared/constants/user.ts` (`USER_ROLES`). Actualización del REGISTRY.md.
 - **Archivos:** `shared/constants/*`.
