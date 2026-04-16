@@ -17,7 +17,10 @@ export function ClientBottomNav({ activePath }: ClientBottomNavProps) {
     >
       <ul className="flex h-16 items-center justify-around">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const isActive = activePath === href;
+          const isActive =
+            href === "/"
+              ? activePath === href
+              : activePath === href || activePath.startsWith(href + "/");
           return (
             <li key={href}>
               <Link

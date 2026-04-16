@@ -57,8 +57,10 @@ export function buildHref(template: string, params?: Record<string, string>): st
 
   return template.replace(/:([a-zA-Z]+)/g, (_match, paramName: string) => {
     const value = params[paramName];
-    if (value === undefined) {
-      throw new Error(`buildHref: missing required param "${paramName}" in template "${template}"`);
+    if (!value) {
+      throw new Error(
+        `buildHref: param "${paramName}" must be a non-empty string in template "${template}"`,
+      );
     }
     return value;
   });

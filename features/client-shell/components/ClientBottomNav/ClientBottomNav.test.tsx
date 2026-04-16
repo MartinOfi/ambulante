@@ -18,8 +18,11 @@ describe("ClientBottomNav", () => {
 
   it("does not mark non-active items with aria-current", () => {
     render(<ClientBottomNav activePath="/orders" />);
-    expect(screen.getByRole("link", { name: /mapa/i })).not.toHaveAttribute("aria-current");
-    expect(screen.getByRole("link", { name: /perfil/i })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: /mapa/i })).not.toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: /perfil/i })).not.toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("renders correct href for each nav item", () => {

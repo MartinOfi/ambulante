@@ -1,2 +1,1 @@
-export { ClientShell, ClientShellContainer } from "./components/ClientShell";
-export { ClientBottomNav } from "./components/ClientBottomNav";
+export { ClientShellContainer } from "./components/ClientShell";
