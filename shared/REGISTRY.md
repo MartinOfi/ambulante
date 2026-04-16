@@ -122,6 +122,17 @@
 
 ## 3. Hooks (`shared/hooks/`)
 
+> Feature-local query hooks live in `features/<name>/hooks/`. They follow the canonical `useXxxQuery` pattern documented in `docs/recipes/query-hook-pattern.md`.
+
+### useStoresNearbyQuery _(feature-local — map)_
+
+- **Ruta:** `features/map/hooks/useStoresNearbyQuery.ts`
+- **Descripción:** Canonical `useXxxQuery` hook. Fetches stores near given coordinates using React Query v5 `useQuery`. Disabled automatically when `coords` is `null` (`enabled: coords !== null`). Returns the full React Query result object; consumers destructure `{ data: stores = [], isLoading, isError }`.
+- **API:** `useStoresNearbyQuery({ coords: Coordinates | null, radius: RadiusValue })`
+- **Query key:** `queryKeys.stores.nearby(coords, radius)` when coords present; `queryKeys.stores.all()` when disabled.
+- **Replaces:** `features/map/hooks/useNearbyStores.ts` (manual `useState+useEffect` pattern — deprecated).
+- **Usado en:** `features/map/components/MapScreen.container.tsx`.
+
 ### useSession
 
 - **Ruta:** `shared/hooks/useSession.ts`
@@ -160,7 +171,7 @@
 - **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Delega a `storeRepository` (F3.4). Swap a Supabase → solo cambiar el repository, sin tocar consumers.
 - **API:** `findNearby({ coords, radiusMeters })`, `findById(id)`
 - **Tipos:** `StoresService`, `FindNearbyInput` re-exportados desde `shared/repositories/store`
-- **Usado en:** `features/map/hooks/useNearbyStores`.
+- **Usado en:** `features/map/hooks/useStoresNearbyQuery`.
 
 ---
 
@@ -508,3 +519,4 @@
 | 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
 | 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |
 | 2026-04-16 | F2.5: ROUTES.client extendido con `orders` y `profile`; `afterEach(cleanup)` añadido al setup global | —     |
+| 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |

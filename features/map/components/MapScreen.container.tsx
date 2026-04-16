@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useGeolocation } from "@/shared/hooks/useGeolocation";
 import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
 import { useRadiusParam } from "@/features/map/hooks/useRadiusParam";
-import { useNearbyStores } from "@/features/map/hooks/useNearbyStores";
+import { useStoresNearbyQuery } from "@/features/map/hooks/useStoresNearbyQuery";
 import { MapScreen } from "./MapScreen";
 
 export function MapScreenContainer() {
@@ -12,19 +12,17 @@ export function MapScreenContainer() {
   const geo = useGeolocation();
 
   const coords = geo.status === "granted" ? geo.coords : null;
-  const { stores } = useNearbyStores({ coords, radius });
+  const { data: stores = [] } = useStoresNearbyQuery({ coords, radius });
 
   const handleExpandRadius = useCallback(() => {
     setRadius(MAX_EXPAND_RADIUS);
-  }, []);
+  }, [setRadius]);
 
   const handleRecenter = useCallback(() => {
     geo.request();
-  }, [geo]);
+  }, [geo.request]);
 
-  const handleManualSearch = useCallback(() => {
-    // TODO v2: abrir selector manual de zona (PRD §9.1)
-  }, []);
+  const handleManualSearch = useCallback(() => {}, []);
 
   return (
     <MapScreen

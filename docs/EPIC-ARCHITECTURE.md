@@ -760,14 +760,14 @@ Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 **⚠️ Conflicto estructural:** F4.4 y F4.5 ambos editan `shared/providers/QueryProvider.tsx`. **No van en paralelo** — F4.5 espera a F4.4 ✅. Esto es una serialización estructural, no solo una advertencia.
 
 ### F4.1 — Pattern para queries: `useXxxQuery` wrapping repository
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Convención para que todos los hooks de data luzcan igual.
 - **Entregable:** Ejemplo canónico `features/map/hooks/useStoresNearbyQuery.ts` + doc con la receta. Reemplaza `useNearbyStores` actual.
 - **Archivos:** `features/map/hooks/useStoresNearbyQuery.ts`, `shared/REGISTRY.md`.
 - **Depends on:** F1.1, F1.2, F3.4
 - **Continues with:** F4.2 (cadena C-F4-pattern)
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `useNearbyStores.ts` eliminado. `meta.onError` no funciona en RQ v5 — se usa `useEffect + isError` para logging. Recipe doc en `docs/recipes/query-hook-pattern.md`. 256/256 tests passing.
 
 ### F4.2 — Pattern para mutations con optimistic updates
 - **Estado:** ⚪ pending
