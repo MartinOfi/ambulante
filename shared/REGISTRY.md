@@ -122,6 +122,15 @@
 
 ## 3. Hooks (`shared/hooks/`)
 
+### useSession
+
+- **Ruta:** `shared/hooks/useSession.ts`
+- **Descripción:** Hook de autenticación. Obtiene la sesión actual al montar, suscribe a cambios de auth vía `onAuthStateChange`, y expone `signIn`/`signUp`/`signOut`. Acepta una instancia de `AuthService` (default: singleton `authService`) para facilitar tests.
+- **API:** `useSession(service?): SessionState & { signIn, signUp, signOut }`
+- **Estados:** `loading | authenticated | unauthenticated | error`
+- **Tipo discriminado:** `SessionState` — cuando `status === "authenticated"` expone `session: Session`.
+- **Usado en:** layouts de route groups protegidos (F2.4+), `middleware.ts`.
+
 ### useGeolocation
 
 - **Ruta:** `shared/hooks/useGeolocation.ts`
@@ -136,6 +145,15 @@
 
 > Clientes de datos. Hoy devuelven mocks; mañana apuntarán a la API real. Los componentes consumen services, nunca mocks directos.
 
+### authService
+
+- **Ruta:** `shared/services/auth.ts`
+- **Tipos:** `shared/services/auth.types.ts`
+- **Descripción:** Implementación mock de `AuthService` (DP-2 Supabase Auth). Gestiona sesión en memoria, pre-seed 3 usuarios de prueba (`client/store/admin @test.com`, password `"password"`). Swap a Supabase: reemplazar solo esta implementación sin tocar consumers.
+- **Interface:** `AuthService` — `signIn(input)`, `signUp(input)`, `signOut()`, `getSession()`, `onAuthStateChange(cb)`
+- **Tipos clave:** `SignInInput`, `SignUpInput`, `AuthResult<T>`, `AuthStateChangeCallback`
+- **Usado en:** `shared/hooks/useSession`, F2.4 middleware.
+
 ### storesService
 
 - **Ruta:** `shared/services/stores.ts`
@@ -149,6 +167,21 @@
 ## 5. Utils (`shared/utils/`)
 
 > Funciones puras genéricas. Sin efectos secundarios.
+
+### parseSessionCookie, serializeSessionCookie
+
+- **Ruta:** `shared/utils/session-cookie.ts`
+- **Descripción:** Serializa/deserializa una `Session` como cookie value base64-encoded. Edge-safe (solo usa `atob`/`btoa` + Zod). `parseSessionCookie` retorna `null` si el valor está vacío, es base64 inválido, JSON inválido, expirado, o no satisface `sessionSchema`. Exporta `SESSION_COOKIE_OPTIONS` con flags de seguridad (`httpOnly`, `secure`, `sameSite`).
+- **API:** `parseSessionCookie(cookieValue: string): Session | null` · `serializeSessionCookie(session: Session): string` · `SESSION_COOKIE_OPTIONS: CookieOptions`
+- **Usado en:** `middleware.ts`, `useSession` (al hacer signIn/signOut para escribir/limpiar la cookie).
+
+### getRequiredRole
+
+- **Ruta:** `shared/utils/route-access.ts`
+- **Descripción:** Función pura que mapea un `pathname` al `UserRole` requerido para accederlo. Retorna `null` para rutas públicas. Exportada por separado del middleware para ser unit-testable sin `NextRequest`.
+- **API:** `getRequiredRole(pathname: string): UserRole | null`
+- **Mapeo:** `/map*` → `client` · `/store*` → `store` · `/admin*` → `admin` · resto → `null`
+- **Usado en:** `middleware.ts`.
 
 ### cn
 
@@ -216,10 +249,10 @@
 - **Descripción:** Producto del catálogo de una tienda.
 - **Usado en:** futuras features de pedido y catálogo.
 
-### User, UserRole
+### User, UserRole, Session
 
 - **Ruta:** `shared/types/user.ts` (re-export de `@/shared/schemas/user`)
-- **Descripción:** Usuario autenticado con rol (`client` | `store` | `admin`).
+- **Descripción:** Usuario autenticado con rol (`client` | `store` | `admin`). `Session` modela la sesión de Supabase Auth: `accessToken`, `refreshToken`, `expiresAt` (Unix timestamp positivo), `user`.
 - **Usado en:** features de auth, F2.x, dashboard.
 
 ---
@@ -246,11 +279,11 @@
 - **Descripción:** Producto del catálogo (precio, disponibilidad, storeId). `photoUrl` y `description` opcionales.
 - **API:** `productSchema.parse(raw)` → `Product`
 
-### userRoleSchema, userSchema
+### userRoleSchema, userSchema, sessionSchema
 
 - **Ruta:** `shared/schemas/user.ts`
-- **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional.
-- **API:** `userSchema.parse(raw)` → `User`; `userRoleSchema.options` para iterar roles.
+- **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional. `sessionSchema` valida sesiones de Supabase Auth (accessToken, refreshToken, expiresAt positivo, user anidado).
+- **API:** `userSchema.parse(raw)` → `User`; `sessionSchema.parse(raw)` → `Session`; `userRoleSchema.options` para iterar roles.
 
 ### orderStatusSchema, orderItemSchema, orderSchema, OrderItem, Order
 
@@ -311,12 +344,18 @@
 - **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
 - **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
 
-### USER_ROLES, UserRole
+### SESSION_COOKIE_NAME, SESSION_COOKIE_MAX_AGE_SECONDS
+
+- **Ruta:** `shared/constants/auth.ts`
+- **Descripción:** Constantes de la cookie de sesión: nombre (`ambulante-session`) y max-age en segundos (3600 = 1h).
+- **Usado en:** `shared/utils/session-cookie.ts`, `middleware.ts`, futuros hooks de signIn/signOut.
+
+### USER_ROLES
 
 - **Ruta:** `shared/constants/user.ts`
-- **Descripción:** Roles de usuario del sistema (PRD §4). Objeto frozen `as const` con los 3 roles.
-- **API:** `USER_ROLES.CLIENTE`, `USER_ROLES.TIENDA`, `USER_ROLES.ADMIN`
-- **Tipo exportado:** `UserRole` = `"CLIENTE" | "TIENDA" | "ADMIN"`.
+- **Descripción:** Roles de usuario del sistema (PRD §4). Objeto frozen `as const` con los 3 roles. Valores alineados con `UserRole` del schema Zod.
+- **API:** `USER_ROLES.client`, `USER_ROLES.store`, `USER_ROLES.admin`
+- **Tipo `UserRole`:** importar desde `@/shared/schemas/user` o `@/shared/types/user` — no re-exportado desde constants para evitar colisión.
 - **Usado en:** guards de autorización, lógica de transición de estados (§7.3 aislamiento de roles).
 
 ---
@@ -465,3 +504,6 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
+| 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
+| 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |

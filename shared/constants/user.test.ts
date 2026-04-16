@@ -1,17 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { USER_ROLES, type UserRole } from "./user";
+import { USER_ROLES } from "./user";
 
 describe("USER_ROLES", () => {
   it("contains all roles defined in PRD §4", () => {
-    expect(USER_ROLES).toHaveProperty("CLIENTE");
-    expect(USER_ROLES).toHaveProperty("TIENDA");
-    expect(USER_ROLES).toHaveProperty("ADMIN");
+    expect(USER_ROLES).toHaveProperty("client");
+    expect(USER_ROLES).toHaveProperty("store");
+    expect(USER_ROLES).toHaveProperty("admin");
   });
 
-  it("values match their keys", () => {
-    expect(USER_ROLES.CLIENTE).toBe("CLIENTE");
-    expect(USER_ROLES.TIENDA).toBe("TIENDA");
-    expect(USER_ROLES.ADMIN).toBe("ADMIN");
+  it("values match schema UserRole literals", () => {
+    expect(USER_ROLES.client).toBe("client");
+    expect(USER_ROLES.store).toBe("store");
+    expect(USER_ROLES.admin).toBe("admin");
   });
 
   it("has exactly 3 roles (PRD §4 defines three roles)", () => {
@@ -22,17 +22,3 @@ describe("USER_ROLES", () => {
     expect(Object.isFrozen(USER_ROLES)).toBe(true);
   });
 });
-
-// Compile-time exhaustiveness check via type assignment
-// If a new role is added without updating UserRole, this becomes a type error.
-type AssertAllRolesCovered = {
-  [K in UserRole]: true;
-};
-
-const _exhaustive: AssertAllRolesCovered = {
-  CLIENTE: true,
-  TIENDA: true,
-  ADMIN: true,
-};
-
-void _exhaustive; // suppress unused warning

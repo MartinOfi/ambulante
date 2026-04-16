@@ -565,33 +565,34 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.2 — Modelo de User + roles
-- **Estado:** 🟡 in-progress
+- **Estado:** ✅ done
 - **Por qué:** Necesitamos el tipo canónico antes de tocar session.
 - **Entregable:** `shared/types/user.ts` con `User`, `UserRole = "client" | "store" | "admin"`, `Session`. Schemas Zod en `shared/schemas/user.ts`.
 - **Archivos:** `shared/types/user.ts`, `shared/schemas/user.ts`.
+- **Notas:** `sessionSchema` añadido a `shared/schemas/user.ts`. `USER_ROLES` en `shared/constants/user.ts` corregido (valores español→inglés, eliminado re-export duplicado de `UserRole`). 15/15 tests en schemas, 4/4 en constants. 0 errores typecheck.
 - **Depends on:** F2.1, F3.1
 - **Continues with:** F2.3 (cadena C-F2-core-auth)
 - **Estimación:** S
 - **Notas:**
 
 ### F2.3 — Auth service + session hook
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Abstracción para que el provider elegido se pueda swapear.
 - **Entregable:** `shared/services/auth.ts` con `AuthService` interface (`signIn`, `signUp`, `signOut`, `getSession`). Implementación según DP-2. `shared/hooks/useSession.ts`.
 - **Archivos:** `shared/services/auth.ts`, `shared/hooks/useSession.ts`.
 - **Depends on:** F2.1, F2.2
 - **Continues with:** F2.4 (cadena C-F2-core-auth)
 - **Estimación:** L
-- **Notas:**
+- **Notas:** `AuthService` interface + mock en `shared/services/auth.types.ts` + `auth.ts`. Mock pre-seed 3 usuarios (client/store/admin @test.com). `onAuthStateChange` subscription para reactivity. `useSession` hook con discriminated union `loading|authenticated|unauthenticated|error`. 15 tests en auth service + 8 en useSession. 283/283 suite completa. 0 typecheck errors.
 
 ### F2.4 — middleware.ts con role gating
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** PRD §7.4 exige "permisos estrictamente separados". Gating debe ser edge-side.
 - **Entregable:** `middleware.ts` que lee sesión, matchea path contra role y redirige si no coincide. Test E2E por rol.
-- **Archivos:** `middleware.ts`, `e2e/auth.spec.ts`.
+- **Archivos:** `middleware.ts`, `e2e/auth.spec.ts`, `shared/constants/auth.ts`, `shared/utils/session-cookie.ts`, `shared/utils/route-access.ts`.
 - **Depends on:** F2.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `getRequiredRole` extraída a `shared/utils/route-access.ts` (pure fn, unit-testable). `parseSessionCookie` en `shared/utils/session-cookie.ts` (Edge-safe atob+Zod). `SESSION_COOKIE_NAME` en `shared/constants/auth.ts`. 9 tests E2E Playwright (unauthenticated redirects + authorized access + wrong-role redirects). 299 unit tests GREEN. 0 typecheck errors.
 
 ### F2.5 — Layout del route group Cliente
 - **Estado:** ⚪ pending
