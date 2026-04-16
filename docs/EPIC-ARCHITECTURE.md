@@ -696,7 +696,7 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 - **Notas:**
 
 ### F3.4 — Repository interfaces
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: now]
 - **Por qué:** Abstraer acceso a datos detrás de interfaces para swappear mock → Supabase sin tocar consumidores.
 - **Entregable:** `shared/repositories/{store,order,user,product}.ts` con interfaces `Repository<T>`. Implementaciones mock en `shared/repositories/mock/*`. Rewiring del `storesService` actual para que use `storeRepository`.
 - **Archivos:** `shared/repositories/*`.
