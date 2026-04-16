@@ -424,7 +424,7 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.3 — Logger abstraction
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 10:30]
 - **Por qué:** `console.log` está prohibido (§TS hooks) pero no hay reemplazo. Cada catch hoy no sabe qué hacer con errores.
 - **Entregable:** `shared/utils/logger.ts` con interfaz `{ debug, info, warn, error }`; implementación dev = console, prod = pluggable (stub inicial para Sentry en F8).
 - **Archivos:** `shared/utils/logger.ts`.
