@@ -424,14 +424,14 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.3 — Logger abstraction
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** `console.log` está prohibido (§TS hooks) pero no hay reemplazo. Cada catch hoy no sabe qué hacer con errores.
 - **Entregable:** `shared/utils/logger.ts` con interfaz `{ debug, info, warn, error }`; implementación dev = console, prod = pluggable (stub inicial para Sentry en F8).
 - **Archivos:** `shared/utils/logger.ts`.
 - **Depends on:** —
 - **Continues with:** F1.10 (cadena C-F1-logger)
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creado `shared/utils/logger.ts` (82 líneas). Patrón transport con `registerErrorHook` para swap Sentry sin tocar call sites. 10 tests, 94% coverage. REGISTRY.md actualizado.
 
 ### F1.4 — Routes tipadas
 - **Estado:** ⚪ pending
@@ -489,13 +489,13 @@ Wave 2 (paralelo, después que terminen dependencias):
 - **Notas:**
 
 ### F1.10 — Logger→Sentry stub
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Preparar el hook para cuando F8 instale Sentry real — evita refactor doble.
 - **Entregable:** `logger.error` tiene un side-effect hook noop que F8.1 reemplazará.
 - **Archivos:** `shared/utils/logger.ts`.
 - **Depends on:** F1.3
 - **Estimación:** S
-- **Notas:**
+- **Notas:** `registerErrorHook` noop stub verificado con 2 tests nuevos. Contrato para F8.1 documentado en comentario. 12 tests totales en logger.test.ts.
 
 ---
 

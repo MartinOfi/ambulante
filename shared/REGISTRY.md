@@ -127,6 +127,15 @@
 - **API:** `formatPrice(amount: number, currency?: string): string`
 - **Usado en:** `features/map/components/StoreCard`.
 
+### logger
+
+- **Ruta:** `shared/utils/logger.ts`
+- **Descripción:** Abstracción de logging con niveles `debug | info | warn | error`. Dev: imprime a consola. Prod: silencioso salvo `error`, que llama al hook registrado (stub noop hasta F8.1 que conecta Sentry).
+- **API:** `logger.debug(msg, ctx?)` · `logger.info(msg, ctx?)` · `logger.warn(msg, ctx?)` · `logger.error(msg, ctx?)` · `logger.registerErrorHook(hook)`
+- **API alternativa:** `createLogger(env)` — factory para tests que necesitan instancia fresca.
+- **Tipos exportados:** `Logger`, `LogContext`, `ErrorHook`
+- **Usado en:** todos los `catch` blocks del proyecto. Reemplaza `console.*` prohibidos.
+
 ---
 
 ## 6. Styles (`shared/styles/`)
