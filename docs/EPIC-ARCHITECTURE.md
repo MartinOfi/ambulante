@@ -613,7 +613,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.7 — Layout del route group Admin
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Desktop-first, sidebar con secciones.
 - **Entregable:** `app/(admin)/layout.tsx` con `<AdminShell>`: sidebar izquierdo, header con user menu.
 - **Archivos:** `app/(admin)/layout.tsx`, `features/admin-shell/*`.
