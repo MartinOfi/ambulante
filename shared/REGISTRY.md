@@ -414,6 +414,21 @@
 - **Errores posibles:** `TERMINAL_STATE` | `INVALID_TRANSITION` | `UNAUTHORIZED_ACTOR`
 - **Usado en:** F3.5 (domain events), F3.6 (timeouts), F4.2 (mutation pattern), F12+ (features de pedido).
 
+### domain events + event bus
+
+- **Ruta eventos:** `shared/domain/events.ts`
+- **Ruta bus:** `shared/domain/event-bus.ts`
+- **Descripción:** Capa de domain events del pedido. `events.ts` define 8 tipos discriminados (`OrderSentDomainEvent` … `OrderExpiredDomainEvent`) + union `OrderDomainEvent` + `SerializedDomainEvent` (JSON-safe). `event-bus.ts` implementa pub/sub en memoria con aislamiento de errores por handler y hook de serialización para F5 realtime.
+- **API:**
+  - `ORDER_DOMAIN_EVENT` — const con 8 tipos de evento
+  - `serializeEvent(event): SerializedDomainEvent` — convierte `Date` → ISO string
+  - `createEventBus(): EventBus` — factory testeable (cada test crea su instancia aislada)
+  - `eventBus` — singleton exportado para uso en runtime
+  - `EventBus.publish(event)` · `EventBus.subscribe(type, handler): () => void` · `EventBus.registerSerializationHook(hook): () => void`
+- **Tipos exportados:** `OrderDomainEvent`, `OrderDomainEventType`, `SerializedDomainEvent`, `EventHandler<E>`, `SerializationHook`, `EventBus`
+- **Nota:** Los `ORDER_DOMAIN_EVENT` son *hechos* (algo ocurrió), distintos de `ORDER_EVENT` de `order-state-machine` que son *comandos* (algo se pide).
+- **Usado en:** F3.6 (timeouts publican eventos), F4.2 (mutations disparan eventos), F5 (realtime registra serialization hook), F12+ (features de pedido).
+
 ---
 
 ## Changelog del registry
@@ -437,3 +452,4 @@
 | 2026-04-16 | F3.4: agregada sección 11. Repositories (StoreRepository, OrderRepository, UserRepository, ProductRepository + mocks); orderSchema en §7b; storesService actualizado a delegación via repository | —     |
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
+| 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
