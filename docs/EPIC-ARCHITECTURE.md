@@ -787,7 +787,7 @@ Wave 3 (después de F4.1):
 - **Notas:**
 
 ### F4.4 — Retry y offline policies
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:00]
 - **Por qué:** App móvil con conexión inestable necesita retry inteligente (backoff exponencial, no retry en 4xx).
 - **Entregable:** QueryClient config actualizada con `retry`, `retryDelay`, `networkMode`. Test con mock de red flaky.
 - **Archivos:** `shared/providers/QueryProvider.tsx`.
