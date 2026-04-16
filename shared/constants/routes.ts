@@ -17,6 +17,8 @@ export const ROUTES = {
   },
   client: {
     map: "/map",
+    orders: "/orders",
+    profile: "/profile",
   },
   store: {
     dashboard: "/store/dashboard",
@@ -33,11 +35,7 @@ export const ROUTES = {
  */
 export type Route = LeafValues<typeof ROUTES>;
 
-type LeafValues<T> = T extends string
-  ? T
-  : T extends object
-    ? LeafValues<T[keyof T]>
-    : never;
+type LeafValues<T> = T extends string ? T : T extends object ? LeafValues<T[keyof T]> : never;
 
 /**
  * Interpolates `:param` placeholders in a route template.
@@ -52,10 +50,7 @@ type LeafValues<T> = T extends string
  *   buildHref(ROUTES.store.order, { orderId: "abc-123" })
  *   // → "/store/order/abc-123"
  */
-export function buildHref(
-  template: string,
-  params?: Record<string, string>,
-): string {
+export function buildHref(template: string, params?: Record<string, string>): string {
   if (!params) {
     return template;
   }
@@ -63,9 +58,7 @@ export function buildHref(
   return template.replace(/:([a-zA-Z]+)/g, (_match, paramName: string) => {
     const value = params[paramName];
     if (value === undefined) {
-      throw new Error(
-        `buildHref: missing required param "${paramName}" in template "${template}"`,
-      );
+      throw new Error(`buildHref: missing required param "${paramName}" in template "${template}"`);
     }
     return value;
   });

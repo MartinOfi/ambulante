@@ -332,9 +332,9 @@
 
 - **Ruta:** `shared/constants/routes.ts`
 - **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
-- **API:** `ROUTES.client.map`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **API:** `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
-- **Usado en:** `features/landing/*` (migrables), cualquier `<Link>` o `router.push`.
+- **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, cualquier `<Link>` o `router.push`.
 
 ### ORDER_STATUS, OrderStatus, TERMINAL_ORDER_STATUSES, ORDER_EXPIRATION_MINUTES, ORDER_AUTOCLOSE_HOURS
 
@@ -507,3 +507,4 @@
 | 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
 | 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
 | 2026-04-16 | F2.4: agregado `SESSION_COOKIE_NAME/MAX_AGE` en §8; `parseSessionCookie`/`serializeSessionCookie` + `getRequiredRole` en §5 | —     |
+| 2026-04-16 | F2.5: ROUTES.client extendido con `orders` y `profile`; `afterEach(cleanup)` añadido al setup global | —     |
