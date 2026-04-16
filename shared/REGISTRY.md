@@ -51,6 +51,27 @@
 - **Descripción:** Menú de navegación radix-ui con sublistas y viewport.
 - **Usado en:** `features/landing/components/LandingNav/*`.
 
+### Input
+
+- **Ruta:** `shared/components/ui/input.tsx`
+- **Descripción:** Campo de texto shadcn con `React.forwardRef`, diseño con tokens (`bg-surface`, `border-border`, `focus-visible:ring-brand`).
+- **API:** `<Input type placeholder disabled className ... />` — acepta todos los atributos nativos de `<input>`.
+- **Usado en:** formularios de auth (LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm).
+
+### Label
+
+- **Ruta:** `shared/components/ui/label.tsx`
+- **Descripción:** Label accesible basado en `@radix-ui/react-label` con `cva`. Aplica `text-destructive` si su campo asociado tiene error (integrado con Form).
+- **API:** `<Label htmlFor className />` — acepta todos los atributos nativos de `<label>`.
+- **Usado en:** `shared/components/ui/form.tsx` (via `FormLabel`).
+
+### Form
+
+- **Ruta:** `shared/components/ui/form.tsx`
+- **Descripción:** Sistema completo de formularios shadcn: `Form` (alias de `FormProvider`), `FormField` (wrapper de `Controller`), `FormItem`, `FormLabel`, `FormControl`, `FormDescription`, `FormMessage`, `useFormField`. Integra `react-hook-form` + Zod via `zodResolver`. `FormLabel` y `FormControl` leen el estado de error automáticamente vía contexto.
+- **API:** `<Form><FormField control name render={({ field }) => <FormItem>...} /></Form>`
+- **Usado en:** LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm.
+
 ### RadialOrbitalTimeline
 
 - **Ruta:** `shared/components/ui/radial-orbital-timeline.tsx`
@@ -296,6 +317,13 @@
 - **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional. `sessionSchema` valida sesiones de Supabase Auth (accessToken, refreshToken, expiresAt positivo, user anidado).
 - **API:** `userSchema.parse(raw)` → `User`; `sessionSchema.parse(raw)` → `Session`; `userRoleSchema.options` para iterar roles.
 
+### loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema
+
+- **Ruta:** `features/auth/schemas/auth.schemas.ts`
+- **Descripción:** Schemas Zod para los 4 formularios de auth. `registerSchema` y `resetPasswordSchema` incluyen refinement `.refine()` para validar que `password === confirmPassword`. `resetPasswordSchema` incluye el campo `token` (string no vacío). Exporta los tipos inferidos `LoginValues`, `RegisterValues`, `ForgotPasswordValues`, `ResetPasswordValues`.
+- **API:** `zodResolver(loginSchema)` en `useForm`; `LoginValues` como tipo del `handleSubmit` handler.
+- **Nota:** estos schemas son de feature (`features/auth/`), no de `shared/` — pero se listan aquí por ser la fuente de verdad de los tipos de los formularios de auth.
+
 ### orderStatusSchema, orderItemSchema, orderSchema, OrderItem, Order
 
 - **Ruta:** `shared/schemas/order.ts`
@@ -342,8 +370,8 @@
 ### ROUTES, Route, buildHref
 
 - **Ruta:** `shared/constants/routes.ts`
-- **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
-- **API:** `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `ROUTES.store.orders`, `ROUTES.store.catalog`, `ROUTES.store.profile`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `auth`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
+- **API:** `ROUTES.auth.login`, `ROUTES.auth.register`, `ROUTES.auth.forgotPassword`, `ROUTES.auth.resetPassword`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `ROUTES.store.orders`, `ROUTES.store.catalog`, `ROUTES.store.profile`, `buildHref(ROUTES.store.order, { orderId: "x" })`
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
 - **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, `features/store-shell/components/StoreNav`, cualquier `<Link>` o `router.push`.
 
@@ -541,3 +569,4 @@
 | 2026-04-16 | F2.6: ROUTES.store expandido (orders/catalog/profile); agregada sección 13. Features con store-shell | —     |
 | 2026-04-16 | F4.1: agregado useStoresNearbyQuery en §3; storesService consumer actualizado a useStoresNearbyQuery | —     |
 | 2026-04-16 | F2.7: `useUIStore` y `useSession` — "Usado en" actualizado con admin-shell container                  | —     |
+| 2026-04-16 | F2.8: agregados Input, Label, Form UI primitives en §1; loginSchema/registerSchema/forgotPasswordSchema/resetPasswordSchema en §7b; ROUTES actualizado con grupo `auth` | —     |
