@@ -594,13 +594,13 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.5 — Layout del route group Cliente
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-16, started: 15:00]
+- **Estado:** ✅ done
 - **Por qué:** Bottom nav mobile-first, shell específico del rol.
 - **Entregable:** `app/(client)/layout.tsx` con `<ClientShell>`: header mínimo, bottom nav, safe areas. Rutas de ejemplo vacías para `/orders`, `/profile`.
 - **Archivos:** `app/(client)/layout.tsx`, `features/client-shell/*`.
 - **Depends on:** F2.4, F1.9
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `ClientBottomNav` (dumb, `activePath` prop, 3 ítems: Mapa/Pedidos/Perfil, `aria-current="page"` en activo). `ClientShell` (dumb, header "Ambulante" + `<main>` + nav). `ClientShellContainer` (smart, `"use client"`, `usePathname()`). `ROUTES.client` extendido con `orders` y `profile`. 11 tests, 263/263 passing, typecheck limpio. Agregado `afterEach(cleanup)` en `vitest.setup.ts` (fix de aislamiento entre tests — faltaba en el setup global).
 
 ### F2.6 — Layout del route group Tienda
 - **Estado:** ⚪ pending

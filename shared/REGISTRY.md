@@ -299,9 +299,9 @@
 
 - **Ruta:** `shared/constants/routes.ts`
 - **Descripción:** Árbol tipado de todas las rutas de la app por rol (`public`, `client`, `store`, `admin`). `ROUTES` es `as const` — el compilador detecta typos en rutas. `buildHref(template, params?)` interpola segmentos `:param` tipados.
-- **API:** `ROUTES.client.map`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
+- **API:** `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.client.profile`, `ROUTES.store.dashboard`, `buildHref(ROUTES.store.order, { orderId: "x" })`
 - **Tipo:** `Route` = unión de todos los strings leaf de `ROUTES`.
-- **Usado en:** `features/landing/*` (migrables), cualquier `<Link>` o `router.push`.
+- **Usado en:** `features/landing/*` (migrables), `features/client-shell/*`, cualquier `<Link>` o `router.push`.
 
 ### ORDER_STATUS, OrderStatus, TERMINAL_ORDER_STATUSES, ORDER_EXPIRATION_MINUTES, ORDER_AUTOCLOSE_HOURS
 
@@ -465,3 +465,4 @@
 | 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
+| 2026-04-16 | F2.5: ROUTES.client extendido con `orders` y `profile`; `afterEach(cleanup)` añadido al setup global | —     |
