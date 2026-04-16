@@ -21,24 +21,32 @@ export function RegisterFormContainer({
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const sessionRole =
+    sessionState.status === "authenticated" ? sessionState.session.user.role : undefined;
+
   useEffect(() => {
     if (sessionState.status === "authenticated") {
       router.push(getRoleRedirect(sessionState.session.user.role));
     }
-  }, [sessionState.status, sessionState.session?.user.role, router]);
+  }, [sessionState.status, sessionRole, router]);
 
   async function handleSubmit(values: RegisterValues): Promise<void> {
     setIsLoading(true);
     setServerError(null);
-    const result = await service.signUp({
-      email: values.email,
-      password: values.password,
-      role: values.role,
-    });
-    if (!result.success) {
-      setServerError(result.error);
+    try {
+      const result = await service.signUp({
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      });
+      if (!result.success) {
+        setServerError(result.error);
+      }
+    } catch {
+      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   return <RegisterForm onSubmit={handleSubmit} isLoading={isLoading} serverError={serverError} />;

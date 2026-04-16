@@ -15,6 +15,7 @@ import {
 } from "@/shared/components/ui/form";
 import { registerSchema, type RegisterValues } from "@/features/auth/schemas/auth.schemas";
 import { ROUTES } from "@/shared/constants/routes";
+import { USER_ROLES } from "@/shared/constants/user";
 
 interface RegisterFormProps {
   readonly onSubmit: (values: RegisterValues) => Promise<void>;
@@ -25,7 +26,7 @@ interface RegisterFormProps {
 export function RegisterForm({ onSubmit, isLoading, serverError }: RegisterFormProps) {
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "", role: "client" },
+    defaultValues: { email: "", password: "", confirmPassword: "", role: USER_ROLES.client },
   });
 
   return (
@@ -56,8 +57,8 @@ export function RegisterForm({ onSubmit, isLoading, serverError }: RegisterFormP
                   className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   {...field}
                 >
-                  <option value="client">Cliente</option>
-                  <option value="store">Tienda</option>
+                  <option value={USER_ROLES.client}>Cliente</option>
+                  <option value={USER_ROLES.store}>Tienda</option>
                 </select>
               </FormControl>
               <FormMessage />

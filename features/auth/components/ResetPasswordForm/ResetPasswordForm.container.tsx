@@ -11,6 +11,14 @@ export function ResetPasswordFormContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  if (!token) {
+    return (
+      <p role="alert" className="text-center text-sm text-destructive">
+        El enlace de recuperación es inválido o expiró. Solicitá uno nuevo.
+      </p>
+    );
+  }
+
   async function handleSubmit(_values: ResetPasswordValues): Promise<void> {
     setIsLoading(true);
     // Mock: simulate network delay

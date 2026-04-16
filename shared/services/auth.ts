@@ -9,7 +9,8 @@ const MOCK_PASSWORD = "password";
 
 interface StoredCredential {
   readonly userId: string;
-  readonly passwordHash: string;
+  // MOCK ONLY — never store plain passwords in production
+  readonly passwordPlaintext: string;
 }
 
 const credentials = new Map<string, StoredCredential>();
@@ -41,7 +42,7 @@ async function seedDefaultUsers(): Promise<void> {
     if (existing) {
       credentials.set(seed.email, {
         userId: existing.id,
-        passwordHash: MOCK_PASSWORD,
+        passwordPlaintext: MOCK_PASSWORD,
       });
       continue;
     }
@@ -51,7 +52,7 @@ async function seedDefaultUsers(): Promise<void> {
       role: seed.role,
       displayName: seed.displayName,
     });
-    credentials.set(seed.email, { userId: user.id, passwordHash: MOCK_PASSWORD });
+    credentials.set(seed.email, { userId: user.id, passwordPlaintext: MOCK_PASSWORD });
   }
 }
 
@@ -64,7 +65,7 @@ export const authService: AuthService = {
     if (!cred) {
       return { success: false, error: "Credenciales inválidas" };
     }
-    if (cred.passwordHash !== password) {
+    if (cred.passwordPlaintext !== password) {
       return { success: false, error: "Credenciales inválidas" };
     }
     const user = await userRepository.findById(cred.userId);
@@ -82,7 +83,7 @@ export const authService: AuthService = {
       return { success: false, error: "El email ya está registrado" };
     }
     const user = await userRepository.create({ id: crypto.randomUUID(), email, role });
-    credentials.set(email, { userId: user.id, passwordHash: password });
+    credentials.set(email, { userId: user.id, passwordPlaintext: password });
     currentSession = makeSession(user);
     notify(currentSession);
     return { success: true, data: currentSession };
