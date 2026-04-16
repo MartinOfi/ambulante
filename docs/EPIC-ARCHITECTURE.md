@@ -381,27 +381,27 @@ Wave 4 (último, requiere F0.3+F0.5+F0.6):
 **Esta es la fase que más se beneficia de trabajo en paralelo.** Son 10 tareas con muy pocas dependencias entre sí.
 
 ```
-Wave 1 (5-6 chats en paralelo, todas independientes):
-├─ Chat α: F1.1 React Query provider
+Wave A (5 chats en paralelo, todas independientes):
+├─ Chat α: F1.1 React Query provider    ← toca app/layout.tsx
 ├─ Chat β: F1.3 Logger abstraction
-├─ Chat γ: F1.4 Routes tipadas         ← archivo propio, no choca con nada
-├─ Chat δ: F1.6 Zustand setup base     ← archivo propio
-├─ Chat ε: F1.7 nuqs provider          ← archivo propio
-└─ Chat ζ: F1.8 Design tokens tipados  ← ⚠️ modifica tailwind.config.ts, coordinar
+├─ Chat γ: F1.4 Routes tipadas          ← archivo propio, no choca con nada
+├─ Chat δ: F1.6 Zustand setup base      ← archivo propio
+└─ Chat ε: F1.8 Design tokens tipados   ← ⚠️ modifica tailwind.config.ts, coordinar
 
-Wave 2 (paralelo, después que terminen dependencias):
+Wave B (paralelo, se abre cuando sus deps están ✅):
 ├─ F1.2 Query keys registry     ← depende de F1.1
 ├─ F1.5 Error boundaries         ← depende de F1.3
+├─ F1.7 nuqs provider            ← depende de F1.1 ✅ (ambos tocan app/layout.tsx — serializar)
 ├─ F1.9 Layout primitives        ← depende de F1.8
 └─ F1.10 Logger→Sentry stub      ← depende de F1.3
 ```
 
 **Archivos compartidos que requieren coordinación:**
 - `tailwind.config.ts`: **solo** F1.8 y F1.9 lo tocan. Serializarlas.
-- `app/layout.tsx`: F1.1 (QueryProvider) y F1.7 (NuqsProvider) lo tocan. Coordinar con merge sequencial o un solo chat haciendo ambas.
+- `app/layout.tsx`: F1.1 (QueryProvider) y F1.7 (NuqsProvider) lo tocan. **F1.7 espera a F1.1 ✅** — no se pueden hacer en paralelo.
 
 **Conflictos no obvios:**
-- F1.1 (React Query provider) y F1.7 (nuqs provider) **ambos envuelven `app/layout.tsx`** → mejor hacerlas secuencialmente o en un solo chat.
+- F1.1 y F1.7 **ambos envuelven `app/layout.tsx`** → F1.7 va en Wave B, después de F1.1 (no es una dep explícita del dominio, es un conflicto de archivo).
 - F1.8 (tokens) y F9.1 (escala spacing) tocan `tailwind.config.ts`. F9.1 es de otra fase pero si se arranca antes de tiempo, choca.
 
 ### F1.1 — React Query provider + QueryClient config
@@ -565,7 +565,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.2 — Modelo de User + roles
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress
 - **Por qué:** Necesitamos el tipo canónico antes de tocar session.
 - **Entregable:** `shared/types/user.ts` con `User`, `UserRole = "client" | "store" | "admin"`, `Session`. Schemas Zod en `shared/schemas/user.ts`.
 - **Archivos:** `shared/types/user.ts`, `shared/schemas/user.ts`.
@@ -649,18 +649,18 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 ### Waves de F3
 
 ```
-Wave 1 (serie — un solo chat):
-└─ F3.1 Schemas Zod base  ← todos los demás heredan tipos de acá
+Wave A (paralelo, 2 chats — sin deps entre sí):
+├─ Chat α: F3.1 Schemas Zod base       ← todos los demás heredan tipos de acá
+└─ Chat β: F3.7 Constants del dominio  ← shared/constants/{order,user}.ts (Depends on: —)
       │
       ▼
-Wave 2 (paralelo, 4 chats — se abre todo):
+Wave B (paralelo, 3 chats — se abre cuando F3.1 ✅):
 ├─ Chat α: F3.2 Order state machine  ← shared/domain/order-state-machine.ts
 ├─ Chat β: F3.3 Product snapshot      ← shared/domain/product-snapshot.ts
-├─ Chat γ: F3.4 Repository interfaces ← shared/repositories/*
-└─ Chat δ: F3.7 Constants del dominio ← shared/constants/{order,user}.ts
+└─ Chat γ: F3.4 Repository interfaces ← shared/repositories/*
       │
       ▼
-Wave 3 (paralelo, 2 chats, después de F3.2):
+Wave C (paralelo, 2 chats, después de F3.2):
 ├─ Chat α: F3.5 Domain events + bus  ← depende de F3.2
 └─ Chat β: F3.6 Timeouts policies    ← depende de F3.2 + F3.5
 ```
@@ -742,21 +742,21 @@ Wave 3 (paralelo, 2 chats, después de F3.2):
 ### Waves de F4
 
 ```
-Wave 1 (paralelo, 3 chats):
-├─ Chat α: F4.3 Zod parseResponse helper  ← archivo aislado
-├─ Chat β: F4.4 Retry + offline policies  ← toca QueryProvider (coordinar con F4.5)
-└─ Chat γ: F4.5 Toaster + error handling  ← toca QueryProvider
+Wave A (paralelo, 3 chats — todos con deps satisfechas al entrar a F4):
+├─ Chat α: F4.1 Pattern useXxxQuery     ← Depends on: F1.1, F1.2, F3.4 (todos ✅)
+├─ Chat β: F4.3 Zod parseResponse helper ← archivo aislado
+└─ Chat γ: F4.4 Retry + offline policies ← toca QueryProvider.tsx
       │
       ▼
-Wave 2 (serie después de F4.3):
-└─ F4.1 Pattern useXxxQuery (establece convención) ← todos los hooks de data futuros lo siguen
+Wave B (serie — después de F4.4 ✅):
+└─ F4.5 Toaster + error handling  ← también toca QueryProvider.tsx (conflicto de archivo con F4.4)
       │
       ▼
-Wave 3 (después de F4.1):
+Wave C (después de F4.1 ✅, via cadena C-F4-pattern):
 └─ F4.2 Pattern useXxxMutation (optimistic updates)
 ```
 
-**⚠️ Coordinación:** F4.4 y F4.5 ambos editan `shared/providers/QueryProvider.tsx`. Si se hacen en paralelo, mergear con cuidado o ponerlos en serie.
+**⚠️ Conflicto estructural:** F4.4 y F4.5 ambos editan `shared/providers/QueryProvider.tsx`. **No van en paralelo** — F4.5 espera a F4.4 ✅. Esto es una serialización estructural, no solo una advertencia.
 
 ### F4.1 — Pattern para queries: `useXxxQuery` wrapping repository
 - **Estado:** ⚪ pending
@@ -1243,26 +1243,20 @@ Wave 4 (al final — requiere features):
 ### Waves dentro de F12
 
 ```
-Wave 1 (serie — un solo chat):
-└─ F12.1 Store detail bottom sheet (es la entrada al flow)
+Wave A (paralelo, todos los chats que tengan deps ✅ al entrar a F12):
+├─ Chat α: F12.1 Store detail bottom sheet  ← Depends on: F2.5, F3.1, F4.1
+├─ Chat β: F12.2 Cart client state          ← Depends on: F1.6, F3.1 (no depende de F12.1)
+├─ Chat γ: F12.3 Submit order               ← cadena C-F12-order (se encadena después de F12.2)
+├─ Chat δ: F12.5 Order history              ← archivos aislados
+├─ Chat ε: F12.6 Cancel flow                ← archivos aislados
+└─ Chat ζ: F12.7 Profile + preferences      ← Depends on: F2.6 (no depende de F12.1)
       │
       ▼
-Wave 2 (paralelo, 2 sub-chats si se quiere):
-├─ F12.2 Cart client state   ← shared/stores/cart.ts
-└─ F12.7 Profile + preferences ← app/(client)/profile/*
-      │
-      ▼
-Wave 3 (serie — el flow principal):
-└─ F12.3 Submit order
-      │
-      ▼
-   F12.4 Order tracking screen  ← es la pantalla crítica, necesita F12.3
-      │
-      ▼
-Wave 4 (paralelo, 2 sub-chats):
-├─ F12.5 Order history
-└─ F12.6 Cancel flow
+Wave B (después de F12.3 ✅, via cadena C-F12-order):
+└─ F12.4 Order tracking screen  ← pantalla crítica, necesita F12.3
 ```
+
+**No existe un bottleneck en F12.1.** F12.2 depende de F1.6 + F3.1, F12.7 depende de F2.6 — ninguno depende de F12.1. La única serialización obligatoria es F12.3 → F12.4 (cadena explícita).
 
 ### F12.1 — Store detail bottom sheet
 - **Estado:** ⚪ pending
@@ -1333,27 +1327,20 @@ Wave 4 (paralelo, 2 sub-chats):
 ### Waves dentro de F13
 
 ```
-Wave 1 (serie — un chat):
-└─ F13.1 Dashboard home (shell base)
+Wave A (paralelo — todos tienen deps ✅ al entrar a F13, ninguno depende entre sí):
+├─ Chat α: F13.1 Dashboard home              ← Depends on: F2.6, F4.1, F5.3
+├─ Chat β: F13.2 Availability toggle          ← Depends on: F3.4, shared/constants/geo.ts
+├─ Chat γ: F13.3 Catálogo CRUD               ← Depends on: F4.1, F4.2
+├─ Chat δ: F13.4 Incoming orders inbox       ← Depends on: F5.3 (no depende de F13.1)
+├─ Chat ε: F13.5 Accept/reject/finalize flow ← Depends on: F3.2, F4.2
+└─ Chat ζ: F13.6 Store profile               ← Depends on: F4.2
       │
       ▼
-Wave 2 (paralelo, 3 sub-chats si se quiere acelerar):
-├─ Chat α: F13.2 Availability toggle + location publishing
-├─ Chat β: F13.3 Catálogo CRUD       ← archivos aislados
-└─ Chat γ: F13.6 Store profile       ← archivos aislados
-      │
-      ▼
-Wave 3 (serie después de F13.1):
-└─ F13.4 Incoming orders inbox
-      │
-      ▼
-Wave 4 (serie — depende del inbox):
-└─ F13.5 Accept/reject/finalize flow
-      │
-      ▼
-Wave 5 (último):
+Wave B (después de F8.3 ✅):
 └─ F13.7 Analytics básico (requiere F8.3)
 ```
+
+**No existe un bottleneck en F13.1.** F13.2–F13.6 dependen de fases anteriores (F3, F4, F5), no de F13.1. La única serialización obligatoria es que F13.7 requiere F8.3 ✅.
 
 ### F13.1 — Dashboard home
 - **Estado:** ⚪ pending
