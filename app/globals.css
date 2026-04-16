@@ -167,6 +167,26 @@
     animation: amb-live-blink 1.6s ease-in-out infinite;
   }
 
+  /* Auth background bokeh orbs — gentle organic drift */
+  @keyframes amb-orb-drift {
+    0%,
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    25% {
+      transform: translate(calc(-50% + 28px), calc(-50% - 20px)) scale(1.08);
+    }
+    50% {
+      transform: translate(calc(-50% - 14px), calc(-50% + 26px)) scale(0.95);
+    }
+    75% {
+      transform: translate(calc(-50% + 18px), calc(-50% + 8px)) scale(1.04);
+    }
+  }
+  .amb-orb-drift {
+    animation: amb-orb-drift 10s ease-in-out infinite;
+  }
+
   /* Respect reduced motion — kill pulses and FAB spring */
   @media (prefers-reduced-motion: reduce) {
     *,
