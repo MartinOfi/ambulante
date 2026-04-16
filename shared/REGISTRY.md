@@ -265,6 +265,20 @@
 
 ---
 
+## 7c. Domain (`shared/domain/`)
+
+> Invariantes y lógica de dominio pura. Sin efectos secundarios, sin dependencias de UI.
+
+### ProductSnapshot, snapshot
+
+- **Ruta:** `shared/domain/product-snapshot.ts`
+- **Descripción:** Tipo `ProductSnapshot` (branded `Readonly<Product>`) e helper `snapshot(product)` que crea una copia congelada del producto al momento de crear un pedido (PRD §7.4 / CLAUDE §7.4).
+- **API:** `snapshot(product: Product): ProductSnapshot` — retorna `Object.freeze({ ...product })` con brand type.
+- **Garantías:** el objeto retornado es inmutable en runtime (`Object.isFrozen === true`) y en el type system (no assignable a `Product` mutable).
+- **Usado en:** futura feature `order-flow` al crear pedidos.
+
+---
+
 ## 8. Constants (`shared/constants/`)
 
 > Reemplazan magic strings / numbers. Todo lo de dominio con significado semántico.
@@ -402,3 +416,4 @@
 | 2026-04-16 | F3.1: agregada sección 7b. Schemas Zod base; actualizados tipos en §7 para re-exportar desde schemas | —     |
 | 2026-04-16 | F3.7: agregados ORDER_STATUS, USER_ROLES y constantes de timeout en sección 8 | —     |
 | 2026-04-16 | F3.4: agregada sección 11. Repositories (StoreRepository, OrderRepository, UserRepository, ProductRepository + mocks); orderSchema en §7b; storesService actualizado a delegación via repository | —     |
+| 2026-04-16 | F3.3: agregada sección 7c. Domain con ProductSnapshot y snapshot()              | —     |
