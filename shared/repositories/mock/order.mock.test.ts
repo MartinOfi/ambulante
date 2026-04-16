@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MockOrderRepository } from "./order.mock";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import type { Order } from "@/shared/schemas/order";
@@ -97,11 +97,13 @@ describe("MockOrderRepository", () => {
     });
 
     it("updates updatedAt on every update", async () => {
+      vi.useFakeTimers();
       const created = await repository.create(makeOrder());
       const originalUpdatedAt = created.updatedAt;
 
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      vi.advanceTimersByTime(10);
       const updated = await repository.update(created.id, { status: ORDER_STATUS.RECIBIDO });
+      vi.useRealTimers();
 
       expect(updated.updatedAt).not.toBe(originalUpdatedAt);
     });

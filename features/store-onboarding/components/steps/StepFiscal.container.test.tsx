@@ -18,7 +18,7 @@ describe("StepFiscal", () => {
       target: { value: "El Rincón" },
     });
     fireEvent.change(screen.getByLabelText(/cuit/i), {
-      target: { value: "20304050607" },
+      target: { value: "20304050609" },
     });
     fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
 
@@ -26,7 +26,7 @@ describe("StepFiscal", () => {
       expect(onNext).toHaveBeenCalledWith({
         businessName: "El Rincón",
         kind: "food-truck",
-        cuit: "20304050607",
+        cuit: "20304050609",
       });
     });
   });
@@ -58,11 +58,11 @@ describe("StepFiscal", () => {
   it("pre-fills fields from defaultValues", () => {
     render(
       <StepFiscal
-        defaultValues={{ businessName: "Prefilled", cuit: "20111222334", kind: "street-cart" }}
+        defaultValues={{ businessName: "Prefilled", cuit: "20000000001", kind: "street-cart" }}
         onNext={vi.fn()}
       />,
     );
     expect(screen.getByDisplayValue("Prefilled")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("20111222334")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("20000000001")).toBeInTheDocument();
   });
 });
