@@ -1005,13 +1005,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Cada error de prod tiene trace; cada KPI del PRD tiene dashboard; hay alertas accionables.
 
 ### F8.1 — Sentry (errors + performance)
-- **Estado:** 🔴 blocked (DP-3)
+- **Estado:** ✅ done [owner: chat-2026-04-16]
 - **Por qué:** Standard de error tracking.
 - **Entregable:** `@sentry/nextjs` instalado, DSN en env, `shared/utils/logger.ts` envía `error` a Sentry en prod.
 - **Archivos:** `sentry.client.config.ts`, `sentry.server.config.ts`, logger.
 - **Depends on:** DP-3, F0.2, F1.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `@sentry/nextjs@10.49.0`. DSN opcional (no rompe dev sin él). `logger.registerErrorHook` conecta `logger.error()` → Sentry. `instrumentation.ts` inicializa server-side.
 
 ### F8.2 — Analytics de producto (eventos)
 - **Estado:** 🔴 blocked (DP-3)
