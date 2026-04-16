@@ -4,12 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { LoginFormContainer } from "./LoginForm.container";
 import type { AuthService } from "@/shared/services/auth.types";
 import type { Session } from "@/shared/types/user";
+import { USER_ROLES } from "@/shared/constants/user";
+import { ROUTES } from "@/shared/constants/routes";
 
 const mockSession: Session = {
   accessToken: "tok",
   refreshToken: "ref",
   expiresAt: Math.floor(Date.now() / 1000) + 3600,
-  user: { id: "1", email: "client@test.com", role: "client" },
+  user: { id: "1", email: "client@test.com", role: USER_ROLES.client },
 };
 
 const mockPush = vi.fn();
@@ -17,15 +19,15 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-function buildMockService(overrides?: Partial<AuthService>): AuthService {
+function buildMockService(overrides: Partial<AuthService> = {}): AuthService {
   return {
-    signIn: vi.fn().mockResolvedValue({ success: true, data: mockSession }),
-    signUp: vi.fn(),
-    signOut: vi.fn(),
-    getSession: vi.fn().mockResolvedValue(null),
-    onAuthStateChange: vi.fn().mockReturnValue(() => {}),
+    signIn: vi.fn<AuthService["signIn"]>().mockResolvedValue({ success: true, data: mockSession }),
+    signUp: vi.fn<AuthService["signUp"]>().mockResolvedValue({ success: true, data: mockSession }),
+    signOut: vi.fn<AuthService["signOut"]>().mockResolvedValue({ success: true, data: undefined }),
+    getSession: vi.fn<AuthService["getSession"]>().mockResolvedValue(null),
+    onAuthStateChange: vi.fn<AuthService["onAuthStateChange"]>().mockReturnValue(() => {}),
     ...overrides,
-  } as unknown as AuthService;
+  };
 }
 
 describe("LoginFormContainer", () => {
@@ -84,7 +86,7 @@ describe("LoginFormContainer", () => {
     await userEvent.click(screen.getByRole("button", { name: /iniciar sesión/i }));
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/map");
+      expect(mockPush).toHaveBeenCalledWith(ROUTES.client.map);
     });
   });
 });

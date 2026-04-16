@@ -8,7 +8,7 @@ export default function ResetPasswordPage() {
   return (
     <AuthCard title="Restablecer contraseña">
       {/* Suspense required because ResetPasswordFormContainer uses useSearchParams */}
-      <Suspense>
+      <Suspense fallback={null}>
         <ResetPasswordFormContainer />
       </Suspense>
     </AuthCard>
