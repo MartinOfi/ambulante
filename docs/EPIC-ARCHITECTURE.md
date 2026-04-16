@@ -576,14 +576,14 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Notas:**
 
 ### F2.3 — Auth service + session hook
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Abstracción para que el provider elegido se pueda swapear.
 - **Entregable:** `shared/services/auth.ts` con `AuthService` interface (`signIn`, `signUp`, `signOut`, `getSession`). Implementación según DP-2. `shared/hooks/useSession.ts`.
 - **Archivos:** `shared/services/auth.ts`, `shared/hooks/useSession.ts`.
 - **Depends on:** F2.1, F2.2
 - **Continues with:** F2.4 (cadena C-F2-core-auth)
 - **Estimación:** L
-- **Notas:**
+- **Notas:** `AuthService` interface + mock en `shared/services/auth.types.ts` + `auth.ts`. Mock pre-seed 3 usuarios (client/store/admin @test.com). `onAuthStateChange` subscription para reactivity. `useSession` hook con discriminated union `loading|authenticated|unauthenticated|error`. 15 tests en auth service + 8 en useSession. 283/283 suite completa. 0 typecheck errors.
 
 ### F2.4 — middleware.ts con role gating
 - **Estado:** ⚪ pending

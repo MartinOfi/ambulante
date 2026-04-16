@@ -122,6 +122,15 @@
 
 ## 3. Hooks (`shared/hooks/`)
 
+### useSession
+
+- **Ruta:** `shared/hooks/useSession.ts`
+- **Descripción:** Hook de autenticación. Obtiene la sesión actual al montar, suscribe a cambios de auth vía `onAuthStateChange`, y expone `signIn`/`signUp`/`signOut`. Acepta una instancia de `AuthService` (default: singleton `authService`) para facilitar tests.
+- **API:** `useSession(service?): SessionState & { signIn, signUp, signOut }`
+- **Estados:** `loading | authenticated | unauthenticated | error`
+- **Tipo discriminado:** `SessionState` — cuando `status === "authenticated"` expone `session: Session`.
+- **Usado en:** layouts de route groups protegidos (F2.4+), `middleware.ts`.
+
 ### useGeolocation
 
 - **Ruta:** `shared/hooks/useGeolocation.ts`
@@ -135,6 +144,15 @@
 ## 4. Services (`shared/services/`)
 
 > Clientes de datos. Hoy devuelven mocks; mañana apuntarán a la API real. Los componentes consumen services, nunca mocks directos.
+
+### authService
+
+- **Ruta:** `shared/services/auth.ts`
+- **Tipos:** `shared/services/auth.types.ts`
+- **Descripción:** Implementación mock de `AuthService` (DP-2 Supabase Auth). Gestiona sesión en memoria, pre-seed 3 usuarios de prueba (`client/store/admin @test.com`, password `"password"`). Swap a Supabase: reemplazar solo esta implementación sin tocar consumers.
+- **Interface:** `AuthService` — `signIn(input)`, `signUp(input)`, `signOut()`, `getSession()`, `onAuthStateChange(cb)`
+- **Tipos clave:** `SignInInput`, `SignUpInput`, `AuthResult<T>`, `AuthStateChangeCallback`
+- **Usado en:** `shared/hooks/useSession`, F2.4 middleware.
 
 ### storesService
 
@@ -466,3 +484,4 @@
 | 2026-04-16 | F3.2: agregada sección 12. Domain con `order-state-machine`                    | —     |
 | 2026-04-16 | F3.5: agregado domain events + event bus en sección 12                         | —     |
 | 2026-04-16 | F2.2: agregado `sessionSchema` + `Session` type en §7/7b; `USER_ROLES` corregido a valores en inglés (`client/store/admin`) en §8; eliminada colisión de tipo `UserRole` en constants | —     |
+| 2026-04-16 | F2.3: agregado `authService` + `AuthService` interface en §4; `useSession` hook en §3 | —     |
