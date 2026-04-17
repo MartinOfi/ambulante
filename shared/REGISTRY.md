@@ -131,10 +131,20 @@
 - **Ruta barrel:** `shared/components/typography/index.ts`
 - **Archivos:** `shared/components/typography/Text.tsx`
 - **Descripción:** Componente polimórfico de tipografía con variantes semánticas. Reemplaza inline Tailwind en `h1/h2/h3/p/span`. Cada variante lleva sus clases de fuente, tamaño, peso y tracking baked-in; el color y espaciado se pasan via `className`.
-- **API:** `<Text variant="display-xl" | "display-lg" | "heading-sm" | "body" | "body-sm" | "overline" | "caption" as? className? />`
+- **API:** `<Text variant="..." as?: ElementType className? {...htmlAttrs} />`
+  - `as` acepta cualquier tag HTML intrínseco (`"div"`, `"article"`, `"li"`…) o componente React. Default: `"span"`.
 - **Elementos por defecto:** `display-xl→h1`, `display-lg→h2`, `heading-sm→h3`, `body/body-sm→p`, `overline/caption→span`
+- **Nota `heading-sm`:** es neutral en casing — no bake `uppercase`. Callers añaden `className="uppercase"` cuando lo necesitan (ej: Features) y lo omiten cuando no (ej: StoreCard). Esto es intencional.
+- **Nota `display-xl`:** incluye breakpoints responsivos baked-in (`sm:text-6xl lg:text-7xl xl:text-8xl`). `cn()` usa `tailwind-merge` así que se pueden sobreescribir via `className`.
 - **Tipo exportado:** `TextVariant`
-- **Usado en:** `features/landing/Hero`, `features/landing/HowItWorks` (SectionHeader), `features/landing/Features`, `features/map/StoreCard`.
+- **Usado en:** `features/landing/Hero`, `features/landing/HowItWorks`, `features/landing/Features`, `features/map/StoreCard`, `shared/components/typography/SectionHeader`.
+
+### SectionHeader
+
+- **Ruta:** `shared/components/typography/SectionHeader.tsx`
+- **Descripción:** Bloque compuesto de eyebrow (`overline`) + título (`display-lg`). Promovido desde `features/landing/HowItWorks` al ser usado en 2+ lugares.
+- **API:** `<SectionHeader eyebrow="..." title="..." />`
+- **Usado en:** `features/landing/HowItWorks`, `features/landing/Features`.
 
 ---
 
@@ -696,3 +706,4 @@
 | 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
 | 2026-04-17 | F7.1: agregada sección 14. Test utilities — `renderWithProviders`, `createTestQueryClient`, barrel con RTL + userEvent | —     |
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
+| 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |

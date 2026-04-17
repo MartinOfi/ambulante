@@ -4,7 +4,7 @@ import { MapPinned, Radar, ShoppingBasket, Send, Handshake } from "lucide-react"
 import RadialOrbitalTimeline, {
   type TimelineItem,
 } from "@/shared/components/ui/radial-orbital-timeline";
-import { Text } from "@/shared/components/typography";
+import { SectionHeader, Text } from "@/shared/components/typography";
 
 const TIMELINE: TimelineItem[] = [
   {
@@ -96,18 +96,5 @@ export function HowItWorks() {
         </div>
       </div>
     </section>
-  );
-}
-
-export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div className="max-w-2xl">
-      <Text variant="overline" className="text-brand">
-        {eyebrow}
-      </Text>
-      <Text variant="display-lg" className="mt-3 text-foreground">
-        {title}
-      </Text>
-    </div>
   );
 }

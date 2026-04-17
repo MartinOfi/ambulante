@@ -74,6 +74,26 @@ describe("Text", () => {
     });
   });
 
+  describe("rest prop forwarding", () => {
+    it("forwards data-testid", () => {
+      render(
+        <Text variant="body" data-testid="my-text">
+          content
+        </Text>,
+      );
+      expect(screen.getByTestId("my-text")).toBeInTheDocument();
+    });
+
+    it("forwards aria-label", () => {
+      render(
+        <Text variant="heading-sm" aria-label="section title">
+          t
+        </Text>,
+      );
+      expect(screen.getByRole("heading", { name: "section title" })).toBeInTheDocument();
+    });
+  });
+
   describe("variant classes", () => {
     it("display-xl applies font-display and font-bold", () => {
       const { container } = render(<Text variant="display-xl">t</Text>);

@@ -20,7 +20,7 @@ const VARIANT_CLASSES: Record<TextVariant, string> = {
   body: "text-lg leading-relaxed",
   "body-sm": "text-sm leading-relaxed",
   overline: "font-display text-xs font-bold uppercase tracking-[0.2em]",
-  caption: "text-xs",
+  caption: "text-xs leading-snug",
 };
 
 const VARIANT_DEFAULT_ELEMENT: Record<TextVariant, ElementType> = {
@@ -39,7 +39,7 @@ interface TextOwnProps {
 
 type TextProps<T extends ElementType = ElementType> = PolymorphicProps<T, TextOwnProps>;
 
-export function Text<T extends ElementType = ElementType>({
+export function Text<T extends ElementType = "span">({
   as,
   variant,
   className,

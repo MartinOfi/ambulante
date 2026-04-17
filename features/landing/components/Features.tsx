@@ -1,6 +1,5 @@
 import { Zap, Navigation, Wallet, Bell, Smartphone, ListChecks } from "lucide-react";
-import { SectionHeader } from "./HowItWorks";
-import { Text } from "@/shared/components/typography";
+import { SectionHeader, Text } from "@/shared/components/typography";
 
 const FEATURES = [
   {
