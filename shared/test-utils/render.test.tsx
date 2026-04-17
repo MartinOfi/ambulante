@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import { useQueryState } from "nuqs";
 import { describe, expect, it } from "vitest";
 
-import { createTestQueryClient, renderWithProviders } from "./render";
+import { createTestQueryClient, renderWithProviders } from "@/shared/test-utils";
 
 function QueryConsumer() {
   const { data } = useQuery({
@@ -40,10 +40,13 @@ describe("renderWithProviders", () => {
   });
 
   it("each call gets an isolated QueryClient by default", () => {
-    const { unmount } = renderWithProviders(<QueryConsumer />);
+    const firstClient = createTestQueryClient();
+    firstClient.setQueryData(["test"], "poisoned-data");
+    const { unmount } = renderWithProviders(<QueryConsumer />, { queryClient: firstClient });
     unmount();
+
     renderWithProviders(<QueryConsumer />);
-    // New isolated client — no cached data from previous render
+    expect(screen.getByTestId("query-data")).not.toHaveTextContent("poisoned-data");
     expect(screen.getByTestId("query-data")).toHaveTextContent("loading");
   });
 });

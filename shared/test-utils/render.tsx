@@ -4,8 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, type RenderOptions } from "@testing-library/react";
 import { NuqsAdapter } from "nuqs/adapters/react";
 
-import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
-
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
@@ -22,7 +20,7 @@ export function createTestQueryClient(): QueryClient {
   });
 }
 
-interface RenderWithProvidersOptions extends Omit<RenderOptions, "wrapper"> {
+export interface RenderWithProvidersOptions extends Omit<RenderOptions, "wrapper"> {
   readonly queryClient?: QueryClient;
 }
 
@@ -30,9 +28,7 @@ function buildWrapper(queryClient: QueryClient) {
   function AllTheProviders({ children }: { readonly children: ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <ThemeProvider>{children}</ThemeProvider>
-        </NuqsAdapter>
+        <NuqsAdapter>{children}</NuqsAdapter>
       </QueryClientProvider>
     );
   }
