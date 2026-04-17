@@ -90,6 +90,18 @@ export const COLORS = {
   },
 } as const;
 
+// ─── Auth panel colors ────────────────────────────────────────────────────────
+
+/**
+ * Fixed dark palette for the auth right-panel. Not theme-aware — always dark.
+ * Kept separate from COLORS.cssVarRefs so the CSS-var-ref contract is not broken.
+ */
+export const AUTH_COLORS = {
+  dark: "#0D0400",
+  "overlay-mid": "#3B1000",
+  "overlay-light": "#6B1E00",
+} as const;
+
 // ─── Border radius ────────────────────────────────────────────────────────────
 
 /** Custom border radius values that extend Tailwind's default scale. */
@@ -109,6 +121,10 @@ export const SHADOWS = {
   sheet: "0 -8px 32px rgba(15, 23, 42, 0.12)",
   /** Floating Action Button — stronger orange glow than pin. */
   fab: "0 8px 24px rgba(234, 88, 12, 0.45)",
+  /** Brutalist card offset — solid foreground shadow at rest. */
+  "card-brutal": "4px 4px 0 0 hsl(var(--foreground))",
+  /** Brutalist card offset — reduced on hover to simulate press. */
+  "card-brutal-hover": "2px 2px 0 0 hsl(var(--foreground))",
 } as const;
 
 // ─── Motion ───────────────────────────────────────────────────────────────────
@@ -126,6 +142,7 @@ export const MOTION = {
     liveBlink: 1600,
     pinFade: 3200,
     fadeSlideIn: 800,
+    orbFloat: 12000,
   },
 
   easings: {
@@ -170,4 +187,99 @@ export const TYPOGRAPHY = {
     display: "var(--font-display)",
     sans: "var(--font-sans)",
   },
+} as const;
+
+// ─── Font size ────────────────────────────────────────────────────────────────
+
+export const FONT_SIZE = {
+  /** 9px — vendor marker labels in the mini-map. */
+  "3xs": "9px",
+  /** 10px — live badge and radio label text. */
+  "2xs": "10px",
+  /** 11px — status chips, distance/price tags in store cards. */
+  "xs-tight": "11px",
+  /** 40px — Ambulante logotype on the auth card. Tuple sets implicit line-height. */
+  "display-auth": ["40px", { lineHeight: "0.88" }] as [string, { lineHeight: string }],
+  /** Fluid clamp 32–56px — section headings that scale with viewport. Tuple sets implicit line-height. */
+  "display-hero": ["clamp(2rem, 6vw, 3.5rem)", { lineHeight: "0.9" }] as [
+    string,
+    { lineHeight: string },
+  ],
+};
+
+// ─── Heights ──────────────────────────────────────────────────────────────────
+
+const ORB_LG_SIZE = "500px";
+
+export const HEIGHTS = {
+  /** 100dvh — full viewport including mobile address bar. */
+  "screen-dvh": "100dvh",
+  /** Bottom sheet snap: peeking. */
+  "sheet-collapsed": "15vh",
+  /** Bottom sheet snap: half-open. */
+  "sheet-half": "45vh",
+  /** Bottom sheet snap: fully expanded. */
+  "sheet-full": "90vh",
+  /** Bokeh orb decorative circle. */
+  "orb-lg": ORB_LG_SIZE,
+} as const;
+
+// ─── Widths ───────────────────────────────────────────────────────────────────
+
+export const WIDTHS = {
+  /** Desktop nav description-list submenu. */
+  "nav-description": "440px",
+  /** Desktop nav simple/icon submenu — base. */
+  "nav-sm": "420px",
+  /** Desktop nav simple/icon submenu — md breakpoint. */
+  "nav-md": "460px",
+  /** Bokeh orb decorative circle. */
+  "orb-lg": ORB_LG_SIZE,
+} as const;
+
+// ─── Max widths ───────────────────────────────────────────────────────────────
+
+export const MAX_WIDTHS = {
+  /** Small centered content block, e.g. EmptyRadius message. */
+  "content-sm": "260px",
+  /** Medium centered content block, e.g. LocationDenied dialog. */
+  "content-md": "320px",
+} as const;
+
+// ─── Min widths ───────────────────────────────────────────────────────────────
+
+export const MIN_WIDTHS = {
+  /** Radius filter chip — ensures tap target meets 48px minimum. */
+  chip: "48px",
+} as const;
+
+// ─── Line heights ─────────────────────────────────────────────────────────────
+
+export const LINE_HEIGHTS = {
+  /** Tight condensed display headings. */
+  display: "0.95",
+  /** Auth card logotype — tighter than display for large decorative type. */
+  "display-auth": "0.88",
+  /** Hero section heading — fluid display type. */
+  "display-hero": "0.9",
+} as const;
+
+// ─── Letter spacings ─────────────────────────────────────────────────────────
+
+export const LETTER_SPACINGS = {
+  /** Section headings — negative tracking for compressed display feel. */
+  display: "-0.03em",
+  /** Eyebrow labels — wide tracking for small-caps uppercase labels. */
+  eyebrow: "0.2em",
+  /** Tag lines — extra-wide tracking for secondary text labels. */
+  tag: "0.14em",
+} as const;
+
+// ─── Blur ─────────────────────────────────────────────────────────────────────
+
+export const BLUR_TOKENS = {
+  /** Bokeh orb blur radius. */
+  orb: "100px",
+  /** Ambient hero glow blur radius. */
+  ambient: "120px",
 } as const;

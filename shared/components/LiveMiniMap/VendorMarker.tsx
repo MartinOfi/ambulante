@@ -35,7 +35,7 @@ export function VendorMarker({ vendor }: VendorMarkerProps) {
           )}
         </span>
         <span
-          className={`whitespace-nowrap rounded-full border border-foreground/10 bg-surface/90 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-tight text-foreground shadow-sm backdrop-blur-sm ${
+          className={`whitespace-nowrap rounded-full border border-foreground/10 bg-surface/90 px-2 py-0.5 text-3xs font-semibold uppercase tracking-tight text-foreground shadow-sm backdrop-blur-sm ${
             state === "fading" ? "opacity-60" : ""
           }`}
         >

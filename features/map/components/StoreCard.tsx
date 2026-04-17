@@ -32,15 +32,15 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
 
         <div className="mt-1 flex items-center gap-2">
           {store.status === "open" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--success))]/10 px-2 py-0.5 text-[11px] font-semibold text-[hsl(var(--success))]">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[hsl(var(--success))]" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-xs-tight font-semibold text-success">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
               Abierto ahora
             </span>
           )}
-          <span className="tabular text-[11px] font-semibold text-muted">
+          <span className="tabular text-xs-tight font-semibold text-muted">
             {formatDistance(store.distanceMeters)}
           </span>
-          <span className="tabular text-[11px] font-semibold text-brand">
+          <span className="tabular text-xs-tight font-semibold text-brand">
             desde {formatPrice(store.priceFromArs)}
           </span>
         </div>

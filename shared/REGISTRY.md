@@ -342,9 +342,19 @@
 ### tokens
 
 - **Ruta:** `shared/styles/tokens.ts`
-- **Descripción:** Single source of truth de design tokens tipados. Exporta `COLORS` (raw HSL values por modo + CSS var refs para Tailwind), `RADIUS`, `SHADOWS`, `MOTION` (keyframes, durations, easings, animations), `TYPOGRAPHY`.
-- **API:** `import { COLORS, RADIUS, SHADOWS, MOTION, TYPOGRAPHY } from '@/shared/styles/tokens'`
+- **Descripción:** Single source of truth de design tokens tipados. Exporta `COLORS`, `RADIUS`, `SHADOWS`, `MOTION`, `TYPOGRAPHY`, `FONT_SIZE`, `HEIGHTS`, `WIDTHS`, `MAX_WIDTHS`, `MIN_WIDTHS`, `LINE_HEIGHTS`, `LETTER_SPACINGS`, `BLUR_TOKENS`.
+- **API:** `import { COLORS, RADIUS, SHADOWS, MOTION, TYPOGRAPHY, FONT_SIZE, HEIGHTS, WIDTHS, MAX_WIDTHS, MIN_WIDTHS, LINE_HEIGHTS, LETTER_SPACINGS, BLUR_TOKENS } from '@/shared/styles/tokens'`
 - **Usado en:** `tailwind.config.ts` (via import relativo — los path aliases no aplican en ese contexto Node.js)
+- **Grupos de tokens (F9.1):**
+  - `FONT_SIZE` — escala tipográfica: `3xs` (9px), `2xs` (10px), `xs-tight` (11px), `xs-loose` (13px), `display-hero` (clamp 2rem→3.5rem), `display-auth` (40px)
+  - `HEIGHTS` — alturas semánticas: `screen-dvh` (100dvh), `sheet-collapsed/half/full`, `orb-lg`
+  - `WIDTHS` — anchos semánticos: `nav-description`, `nav-sm`, `nav-md`, `orb-lg`
+  - `MAX_WIDTHS` — anchos máximos: `content-sm` (260px), `content-md` (320px)
+  - `MIN_WIDTHS` — anchos mínimos: `chip` (48px)
+  - `LINE_HEIGHTS` — interlineado: `display` (0.95), `tight-xl` (0.9)
+  - `LETTER_SPACINGS` — tracking: `tag` (0.14em), `eyebrow` (0.2em), `display` (-0.02em)
+  - `BLUR_TOKENS` — radios de blur: `orb` (100px), `ambient` (120px)
+  - `SHADOWS` extendido — sombras: `pin`, `card-brutal`, `card-brutal-hover`, `sheet`
 - **Nota:** `COLORS.raw.light` / `COLORS.raw.dark` son los valores crudos HSL para uso runtime. `COLORS.cssVarRefs` contiene las references `hsl(var(--token))` para el config de Tailwind.
 
 ### contrast
@@ -725,6 +735,7 @@
 | 2026-04-16 | Auth refactor: LiveMiniMap promovido de `features/landing/` a `shared/components/LiveMiniMap/`; AuthCard reescrito como layout split-screen (form izq + mapa+foto der) | —     |
 | 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
 | 2026-04-17 | F7.1: agregada sección 14. Test utilities — `renderWithProviders`, `createTestQueryClient`, barrel con RTL + userEvent | —     |
+| 2026-04-17 | F9.1: tokens actualizado con grupos FONT_SIZE, HEIGHTS, WIDTHS, MAX_WIDTHS, MIN_WIDTHS, LINE_HEIGHTS, LETTER_SPACINGS, BLUR_TOKENS, SHADOWS extendido | —     |
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
 | 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |
 | 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |

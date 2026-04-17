@@ -16,9 +16,9 @@ export interface NearbyBottomSheetProps {
 }
 
 const SNAP_CLASSES: Record<BottomSheetSnap, string> = {
-  [BOTTOM_SHEET_SNAP.COLLAPSED]: "h-[15vh]",
-  [BOTTOM_SHEET_SNAP.HALF]: "h-[45vh]",
-  [BOTTOM_SHEET_SNAP.FULL]: "h-[90vh]",
+  [BOTTOM_SHEET_SNAP.COLLAPSED]: "h-sheet-collapsed",
+  [BOTTOM_SHEET_SNAP.HALF]: "h-sheet-half",
+  [BOTTOM_SHEET_SNAP.FULL]: "h-sheet-full",
 };
 
 function nextSnap(current: BottomSheetSnap): BottomSheetSnap {

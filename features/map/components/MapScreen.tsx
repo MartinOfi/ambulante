@@ -36,7 +36,7 @@ export function MapScreen({
   const isDenied = geo.status === "denied";
 
   return (
-    <main className="relative h-[100dvh] w-full overflow-hidden bg-surface">
+    <main className="relative h-screen-dvh w-full overflow-hidden bg-surface">
       <MapCanvas stores={stores} hasUserLocation={hasLocation} />
 
       <TopHeader radius={radius} onRadiusChange={onRadiusChange} />

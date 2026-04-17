@@ -40,10 +40,10 @@ export function ForVendors() {
 
       <div className="relative mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center">
         <div>
-          <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-brand">
+          <span className="font-display text-xs font-bold uppercase tracking-eyebrow text-brand">
             Para tiendas ambulantes
           </span>
-          <h2 className="mt-3 font-display text-[clamp(2rem,6vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-foreground">
+          <h2 className="mt-3 font-display text-display-hero font-bold uppercase leading-display tracking-display text-foreground">
             Tu puesto,
             <br />
             <span className="text-brand">visible</span> cuando importa.
@@ -65,7 +65,7 @@ export function ForVendors() {
           {BENEFITS.map(({ icon: Icon, title, body }) => (
             <li
               key={title}
-              className="flex items-start gap-4 rounded-card border-2 border-foreground bg-surface-elevated p-5 shadow-[4px_4px_0_0_hsl(var(--foreground))] transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[2px_2px_0_0_hsl(var(--foreground))]"
+              className="flex items-start gap-4 rounded-card border-2 border-foreground bg-surface-elevated p-5 shadow-card-brutal transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-card-brutal-hover"
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
                 <Icon className="h-5 w-5" aria-hidden="true" />
