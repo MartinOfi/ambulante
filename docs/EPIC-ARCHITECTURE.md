@@ -1084,13 +1084,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.4 — Motion primitives
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Durations y easings consistentes. Hoy cada componente reinventa (`duration-300 ease-out`, `ease-[cubic-bezier(...)]`).
 - **Entregable:** `shared/styles/motion.ts` con `durations`, `easings`, helpers para framer-motion.
-- **Archivos:** `shared/styles/motion.ts`.
+- **Archivos:** `shared/styles/motion.ts`, `shared/styles/motion.test.ts`.
 - **Depends on:** F1.8
 - **Estimación:** S
-- **Notas:**
+- **Notas:** FM_DURATIONS (ms→s), FM_EASINGS (cubic-bezier arrays), TRANSITIONS (fast/base/slow/spring), FADE_IN/SLIDE_UP/SLIDE_DOWN variants, TW_TRANSITIONS. Tipos locales compatibles con motion/react para cuando se instale. 514 tests verdes, typecheck limpio.
 
 ### F9.5 — Storybook (opcional)
 - **Estado:** ⏸️ deferred
