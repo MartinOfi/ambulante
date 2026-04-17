@@ -842,13 +842,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F5.2 — Realtime service abstraction
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Interfaz para swapear transporte (Supabase Realtime / WebSocket propio / Pusher).
 - **Entregable:** `shared/services/realtime.ts` con `RealtimeService` interface: `subscribe(channel, handler)`, `unsubscribe`, `status`.
 - **Archivos:** `shared/services/realtime.ts`.
 - **Depends on:** F5.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creados `shared/services/realtime.types.ts` (interfaz `RealtimeService`, tipos `RealtimeStatus`, `RealtimeMessage<T>`, `RealtimeHandler<T>`, `RealtimeStatusHandler`) y `shared/services/realtime.ts` (factory `createMockRealtimeService`, singleton `realtimeService`, `REALTIME_CHANNELS` as const). Mock in-memory integrado con `eventBus.registerSerializationHook` — domain events fluyen automáticamente al canal `"orders"`. 15 tests, 0 errores TypeScript. REGISTRY.md actualizado.
 
 ### F5.3 — Integración con React Query
 - **Estado:** ⚪ pending

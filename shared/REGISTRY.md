@@ -91,6 +91,15 @@
 
 ## 2. Componentes compuestos (`shared/components/`)
 
+### LiveMiniMap
+
+- **Ruta:** `shared/components/LiveMiniMap/index.ts` (barrel)
+- **Archivos:** `LiveMiniMap.tsx`, `MapCanvas.tsx`, `UserMarker.tsx`, `VendorMarker.tsx`, `vendors.ts`
+- **Descripción:** Mapa decorativo en tiempo real con marcadores de tiendas ambulantes, radar de usuario, street grid SVG y badges de features. Server Component sin props. Movido desde `features/landing/` para permitir uso en auth pages.
+- **API:** `<LiveMiniMap />` — sin props.
+- **Sub-tipos:** `MapVendor`, `VendorState`, `LabelSide` exportados desde `vendors.ts`.
+- **Usado en:** `features/landing/components/Hero`, `features/auth/components/AuthCard`.
+
 ### ThemeProvider
 
 - **Ruta:** `shared/components/theme/ThemeProvider.tsx`
@@ -216,6 +225,17 @@
 - **Interface:** `AuthService` — `signIn(input)`, `signUp(input)`, `signOut()`, `getSession()`, `onAuthStateChange(cb)`
 - **Tipos clave:** `SignInInput`, `SignUpInput`, `AuthResult<T>`, `AuthStateChangeCallback`
 - **Usado en:** `shared/hooks/useSession`, F2.4 middleware.
+
+### realtimeService
+
+- **Ruta:** `shared/services/realtime.ts`
+- **Tipos:** `shared/services/realtime.types.ts`
+- **Descripción:** Abstracción de transporte realtime. Interfaz `RealtimeService` swapeable (mock in-memory hoy → Supabase Realtime cuando llegue el backend). Se integra con el `eventBus` via `registerSerializationHook`: los domain events publicados al bus fluyen automáticamente al canal `"orders"`. Arranca en estado `"online"`.
+- **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `destroy()`
+- **Factory exportada:** `createMockRealtimeService(options?)` — recibe `eventBus` opcional (para tests con bus aislado)
+- **Canales:** `REALTIME_CHANNELS` as const — `{ orders: "orders", stores: "stores" }`
+- **Tipos clave:** `RealtimeStatus` ("connecting" | "online" | "offline"), `RealtimeMessage<T>`, `RealtimeHandler<T>`, `RealtimeStatusHandler`, `RealtimeChannel`
+- **Usado en:** F5.3 (`useRealtimeInvalidation`), F5.4 (reconnect hook).
 
 ### storesService
 
@@ -592,6 +612,28 @@
 
 ---
 
+## 14. Test utilities (`shared/test-utils/`)
+
+> Solo para archivos `*.test.{ts,tsx}`. No importar desde código de producción.
+
+### renderWithProviders + createTestQueryClient
+
+- **Ruta barrel:** `shared/test-utils/index.ts`
+- **Ruta impl:** `shared/test-utils/render.tsx`
+- **Descripción:** Helper que envuelve componentes con todos los providers de la app (`QueryClientProvider`, `NuqsAdapter`, `ThemeProvider`) para tests de componentes. `createTestQueryClient()` crea un `QueryClient` sin retries y `staleTime: Infinity` para tests deterministas. El barrel re-exporta todo de `@testing-library/react` y `userEvent` de `@testing-library/user-event`.
+- **API:**
+  - `renderWithProviders(ui, options?)` — `options.queryClient?: QueryClient` para pre-sembrar datos en caché
+  - `createTestQueryClient(): QueryClient` — fábrica de cliente aislado por test
+  - `userEvent` — re-export de `@testing-library/user-event`
+  - Toda la API de `@testing-library/react` (screen, fireEvent, waitFor, etc.)
+- **Uso canónico:**
+  ```ts
+  import { renderWithProviders, screen, userEvent } from '@/shared/test-utils';
+  ```
+- **Nota:** Usa `nuqs/adapters/react` (no el adaptador Next.js) para compatibilidad con jsdom.
+
+---
+
 ## Changelog del registry
 
 | Fecha      | Cambio                                                              | Autor |
@@ -627,3 +669,5 @@
 | 2026-04-16 | F4.4: QueryProvider actualizado — retry inteligente (no 4xx), backoff exp., networkMode offlineFirst; exports auxiliares documentados | —     |
 | 2026-04-16 | F4.3: agregado parseResponse + ParseError en sección 2b. Query                 | —     |
 | 2026-04-16 | F4.5: agregado Toaster en §1; extractErrorMessage en §5; QUERY/MUTATION_ERROR_MESSAGE en §8; QueryProvider actualizado con toast en QueryCache.onError y mutations.onError | —     |
+| 2026-04-16 | Auth refactor: LiveMiniMap promovido de `features/landing/` a `shared/components/LiveMiniMap/`; AuthCard reescrito como layout split-screen (form izq + mapa+foto der) | —     |
+| 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
