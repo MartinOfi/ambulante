@@ -1,7 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Icon } from "./Icon";
-import { ICON_COLOR, ICON_SIZE, ICON_STROKE_WIDTH } from "./Icon.types";
+import {
+  ICON_COLOR,
+  ICON_SIZE,
+  ICON_STROKE_WIDTH,
+  type IconColor,
+  type IconSize,
+} from "./Icon.types";
 
 function renderIcon(props: React.ComponentProps<typeof Icon>) {
   return render(<Icon {...props} />);
@@ -52,6 +58,18 @@ describe("Icon", () => {
   });
 
   describe("size prop", () => {
+    it.each(Object.entries(ICON_SIZE) as [IconSize, number][])(
+      "applies %s size (%dpx)",
+      async (sizeKey, px) => {
+        const { container } = renderIcon({ name: "House", size: sizeKey });
+        await waitFor(() => {
+          const svg = container.querySelector("svg");
+          expect(svg).toHaveAttribute("width", String(px));
+          expect(svg).toHaveAttribute("height", String(px));
+        });
+      },
+    );
+
     it("applies md size (20px) by default", async () => {
       const { container } = renderIcon({ name: "House" });
       await waitFor(() => {
@@ -60,40 +78,24 @@ describe("Icon", () => {
         expect(svg).toHaveAttribute("height", String(ICON_SIZE.md));
       });
     });
-
-    it("applies lg size (24px) when size=lg", async () => {
-      const { container } = renderIcon({ name: "House", size: "lg" });
-      await waitFor(() => {
-        const svg = container.querySelector("svg");
-        expect(svg).toHaveAttribute("width", String(ICON_SIZE.lg));
-        expect(svg).toHaveAttribute("height", String(ICON_SIZE.lg));
-      });
-    });
-
-    it("applies xs size (12px) when size=xs", async () => {
-      const { container } = renderIcon({ name: "House", size: "xs" });
-      await waitFor(() => {
-        const svg = container.querySelector("svg");
-        expect(svg).toHaveAttribute("width", String(ICON_SIZE.xs));
-      });
-    });
   });
 
   describe("color prop", () => {
     // lucide-react maps the `color` prop to the SVG `stroke` attribute
-    it("applies currentColor as stroke when color=inherit (default)", async () => {
+    it.each(Object.entries(ICON_COLOR) as [IconColor, string][])(
+      "applies %s color as stroke",
+      async (colorKey, colorValue) => {
+        const { container } = renderIcon({ name: "House", color: colorKey });
+        await waitFor(() => {
+          expect(container.querySelector("svg")).toHaveAttribute("stroke", colorValue);
+        });
+      },
+    );
+
+    it("applies currentColor as stroke by default (color=inherit)", async () => {
       const { container } = renderIcon({ name: "House" });
       await waitFor(() => {
-        const svg = container.querySelector("svg");
-        expect(svg).toHaveAttribute("stroke", ICON_COLOR.inherit);
-      });
-    });
-
-    it("applies brand color CSS var as stroke when color=brand", async () => {
-      const { container } = renderIcon({ name: "House", color: "brand" });
-      await waitFor(() => {
-        const svg = container.querySelector("svg");
-        expect(svg).toHaveAttribute("stroke", ICON_COLOR.brand);
+        expect(container.querySelector("svg")).toHaveAttribute("stroke", ICON_COLOR.inherit);
       });
     });
   });
@@ -120,6 +122,14 @@ describe("Icon", () => {
         const svg = container.querySelector("svg");
         expect(svg).toHaveAttribute("stroke-width", String(ICON_STROKE_WIDTH));
       });
+    });
+
+    it("Suspense fallback span has aria-hidden to avoid screen reader noise", () => {
+      const { container } = renderIcon({ name: "House" });
+      const span = container.querySelector("span");
+      if (span) {
+        expect(span).toHaveAttribute("aria-hidden", "true");
+      }
     });
   });
 

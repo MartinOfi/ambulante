@@ -28,6 +28,7 @@ export type IconName = {
   [K in keyof typeof LucideIcons]: (typeof LucideIcons)[K] extends LucideIcon ? K : never;
 }[keyof typeof LucideIcons];
 
+// 1.5 is a unitless SVG stroke-width (px-equivalent); Lucide's default is 2.
 export const ICON_STROKE_WIDTH = 1.5;
 
 export interface IconProps {
@@ -36,5 +37,6 @@ export interface IconProps {
   readonly color?: IconColor;
   readonly className?: string;
   readonly "aria-label"?: string;
-  readonly "aria-hidden"?: boolean;
+  // Accepts boolean or string to align with React's SVGProps definition.
+  readonly "aria-hidden"?: boolean | "true" | "false";
 }
