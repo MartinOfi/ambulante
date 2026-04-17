@@ -126,6 +126,16 @@
 - **Tipo polimórfico compartido:** `shared/components/layout/polymorphic.types.ts` → `PolymorphicProps<T, Extra>`
 - **API:** `import { Stack, Row, Container, Screen, Spacer, Divider } from '@/shared/components/layout'`
 
+### Text (tipografía sistematizada)
+
+- **Ruta barrel:** `shared/components/typography/index.ts`
+- **Archivos:** `shared/components/typography/Text.tsx`
+- **Descripción:** Componente polimórfico de tipografía con variantes semánticas. Reemplaza inline Tailwind en `h1/h2/h3/p/span`. Cada variante lleva sus clases de fuente, tamaño, peso y tracking baked-in; el color y espaciado se pasan via `className`.
+- **API:** `<Text variant="display-xl" | "display-lg" | "heading-sm" | "body" | "body-sm" | "overline" | "caption" as? className? />`
+- **Elementos por defecto:** `display-xl→h1`, `display-lg→h2`, `heading-sm→h3`, `body/body-sm→p`, `overline/caption→span`
+- **Tipo exportado:** `TextVariant`
+- **Usado en:** `features/landing/Hero`, `features/landing/HowItWorks` (SectionHeader), `features/landing/Features`, `features/map/StoreCard`.
+
 ---
 
 ## 2b. Query (`shared/query/`)
@@ -685,3 +695,4 @@
 | 2026-04-16 | Auth refactor: LiveMiniMap promovido de `features/landing/` a `shared/components/LiveMiniMap/`; AuthCard reescrito como layout split-screen (form izq + mapa+foto der) | —     |
 | 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
 | 2026-04-17 | F7.1: agregada sección 14. Test utilities — `renderWithProviders`, `createTestQueryClient`, barrel con RTL + userEvent | —     |
+| 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |

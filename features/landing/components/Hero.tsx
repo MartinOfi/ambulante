@@ -11,6 +11,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { LiveMiniMap } from "@/shared/components/LiveMiniMap";
+import { Text } from "@/shared/components/typography";
 
 interface ActiveVendor {
   name: string;
@@ -81,9 +82,10 @@ export function Hero() {
               </div>
             </div>
 
-            <h1
+            <Text
+              variant="display-xl"
               data-testid="hero-heading"
-              className="amb-fade-in amb-delay-200 font-display text-5xl font-bold uppercase leading-[0.9] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl xl:text-8xl"
+              className="amb-fade-in amb-delay-200 text-foreground"
             >
               Todo lo ambulante,
               <br />
@@ -92,13 +94,13 @@ export function Hero() {
               </span>
               <br />
               ahora mismo.
-            </h1>
+            </Text>
 
-            <p className="amb-fade-in amb-delay-300 max-w-xl text-lg leading-relaxed text-muted">
+            <Text variant="body" className="amb-fade-in amb-delay-300 max-w-xl text-muted">
               Aparecen y desaparecen. Ambulante te muestra qué tiendas están activas hoy, para que
               no camines en vano. No procesamos pagos, no manejamos stock — solo el mapa que te dice
               quién está ahí.
-            </p>
+            </Text>
 
             <div className="amb-fade-in amb-delay-400 flex flex-col gap-4 sm:flex-row">
               <Link

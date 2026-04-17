@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import type { Store } from "@/shared/types/store";
 import { formatDistance, formatPrice } from "@/shared/utils/format";
+import { Text } from "@/shared/components/typography";
 
 interface StoreCardProps {
   readonly store: Store;
@@ -22,10 +23,12 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <h3 className="truncate font-display text-lg font-bold leading-tight text-foreground">
+        <Text variant="heading-sm" className="truncate leading-tight text-foreground">
           {store.name}
-        </h3>
-        <p className="truncate text-xs text-muted">{store.tagline}</p>
+        </Text>
+        <Text variant="caption" as="p" className="truncate text-muted">
+          {store.tagline}
+        </Text>
 
         <div className="mt-1 flex items-center gap-2">
           {store.status === "open" && (

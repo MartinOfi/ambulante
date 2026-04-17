@@ -1,5 +1,6 @@
 import { Zap, Navigation, Wallet, Bell, Smartphone, ListChecks } from "lucide-react";
 import { SectionHeader } from "./HowItWorks";
+import { Text } from "@/shared/components/typography";
 
 const FEATURES = [
   {
@@ -49,10 +50,12 @@ export function Features() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </div>
-              <h3 className="mt-5 font-display text-lg font-bold uppercase tracking-tight text-foreground">
+              <Text variant="heading-sm" className="mt-5 uppercase tracking-tight text-foreground">
                 {title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+              </Text>
+              <Text variant="body-sm" className="mt-2 text-muted">
+                {body}
+              </Text>
             </li>
           ))}
         </ul>
