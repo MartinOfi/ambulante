@@ -9,6 +9,10 @@ out/
 build/
 dist/
 
+# serwist — generated service worker (built by next.config.ts withSerwist)
+public/sw.js
+public/sw.js.map
+
 # production
 *.tsbuildinfo
 

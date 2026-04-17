@@ -315,6 +315,19 @@
 - **Usado en:** `tailwind.config.ts` (via import relativo — los path aliases no aplican en ese contexto Node.js)
 - **Nota:** `COLORS.raw.light` / `COLORS.raw.dark` son los valores crudos HSL para uso runtime. `COLORS.cssVarRefs` contiene las references `hsl(var(--token))` para el config de Tailwind.
 
+### motion
+
+- **Ruta:** `shared/styles/motion.ts`
+- **Descripción:** Primitivas de animación derivadas de `MOTION` en tokens.ts. Exporta duraciones en segundos para framer-motion, cubic-bezier easing arrays, transition presets reutilizables, variant presets (fade/slide), y Tailwind class helpers para CSS transitions.
+- **API:**
+  - `FM_DURATIONS` — `{ fast, base, slow }` en segundos
+  - `FM_EASINGS` — `{ easeOut, easeInOut, linear }` como `[number, number, number, number]`
+  - `TRANSITIONS` — `{ fast, base, slow, spring }` como objetos listos para pasar a `transition=` de motion.* components
+  - `FADE_IN_VARIANTS`, `SLIDE_UP_VARIANTS`, `SLIDE_DOWN_VARIANTS` — objetos `{ initial, animate, exit }` para `variants=`
+  - `TW_TRANSITIONS` — `{ fast, base, slow }` como strings de clases Tailwind (`"transition duration-200 ease-out"`)
+- **Tipos exportados (internos):** `MotionTransition`, `MotionVariants` — compatibles con `motion/react` para cuando se instale el paquete.
+- **Usado en:** cualquier componente que necesite animaciones consistentes.
+
 ---
 
 ## 7. Types (`shared/types/`)

@@ -6,7 +6,8 @@ const PROTECTED_PREFIXES: ReadonlyArray<{ prefix: string; role: UserRole }> = [
   { prefix: "/admin", role: "admin" },
 ];
 
-// Derived from PROTECTED_PREFIXES — single source of truth for the matcher in middleware.ts
+// Next.js config.matcher requires static literals and cannot reference this array.
+// Keep middleware.ts matchers in sync with PROTECTED_PREFIXES manually.
 export const MIDDLEWARE_MATCHERS = PROTECTED_PREFIXES.map(({ prefix }) => `${prefix}/:path*`);
 
 export function getRequiredRole(pathname: string): UserRole | null {

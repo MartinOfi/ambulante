@@ -10,7 +10,7 @@ import {
   Palette,
   BookOpen,
 } from "lucide-react";
-import { LiveMiniMap } from "./LiveMiniMap";
+import { LiveMiniMap } from "@/shared/components/LiveMiniMap";
 
 interface ActiveVendor {
   name: string;

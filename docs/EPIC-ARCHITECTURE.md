@@ -1057,7 +1057,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Cualquier componente nuevo usa tokens y primitivas. No hay valores arbitrarios (`h-[45vh]`) excepto casos justificados.
 
 ### F9.1 — Escala de spacing en Tailwind
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17]
 - **Por qué:** Hoy `h-[45vh]`, `w-[440px]`, `text-[11px]` — cada componente elige un número distinto.
 - **Entregable:** `tailwind.config.ts` con `spacing`, `height`, `width`, `fontSize` extendidos desde `tokens.ts`. Reemplazar TODOS los arbitrary values en features/.
 - **Archivos:** `tailwind.config.ts`, grep de arbitraries.

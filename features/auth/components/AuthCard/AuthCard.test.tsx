@@ -13,6 +13,11 @@ describe("AuthCard", () => {
     expect(screen.getByText("Recuperar contraseña")).toBeInTheDocument();
   });
 
+  it("renders the tagline", () => {
+    render(<AuthCard title="Iniciá sesión">contenido</AuthCard>);
+    expect(screen.getByText("Tu mercado en movimiento")).toBeInTheDocument();
+  });
+
   it("renders children", () => {
     render(
       <AuthCard title="Título">
