@@ -100,6 +100,18 @@
 - **Sub-tipos:** `MapVendor`, `VendorState`, `LabelSide` exportados desde `vendors.ts`.
 - **Usado en:** `features/landing/components/Hero`, `features/auth/components/AuthCard`.
 
+### Icon
+
+- **Ruta:** `shared/components/Icon/Icon.tsx` + `Icon.types.ts` + `index.ts`
+- **Descripción:** Wrapper lazy-loaded sobre `lucide-react`. Carga cada icono bajo demanda con `React.lazy` + módulo-level cache (`Map<IconName, LazyExoticComponent>`). Gestiona su propio `<Suspense>` interno con fallback `<span>` del mismo tamaño.
+- **API:** `<Icon name size? color? className? aria-label? aria-hidden? />`
+  - `name` — `IconName` (union de ~1450 nombres de lucide, con autocomplete y typo-detection)
+  - `size` — `"xs" | "sm" | "md" | "lg" | "xl"` (12/16/20/24/32px). Default: `"md"`.
+  - `color` — `"inherit" | "brand" | "muted" | "foreground" | "success" | "destructive"`. Default: `"inherit"` (`currentColor`).
+- **Constantes exportadas:** `ICON_SIZE`, `ICON_COLOR`, `ICON_STROKE_WIDTH` (1.5)
+- **Tipos exportados:** `IconName`, `IconSize`, `IconColor`, `IconProps`
+- **Nota:** requiere `"use client"` (React.lazy). Usar dentro de Server Components sin `"use client"` propio — el boundary se toma del primer Client Component ancestro.
+
 ### ThemeProvider
 
 - **Ruta:** `shared/components/theme/ThemeProvider.tsx`
@@ -685,3 +697,4 @@
 | 2026-04-16 | Auth refactor: LiveMiniMap promovido de `features/landing/` a `shared/components/LiveMiniMap/`; AuthCard reescrito como layout split-screen (form izq + mapa+foto der) | —     |
 | 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
 | 2026-04-17 | F7.1: agregada sección 14. Test utilities — `renderWithProviders`, `createTestQueryClient`, barrel con RTL + userEvent | —     |
+| 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |
