@@ -1109,7 +1109,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.7 — Contrast audit (a11y)
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 11:00]
 - **Por qué:** WCAG AA mínimo.
 - **Entregable:** Reporte con contrastes calculados por token combination. Fix de los que fallen.
 - **Archivos:** doc + fixes en tokens.
