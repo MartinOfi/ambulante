@@ -315,6 +315,14 @@
 - **Usado en:** `tailwind.config.ts` (via import relativo — los path aliases no aplican en ese contexto Node.js)
 - **Nota:** `COLORS.raw.light` / `COLORS.raw.dark` son los valores crudos HSL para uso runtime. `COLORS.cssVarRefs` contiene las references `hsl(var(--token))` para el config de Tailwind.
 
+### contrast
+
+- **Ruta:** `shared/styles/contrast.ts`
+- **Descripción:** Utilidades WCAG para calcular luminancia relativa y ratio de contraste desde valores HSL. Exporta `WCAG_THRESHOLDS` (normalText: 4.5, largeText: 3.0), `parseHsl`, `hslToLuminance`, `contrastRatio`.
+- **API:** `import { WCAG_THRESHOLDS, parseHsl, hslToLuminance, contrastRatio } from '@/shared/styles/contrast'`
+- **Tipos exportados:** `HslColor — { h: number; s: number; l: number }`
+- **Nota:** `parseHsl` acepta el formato "H S% L%" que usan los tokens en `COLORS.raw`. Usado en `contrast.test.ts` para auditorías WCAG AA.
+
 ### motion
 
 - **Ruta:** `shared/styles/motion.ts`

@@ -15,15 +15,15 @@
 
     /* Text */
     --foreground: 222 47% 11%; /* #0F172A */
-    --muted: 215 16% 47%; /* #64748B */
+    --muted: 215 16% 46%; /* darkened 1% for WCAG AA on warm cream surface */
 
     /* Always-dark accent (hero, product showcase) — stays dark in both modes */
     --ink: 222 47% 11%; /* #0F172A */
 
     /* Semantic */
-    --success: 142 71% 45%; /* #16A34A */
+    --success: 142 71% 30%; /* darkened for WCAG AA on warm cream surface */
     --border: 24 75% 94%; /* #FCEAE1 */
-    --destructive: 0 72% 51%; /* #DC2626 */
+    --destructive: 0 72% 50%; /* #C51D1D — darkened for WCAG AA on warm cream */
 
     /* shadcn-compat: static colors that don't change between modes */
     --primary-foreground: 0 0% 100%; /* pure white — button/badge text on brand-primary bg */
@@ -42,6 +42,8 @@
     --border: 222 25% 18%; /* #252C3A */
     /* Ink goes deeper so hero/howitworks still pop as the darkest block */
     --ink: 222 60% 3%; /* near-black */
+    /* destructive needs a lighter value in dark mode to pass WCAG AA on dark surfaces */
+    --destructive: 0 72% 63%;
   }
 
   html,
