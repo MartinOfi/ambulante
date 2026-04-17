@@ -226,6 +226,22 @@ Ahora sí escribís el código según el plan auditado.
 - Si tocás `shared/` → actualizar `shared/REGISTRY.md` en el mismo turno.
 - Corré `npx tsc --noEmit` después de cada archivo.
 
+### Tareas estéticas / UI — toolchain obligatorio
+
+Si tu tarea implica diseño visual, componentes UI, animaciones, ilustraciones o cualquier aspecto estético, **debés usar estas herramientas en este orden**:
+
+| Herramienta | Cuándo usarla | Cómo invocarla |
+|---|---|---|
+| **`/ui-ux-pro-max`** | Siempre primero — orienta el diseño y las decisiones estéticas | Skill: `/ui-ux-pro-max` |
+| **21st.dev MCP** (`mcp__magic__*`) | Componentes UI listos: buscar inspiración, construir o refinar piezas | `mcp__magic__21st_magic_component_builder`, `mcp__magic__21st_magic_component_inspiration`, `mcp__magic__21st_magic_component_refiner` |
+| **MagicUI MCP** (`mcp__magicuidesign-mcp__*`) | Componentes animados del registry de Magic UI | `mcp__magicuidesign-mcp__searchRegistryItems`, `mcp__magicuidesign-mcp__getRegistryItem` |
+| **Nanobanana MCP** (`mcp__nanobanana__*`) | Generar o editar imágenes con IA | `mcp__nanobanana__generate_image` |
+| **Stitch MCP** (`mcp__stitch__*`) | Diseño de pantallas / interfaces completas | `mcp__stitch__generate_screen_from_text`, `mcp__stitch__edit_screens`, `mcp__stitch__fetch_screen_code` |
+
+**Regla:** no implementes UI "a mano" sin haber consultado primero las herramientas de arriba. Si una herramienta no tiene lo que necesitás, documentalo en el chat antes de continuar con código propio.
+
+**Regla de consistencia visual (no negociable):** antes de escribir cualquier estilo, leé `app/globals.css` y `tailwind.config.ts` para identificar los tokens de color, tipografía y espaciado del proyecto. Toda pieza UI nueva **debe usar exclusivamente esos tokens**. Prohibido introducir colores hardcodeados (`#fff`, `rgb(...)`, `hsl(...)`) o clases de Tailwind que no correspondan a la paleta existente. Si la tarea requiere un color nuevo, proponerlo como token en `globals.css` y justificarlo en el PASO 2 — no usarlo directamente en el componente.
+
 ## PASO 6 · Verificación final
 
 Antes de marcar done, estas 4 cosas deben pasar y tenés que pegar el output:
@@ -590,4 +606,5 @@ con el output exacto — no improvises.
 | 2026-04-15 | Simplificado: eliminado campo Fase/Wave redundante, solo Task IDs |
 | 2026-04-15 | Agregado PASO 8 de auto-continuación por cadena (`Continues with:`) |
 | 2026-04-15 | Agregado PASO 0 de setup de worktree obligatorio + apéndice de migración para chats en curso (post race-condition de F0 wave 1) |
+| 2026-04-17 | Agregado toolchain obligatorio para tareas UI/estéticas en PASO 5: `/ui-ux-pro-max`, 21st.dev MCP, MagicUI MCP, Nanobanana MCP, Stitch MCP |
 
