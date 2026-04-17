@@ -885,13 +885,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Lighthouse PWA score = 100. Push funciona en Android + iOS (con fallback documentado para iOS Safari).
 
 ### F6.1 — Serwist setup
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 10:45]
+- **Estado:** ✅ done [owner: chat-2026-04-17, completed: 10:57]
 - **Por qué:** Service worker moderno para Next 15. El CLAUDE.md prohíbe `next-pwa` (abandonado).
 - **Entregable:** `serwist` instalado, `app/sw.ts`, config en `next.config.mjs`.
-- **Archivos:** `app/sw.ts`, `next.config.mjs`.
+- **Archivos:** `app/sw.ts`, `next.config.ts`, `tsconfig.json` (excluye `app/sw.ts` para evitar conflicto `lib.dom` vs `lib.webworker`).
 - **Depends on:** F0.8
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `app/sw.ts` excluido de tsconfig principal — `ServiceWorkerGlobalScope` vive en `lib.webworker`, incompatible con `lib.dom`. Serwist usa su propio bundler interno. `config.matcher` en `middleware.ts` requiere literales inline (Next.js no puede resolver identificadores en análisis estático). `public/sw.js` generado (52KB). 499 tests passing.
 
 ### F6.2 — Estrategia de caché offline
 - **Estado:** ⚪ pending

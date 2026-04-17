@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 // We test the module in isolation by mocking env before import.
 // Each describe block re-imports the module with a fresh env to test

@@ -1,6 +1,6 @@
 import type { ElementType } from "react";
 import { cn } from "@/shared/utils/cn";
-import type { PolymorphicProps } from "../polymorphic.types";
+import type { PolymorphicProps } from "@/shared/components/layout/polymorphic.types";
 
 type ContainerSize = "sm" | "md" | "lg" | "xl" | "full";
 
@@ -19,10 +19,7 @@ interface ContainerOwnProps {
   padded?: boolean;
 }
 
-type ContainerProps<T extends ElementType = "div"> = PolymorphicProps<
-  T,
-  ContainerOwnProps
->;
+type ContainerProps<T extends ElementType = "div"> = PolymorphicProps<T, ContainerOwnProps>;
 
 export function Container<T extends ElementType = "div">({
   as,
@@ -36,15 +33,7 @@ export function Container<T extends ElementType = "div">({
   const Tag = (as ?? "div") as ElementType;
 
   return (
-    <Tag
-      className={cn(
-        "mx-auto w-full",
-        SIZE_CLASS[size],
-        padded && "px-4",
-        className
-      )}
-      {...rest}
-    >
+    <Tag className={cn("mx-auto w-full", SIZE_CLASS[size], padded && "px-4", className)} {...rest}>
       {children}
     </Tag>
   );

@@ -1,6 +1,6 @@
 import type { ElementType } from "react";
 import { cn } from "@/shared/utils/cn";
-import type { PolymorphicProps } from "../polymorphic.types";
+import type { PolymorphicProps } from "@/shared/components/layout/polymorphic.types";
 
 type ScreenProps<T extends ElementType = "div"> = PolymorphicProps<T>;
 
@@ -19,7 +19,7 @@ export function Screen<T extends ElementType = "div">({
         "min-h-screen overflow-y-auto",
         // Safe-area insets ensure content is never hidden behind notches / home bars.
         "pb-safe pt-safe",
-        className
+        className,
       )}
       {...rest}
     >

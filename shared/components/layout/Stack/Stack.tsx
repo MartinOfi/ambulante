@@ -1,6 +1,6 @@
 import type { ElementType } from "react";
 import { cn } from "@/shared/utils/cn";
-import type { PolymorphicProps } from "../polymorphic.types";
+import type { PolymorphicProps } from "@/shared/components/layout/polymorphic.types";
 
 type GapScale = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16;
 type AlignItems = "start" | "center" | "end" | "stretch" | "baseline";
@@ -64,7 +64,7 @@ export function Stack<T extends ElementType = "div">({
         gap !== undefined && GAP_CLASS[gap],
         align && ALIGN_CLASS[align],
         justify && JUSTIFY_CLASS[justify],
-        className
+        className,
       )}
       {...rest}
     >

@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import withSerwist from "@serwist/next";
 import "./shared/config/env.runtime";
 
 const nextConfig: NextConfig = {
@@ -12,7 +13,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+// SW only runs in production builds (CLAUDE.md §9 — interferes with HMR in dev)
+const withSerwistConfig = withSerwist({
+  swSrc: "app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
+});
+
+export default withSentryConfig(withSerwistConfig(nextConfig), {
   silent: true,
   disableLogger: true,
   widenClientFileUpload: true,
