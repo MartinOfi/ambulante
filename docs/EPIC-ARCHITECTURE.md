@@ -1109,13 +1109,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.7 — Contrast audit (a11y)
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 11:00]
+- **Estado:** ✅ done [owner: chat-2026-04-17, completed: 14:59]
 - **Por qué:** WCAG AA mínimo.
 - **Entregable:** Reporte con contrastes calculados por token combination. Fix de los que fallen.
-- **Archivos:** doc + fixes en tokens.
+- **Archivos:** `shared/styles/contrast.ts`, `shared/styles/contrast.test.ts`, `docs/a11y-contrast-report.md`, `shared/styles/tokens.ts`, `app/globals.css`
 - **Depends on:** F1.8
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 4 tokens corregidos (muted light 47→46%, success light 45→30%, destructive light 51→50%, destructive dark 51→63%). Bug estructural: `.dark {}` en globals.css no tenía override de `--destructive` — agregado. 22 assertions WCAG, 536 tests total passing.
 
 ---
 
