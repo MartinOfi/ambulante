@@ -937,7 +937,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** CI bloquea PRs con coverage <80% o tests fallando.
 
 ### F7.1 — Testing library setup completo
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 11:00]
 - **Por qué:** F0.5 solo hizo el setup básico. Ahora sumar testing-library, jest-dom, user-event.
 - **Entregable:** `vitest.setup.ts` con matchers de jest-dom. Helpers `renderWithProviders` en `shared/test-utils/`.
 - **Archivos:** `vitest.setup.ts`, `shared/test-utils/*`.
