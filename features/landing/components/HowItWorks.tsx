@@ -4,6 +4,7 @@ import { MapPinned, Radar, ShoppingBasket, Send, Handshake } from "lucide-react"
 import RadialOrbitalTimeline, {
   type TimelineItem,
 } from "@/shared/components/ui/radial-orbital-timeline";
+import { SectionHeader, Text } from "@/shared/components/typography";
 
 const TIMELINE: TimelineItem[] = [
   {
@@ -85,28 +86,15 @@ export function HowItWorks() {
 
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader eyebrow="Cómo funciona" title="Cinco pasos. Cero fricción." />
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
+        <Text variant="body-sm" className="mt-4 max-w-xl text-muted">
           Un sistema de coordinación en tiempo real entre clientes y tiendas ambulantes. Tocá un
           nodo para explorar cada paso.
-        </p>
+        </Text>
 
         <div className="mt-8">
           <RadialOrbitalTimeline timelineData={TIMELINE} />
         </div>
       </div>
     </section>
-  );
-}
-
-export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div className="max-w-2xl">
-      <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-brand">
-        {eyebrow}
-      </span>
-      <h2 className="mt-3 font-display text-[clamp(2rem,6vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-foreground">
-        {title}
-      </h2>
-    </div>
   );
 }

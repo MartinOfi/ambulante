@@ -1066,7 +1066,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.2 — Tipografía sistematizada
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Sin escala, terminamos con 14 variantes inconsistentes.
 - **Entregable:** Componente `<Text variant="display-xl" | "heading-lg" | "body" | "caption" ... />` tipado. Todos los `h1/h2/p` existentes migran.
 - **Archivos:** `shared/components/typography/Text.tsx`.

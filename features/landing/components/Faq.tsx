@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { SectionHeader } from "./HowItWorks";
+import { SectionHeader } from "@/shared/components/typography";
 
 const FAQS = [
   {
