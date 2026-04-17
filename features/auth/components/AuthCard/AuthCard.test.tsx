@@ -21,4 +21,16 @@ describe("AuthCard", () => {
     );
     expect(screen.getByText("formulario")).toBeInTheDocument();
   });
+
+  it("marks the decorative right panel as aria-hidden", () => {
+    const { container } = render(<AuthCard title="Test">contenido</AuthCard>);
+    const rightPanel = container.querySelector('[aria-hidden="true"]');
+    expect(rightPanel).toBeInTheDocument();
+  });
+
+  it("renders the LiveMiniMap inside the right panel", () => {
+    render(<AuthCard title="Test">contenido</AuthCard>);
+    // LiveMiniMap renders a map canvas role or its container
+    expect(screen.getByTestId("live-mini-map")).toBeInTheDocument();
+  });
 });

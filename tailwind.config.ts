@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 // Relative import intentional: tailwind.config.ts runs in Node.js outside the
 // Next.js compiler, so @/ path aliases are not available here.
 import {
+  AUTH_COLORS,
   BLUR_TOKENS,
   COLORS,
   FONT_SIZE,
@@ -22,7 +23,7 @@ const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./features/**/*.{ts,tsx}", "./shared/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      colors: COLORS.cssVarRefs,
+      colors: { ...COLORS.cssVarRefs, auth: AUTH_COLORS },
       fontFamily: {
         display: [TYPOGRAPHY.fontFamilies.display, "system-ui", "sans-serif"],
         sans: [TYPOGRAPHY.fontFamilies.sans, "system-ui", "sans-serif"],
@@ -41,6 +42,8 @@ const config: Config = {
       animation: Object.fromEntries(
         Object.entries(MOTION.animations).map(([name, { value }]) => [name, value]),
       ),
+      // 3% opacity not in Tailwind default scale (0, 5, 10…) — needed for subtle bg tints
+      opacity: { "3": "0.03" },
     },
   },
   plugins: [],

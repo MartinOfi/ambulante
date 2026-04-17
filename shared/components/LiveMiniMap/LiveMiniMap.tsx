@@ -11,7 +11,10 @@ function MicroBadge({ children }: { readonly children: ReactNode }) {
 
 export function LiveMiniMap() {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/5 p-6 shadow-2xl backdrop-blur-xl">
+    <div
+      data-testid="live-mini-map"
+      className="relative overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/5 p-6 shadow-2xl backdrop-blur-xl"
+    >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand/20 blur-3xl"

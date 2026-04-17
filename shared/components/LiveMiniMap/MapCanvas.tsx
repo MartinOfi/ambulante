@@ -4,7 +4,7 @@ import { VendorMarker } from "./VendorMarker";
 
 export function MapCanvas() {
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/[0.03]">
+    <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-foreground/10 bg-foreground/3">
       <svg
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
@@ -62,7 +62,7 @@ export function MapCanvas() {
           className="text-foreground/15"
         />
 
-        <circle cx="50" cy="50" r="36" fill="currentColor" className="text-brand/[0.05]" />
+        <circle cx="50" cy="50" r="36" fill="currentColor" className="text-brand/5" />
         <circle
           cx="50"
           cy="50"

@@ -83,7 +83,7 @@ export function Hero() {
 
             <h1
               data-testid="hero-heading"
-              className="amb-fade-in amb-delay-200 font-display text-5xl font-bold uppercase leading-[0.9] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl xl:text-8xl"
+              className="amb-fade-in amb-delay-200 font-display text-5xl font-bold uppercase leading-display-hero tracking-display text-foreground sm:text-6xl lg:text-7xl xl:text-8xl"
             >
               Todo lo ambulante,
               <br />

@@ -88,6 +88,18 @@ export const COLORS = {
   },
 } as const;
 
+// ─── Auth panel colors ────────────────────────────────────────────────────────
+
+/**
+ * Fixed dark palette for the auth right-panel. Not theme-aware — always dark.
+ * Kept separate from COLORS.cssVarRefs so the CSS-var-ref contract is not broken.
+ */
+export const AUTH_COLORS = {
+  dark: "#0D0400",
+  "overlay-mid": "#3B1000",
+  "overlay-light": "#6B1E00",
+} as const;
+
 // ─── Border radius ────────────────────────────────────────────────────────────
 
 /** Custom border radius values that extend Tailwind's default scale. */
@@ -128,6 +140,7 @@ export const MOTION = {
     liveBlink: 1600,
     pinFade: 3200,
     fadeSlideIn: 800,
+    orbFloat: 12000,
   },
 
   easings: {
@@ -183,13 +196,18 @@ export const FONT_SIZE = {
   "2xs": "10px",
   /** 11px — status chips, distance/price tags in store cards. */
   "xs-tight": "11px",
-  /** 40px — Ambulante logotype on the auth card. */
-  "display-auth": "40px",
-  /** Fluid clamp 32–56px — section headings that scale with viewport. */
-  "display-hero": "clamp(2rem, 6vw, 3.5rem)",
-} as const;
+  /** 40px — Ambulante logotype on the auth card. Tuple sets implicit line-height. */
+  "display-auth": ["40px", { lineHeight: "0.88" }] as [string, { lineHeight: string }],
+  /** Fluid clamp 32–56px — section headings that scale with viewport. Tuple sets implicit line-height. */
+  "display-hero": ["clamp(2rem, 6vw, 3.5rem)", { lineHeight: "0.9" }] as [
+    string,
+    { lineHeight: string },
+  ],
+};
 
 // ─── Heights ──────────────────────────────────────────────────────────────────
+
+const ORB_LG_SIZE = "500px";
 
 export const HEIGHTS = {
   /** 100dvh — full viewport including mobile address bar. */
@@ -201,7 +219,7 @@ export const HEIGHTS = {
   /** Bottom sheet snap: fully expanded. */
   "sheet-full": "90vh",
   /** Bokeh orb decorative circle. */
-  "orb-lg": "500px",
+  "orb-lg": ORB_LG_SIZE,
 } as const;
 
 // ─── Widths ───────────────────────────────────────────────────────────────────
@@ -214,7 +232,7 @@ export const WIDTHS = {
   /** Desktop nav simple/icon submenu — md breakpoint. */
   "nav-md": "460px",
   /** Bokeh orb decorative circle. */
-  "orb-lg": "500px",
+  "orb-lg": ORB_LG_SIZE,
 } as const;
 
 // ─── Max widths ───────────────────────────────────────────────────────────────
@@ -238,13 +256,17 @@ export const MIN_WIDTHS = {
 export const LINE_HEIGHTS = {
   /** Tight condensed display headings. */
   display: "0.95",
+  /** Auth card logotype — tighter than display for large decorative type. */
+  "display-auth": "0.88",
+  /** Hero section heading — fluid display type. */
+  "display-hero": "0.9",
 } as const;
 
 // ─── Letter spacings ─────────────────────────────────────────────────────────
 
 export const LETTER_SPACINGS = {
   /** Section headings — negative tracking for compressed display feel. */
-  display: "-0.02em",
+  display: "-0.03em",
   /** Eyebrow labels — wide tracking for small-caps uppercase labels. */
   eyebrow: "0.2em",
   /** Tag lines — extra-wide tracking for secondary text labels. */
