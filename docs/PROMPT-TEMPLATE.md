@@ -51,24 +51,9 @@ a costa de calidad.
 
 # PASO 0 · Setup del worktree (OBLIGATORIO — antes de leer nada)
 
-**🚨 Cero excepciones a esta regla.** Si dos chats paralelos comparten el mismo
-directorio físico (`~/Desktop/ambulante/`), comparten `.git/HEAD` y se pisan las
-branches en race condition. Cada chat **debe** correr en su propio `git worktree`.
+**🚨 CREÁ EL WORKTREE. AHORA. SIN EXCUSAS.**
 
-## Cómo verificar si ya estás en un worktree dedicado
-
-```
-pwd
-git worktree list
-```
-
-- Si `pwd` muestra `~/Desktop/ambulante-<task-id>` (ej. `~/Desktop/ambulante-f0-1`)
-  y tu branch corresponde a tu task → ✅ ya estás bien, saltá al bloque "Lectura
-  obligatoria".
-- Si `pwd` muestra `~/Desktop/ambulante` (el principal) → ❌ tenés que crear tu
-  worktree antes de hacer cualquier otra cosa. Seguí los pasos de abajo.
-
-## Crear tu worktree (si estás en el directorio principal)
+## Crear tu worktree
 
 1. Verificá que el principal esté en `main` con working tree limpio:
    ```
