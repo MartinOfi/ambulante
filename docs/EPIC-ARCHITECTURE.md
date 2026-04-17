@@ -1100,7 +1100,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.6 — Dark mode audit
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 10:45]
 - **Por qué:** Dark mode existe pero sin test visual.
 - **Entregable:** Checklist de pantallas verificadas. Test Playwright con `prefers-color-scheme`.
 - **Archivos:** `e2e/dark-mode.spec.ts`.
