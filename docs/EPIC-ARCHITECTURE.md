@@ -1100,13 +1100,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.6 — Dark mode audit
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 10:45]
+- **Estado:** ✅ done
 - **Por qué:** Dark mode existe pero sin test visual.
 - **Entregable:** Checklist de pantallas verificadas. Test Playwright con `prefers-color-scheme`.
 - **Archivos:** `e2e/dark-mode.spec.ts`.
 - **Depends on:** F0.6
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creado `e2e/dark-mode.spec.ts` (106 líneas). 6 tests cubren: clase `.dark` en `<html>`, background dark surface, color de texto no negro, ausencia de white-on-white en landing, y visibilidad del ThemeToggle. Usa `colorScheme: 'dark'` en nuevo BrowserContext para que el blocking script `theme-init` del layout aplique `.dark` automáticamente vía `prefers-color-scheme`.
 
 ### F9.7 — Contrast audit (a11y)
 - **Estado:** ✅ done [owner: chat-2026-04-17, completed: 14:59]
