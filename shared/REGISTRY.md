@@ -671,3 +671,4 @@
 | 2026-04-16 | F4.5: agregado Toaster en §1; extractErrorMessage en §5; QUERY/MUTATION_ERROR_MESSAGE en §8; QueryProvider actualizado con toast en QueryCache.onError y mutations.onError | —     |
 | 2026-04-16 | Auth refactor: LiveMiniMap promovido de `features/landing/` a `shared/components/LiveMiniMap/`; AuthCard reescrito como layout split-screen (form izq + mapa+foto der) | —     |
 | 2026-04-17 | F5.2: agregado `realtimeService` en §4; `REALTIME_CHANNELS`, `RealtimeService` interface, factory `createMockRealtimeService` | —     |
+| 2026-04-17 | F7.1: agregada sección 14. Test utilities — `renderWithProviders`, `createTestQueryClient`, barrel con RTL + userEvent | —     |

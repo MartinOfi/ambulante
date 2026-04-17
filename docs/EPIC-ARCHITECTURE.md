@@ -937,13 +937,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** CI bloquea PRs con coverage <80% o tests fallando.
 
 ### F7.1 — Testing library setup completo
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 11:00]
+- **Estado:** ✅ done [owner: chat-2026-04-17]
 - **Por qué:** F0.5 solo hizo el setup básico. Ahora sumar testing-library, jest-dom, user-event.
 - **Entregable:** `vitest.setup.ts` con matchers de jest-dom. Helpers `renderWithProviders` en `shared/test-utils/`.
 - **Archivos:** `vitest.setup.ts`, `shared/test-utils/*`.
 - **Depends on:** F0.5, F1.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creados `shared/test-utils/render.tsx` (`renderWithProviders`, `createTestQueryClient`) y `shared/test-utils/index.ts` (barrel con RTL + userEvent). Usa `nuqs/adapters/react` para compatibilidad con jsdom. 4 tests verdes. 499/499 tests totales verdes. 0 errores TS.
 
 ### F7.2 — Test factories y fixtures
 - **Estado:** ⚪ pending
