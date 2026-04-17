@@ -1,19 +1,28 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // We test the module in isolation by mocking env before import.
 // Each describe block re-imports the module with a fresh env to test
 // dev vs prod behavior without relying on process.env at module load time.
 
 describe("Logger — development transport", () => {
-  const consoleSpy = {
-    debug: vi.spyOn(console, "debug").mockImplementation(() => undefined),
-    info: vi.spyOn(console, "info").mockImplementation(() => undefined),
-    warn: vi.spyOn(console, "warn").mockImplementation(() => undefined),
-    error: vi.spyOn(console, "error").mockImplementation(() => undefined),
+  let consoleSpy: {
+    debug: ReturnType<typeof vi.spyOn>;
+    info: ReturnType<typeof vi.spyOn>;
+    warn: ReturnType<typeof vi.spyOn>;
+    error: ReturnType<typeof vi.spyOn>;
   };
 
+  beforeEach(() => {
+    consoleSpy = {
+      debug: vi.spyOn(console, "debug").mockImplementation(() => undefined),
+      info: vi.spyOn(console, "info").mockImplementation(() => undefined),
+      warn: vi.spyOn(console, "warn").mockImplementation(() => undefined),
+      error: vi.spyOn(console, "error").mockImplementation(() => undefined),
+    };
+  });
+
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("forwards debug calls to console.debug with message", async () => {
@@ -51,15 +60,24 @@ describe("Logger — development transport", () => {
 });
 
 describe("Logger — production transport", () => {
-  const consoleSpy = {
-    debug: vi.spyOn(console, "debug").mockImplementation(() => undefined),
-    info: vi.spyOn(console, "info").mockImplementation(() => undefined),
-    warn: vi.spyOn(console, "warn").mockImplementation(() => undefined),
-    error: vi.spyOn(console, "error").mockImplementation(() => undefined),
+  let consoleSpy: {
+    debug: ReturnType<typeof vi.spyOn>;
+    info: ReturnType<typeof vi.spyOn>;
+    warn: ReturnType<typeof vi.spyOn>;
+    error: ReturnType<typeof vi.spyOn>;
   };
 
+  beforeEach(() => {
+    consoleSpy = {
+      debug: vi.spyOn(console, "debug").mockImplementation(() => undefined),
+      info: vi.spyOn(console, "info").mockImplementation(() => undefined),
+      warn: vi.spyOn(console, "warn").mockImplementation(() => undefined),
+      error: vi.spyOn(console, "error").mockImplementation(() => undefined),
+    };
+  });
+
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("does NOT call console.debug in production", async () => {
