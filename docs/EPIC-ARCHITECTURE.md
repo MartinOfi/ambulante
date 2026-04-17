@@ -1075,7 +1075,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F9.3 — Icon system
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 10:45]
 - **Por qué:** `lucide-react` cada import es un bundle-cost. Wrapper con lazy + size tokens.
 - **Entregable:** `shared/components/Icon/Icon.tsx` con props `name`, `size` (token), `color` (token).
 - **Archivos:** `shared/components/Icon/*`.
