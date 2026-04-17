@@ -885,7 +885,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Lighthouse PWA score = 100. Push funciona en Android + iOS (con fallback documentado para iOS Safari).
 
 ### F6.1 — Serwist setup
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-17, started: 10:45]
 - **Por qué:** Service worker moderno para Next 15. El CLAUDE.md prohíbe `next-pwa` (abandonado).
 - **Entregable:** `serwist` instalado, `app/sw.ts`, config en `next.config.mjs`.
 - **Archivos:** `app/sw.ts`, `next.config.mjs`.
