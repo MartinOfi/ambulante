@@ -28,7 +28,7 @@ function SubmenuIcon({ name }: { readonly name: IconName }) {
 function DesktopSubmenu({ link }: { readonly link: SubmenuLink }) {
   if (link.type === "description") {
     return (
-      <ul className="grid w-[440px] gap-2 p-3">
+      <ul className="grid w-nav-description gap-2 p-3">
         {link.items.map((item) => (
           <li key={item.label}>
             <NavigationMenuLink asChild>
@@ -52,7 +52,7 @@ function DesktopSubmenu({ link }: { readonly link: SubmenuLink }) {
 
   if (link.type === "simple") {
     return (
-      <ul className="grid w-[420px] gap-2 p-3 md:w-[460px] md:grid-cols-2">
+      <ul className="grid w-nav-sm gap-2 p-3 md:w-nav-md md:grid-cols-2">
         {link.items.map((item) => (
           <li key={item.label}>
             <NavigationMenuLink asChild>
@@ -70,7 +70,7 @@ function DesktopSubmenu({ link }: { readonly link: SubmenuLink }) {
   }
 
   return (
-    <ul className="grid w-[420px] gap-2 p-3 md:w-[460px] md:grid-cols-2">
+    <ul className="grid w-nav-sm gap-2 p-3 md:w-nav-md md:grid-cols-2">
       {link.items.map((item) => (
         <li key={item.label}>
           <NavigationMenuLink asChild>

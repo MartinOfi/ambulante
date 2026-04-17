@@ -18,7 +18,7 @@ export function LocationDenied({ onRetry, onManualSearch }: Props) {
         <MapPinOff className="h-10 w-10 text-brand" strokeWidth={2} />
       </div>
 
-      <div className="flex max-w-[320px] flex-col gap-2">
+      <div className="flex max-w-content-md flex-col gap-2">
         <h1
           id="loc-denied-title"
           className="font-display text-2xl font-bold leading-tight text-foreground"
@@ -31,7 +31,7 @@ export function LocationDenied({ onRetry, onManualSearch }: Props) {
         </p>
       </div>
 
-      <div className="flex w-full max-w-[320px] flex-col gap-3">
+      <div className="flex w-full max-w-content-md flex-col gap-3">
         <button
           type="button"
           onClick={onRetry}

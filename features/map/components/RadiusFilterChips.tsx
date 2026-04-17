@@ -25,7 +25,7 @@ export function RadiusFilterChips({ value, onChange }: RadiusFilterChipsProps) {
             aria-checked={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "h-9 min-w-[48px] rounded-full px-3 font-display text-sm font-semibold transition-all duration-200",
+              "h-9 min-w-chip rounded-full px-3 font-display text-sm font-semibold transition-all duration-200",
               active ? "bg-brand text-white shadow-pin" : "text-muted hover:text-foreground",
             )}
           >

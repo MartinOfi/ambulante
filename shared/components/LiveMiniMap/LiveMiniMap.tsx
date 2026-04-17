@@ -3,7 +3,7 @@ import { MapCanvas } from "./MapCanvas";
 
 function MicroBadge({ children }: { readonly children: ReactNode }) {
   return (
-    <span className="inline-flex flex-1 items-center justify-center rounded-full border border-foreground/10 bg-foreground/5 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">
+    <span className="inline-flex flex-1 items-center justify-center rounded-full border border-foreground/10 bg-foreground/5 px-2 py-1 text-2xs font-bold uppercase tracking-wider text-muted">
       {children}
     </span>
   );
@@ -23,12 +23,12 @@ export function LiveMiniMap() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand amb-live-blink" />
           </span>
-          <span className="font-display text-[11px] font-bold uppercase tracking-wider text-brand">
+          <span className="font-display text-xs-tight font-bold uppercase tracking-wider text-brand">
             En vivo
           </span>
-          <span className="text-[11px] text-muted">· actualizado ahora</span>
+          <span className="text-xs-tight text-muted">· actualizado ahora</span>
         </div>
-        <span className="font-display text-[10px] font-bold uppercase tracking-wider text-muted">
+        <span className="font-display text-2xs font-bold uppercase tracking-wider text-muted">
           Radio 2 km
         </span>
       </div>

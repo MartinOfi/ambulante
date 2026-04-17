@@ -10,7 +10,7 @@ import {
   Palette,
   BookOpen,
 } from "lucide-react";
-import { LiveMiniMap } from "./LiveMiniMap";
+import { LiveMiniMap } from "@/shared/components/LiveMiniMap";
 
 interface ActiveVendor {
   name: string;
@@ -33,11 +33,11 @@ export function Hero() {
       {/* Ambient brand glows — warm orange halos work on both cream and near-black */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-20 z-0 h-96 w-96 rounded-full bg-brand/20 blur-[120px]"
+        className="pointer-events-none absolute -left-40 top-20 z-0 h-96 w-96 rounded-full bg-brand/20 blur-ambient"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-40 top-40 z-0 h-96 w-96 rounded-full bg-brand/10 blur-[120px]"
+        className="pointer-events-none absolute -right-40 top-40 z-0 h-96 w-96 rounded-full bg-brand/10 blur-ambient"
       />
       {/* Dot pattern uses currentColor so it inverts with the theme */}
       <div
@@ -74,7 +74,7 @@ export function Hero() {
             <div className="amb-fade-in amb-delay-100">
               <div className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-foreground/10">
                 <LiveDot />
-                <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-muted sm:text-xs">
+                <span className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-muted sm:text-xs">
                   Tiendas ambulantes en vivo
                   <Sparkles className="h-3.5 w-3.5 fill-brand text-brand" aria-hidden="true" />
                 </span>

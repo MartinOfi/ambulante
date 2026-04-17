@@ -101,10 +101,10 @@ export function HowItWorks() {
 export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="max-w-2xl">
-      <span className="font-display text-xs font-bold uppercase tracking-[0.2em] text-brand">
+      <span className="font-display text-xs font-bold uppercase tracking-eyebrow text-brand">
         {eyebrow}
       </span>
-      <h2 className="mt-3 font-display text-[clamp(2rem,6vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-[-0.02em] text-foreground">
+      <h2 className="mt-3 font-display text-display-hero font-bold uppercase leading-display tracking-display text-foreground">
         {title}
       </h2>
     </div>

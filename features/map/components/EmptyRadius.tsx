@@ -18,7 +18,7 @@ export function EmptyRadius({ radius, onExpandRadius }: EmptyRadiusProps) {
       </div>
       <div className="flex flex-col gap-1">
         <p className="font-display text-lg font-bold text-foreground">Nada por acá todavía</p>
-        <p className="max-w-[260px] text-sm text-muted">
+        <p className="max-w-content-sm text-sm text-muted">
           No hay tiendas activas en {radius / 1000} km.{" "}
           {canExpand ? "Probá ampliando el radio." : "Volvé a intentarlo en unos minutos."}
         </p>

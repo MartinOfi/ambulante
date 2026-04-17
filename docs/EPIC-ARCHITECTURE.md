@@ -1057,13 +1057,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Cualquier componente nuevo usa tokens y primitivas. No hay valores arbitrarios (`h-[45vh]`) excepto casos justificados.
 
 ### F9.1 — Escala de spacing en Tailwind
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: claude-2026-04-17]
 - **Por qué:** Hoy `h-[45vh]`, `w-[440px]`, `text-[11px]` — cada componente elige un número distinto.
 - **Entregable:** `tailwind.config.ts` con `spacing`, `height`, `width`, `fontSize` extendidos desde `tokens.ts`. Reemplazar TODOS los arbitrary values en features/.
 - **Archivos:** `tailwind.config.ts`, grep de arbitraries.
 - **Depends on:** F1.8
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Tokens agregados a `shared/styles/tokens.ts`: FONT_SIZE (3xs/2xs/xs-tight/xs-loose/display-hero/display-auth), HEIGHTS (screen-dvh, sheet-*, orb-lg), WIDTHS (nav-*, orb-lg), MAX_WIDTHS (content-sm/md), MIN_WIDTHS (chip), LINE_HEIGHTS (display/tight-xl), LETTER_SPACINGS (tag/eyebrow/display), BLUR_TOKENS (orb/ambient), SHADOWS extendido. Todos los arbitrary values en `features/` y `shared/components/LiveMiniMap/` reemplazados con clases token. `features/landing/components/LiveMiniMap/` eliminado — canonical en `shared/components/LiveMiniMap/`. Excepciones aceptadas: leading-[0.9]/tracking-[-0.03em] en heading hero (sin token equivalente), cubic-bezier en MobileNav, SVG inline attrs en MapCanvas.
 
 ### F9.2 — Tipografía sistematizada
 - **Estado:** ⚪ pending

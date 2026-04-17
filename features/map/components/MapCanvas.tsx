@@ -24,7 +24,7 @@ export function MapCanvas({ stores, hasUserLocation }: MapCanvasProps) {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Base map placeholder — warm cream with street grid */}
-      <div className="absolute inset-0 bg-[hsl(var(--surface))]">
+      <div className="absolute inset-0 bg-surface">
         <svg className="h-full w-full opacity-60" xmlns="http://www.w3.org/2000/svg" aria-hidden>
           <defs>
             <pattern id="streets" width="80" height="80" patternUnits="userSpaceOnUse">
