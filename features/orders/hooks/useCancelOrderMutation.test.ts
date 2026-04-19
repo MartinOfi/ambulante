@@ -8,7 +8,7 @@ import { authService } from "@/shared/services/auth";
 import { ordersService } from "@/features/orders/services/orders.mock";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { queryKeys } from "@/shared/query/keys";
-import type { OrderEnviado } from "@/shared/domain/order-state-machine";
+import type { OrderEnviado, OrderCancelado } from "@/shared/domain/order-state-machine";
 
 vi.mock("@/shared/services/auth", () => ({
   authService: { getSession: vi.fn() },
@@ -89,12 +89,15 @@ describe("useCancelOrderMutation", () => {
 
   it("calls ordersService.cancel with orderId when authenticated as client", async () => {
     mockGetSession.mockResolvedValueOnce(STUB_SESSION_CLIENT);
-    const cancelled = {
-      ...STUB_ORDER_ENVIADO,
+    const cancelled: OrderCancelado = {
+      id: STUB_ORDER_ENVIADO.id,
+      clientId: STUB_ORDER_ENVIADO.clientId,
+      storeId: STUB_ORDER_ENVIADO.storeId,
+      sentAt: STUB_ORDER_ENVIADO.sentAt,
       status: ORDER_STATUS.CANCELADO,
       cancelledAt: new Date(),
     };
-    mockCancel.mockResolvedValueOnce(cancelled as never);
+    mockCancel.mockResolvedValueOnce(cancelled);
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
     const { result } = renderHook(() => useCancelOrderMutation(), {
@@ -111,11 +114,11 @@ describe("useCancelOrderMutation", () => {
 
   it("applies optimistic CANCELADO status before the request resolves", async () => {
     mockGetSession.mockResolvedValue(STUB_SESSION_CLIENT);
-    let resolveCancel!: (value: unknown) => void;
+    let resolveCancel!: (value: OrderCancelado) => void;
     mockCancel.mockReturnValueOnce(
-      new Promise((res) => {
+      new Promise<OrderCancelado>((res) => {
         resolveCancel = res;
-      }) as never,
+      }),
     );
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
@@ -127,15 +130,22 @@ describe("useCancelOrderMutation", () => {
       qc.getMutationCache().getAll()[0]?.execute("order-1");
     });
 
+    // Assert optimistic update applied before request resolves
     await waitFor(() => {
       const cached = qc.getQueryData<{ status: string }>(queryKeys.orders.byId("order-1"));
       return cached?.status === ORDER_STATUS.CANCELADO;
     });
 
-    resolveCancel({
-      ...STUB_ORDER_ENVIADO,
+    const resolved: OrderCancelado = {
+      id: STUB_ORDER_ENVIADO.id,
+      clientId: STUB_ORDER_ENVIADO.clientId,
+      storeId: STUB_ORDER_ENVIADO.storeId,
+      sentAt: STUB_ORDER_ENVIADO.sentAt,
       status: ORDER_STATUS.CANCELADO,
       cancelledAt: new Date(),
+    };
+    await act(async () => {
+      resolveCancel(resolved);
     });
   });
 
