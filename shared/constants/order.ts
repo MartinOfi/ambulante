@@ -22,6 +22,7 @@ export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
  */
 export const TERMINAL_ORDER_STATUSES: readonly OrderStatus[] = Object.freeze([
   ORDER_STATUS.RECHAZADO,
+  ORDER_STATUS.CANCELADO,
   ORDER_STATUS.FINALIZADO,
   ORDER_STATUS.EXPIRADO,
 ]);

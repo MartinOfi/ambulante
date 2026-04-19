@@ -124,4 +124,9 @@ export const ordersService: OrdersService = {
     await delay();
     return orderRepository.findAll({ clientId, status });
   },
+
+  cancel: async (_orderId: string) => {
+    await new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
+    throw new Error("ordersService.cancel: not implemented — replace with real API call");
+  },
 };

@@ -1304,11 +1304,11 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.6 — Cancel flow
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-19, completed: 2026-04-19]
 - **Entregable:** Cliente puede cancelar en estados permitidos (§6.1). Confirmación.
 - **Depends on:** F3.2, F4.2
 - **Estimación:** S
-- **Notas:**
+- **Notas:** `useCancelOrderMutation` con optimistic update + rollback. `CancelOrderButton` + container. 5 tests pasando.
 
 ### F12.7 — Profile + preferences
 - **Estado:** ✅ done
