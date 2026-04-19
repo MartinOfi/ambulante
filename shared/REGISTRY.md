@@ -739,3 +739,4 @@
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
 | 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |
 | 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |
+| 2026-04-19 | F12.7: feature `profile` completa — `useLocationPermission`, `useNotificationPrefs`, `ProfilePage`, `LocationPermission`, `NotificationPrefs`, constantes `LOCATION_PERMISSION_STATUS`, `NOTIFICATION_PERMISSION`, `NOTIFICATION_PREF_KEYS`, `NOTIFICATION_PREFS_STORAGE_KEY` (todos feature-local, no promovidos a shared) | —     |
