@@ -4,6 +4,8 @@ import type { Session, User } from "@/shared/types/user";
 import { USER_ROLES } from "@/shared/constants/user";
 import { userRoleSchema } from "@/shared/schemas/user";
 import { logger } from "@/shared/utils/logger";
+import { writeSessionCookie, clearSessionCookie } from "@/shared/utils/session-cookie";
+import { SESSION_COOKIE_MAX_AGE_SECONDS } from "@/shared/constants/auth";
 import type { AuthService, AuthStateChangeCallback, SignInInput, SignUpInput } from "./auth.types";
 import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
 
@@ -37,7 +39,9 @@ const signUpInputSchema = z.object({
 });
 
 function notify(session: Session | null): void {
-  listeners.forEach((cb) => {
+  // Snapshot before iteration so listeners added/removed mid-notify don't affect this call
+  const snapshot = [...listeners];
+  snapshot.forEach((cb) => {
     try {
       cb(session);
     } catch (err) {
@@ -50,7 +54,7 @@ function makeSession(user: User): Session {
   return {
     accessToken: `mock-access-${user.id}-${Date.now()}`,
     refreshToken: `mock-refresh-${user.id}-${Date.now()}`,
-    expiresAt: Math.floor(Date.now() / 1000) + 3600,
+    expiresAt: Math.floor(Date.now() / 1000) + SESSION_COOKIE_MAX_AGE_SECONDS,
     user,
   };
 }
@@ -127,6 +131,7 @@ export const authService: AuthService = {
       return { success: false, error: "Usuario no encontrado" };
     }
     currentSession = makeSession(user);
+    writeSessionCookie(currentSession);
     notify(currentSession);
     return { success: true, data: currentSession };
   },
@@ -151,14 +156,21 @@ export const authService: AuthService = {
     // MOCK ONLY — plain-text password storage; never do this in production
     credentials.set(email, { userId: user.id, _unsafePasswordForMockOnly: password });
     currentSession = makeSession(user);
+    writeSessionCookie(currentSession);
     notify(currentSession);
     return { success: true, data: currentSession };
   },
 
   async signOut() {
-    currentSession = null;
-    notify(null);
-    return { success: true, data: undefined };
+    try {
+      currentSession = null;
+      clearSessionCookie();
+      notify(null);
+      return { success: true, data: undefined };
+    } catch (err) {
+      logger.error("signOut failed", { error: err });
+      return { success: false, error: "No se pudo cerrar la sesión. Intentá de nuevo." };
+    }
   },
 
   async getSession() {

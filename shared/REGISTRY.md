@@ -351,12 +351,12 @@
 
 > Funciones puras genéricas. Sin efectos secundarios.
 
-### parseSessionCookie, serializeSessionCookie
+### parseSessionCookie, serializeSessionCookie, writeSessionCookie, clearSessionCookie
 
 - **Ruta:** `shared/utils/session-cookie.ts`
-- **Descripción:** Serializa/deserializa una `Session` como cookie value base64-encoded. Edge-safe (solo usa `atob`/`btoa` + Zod). `parseSessionCookie` retorna `null` si el valor está vacío, es base64 inválido, JSON inválido, expirado, o no satisface `sessionSchema`. Exporta `SESSION_COOKIE_OPTIONS` con flags de seguridad (`httpOnly`, `secure`, `sameSite`).
-- **API:** `parseSessionCookie(cookieValue: string): Session | null` · `serializeSessionCookie(session: Session): string` · `SESSION_COOKIE_OPTIONS: CookieOptions`
-- **Usado en:** `middleware.ts`, `useSession` (al hacer signIn/signOut para escribir/limpiar la cookie).
+- **Descripción:** Serializa/deserializa una `Session` como cookie value base64-encoded. Edge-safe (solo usa `atob`/`btoa` + Zod). `parseSessionCookie` retorna `null` si el valor está vacío, es base64 inválido, JSON inválido, expirado, o no satisface `sessionSchema`. Exporta `SESSION_COOKIE_OPTIONS` con flags de seguridad. `writeSessionCookie`/`clearSessionCookie` escriben/borran la cookie desde el browser (`document.cookie`) — MOCK PHASE ONLY, sin `httpOnly`.
+- **API:** `parseSessionCookie(cookieValue: string): Session | null` · `serializeSessionCookie(session: Session): string` · `SESSION_COOKIE_OPTIONS` · `writeSessionCookie(session: Session): void` · `clearSessionCookie(): void`
+- **Usado en:** `middleware.ts`, `shared/services/auth.ts` (signIn/signUp/signOut).
 
 ### getRequiredRole
 

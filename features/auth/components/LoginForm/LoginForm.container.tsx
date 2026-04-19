@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useSession } from "@/shared/hooks/useSession";
 import { authService as defaultAuthService } from "@/shared/services/auth";
 import type { AuthService } from "@/shared/services/auth.types";
 import { getRoleRedirect } from "@/features/auth/utils/role-redirect";
 import { loginSchema, type LoginValues } from "@/features/auth/schemas/auth.schemas";
+import { UNEXPECTED_ERROR_MESSAGE } from "@/shared/constants/ui-messages";
 import { LoginForm } from "./LoginForm";
 
 interface LoginFormContainerProps {
@@ -16,7 +16,6 @@ interface LoginFormContainerProps {
 }
 
 export function LoginFormContainer({ service = defaultAuthService }: LoginFormContainerProps) {
-  const router = useRouter();
   const sessionState = useSession(service);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -26,14 +25,12 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
     defaultValues: { email: "", password: "" },
   });
 
-  const sessionRole =
-    sessionState.status === "authenticated" ? sessionState.session.user.role : undefined;
-
   useEffect(() => {
     if (sessionState.status === "authenticated") {
-      router.push(getRoleRedirect(sessionState.session.user.role));
+      // Full navigation needed so the middleware reads the newly written cookie
+      window.location.href = getRoleRedirect(sessionState.session.user.role);
     }
-  }, [sessionState.status, sessionRole, router]);
+  }, [sessionState]);
 
   async function handleSubmit(values: LoginValues): Promise<void> {
     setIsLoading(true);
@@ -44,7 +41,7 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
         setServerError(result.error);
       }
     } catch {
-      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+      setServerError(UNEXPECTED_ERROR_MESSAGE);
     } finally {
       setIsLoading(false);
     }
