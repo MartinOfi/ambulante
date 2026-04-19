@@ -1362,7 +1362,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.3 — Catálogo CRUD
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 11:00]
 - **Entregable:** `/store/catalog` lista; `/store/catalog/new`; `/store/catalog/[id]/edit`. Upload de foto.
 - **Depends on:** F4.1, F4.2
 - **Estimación:** L
