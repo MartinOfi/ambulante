@@ -739,3 +739,4 @@
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
 | 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |
 | 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |
+| 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |

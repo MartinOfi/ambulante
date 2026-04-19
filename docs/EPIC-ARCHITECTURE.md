@@ -1362,11 +1362,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.3 — Catálogo CRUD
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 11:00]
+- **Estado:** ✅ done [owner: chat-2026-04-19, completed: 2026-04-19]
 - **Entregable:** `/store/catalog` lista; `/store/catalog/new`; `/store/catalog/[id]/edit`. Upload de foto.
 - **Depends on:** F4.1, F4.2
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Hooks con optimistic updates (create/update/delete). Container/Presentational. 26/26 tests GREEN.
 
 ### F13.4 — Incoming orders inbox
 - **Estado:** ⚪ pending
