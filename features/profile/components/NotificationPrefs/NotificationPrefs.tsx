@@ -82,6 +82,11 @@ export function NotificationPrefs({
           Notificaciones denegadas — habilitá los permisos desde la configuración del navegador.
         </Text>
       )}
+      {isUnsupported && (
+        <Text variant="body-sm" className="text-muted-foreground">
+          Las notificaciones no están disponibles en este dispositivo o navegador.
+        </Text>
+      )}
       {isDefault && (
         <Row>
           <Button size="sm" variant="outline" onClick={onRequestPermission}>

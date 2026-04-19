@@ -23,6 +23,17 @@ const DEFAULT_PREFS: NotificationPrefs = {
   marketing: false,
 };
 
+function toNotificationPermission(value: string): NotificationPermission {
+  if (
+    value === NOTIFICATION_PERMISSION.GRANTED ||
+    value === NOTIFICATION_PERMISSION.DENIED ||
+    value === NOTIFICATION_PERMISSION.DEFAULT
+  ) {
+    return value;
+  }
+  return NOTIFICATION_PERMISSION.UNSUPPORTED;
+}
+
 function loadPrefs(): NotificationPrefs {
   try {
     const raw = localStorage.getItem(NOTIFICATION_PREFS_STORAGE_KEY);
@@ -36,7 +47,7 @@ function loadPrefs(): NotificationPrefs {
 
 function getNotificationPermission(): NotificationPermission {
   if (typeof Notification === "undefined") return NOTIFICATION_PERMISSION.UNSUPPORTED;
-  return Notification.permission as NotificationPermission;
+  return toNotificationPermission(Notification.permission);
 }
 
 export type UseNotificationPrefsResult = {
@@ -62,7 +73,7 @@ export function useNotificationPrefs(): UseNotificationPrefsResult {
   const requestNotificationPermission = useCallback(async () => {
     if (typeof Notification === "undefined") return;
     const result = await Notification.requestPermission();
-    setNotificationPermission(result as NotificationPermission);
+    setNotificationPermission(toNotificationPermission(result));
   }, []);
 
   return { prefs, notificationPermission, togglePref, requestNotificationPermission };

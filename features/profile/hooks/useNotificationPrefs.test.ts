@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useNotificationPrefs } from "./useNotificationPrefs";
+import { NOTIFICATION_PREFS_STORAGE_KEY } from "@/features/profile/constants";
 
-const STORAGE_KEY = "ambulante:notification-prefs";
+const STORAGE_KEY = NOTIFICATION_PREFS_STORAGE_KEY;
 
 describe("useNotificationPrefs", () => {
   beforeEach(() => {
@@ -87,5 +88,22 @@ describe("useNotificationPrefs", () => {
 
     const { result } = renderHook(() => useNotificationPrefs());
     expect(result.current.prefs.orderUpdates).toBe(false);
+  });
+
+  it("updates notificationPermission to 'granted' after requestNotificationPermission", async () => {
+    Object.defineProperty(globalThis, "Notification", {
+      value: { permission: "default", requestPermission: vi.fn().mockResolvedValue("granted") },
+      configurable: true,
+      writable: true,
+    });
+
+    const { result } = renderHook(() => useNotificationPrefs());
+    expect(result.current.notificationPermission).toBe("default");
+
+    await act(async () => {
+      await result.current.requestNotificationPermission();
+    });
+
+    expect(result.current.notificationPermission).toBe("granted");
   });
 });

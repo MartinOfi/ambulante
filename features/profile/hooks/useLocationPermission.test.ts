@@ -123,4 +123,62 @@ describe("useLocationPermission", () => {
 
     expect(typeof result.current.requestPermission).toBe("function");
   });
+
+  it("sets status to 'granted' when requestPermission succeeds", async () => {
+    const mockStatus = makeMockPermission("prompt");
+    vi.spyOn(navigator.permissions, "query").mockResolvedValue(
+      mockStatus as unknown as PermissionStatus,
+    );
+    Object.defineProperty(globalThis, "navigator", {
+      value: {
+        permissions: navigator.permissions,
+        geolocation: {
+          getCurrentPosition: vi.fn((onSuccess: PositionCallback) => {
+            onSuccess({ coords: {}, timestamp: 0 } as GeolocationPosition);
+          }),
+        },
+      },
+      configurable: true,
+      writable: true,
+    });
+
+    const { result } = renderHook(() => useLocationPermission());
+    await waitFor(() => expect(result.current.status).toBe("prompt"));
+
+    await act(async () => {
+      await result.current.requestPermission();
+    });
+
+    expect(result.current.status).toBe("granted");
+  });
+
+  it("sets status to 'denied' when requestPermission is rejected", async () => {
+    const mockStatus = makeMockPermission("prompt");
+    vi.spyOn(navigator.permissions, "query").mockResolvedValue(
+      mockStatus as unknown as PermissionStatus,
+    );
+    Object.defineProperty(globalThis, "navigator", {
+      value: {
+        permissions: navigator.permissions,
+        geolocation: {
+          getCurrentPosition: vi.fn(
+            (_onSuccess: PositionCallback, onError: PositionErrorCallback) => {
+              onError({ code: 1, message: "denied" } as GeolocationPositionError);
+            },
+          ),
+        },
+      },
+      configurable: true,
+      writable: true,
+    });
+
+    const { result } = renderHook(() => useLocationPermission());
+    await waitFor(() => expect(result.current.status).toBe("prompt"));
+
+    await act(async () => {
+      await result.current.requestPermission();
+    });
+
+    expect(result.current.status).toBe("denied");
+  });
 });

@@ -14,7 +14,8 @@ export function ProfilePageContainer() {
 
   const handleSignOut = useCallback(async () => {
     await sessionResult.signOut();
-  }, [sessionResult]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionResult.signOut]);
 
   if (sessionResult.status === "loading") {
     return null;

@@ -53,4 +53,14 @@ describe("ProfilePage", () => {
     render(<ProfilePage {...defaultProps} displayName={undefined} />);
     expect(screen.getByText("Invitado")).toBeInTheDocument();
   });
+
+  it("shows unsupported message when notification permission is unsupported", () => {
+    render(
+      <ProfilePage
+        {...defaultProps}
+        notificationPermission={NOTIFICATION_PERMISSION.UNSUPPORTED}
+      />,
+    );
+    expect(screen.getByText(/no están disponibles en este dispositivo/i)).toBeInTheDocument();
+  });
 });
