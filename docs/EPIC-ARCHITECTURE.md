@@ -1383,11 +1383,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.6 — Store profile management
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 11:00]
+- **Estado:** ✅ done [owner: chat-2026-04-19, completed: 2026-04-19]
 - **Entregable:** `/store/profile` — datos, zona, horarios base.
 - **Depends on:** F4.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** schemas + service mock + hooks (useStoreProfileQuery, useUpdateStoreProfileMutation con optimistic update) + StoreProfileForm + StoreProfilePage Container/Dumb + page route. 7 hook tests GREEN (591 total).
 
 ### F13.7 — Analytics básico
 - **Estado:** ⚪ pending

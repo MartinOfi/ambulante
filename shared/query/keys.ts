@@ -6,6 +6,7 @@ export const queryKeys = {
     nearby: (coords: Coordinates, radiusMeters: number) =>
       ["stores", "nearby", coords, radiusMeters] as const,
     byId: (id: string) => ["stores", "by-id", id] as const,
+    profile: (storeId: string) => ["stores", "profile", storeId] as const,
   },
   orders: {
     all: () => ["orders"] as const,
