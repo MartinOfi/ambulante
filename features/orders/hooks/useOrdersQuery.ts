@@ -1,12 +1,10 @@
-"use client";
-
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type { OrderStatus } from "@/shared/constants/order";
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { ordersService } from "@/features/orders/services";
 
 export interface UseOrdersQueryInput {
   readonly clientId: string | null;
@@ -15,7 +13,9 @@ export interface UseOrdersQueryInput {
 
 export function useOrdersQuery({ clientId, status }: UseOrdersQueryInput) {
   const query = useQuery({
-    queryKey: clientId ? queryKeys.orders.byUser(clientId) : queryKeys.orders.all(),
+    queryKey: clientId
+      ? [...queryKeys.orders.byUser(clientId), status ?? "all"]
+      : queryKeys.orders.all(),
     queryFn: async () => {
       if (!clientId) throw new Error("clientId required");
       return ordersService.findByUser({ clientId, status });

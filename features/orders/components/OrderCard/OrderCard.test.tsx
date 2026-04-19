@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { render } from "@/shared/test-utils";
 import { describe, it, expect } from "vitest";
 import React from "react";
 
@@ -25,9 +26,10 @@ describe("OrderCard", () => {
     expect(screen.getByText(/abc123/i)).toBeInTheDocument();
   });
 
-  it("renders the status badge", () => {
+  it("renders the status badge with human label", () => {
     render(<OrderCard order={MOCK_ORDER} />);
-    expect(screen.getByText(ORDER_STATUS.ACEPTADO)).toBeInTheDocument();
+    expect(screen.getByText("Aceptado")).toBeInTheDocument();
+    expect(screen.queryByText(ORDER_STATUS.ACEPTADO)).not.toBeInTheDocument();
   });
 
   it("renders the correct item count", () => {

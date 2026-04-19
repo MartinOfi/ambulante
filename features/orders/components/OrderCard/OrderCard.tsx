@@ -1,25 +1,26 @@
+import { ORDER_STATUS, type OrderStatus } from "@/shared/constants/order";
 import type { OrderCardProps } from "./OrderCard.types";
 
-const STATUS_LABELS: Record<string, string> = {
-  ENVIADO: "Enviado",
-  RECIBIDO: "Recibido",
-  ACEPTADO: "Aceptado",
-  RECHAZADO: "Rechazado",
-  EN_CAMINO: "En camino",
-  FINALIZADO: "Finalizado",
-  CANCELADO: "Cancelado",
-  EXPIRADO: "Expirado",
+const STATUS_LABELS: Record<OrderStatus, string> = {
+  [ORDER_STATUS.ENVIADO]: "Enviado",
+  [ORDER_STATUS.RECIBIDO]: "Recibido",
+  [ORDER_STATUS.ACEPTADO]: "Aceptado",
+  [ORDER_STATUS.RECHAZADO]: "Rechazado",
+  [ORDER_STATUS.EN_CAMINO]: "En camino",
+  [ORDER_STATUS.FINALIZADO]: "Finalizado",
+  [ORDER_STATUS.CANCELADO]: "Cancelado",
+  [ORDER_STATUS.EXPIRADO]: "Expirado",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  ENVIADO: "bg-blue-100 text-blue-800",
-  RECIBIDO: "bg-yellow-100 text-yellow-800",
-  ACEPTADO: "bg-green-100 text-green-800",
-  RECHAZADO: "bg-red-100 text-red-800",
-  EN_CAMINO: "bg-purple-100 text-purple-800",
-  FINALIZADO: "bg-gray-100 text-gray-700",
-  CANCELADO: "bg-red-50 text-red-600",
-  EXPIRADO: "bg-gray-50 text-gray-500",
+const STATUS_COLORS: Record<OrderStatus, string> = {
+  [ORDER_STATUS.ENVIADO]: "bg-blue-100 text-blue-800",
+  [ORDER_STATUS.RECIBIDO]: "bg-yellow-100 text-yellow-800",
+  [ORDER_STATUS.ACEPTADO]: "bg-green-100 text-green-800",
+  [ORDER_STATUS.RECHAZADO]: "bg-red-100 text-red-800",
+  [ORDER_STATUS.EN_CAMINO]: "bg-purple-100 text-purple-800",
+  [ORDER_STATUS.FINALIZADO]: "bg-gray-100 text-gray-700",
+  [ORDER_STATUS.CANCELADO]: "bg-red-50 text-red-600",
+  [ORDER_STATUS.EXPIRADO]: "bg-gray-50 text-gray-500",
 };
 
 function formatDate(isoString: string): string {
@@ -36,15 +37,15 @@ function formatOrderId(id: string): string {
 
 export function OrderCard({ order }: OrderCardProps) {
   const itemCount = order.items.length;
-  const colorClass = STATUS_COLORS[order.status] ?? "bg-gray-100 text-gray-700";
-  const statusLabel = STATUS_LABELS[order.status] ?? order.status;
+  const colorClass = STATUS_COLORS[order.status];
+  const statusLabel = STATUS_LABELS[order.status];
 
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <span className="font-mono text-sm text-gray-500">{formatOrderId(order.id)}</span>
         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colorClass}`}>
-          {order.status}
+          {statusLabel}
         </span>
       </div>
 

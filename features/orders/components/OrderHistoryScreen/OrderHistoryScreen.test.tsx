@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/shared/test-utils";
 import { describe, it, expect } from "vitest";
 import React from "react";
 
@@ -77,7 +77,7 @@ describe("OrderHistoryScreen", () => {
       />,
     );
 
-    const activeTab = screen.getByRole("button", { name: ORDER_STATUS.ENVIADO });
+    const activeTab = screen.getByRole("button", { name: "Enviado" });
     expect(activeTab).toHaveAttribute("aria-pressed", "true");
   });
 });
