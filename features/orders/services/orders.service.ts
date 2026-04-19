@@ -1,4 +1,3 @@
-import type { Order as StateMachineOrder } from "@/shared/domain/order-state-machine";
 import type { Order } from "@/shared/schemas/order";
 import type { OrderStatus } from "@/shared/constants/order";
 
@@ -8,6 +7,8 @@ export interface FindByUserInput {
 }
 
 export interface OrdersService {
-  readonly accept: (orderId: string) => Promise<StateMachineOrder>;
+  readonly accept: (orderId: string) => Promise<Order>;
+  readonly reject: (orderId: string) => Promise<Order>;
+  readonly finalize: (orderId: string) => Promise<Order>;
   readonly findByUser: (input: FindByUserInput) => Promise<readonly Order[]>;
 }

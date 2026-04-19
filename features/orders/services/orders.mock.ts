@@ -1,6 +1,9 @@
+import { ORDER_ACTOR, ORDER_EVENT, transition } from "@/shared/domain/order-state-machine";
+import type { Order as DomainOrder, OrderEvent } from "@/shared/domain/order-state-machine";
 import { orderRepository } from "@/shared/repositories";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { logger } from "@/shared/utils/logger";
+import type { Order } from "@/shared/schemas/order";
 import type { OrdersService, FindByUserInput } from "./orders.service";
 
 const MOCK_NETWORK_DELAY_MS = 300;
@@ -10,7 +13,9 @@ const DEMO_SEEDS = [
     clientId: "demo-client-1",
     storeId: "store-demo-1",
     status: ORDER_STATUS.ENVIADO,
-    items: [{ productId: "p1", productName: "Empanada de carne", productPriceArs: 500, quantity: 3 }],
+    items: [
+      { productId: "p1", productName: "Empanada de carne", productPriceArs: 500, quantity: 3 },
+    ],
     notes: "Sin picante por favor",
   },
   {
@@ -32,7 +37,9 @@ const DEMO_SEEDS = [
     clientId: "demo-client-1",
     storeId: "store-demo-1",
     status: ORDER_STATUS.CANCELADO,
-    items: [{ productId: "p1", productName: "Empanada de carne", productPriceArs: 500, quantity: 1 }],
+    items: [
+      { productId: "p1", productName: "Empanada de carne", productPriceArs: 500, quantity: 1 },
+    ],
   },
   {
     clientId: "other-client",
@@ -57,14 +64,64 @@ seedDemoOrders().catch((err) => {
   });
 });
 
+function delay(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
+}
+
+async function applyTransition({
+  orderId,
+  event,
+  errorContext,
+}: {
+  readonly orderId: string;
+  readonly event: OrderEvent;
+  readonly errorContext: string;
+}): Promise<Order> {
+  await delay();
+
+  const persisted = await orderRepository.findById(orderId);
+  if (persisted === null) {
+    logger.error(`${errorContext}: order not found`, { orderId });
+    throw new Error(`Order "${orderId}" not found`);
+  }
+
+  const domainOrder: DomainOrder = {
+    id: persisted.id,
+    clientId: persisted.clientId,
+    storeId: persisted.storeId,
+    sentAt: new Date(persisted.createdAt),
+    // The status cast is safe: both models share the same ORDER_STATUS string literals.
+    status: persisted.status as DomainOrder["status"],
+  } as DomainOrder;
+
+  const result = transition({ order: domainOrder, event, actor: ORDER_ACTOR.TIENDA });
+
+  if (!result.ok) {
+    logger.error(`${errorContext}: invalid transition`, { orderId, error: result.error });
+    throw new Error(`Transition failed: ${result.error.kind}`);
+  }
+
+  return orderRepository.update(orderId, { status: result.value.status });
+}
+
 export const ordersService: OrdersService = {
-  accept: async (_orderId: string) => {
-    await new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
-    throw new Error("ordersService.accept: not implemented — replace with real API call");
+  accept: async (orderId: string): Promise<Order> => {
+    const event: OrderEvent = { type: ORDER_EVENT.TIENDA_ACEPTA, occurredAt: new Date() };
+    return applyTransition({ orderId, event, errorContext: "ordersService.accept" });
   },
 
-  findByUser: async ({ clientId, status }: FindByUserInput) => {
-    await new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
+  reject: async (orderId: string): Promise<Order> => {
+    const event: OrderEvent = { type: ORDER_EVENT.TIENDA_RECHAZA, occurredAt: new Date() };
+    return applyTransition({ orderId, event, errorContext: "ordersService.reject" });
+  },
+
+  finalize: async (orderId: string): Promise<Order> => {
+    const event: OrderEvent = { type: ORDER_EVENT.TIENDA_FINALIZA, occurredAt: new Date() };
+    return applyTransition({ orderId, event, errorContext: "ordersService.finalize" });
+  },
+
+  findByUser: async ({ clientId, status }: FindByUserInput): Promise<readonly Order[]> => {
+    await delay();
     return orderRepository.findAll({ clientId, status });
   },
 };

@@ -1,6 +1,10 @@
 export { useAcceptOrderMutation } from "./hooks/useAcceptOrderMutation";
+export { useRejectOrderMutation } from "./hooks/useRejectOrderMutation";
+export { useFinalizeOrderMutation } from "./hooks/useFinalizeOrderMutation";
 export { useOrdersQuery } from "./hooks/useOrdersQuery";
 export type { UseOrdersQueryInput } from "./hooks/useOrdersQuery";
 export { useStatusParam } from "./hooks/useStatusParam";
 export { OrderHistoryScreenContainer } from "./components/OrderHistoryScreen";
+export { OrderActions, OrderActionsContainer } from "./components/OrderActions";
+export type { OrderActionsProps } from "./components/OrderActions";
 export type { OrdersService, FindByUserInput } from "./services/orders.service";

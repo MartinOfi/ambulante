@@ -1376,11 +1376,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.5 — Accept/reject/finalize flow
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-f13-5, finished: 2026-04-19]
 - **Entregable:** Actions disparadas con mutations, state machine enforcement.
 - **Depends on:** F3.2, F4.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Archivos creados: `features/orders/hooks/useRejectOrderMutation.ts`, `features/orders/hooks/useFinalizeOrderMutation.ts`, `features/orders/components/OrderActions/` (OrderActions.tsx dumb + OrderActions.container.tsx smart + types + barrel). `features/orders/services/orders.service.ts` y `orders.mock.ts` extendidos con `reject` y `finalize`. 27 tests, 0 errores TS. State machine enforcement: el dumb component solo renderiza botones válidos según el estado actual del pedido (RECIBIDO→Aceptar/Rechazar, EN_CAMINO→Finalizar, terminales→null). Optimistic updates + rollback en los 3 mutation hooks.
 
 ### F13.6 — Store profile management
 - **Estado:** ⚪ pending
