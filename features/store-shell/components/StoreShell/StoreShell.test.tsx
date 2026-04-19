@@ -7,6 +7,7 @@ import { StoreShell } from "./StoreShell";
 const makeProps = () => ({
   currentPath: "/store/dashboard",
   isAvailable: false,
+  locationStatus: "idle" as const,
   onToggleAvailability: vi.fn(),
 });
 

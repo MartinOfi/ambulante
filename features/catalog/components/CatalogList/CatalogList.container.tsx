@@ -22,7 +22,10 @@ export function CatalogListContainer() {
   }
 
   async function handleDelete(productId: string) {
-    if (!storeId) return;
+    if (!storeId) {
+      router.push(ROUTES.public.home);
+      return;
+    }
     setDeletingId(productId);
     deleteMutation.mutate({ storeId, productId }, { onSettled: () => setDeletingId(null) });
   }

@@ -30,6 +30,7 @@ export function ProductCard({ product, onEdit, onDelete, isDeleting = false }: P
           variant="outline"
           size="sm"
           className="flex-1"
+          aria-label={`Editar ${product.name}`}
           onClick={() => onEdit(product.id)}
           disabled={isDeleting}
         >
@@ -40,6 +41,7 @@ export function ProductCard({ product, onEdit, onDelete, isDeleting = false }: P
           variant="destructive"
           size="sm"
           className="flex-1"
+          aria-label={`Eliminar ${product.name}`}
           onClick={() => onDelete(product.id)}
           disabled={isDeleting}
         >

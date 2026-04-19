@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAvailability } from "@/features/store-shell/hooks/useAvailability";
 import { useSession } from "@/shared/hooks/useSession";
 import { storesService } from "@/shared/services/stores";
+import { logger } from "@/shared/utils/logger";
 import {
   GEO_MAX_AGE_MS,
   GEO_TIMEOUT_MS,
@@ -62,11 +63,19 @@ export function useLocationPublishing(): UseLocationPublishingReturn {
               setLocationStatus("publishing");
               resetStaleTimer();
             })
-            .catch(() => {
+            .catch((err: unknown) => {
+              logger.error("useLocationPublishing: updateLocation failed", {
+                storeId,
+                error: err instanceof Error ? err.message : String(err),
+              });
               setLocationStatus("error");
             });
         },
-        () => {
+        (geoErr: GeolocationPositionError) => {
+          logger.warn("useLocationPublishing: geolocation failed", {
+            code: geoErr.code,
+            message: geoErr.message,
+          });
           setLocationStatus("error");
         },
         { enableHighAccuracy: true, timeout: GEO_TIMEOUT_MS, maximumAge: GEO_MAX_AGE_MS },

@@ -166,7 +166,8 @@
 
 - **Ruta:** `shared/query/keys.ts`
 - **Descripción:** Registro centralizado de query key factories para React Query v5. Organizado por dominio con jerarquía para invalidación parcial.
-- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.stores.profile(storeId)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`, `queryKeys.products.all()`, `queryKeys.products.byStore(storeId)`
+- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.stores.profile(storeId)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`, `queryKeys.products.all()`, `queryKeys.products.byStore(storeId)`, `queryKeys.catalog.byStore(storeId)`, `queryKeys.catalog.byId(id)`
+- **Nota:** `products.*` = catálogo read-only (client-facing). `catalog.*` = catálogo CRUD (store owner). Namespaces separados; mutaciones de catálogo solo invalidan `catalog.*`.
 - **Usado en:** hooks de data en `features/*/hooks/`.
 
 ### parseResponse + ParseError
@@ -819,3 +820,4 @@
 | 2026-04-19 | F13.2: `useLocationPublishing` hook en §13 (store-shell); storeSchema con `ownerId`; `storesService.findByOwnerId`/`updateLocation` implementados; `storeRepository.findByOwnerId` documentado en §11; geo constants "Usado en" actualizado | —     |
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
+| 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |

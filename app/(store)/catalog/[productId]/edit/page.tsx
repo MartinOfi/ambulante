@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ROUTES } from "@/shared/constants/routes";
 import { EditProductFormContainer } from "@/features/catalog/components/ProductForm";
 
+// Route is protected by middleware (role: store). When Supabase is integrated, add
+// server-side ownership verification: ensure productId belongs to session.user.id's store.
+
 interface EditProductPageProps {
   readonly params: Promise<{ productId: string }>;
 }

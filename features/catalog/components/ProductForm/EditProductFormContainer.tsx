@@ -47,24 +47,17 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
   }, [product, form]);
 
   async function handleSubmit(values: EditProductValues): Promise<void> {
-    if (!storeId) return;
+    if (!storeId) {
+      setServerError("Sesión expirada. Volvé a iniciar sesión.");
+      return;
+    }
     setServerError(null);
-
-    await new Promise<void>((resolve) => {
-      updateMutation.mutate(
-        { storeId, productId, values },
-        {
-          onSuccess: () => {
-            router.push(ROUTES.store.catalog);
-            resolve();
-          },
-          onError: () => {
-            setServerError("No se pudo actualizar el producto. Intentá de nuevo.");
-            resolve();
-          },
-        },
-      );
-    });
+    try {
+      await updateMutation.mutateAsync({ storeId, productId, values });
+      router.push(ROUTES.store.catalog);
+    } catch {
+      setServerError("No se pudo actualizar el producto. Intentá de nuevo.");
+    }
   }
 
   if (isLoading) {

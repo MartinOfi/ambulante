@@ -27,24 +27,17 @@ export function CreateProductFormContainer() {
   });
 
   async function handleSubmit(values: CreateProductValues): Promise<void> {
-    if (!storeId) return;
+    if (!storeId) {
+      setServerError("Sesión expirada. Volvé a iniciar sesión.");
+      return;
+    }
     setServerError(null);
-
-    await new Promise<void>((resolve) => {
-      createMutation.mutate(
-        { storeId, values },
-        {
-          onSuccess: () => {
-            router.push(ROUTES.store.catalog);
-            resolve();
-          },
-          onError: () => {
-            setServerError("No se pudo crear el producto. Intentá de nuevo.");
-            resolve();
-          },
-        },
-      );
-    });
+    try {
+      await createMutation.mutateAsync({ storeId, values });
+      router.push(ROUTES.store.catalog);
+    } catch {
+      setServerError("No se pudo crear el producto. Intentá de nuevo.");
+    }
   }
 
   return (
