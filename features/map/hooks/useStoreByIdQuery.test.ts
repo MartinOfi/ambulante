@@ -20,7 +20,7 @@ vi.mock("@/shared/services/stores", () => ({
 }));
 
 const MOCK_STORE: Store = {
-  id: "store-1",
+  id: "10000000-0000-4000-8000-000000000001",
   name: "Empanadas Don Pedro",
   kind: "food-truck",
   status: "open",
@@ -29,6 +29,7 @@ const MOCK_STORE: Store = {
   distanceMeters: 500,
   priceFromArs: 1200,
   tagline: "Las mejores empanadas del barrio",
+  ownerId: "00000000-0000-4000-8000-000000000001",
 };
 
 function createWrapper() {

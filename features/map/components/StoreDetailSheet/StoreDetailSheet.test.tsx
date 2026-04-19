@@ -7,7 +7,7 @@ import type { Product } from "@/shared/schemas/product";
 import { StoreDetailSheet } from "./StoreDetailSheet";
 
 const MOCK_STORE: Store = {
-  id: "store-1",
+  id: "10000000-0000-4000-8000-000000000001",
   name: "Empanadas Don Pedro",
   kind: "food-truck",
   status: "open",
@@ -18,6 +18,7 @@ const MOCK_STORE: Store = {
   tagline: "Las mejores empanadas del barrio",
   description: "Un food truck con las mejores empanadas del barrio porteño.",
   hours: "Lun–Sáb 12:00–22:00",
+  ownerId: "00000000-0000-4000-8000-000000000001",
 };
 
 const MOCK_PRODUCTS: readonly Product[] = [

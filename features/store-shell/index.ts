@@ -6,3 +6,8 @@ export { AvailabilityToggle } from "./components/AvailabilityToggle";
 export type { AvailabilityToggleProps } from "./components/AvailabilityToggle";
 export { useAvailability } from "./hooks/useAvailability";
 export type { UseAvailabilityReturn } from "./hooks/useAvailability";
+export { useLocationPublishing } from "./hooks/useLocationPublishing";
+export type {
+  UseLocationPublishingReturn,
+  LocationPublishingStatus,
+} from "./hooks/useLocationPublishing";

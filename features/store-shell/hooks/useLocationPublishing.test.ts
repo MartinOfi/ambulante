@@ -98,7 +98,6 @@ function setAuthenticated(userId: string): void {
         email: "store@test.com",
         role: "store",
         displayName: "Tienda Test",
-        createdAt: new Date().toISOString(),
       },
     },
     signIn: vi.fn(),
