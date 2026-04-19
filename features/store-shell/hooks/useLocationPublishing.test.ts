@@ -174,11 +174,16 @@ describe("useLocationPublishing", () => {
     setAuthenticated(MOCK_USER_ID);
     mockGeo(MOCK_COORDS.lat, MOCK_COORDS.lng);
 
+    // First update succeeds; subsequent ones hang so resetStaleTimer is never called again
+    vi.mocked(storesService.updateLocation)
+      .mockResolvedValueOnce(undefined)
+      .mockReturnValue(new Promise<void>(() => {}));
+
     const { result } = renderHook(() => useLocationPublishing());
     await flushPromises();
     expect(result.current.locationStatus).toBe("publishing");
 
-    // Advance past stale threshold (no interval fires at this point since STALE < REFRESH)
+    // Interval fires at 45s and 90s but those updates never settle → stale timer fires at 120s
     await act(() => vi.advanceTimersByTimeAsync(STORE_LOCATION_STALE_MS + 1));
 
     expect(result.current.locationStatus).toBe("stale");
