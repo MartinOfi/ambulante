@@ -4,7 +4,7 @@ import { orderRepository } from "@/shared/repositories";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { logger } from "@/shared/utils/logger";
 import type { Order } from "@/shared/schemas/order";
-import type { OrdersService, FindByUserInput } from "./orders.service";
+import type { OrdersService, FindByUserInput, SendOrderInput } from "./orders.service";
 
 const MOCK_NETWORK_DELAY_MS = 300;
 
@@ -128,5 +128,21 @@ export const ordersService: OrdersService = {
   cancel: async (_orderId: string) => {
     await new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
     throw new Error("ordersService.cancel: not implemented — replace with real API call");
+  },
+
+  send: async ({ storeId, items, notes }: SendOrderInput): Promise<Order> => {
+    await delay();
+    return orderRepository.create({
+      clientId: "demo-client-1",
+      storeId,
+      status: ORDER_STATUS.ENVIADO,
+      items: [...items],
+      notes,
+    });
+  },
+
+  getById: async (orderId: string): Promise<Order | null> => {
+    await delay();
+    return orderRepository.findById(orderId);
   },
 };

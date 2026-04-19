@@ -851,7 +851,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** Creados `shared/services/realtime.types.ts` (interfaz `RealtimeService`, tipos `RealtimeStatus`, `RealtimeMessage<T>`, `RealtimeHandler<T>`, `RealtimeStatusHandler`) y `shared/services/realtime.ts` (factory `createMockRealtimeService`, singleton `realtimeService`, `REALTIME_CHANNELS` as const). Mock in-memory integrado con `eventBus.registerSerializationHook` — domain events fluyen automáticamente al canal `"orders"`. 15 tests, 0 errores TypeScript. REGISTRY.md actualizado.
 
 ### F5.3 — Integración con React Query
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Un evento realtime debe invalidar las queries relevantes. Sin esto, cada componente suscribe por su lado y es un caos.
 - **Entregable:** `shared/query/useRealtimeInvalidation.ts` que conecta el event bus con `queryClient.invalidateQueries(queryKeys...)`.
 - **Archivos:** `shared/query/useRealtimeInvalidation.ts`.
@@ -1270,7 +1270,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:** Se extendió `storeSchema` con `description?` y `hours?`. Se creó `shared/services/products.ts` (thin wrapper sobre `productRepository`). Se agregaron 9 productos seed (3 por tienda) a `MockProductRepository`. Se añadió `queryKeys.products` al registry. Container/presentational pattern: `StoreDetailSheet.tsx` (dumb) + `StoreDetailSheet.container.tsx` (smart). 15/15 tests GREEN. Wired desde `MapScreenContainer` via `selectedStoreId` state.
 
 ### F12.2 — Product selection + cart client state
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Entregable:** Cart en Zustand, persistido por tienda activa, validación con zod.
 - **Archivos:** `shared/stores/cart.ts`, componente.
 - **Depends on:** F1.6, F3.1
@@ -1278,7 +1278,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.3 — Submit order
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Entregable:** Mutation con optimistic update; transición a `ENVIADO`. Snapshot de productos.
 - **Archivos:** `features/orders/hooks/useSendOrderMutation.ts`.
 - **Depends on:** F3.2, F3.3, F4.2
@@ -1287,7 +1287,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.4 — Order tracking screen
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** La pantalla más crítica del flow (§5.1 C6).
 - **Entregable:** `/orders/[id]` con realtime subscription al pedido, timeline de estados, CTA por estado.
 - **Archivos:** `app/(client)/orders/[id]/page.tsx`, feature.

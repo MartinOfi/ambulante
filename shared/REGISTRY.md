@@ -183,6 +183,14 @@
   ```
 - **Usado en:** cualquier `queryFn` que consuma datos externos (features/*/hooks/).
 
+### useRealtimeInvalidation
+
+- **Ruta:** `shared/query/useRealtimeInvalidation.ts`
+- **Descripción:** Hook bridge que conecta `realtimeService.subscribe` con `queryClient.invalidateQueries`. Se suscribe al canal en mount, invalida `queryKey` en cada mensaje, y desuscribe en unmount. Usa `useRef` para capturar la queryKey sin re-disparar el efecto en cada render.
+- **API:** `useRealtimeInvalidation({ channel: string, queryKey: readonly unknown[] }): void`
+- **Nota:** solo re-subscribe cuando cambia `channel`. `queryKey` se actualiza via ref — no es una dependencia del efecto.
+- **Usado en:** `features/orders/components/OrderTracking/OrderTracking.container.tsx`.
+
 ---
 
 ## 2c. Providers (`shared/providers/`)
@@ -224,6 +232,23 @@
 - **API:** `useUpdateStoreProfileMutation(storeId: string)` → `UseMutationResult`; call `mutate(input)`.
 - **Service:** `features/store-profile/services/store-profile.mock.ts` — `storeProfileService.updateProfile(storeId, input)`.
 - **Usado en:** `features/store-profile/components/StoreProfilePage/StoreProfilePage.container.tsx`.
+
+### useOrderQuery _(feature-local — orders)_
+
+- **Ruta:** `features/orders/hooks/useOrderQuery.ts`
+- **Descripción:** Fetches a single order by ID using React Query v5 `useQuery`. Returns `Order | null` (null when not found). Used by `OrderTrackingContainer` for the live tracking screen.
+- **API:** `useOrderQuery(orderId: string)` → `UseQueryResult<Order | null>`
+- **Query key:** `queryKeys.orders.byId(orderId)`
+- **Service:** `ordersService.getById(orderId)` from `features/orders/services/orders.mock.ts`.
+- **Usado en:** `features/orders/components/OrderTracking/OrderTracking.container.tsx`.
+
+### useSendOrderMutation _(feature-local — orders)_
+
+- **Ruta:** `features/orders/hooks/useSendOrderMutation.ts`
+- **Descripción:** Mutation hook para enviar un nuevo pedido (crea en estado `ENVIADO`). Invalida `orders.all()` on success. Loguea errores con `logger.error`. Input: `SendOrderInput = { storeId, items, notes? }`.
+- **API:** `useSendOrderMutation()` → `UseMutationResult`; call `mutate({ storeId, items })`.
+- **Service:** `ordersService.send(input)` — crea snapshot inmutable de productos al momento del pedido (PRD §7.4).
+- **Usado en:** futuras features de checkout / CartSummaryBar.
 
 ### useAcceptOrderMutation _(feature-local — orders)_
 
@@ -609,6 +634,17 @@
 > **Persistencia:** usar `persist` middleware con `partialize` para serializar solo el state, no las acciones.
 > **Selección granular:** `const value = useXStore((s) => s.field)` — nunca desestructurar el store entero para evitar re-renders innecesarios.
 
+### useCartStore
+
+- **Ruta:** `shared/stores/cart.ts`
+- **Descripción:** Estado global del carrito de compras. Persiste en localStorage. Soporta un único `activeStoreId` — agregar un producto de otra tienda limpia el carrito actual (invariante de aislamiento de tienda). `CartItem` extiende `OrderItem` con `storeId` para detección interna.
+- **API:**
+  - Estado: `activeStoreId: string | null`, `items: readonly CartItem[]`
+  - Acciones: `addItem(product, storeId)`, `removeItem(productId)`, `clearCart()`, `totalItems(): number`
+- **Persistencia:** `ambulante-cart` en localStorage (solo state, sin acciones).
+- **Tipo exportado:** `CartItem = OrderItem & { storeId: string }`
+- **Usado en:** futuras features de checkout; CartSummaryBar.
+
 ### useUIStore
 
 - **Ruta:** `shared/stores/ui.ts`
@@ -712,6 +748,17 @@
 ## 13. Features (`features/`)
 
 > Shell de roles y bloques de UI específicos que no son candidatos a `shared/` porque pertenecen a un solo contexto de rol. Se documentan acá para evitar reimplementaciones.
+
+### OrderTracking (F12.4)
+
+- **Ruta barrel:** `features/orders/components/OrderTracking/index.ts`
+- **Archivos:** `OrderTracking.tsx` (dumb), `OrderTracking.container.tsx` (smart), `OrderTracking.types.ts`
+- **Descripción:** Pantalla de seguimiento de un pedido en tiempo real. Timeline de 5 pasos (ENVIADO→RECIBIDO→ACEPTADO→EN_CAMINO→FINALIZADO) con `data-testid`, `data-current`, `data-completed`. Estados terminales (CANCELADO/RECHAZADO/EXPIRADO) muestran mensaje en lugar del timeline. CTAs por estado: cancelar (ENVIADO/RECIBIDO), confirmar en camino (ACEPTADO), ninguno (EN_CAMINO/FINALIZADO/terminales).
+- **API dumb:** `<OrderTracking order onConfirmOnTheWay onCancel isCancelling isConfirmingOnTheWay />`
+- **API smart:** `<OrderTrackingContainer orderId />` — usa `useOrderQuery` + `useRealtimeInvalidation` para invalidación en tiempo real.
+- **Ruta app:** `app/(client)/orders/[id]/page.tsx`
+- **Tipos exportados:** `OrderTrackingProps`
+- **Usado en:** `app/(client)/orders/[id]/page.tsx`.
 
 ### StoreDetailSheet (F12.1)
 
