@@ -7,10 +7,11 @@ import type {
   UpdateStoreInput,
 } from "@/shared/repositories/store";
 import { logger } from "@/shared/utils/logger";
+import { SEED_STORE_IDS, SEED_USER_IDS } from "./seeds";
 
 const SEED_STORES: readonly Store[] = Object.freeze([
   {
-    id: "dona-rosa",
+    id: SEED_STORE_IDS.donaRosa,
     name: "Doña Rosa Empanadas",
     kind: "food-truck",
     photoUrl: "https://images.unsplash.com/photo-1625944525200-e0f65d17c2e2?w=400&q=80",
@@ -19,9 +20,10 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     status: "open",
     priceFromArs: 800,
     tagline: "Empanadas salteñas recién horneadas",
+    ownerId: SEED_USER_IDS.store,
   },
   {
-    id: "pancho-parque",
+    id: SEED_STORE_IDS.panchoParque,
     name: "Pancho del Parque",
     kind: "street-cart",
     photoUrl: "https://images.unsplash.com/photo-1612392987125-7f5b9ec85d44?w=400&q=80",
@@ -30,9 +32,10 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     status: "open",
     priceFromArs: 600,
     tagline: "Clásico pancho con papas al pie",
+    ownerId: SEED_USER_IDS.store2,
   },
   {
-    id: "helados-tino",
+    id: SEED_STORE_IDS.heladosTino,
     name: "Helados Tino",
     kind: "ice-cream",
     photoUrl: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=80",
@@ -41,6 +44,7 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     status: "open",
     priceFromArs: 1200,
     tagline: "Artesanal, rotativo por el barrio",
+    ownerId: SEED_USER_IDS.store3,
   },
 ]);
 
@@ -65,6 +69,10 @@ export class MockStoreRepository implements StoreRepository {
 
   async findById(id: string): Promise<Store | null> {
     return this.stores.find((store) => store.id === id) ?? null;
+  }
+
+  async findByOwnerId(userId: string): Promise<Store | null> {
+    return this.stores.find((store) => store.ownerId === userId) ?? null;
   }
 
   async findNearby({ radiusMeters }: FindNearbyInput): Promise<readonly Store[]> {

@@ -5,6 +5,7 @@ import { USER_ROLES } from "@/shared/constants/user";
 import { userRoleSchema } from "@/shared/schemas/user";
 import { logger } from "@/shared/utils/logger";
 import type { AuthService, AuthStateChangeCallback, SignInInput, SignUpInput } from "./auth.types";
+import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
 
 export type { AuthService, SignInInput, SignUpInput };
 
@@ -58,6 +59,7 @@ async function seedUser(seed: {
   email: string;
   role: User["role"];
   displayName: string;
+  id?: string;
 }): Promise<void> {
   const existing = await userRepository.findByEmail(seed.email);
   if (existing) {
@@ -68,7 +70,7 @@ async function seedUser(seed: {
     return;
   }
   const user = await userRepository.create({
-    id: crypto.randomUUID(),
+    id: seed.id ?? crypto.randomUUID(),
     email: seed.email,
     role: seed.role,
     displayName: seed.displayName,
@@ -77,10 +79,25 @@ async function seedUser(seed: {
 }
 
 async function seedDefaultUsers(): Promise<void> {
-  const seeds: Array<{ email: string; role: User["role"]; displayName: string }> = [
-    { email: "client@test.com", role: USER_ROLES.client, displayName: "Cliente Test" },
-    { email: "store@test.com", role: USER_ROLES.store, displayName: "Tienda Test" },
-    { email: "admin@test.com", role: USER_ROLES.admin, displayName: "Admin Test" },
+  const seeds: Array<{ email: string; role: User["role"]; displayName: string; id: string }> = [
+    {
+      email: "client@test.com",
+      role: USER_ROLES.client,
+      displayName: "Cliente Test",
+      id: SEED_USER_IDS.client,
+    },
+    {
+      email: "store@test.com",
+      role: USER_ROLES.store,
+      displayName: "Tienda Test",
+      id: SEED_USER_IDS.store,
+    },
+    {
+      email: "admin@test.com",
+      role: USER_ROLES.admin,
+      displayName: "Admin Test",
+      id: SEED_USER_IDS.admin,
+    },
   ];
 
   await Promise.all(seeds.map(seedUser));

@@ -3,7 +3,7 @@ import { MockStoreRepository } from "./store.mock";
 import type { Store } from "@/shared/schemas/store";
 
 const makeStore = (overrides: Partial<Store> = {}): Store => ({
-  id: "test-store",
+  id: "00000000-0000-4000-8000-000000000099",
   name: "Test Store",
   kind: "food-truck",
   photoUrl: "https://example.com/photo.jpg",
@@ -12,6 +12,7 @@ const makeStore = (overrides: Partial<Store> = {}): Store => ({
   status: "open",
   priceFromArs: 800,
   tagline: "Test tagline",
+  ownerId: "00000000-0000-4000-8000-000000000001",
   ...overrides,
 });
 

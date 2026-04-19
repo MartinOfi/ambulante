@@ -26,6 +26,9 @@ export const storeSchema = z
       .number({ required_error: "El precio es obligatorio" })
       .min(0, "El precio no puede ser negativo"),
     tagline: z.string({ required_error: "El tagline es obligatorio" }),
+    ownerId: z
+      .string({ required_error: "El ID del dueño es obligatorio" })
+      .uuid("El ID del dueño debe ser un UUID válido"),
   })
   .strict();
 

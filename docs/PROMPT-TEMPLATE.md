@@ -105,8 +105,8 @@ a costa de calidad.
   con su path absoluto.
 - **Paths absolutos siempre** en Read/Edit/Write. Tu raíz de trabajo es el
   worktree, no el principal.
-- **Cleanup al terminar la cadena de tasks:** desde el principal,
-  `git worktree remove ../ambulante-<task-id>`.
+- **Cleanup al terminar la cadena de tasks:** se gestiona en el PASO 9 — el agente
+  pregunta al usuario antes de borrar el worktree y mergear.
 
 # Lectura obligatoria (en este orden, ANTES de cualquier otra acción)
 
@@ -279,7 +279,7 @@ Si algo falla, fijalo. No cierres la tarea con algo roto.
 2. Buscá el campo `Continues with:` dentro del bloque.
 
 ### Caso A — No hay `Continues with:` o dice `—`
-El chat termina acá. Imprimí: "Cadena cerrada. No hay continuación." y detenete.
+La cadena cerró. Imprimí: "Cadena cerrada. No hay continuación." y continuá con el **PASO 9**.
 
 ### Caso B — `Continues with: Fx.y` (hay sucesor)
 
@@ -298,6 +298,52 @@ El chat termina acá. Imprimí: "Cadena cerrada. No hay continuación." y detene
      (PASO 6) y su propio completion (PASO 7).
 6. Al terminar esa tarea, volvé a chequear `Continues with:` y repetí. La cadena
    se ejecuta entera en este mismo chat hasta que `Continues with: —` o ausente.
+
+## PASO 9 · Code review final + cierre del worktree
+
+Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
+
+### 9.1 · Code review
+
+1. Ejecutá el agente de code review:
+   ```
+   /everything-claude-code:code-reviewer
+   ```
+2. El agente va a revisar **todos los archivos creados o modificados en esta cadena**.
+3. Tomá **todos los issues** que reporte — critical, high, medium y low — y fixealos uno por uno.
+4. Por cada fix, corré `npx tsc --noEmit` y `npx vitest run` para asegurarte que no rompiste nada.
+5. Si algún fix es complejo, aplicá el PASO 3 (auditoría) antes de escribirlo.
+6. Repetí el code review hasta que no queden issues.
+
+### 9.2 · Verificación post-fix
+
+Corré el PASO 6 completo una vez más y pegá el output:
+1. `npx tsc --noEmit` → 0 errores.
+2. `npx vitest run` → todos verdes; coverage ≥80%.
+3. `wc -l` sobre archivos tocados → sin exceder límites.
+4. `grep -rn 'console\.log\|: any\b' <archivos>` → vacío.
+
+### 9.3 · Consulta al usuario
+
+Una vez que el code review esté limpio y la verificación pase, imprimí **exactamente** esto:
+
+```
+✅ Code review completo. No quedan issues.
+
+¿Querés que:
+1. Commitee todos los cambios con el mensaje de cierre
+2. Mergee `<branch>` a `main`
+3. Borre el worktree `<dir>` y la branch `<branch>`
+
+Respondé s (sí a todo) o decime qué pasos omitir.
+```
+
+- Si el usuario responde **s** o equivalente → ejecutá los 3 pasos en orden:
+  1. `git add -p` (o por archivo) + `git commit -m "feat(fX.Y): <descripción>"`.
+  2. Desde el principal: `git -C /Users/martinoficialdegui/Desktop/ambulante merge --no-ff <branch>`.
+  3. Desde el principal: `git worktree remove <dir> && git branch -d <branch>`.
+- Si el usuario pide omitir algún paso → respetalo y reportá qué quedó pendiente.
+- Si hay conflictos en el merge → reportalos con detalle y esperá instrucciones. No fuerces.
 
 ### Regla importante de la cadena
 
@@ -607,4 +653,5 @@ con el output exacto — no improvises.
 | 2026-04-15 | Agregado PASO 8 de auto-continuación por cadena (`Continues with:`) |
 | 2026-04-15 | Agregado PASO 0 de setup de worktree obligatorio + apéndice de migración para chats en curso (post race-condition de F0 wave 1) |
 | 2026-04-17 | Agregado toolchain obligatorio para tareas UI/estéticas en PASO 5: `/ui-ux-pro-max`, 21st.dev MCP, MagicUI MCP, Nanobanana MCP, Stitch MCP |
+| 2026-04-19 | Agregado PASO 9: code review final con `/everything-claude-code:code-reviewer` (todos los severities), fix obligatorio, y consulta al usuario para commit + merge a main + borrado de worktree/branch |
 

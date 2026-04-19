@@ -25,7 +25,7 @@ const MOCK_RADIUS: RadiusValue = 2000;
 
 const MOCK_STORES: readonly Store[] = [
   {
-    id: "store-1",
+    id: "10000000-0000-4000-8000-000000000001",
     name: "Empanadas Don Pedro",
     kind: "food-truck",
     status: "open",
@@ -34,9 +34,10 @@ const MOCK_STORES: readonly Store[] = [
     distanceMeters: 500,
     priceFromArs: 1200,
     tagline: "Las mejores empanadas del barrio",
+    ownerId: "00000000-0000-4000-8000-000000000001",
   },
   {
-    id: "store-2",
+    id: "10000000-0000-4000-8000-000000000002",
     name: "Tacos El Mexicano",
     kind: "street-cart",
     status: "open",
@@ -45,6 +46,7 @@ const MOCK_STORES: readonly Store[] = [
     distanceMeters: 800,
     priceFromArs: 900,
     tagline: "Auténtica comida mexicana",
+    ownerId: "00000000-0000-4000-8000-000000000002",
   },
 ];
 

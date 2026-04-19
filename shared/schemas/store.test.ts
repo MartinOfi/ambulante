@@ -27,7 +27,7 @@ describe("storeStatusSchema", () => {
 
 describe("storeSchema", () => {
   const validStore = {
-    id: "store-1",
+    id: "00000000-0000-4000-8000-000000000001",
     name: "El Chori",
     kind: "food-truck",
     photoUrl: "https://example.com/photo.jpg",
@@ -36,6 +36,7 @@ describe("storeSchema", () => {
     status: "open",
     priceFromArs: 1500,
     tagline: "Los mejores choripanes",
+    ownerId: "00000000-0000-4000-8000-000000000002",
   };
 
   it("accepts a valid store", () => {

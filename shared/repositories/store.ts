@@ -21,4 +21,5 @@ export interface StoreRepository extends Repository<
   StoreFilters
 > {
   findNearby(input: FindNearbyInput): Promise<readonly Store[]>;
+  findByOwnerId(userId: string): Promise<Store | null>;
 }
