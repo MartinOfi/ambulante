@@ -1296,7 +1296,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.5 — Order history
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: continuación]
+- **Estado:** ✅ done
 - **Entregable:** `/orders` listado paginado; filtros por estado.
 - **Archivos:** `app/(client)/orders/page.tsx`, feature.
 - **Depends on:** F4.1
