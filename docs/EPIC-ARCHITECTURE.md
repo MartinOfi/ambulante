@@ -1304,7 +1304,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.6 — Cancel flow
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 10:00]
 - **Entregable:** Cliente puede cancelar en estados permitidos (§6.1). Confirmación.
 - **Depends on:** F3.2, F4.2
 - **Estimación:** S
