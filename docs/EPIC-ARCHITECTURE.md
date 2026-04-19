@@ -1376,7 +1376,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.5 — Accept/reject/finalize flow
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f13-5, started: 2026-04-19]
 - **Entregable:** Actions disparadas con mutations, state machine enforcement.
 - **Depends on:** F3.2, F4.2
 - **Estimación:** M
