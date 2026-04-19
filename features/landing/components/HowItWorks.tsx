@@ -98,16 +98,3 @@ export function HowItWorks() {
     </section>
   );
 }
-
-export function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div className="max-w-2xl">
-      <span className="font-display text-xs font-bold uppercase tracking-eyebrow text-brand">
-        {eyebrow}
-      </span>
-      <h2 className="mt-3 font-display text-display-hero font-bold uppercase leading-display tracking-display text-foreground">
-        {title}
-      </h2>
-    </div>
-  );
-}
