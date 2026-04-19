@@ -31,6 +31,8 @@ export const ROUTES = {
     dashboard: "/store/dashboard",
     orders: "/store/orders",
     catalog: "/store/catalog",
+    catalogNew: "/store/catalog/new",
+    catalogEdit: "/store/catalog/:productId/edit",
     profile: "/store/profile",
     order: "/store/order/:orderId",
     pendingApproval: "/store/pending-approval",
