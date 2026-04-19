@@ -38,16 +38,8 @@ const DAY_LABELS: Record<ProfileDay, string> = {
   domingo: "Dom",
 };
 
-function buildDefaultValues(profile: StoreProfile): UpdateStoreProfileInput {
-  return {
-    businessName: profile.businessName,
-    kind: profile.kind,
-    neighborhood: profile.neighborhood,
-    coverageNotes: profile.coverageNotes,
-    days: profile.days,
-    openTime: profile.openTime,
-    closeTime: profile.closeTime,
-  };
+function buildDefaultValues({ storeId: _, ...rest }: StoreProfile): UpdateStoreProfileInput {
+  return rest;
 }
 
 export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StoreProfileFormProps) {
@@ -133,13 +125,15 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
             <FormItem>
               <FormLabel>Días de operación</FormLabel>
               <FormControl>
-                <div className="flex flex-wrap gap-2">
+                <div role="group" aria-label="Días de operación" className="flex flex-wrap gap-2">
                   {PROFILE_DAYS.map((day) => {
                     const checked = (field.value ?? []).includes(day);
                     return (
                       <button
                         key={day}
                         type="button"
+                        aria-pressed={checked}
+                        aria-label={day}
                         onClick={() => {
                           const current = field.value ?? [];
                           const next = checked

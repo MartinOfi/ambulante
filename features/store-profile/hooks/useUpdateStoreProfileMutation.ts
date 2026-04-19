@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { storeProfileService } from "@/features/store-profile/services/store-profile.mock";
+import { storeProfileService } from "@/features/store-profile/services";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type {

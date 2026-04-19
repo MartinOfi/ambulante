@@ -7,6 +7,8 @@ import { logger } from "@/shared/utils/logger";
 
 export const MOCK_STORE_ID = "dona-rosa";
 
+const MOCK_LATENCY_MS = 300;
+
 const INITIAL_PROFILE: StoreProfile = {
   storeId: MOCK_STORE_ID,
   businessName: "Doña Rosa Empanadas",
@@ -18,10 +20,8 @@ const INITIAL_PROFILE: StoreProfile = {
   closeTime: "20:00",
 };
 
-let currentProfile: StoreProfile = { ...INITIAL_PROFILE };
-
 function simulateLatency(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 300));
+  return new Promise((resolve) => setTimeout(resolve, MOCK_LATENCY_MS));
 }
 
 function assertStoreExists(storeId: string): void {
@@ -31,17 +31,24 @@ function assertStoreExists(storeId: string): void {
   }
 }
 
-export const storeProfileService: StoreProfileService = {
-  async getProfile(storeId: string): Promise<StoreProfile> {
-    await simulateLatency();
-    assertStoreExists(storeId);
-    return { ...currentProfile };
-  },
+function createStoreProfileService(): StoreProfileService & { reset(): void } {
+  let profile: StoreProfile = { ...INITIAL_PROFILE };
+  return {
+    async getProfile(storeId: string): Promise<StoreProfile> {
+      await simulateLatency();
+      assertStoreExists(storeId);
+      return { ...profile };
+    },
+    async updateProfile(storeId: string, input: UpdateStoreProfileInput): Promise<StoreProfile> {
+      await simulateLatency();
+      assertStoreExists(storeId);
+      profile = { ...profile, ...input };
+      return { ...profile };
+    },
+    reset(): void {
+      profile = { ...INITIAL_PROFILE };
+    },
+  };
+}
 
-  async updateProfile(storeId: string, input: UpdateStoreProfileInput): Promise<StoreProfile> {
-    await simulateLatency();
-    assertStoreExists(storeId);
-    currentProfile = { ...currentProfile, ...input };
-    return { ...currentProfile };
-  },
-};
+export const storeProfileService = createStoreProfileService();

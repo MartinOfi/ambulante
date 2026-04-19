@@ -3,12 +3,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { storeProfileService } from "@/features/store-profile/services/store-profile.mock";
+import { storeProfileService } from "@/features/store-profile/services";
 import { logger } from "@/shared/utils/logger";
 import type { StoreProfile } from "@/features/store-profile/schemas/store-profile.schemas";
 import { useStoreProfileQuery } from "./useStoreProfileQuery";
 
-vi.mock("@/features/store-profile/services/store-profile.mock", () => ({
+vi.mock("@/features/store-profile/services", () => ({
   storeProfileService: {
     getProfile: vi.fn(),
     updateProfile: vi.fn(),

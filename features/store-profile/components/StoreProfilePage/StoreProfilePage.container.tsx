@@ -1,6 +1,6 @@
 "use client";
 
-import { MOCK_STORE_ID } from "@/features/store-profile/services/store-profile.mock";
+import { MOCK_STORE_ID } from "@/features/store-profile/services";
 import { useStoreProfileQuery } from "@/features/store-profile/hooks/useStoreProfileQuery";
 import { useUpdateStoreProfileMutation } from "@/features/store-profile/hooks/useUpdateStoreProfileMutation";
 import { StoreProfilePage } from "./StoreProfilePage";
