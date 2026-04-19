@@ -24,5 +24,5 @@ export function middleware(request: NextRequest): NextResponse {
 
 // Next.js static analysis requires literal values in config.matcher — no identifier references.
 export const config = {
-  matcher: ["/map/:path*", "/store/:path*", "/admin/:path*"],
+  matcher: ["/map/:path*", "/orders/:path*", "/profile/:path*", "/store/:path*", "/admin/:path*"],
 };

@@ -41,4 +41,20 @@ describe("getRequiredRole", () => {
   it("returns null for /api paths", () => {
     expect(getRequiredRole("/api/health")).toBeNull();
   });
+
+  it("returns client for /orders", () => {
+    expect(getRequiredRole("/orders")).toBe("client");
+  });
+
+  it("returns client for /orders sub-paths", () => {
+    expect(getRequiredRole("/orders/abc-123")).toBe("client");
+  });
+
+  it("returns client for /profile", () => {
+    expect(getRequiredRole("/profile")).toBe("client");
+  });
+
+  it("returns client for /profile sub-paths", () => {
+    expect(getRequiredRole("/profile/settings")).toBe("client");
+  });
 });

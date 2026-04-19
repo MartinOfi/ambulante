@@ -25,6 +25,7 @@ export const ROUTES = {
   client: {
     map: "/map",
     orders: "/orders",
+    order: "/orders/:orderId",
     profile: "/profile",
   },
   store: {

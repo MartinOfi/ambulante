@@ -2,6 +2,8 @@ import type { UserRole } from "@/shared/types/user";
 
 const PROTECTED_PREFIXES: ReadonlyArray<{ prefix: string; role: UserRole }> = [
   { prefix: "/map", role: "client" },
+  { prefix: "/orders", role: "client" },
+  { prefix: "/profile", role: "client" },
   { prefix: "/store", role: "store" },
   { prefix: "/admin", role: "admin" },
 ];
