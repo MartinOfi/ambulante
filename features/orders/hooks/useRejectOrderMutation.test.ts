@@ -39,23 +39,31 @@ const MOCK_STORE_SESSION = {
 
 const ORDER_ID = "order-456";
 
+const MOCK_ITEM = {
+  productId: "prod-1",
+  productName: "Empanada",
+  productPriceArs: 500,
+  quantity: 2,
+};
+
 const MOCK_ORDER_RECIBIDO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.RECIBIDO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:00:05.000Z",
 };
 
 const MOCK_ORDER_RECHAZADO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.RECHAZADO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
-  rejectedAt: new Date("2026-04-16T10:01:00Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:01:00.000Z",
 };
 
 function createWrapper() {
@@ -96,7 +104,6 @@ describe("useRejectOrderMutation", () => {
 
     const optimisticOrder = queryClient.getQueryData<Order>(queryKeys.orders.byId(ORDER_ID));
     expect(optimisticOrder?.status).toBe(ORDER_STATUS.RECHAZADO);
-    expect((optimisticOrder as { rejectedAt?: unknown })?.rejectedAt).toBeInstanceOf(Date);
 
     resolveReject(MOCK_ORDER_RECHAZADO);
     await waitFor(() => expect(result.current.isPending).toBe(false));

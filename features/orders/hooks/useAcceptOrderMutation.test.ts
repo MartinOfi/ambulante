@@ -9,7 +9,7 @@ import { logger } from "@/shared/utils/logger";
 import { queryKeys } from "@/shared/query/keys";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { USER_ROLES } from "@/shared/constants/user";
-import type { Order } from "@/shared/domain/order-state-machine";
+import type { Order } from "@/shared/schemas/order";
 import { useAcceptOrderMutation } from "./useAcceptOrderMutation";
 
 vi.mock("@/features/orders/services/orders.mock", () => ({
@@ -37,23 +37,31 @@ const MOCK_STORE_SESSION = {
 
 const ORDER_ID = "order-123";
 
+const MOCK_ITEM = {
+  productId: "prod-1",
+  productName: "Empanada",
+  productPriceArs: 500,
+  quantity: 2,
+};
+
 const MOCK_ORDER_RECIBIDO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.RECIBIDO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:00:05.000Z",
 };
 
 const MOCK_ORDER_ACEPTADO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.ACEPTADO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
-  acceptedAt: new Date("2026-04-16T10:01:00Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:01:00.000Z",
 };
 
 function createWrapper() {
@@ -94,7 +102,6 @@ describe("useAcceptOrderMutation", () => {
 
     const optimisticOrder = queryClient.getQueryData<Order>(queryKeys.orders.byId(ORDER_ID));
     expect(optimisticOrder?.status).toBe(ORDER_STATUS.ACEPTADO);
-    expect((optimisticOrder as { acceptedAt?: unknown })?.acceptedAt).toBeInstanceOf(Date);
 
     resolveAccept(MOCK_ORDER_ACEPTADO);
     await waitFor(() => expect(result.current.isPending).toBe(false));

@@ -4,7 +4,7 @@ import { ORDER_STATUS } from "@/shared/constants/order";
 import { USER_ROLES } from "@/shared/constants/user";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import type { Order } from "@/shared/domain/order-state-machine";
+import type { Order } from "@/shared/schemas/order";
 import { ordersService } from "@/features/orders/services/orders.mock";
 import { authService } from "@/shared/services/auth";
 
@@ -35,12 +35,7 @@ export function useAcceptOrderMutation() {
 
       queryClient.setQueryData<Order>(queryKeys.orders.byId(orderId), (old) => {
         if (old === undefined) return old;
-        // Safe cast: onSettled invalidates and replaces with server truth immediately
-        return {
-          ...old,
-          status: ORDER_STATUS.ACEPTADO,
-          acceptedAt: new Date(),
-        } as Order;
+        return { ...old, status: ORDER_STATUS.ACEPTADO };
       });
 
       return { previous };

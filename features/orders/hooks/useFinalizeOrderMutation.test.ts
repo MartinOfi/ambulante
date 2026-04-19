@@ -39,27 +39,31 @@ const MOCK_STORE_SESSION = {
 
 const ORDER_ID = "order-789";
 
+const MOCK_ITEM = {
+  productId: "prod-1",
+  productName: "Empanada",
+  productPriceArs: 500,
+  quantity: 2,
+};
+
 const MOCK_ORDER_EN_CAMINO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.EN_CAMINO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
-  acceptedAt: new Date("2026-04-16T10:01:00Z"),
-  onTheWayAt: new Date("2026-04-16T10:05:00Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:05:00.000Z",
 };
 
 const MOCK_ORDER_FINALIZADO: Order = {
   id: ORDER_ID,
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-04-16T10:00:00Z"),
   status: ORDER_STATUS.FINALIZADO,
-  receivedAt: new Date("2026-04-16T10:00:05Z"),
-  acceptedAt: new Date("2026-04-16T10:01:00Z"),
-  onTheWayAt: new Date("2026-04-16T10:05:00Z"),
-  finishedAt: new Date("2026-04-16T10:30:00Z"),
+  items: [MOCK_ITEM],
+  createdAt: "2026-04-16T10:00:00.000Z",
+  updatedAt: "2026-04-16T10:30:00.000Z",
 };
 
 function createWrapper() {
@@ -100,7 +104,6 @@ describe("useFinalizeOrderMutation", () => {
 
     const optimisticOrder = queryClient.getQueryData<Order>(queryKeys.orders.byId(ORDER_ID));
     expect(optimisticOrder?.status).toBe(ORDER_STATUS.FINALIZADO);
-    expect((optimisticOrder as { finishedAt?: unknown })?.finishedAt).toBeInstanceOf(Date);
 
     resolveFinalize(MOCK_ORDER_FINALIZADO);
     await waitFor(() => expect(result.current.isPending).toBe(false));
