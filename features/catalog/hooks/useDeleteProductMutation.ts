@@ -19,7 +19,7 @@ export function useDeleteProductMutation() {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, DeleteProductInput, MutationContext>({
-    mutationFn: ({ productId }) => catalogService.delete(productId),
+    mutationFn: ({ storeId, productId }) => catalogService.delete(storeId, productId),
 
     onMutate: async ({ storeId, productId }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.catalog.byStore(storeId) });

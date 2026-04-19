@@ -8,6 +8,6 @@ export interface CatalogService {
   findByStore(storeId: string): Promise<readonly Product[]>;
   findById(id: string): Promise<Product | null>;
   create(storeId: string, values: CreateProductValues): Promise<Product>;
-  update(id: string, values: EditProductValues): Promise<Product>;
-  delete(id: string): Promise<void>;
+  update(storeId: string, id: string, values: EditProductValues): Promise<Product>;
+  delete(storeId: string, id: string): Promise<void>;
 }

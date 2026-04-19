@@ -1,9 +1,14 @@
 import type { UseFormReturn } from "react-hook-form";
-import type { CreateProductValues } from "@/features/catalog/schemas/catalog.schemas";
+import type {
+  CreateProductValues,
+  EditProductValues,
+} from "@/features/catalog/schemas/catalog.schemas";
+
+type ProductFormValues = CreateProductValues | EditProductValues;
 
 export interface ProductFormProps {
-  readonly form: UseFormReturn<CreateProductValues>;
-  readonly onSubmit: (values: CreateProductValues) => Promise<void>;
+  readonly form: UseFormReturn<ProductFormValues>;
+  readonly onSubmit: (values: ProductFormValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly serverError: string | null;
   readonly submitLabel: string;

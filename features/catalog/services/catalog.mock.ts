@@ -22,7 +22,11 @@ export const catalogService: CatalogService = {
     });
   },
 
-  async update(id, values) {
+  async update(storeId, id, values) {
+    const existing = await productRepository.findById(id);
+    if (!existing || existing.storeId !== storeId) {
+      throw new Error(`Product "${id}" not found for store "${storeId}"`);
+    }
     return productRepository.update(id, {
       name: values.name,
       description: values.description,
@@ -32,7 +36,11 @@ export const catalogService: CatalogService = {
     });
   },
 
-  async delete(id) {
+  async delete(storeId, id) {
+    const existing = await productRepository.findById(id);
+    if (!existing || existing.storeId !== storeId) {
+      throw new Error(`Product "${id}" not found for store "${storeId}"`);
+    }
     return productRepository.delete(id);
   },
 };

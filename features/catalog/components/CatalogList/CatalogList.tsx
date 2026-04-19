@@ -1,5 +1,3 @@
-"use client";
-
 import { ProductCard } from "@/features/catalog/components/ProductCard";
 import type { CatalogListProps } from "./CatalogList.types";
 

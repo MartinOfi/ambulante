@@ -23,7 +23,8 @@ export function useUpdateProductMutation() {
   const queryClient = useQueryClient();
 
   return useMutation<Product, Error, UpdateProductInput, MutationContext>({
-    mutationFn: ({ productId, values }) => catalogService.update(productId, values),
+    mutationFn: ({ storeId, productId, values }) =>
+      catalogService.update(storeId, productId, values),
 
     onMutate: async ({ storeId, productId, values }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.catalog.byStore(storeId) });

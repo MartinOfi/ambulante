@@ -27,7 +27,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
   const updateMutation = useUpdateProductMutation();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const product = products?.find((p) => p.id === productId);
+  const product = products?.find((item) => item.id === productId);
 
   const form = useForm<EditProductValues>({
     resolver: zodResolver(editProductSchema),
@@ -38,6 +38,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
     if (product) {
       form.reset({
         name: product.name,
+        description: product.description ?? "",
         priceArs: product.priceArs,
         photoUrl: product.photoUrl ?? "",
         isAvailable: product.isAvailable,
