@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, skipToken } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { productsService } from "@/shared/services/products";
@@ -9,12 +7,10 @@ import { logger } from "@/shared/utils/logger";
 
 export function useStoreProductsQuery(storeId: string | null) {
   const query = useQuery({
-    queryKey: storeId ? queryKeys.products.byStore(storeId) : queryKeys.products.all(),
-    queryFn: async () => {
-      if (!storeId) throw new Error("storeId required");
-      return productsService.findByStore(storeId);
-    },
-    enabled: storeId !== null,
+    queryKey: storeId
+      ? queryKeys.products.byStore(storeId)
+      : (["products", "by-store", "__disabled__"] as const),
+    queryFn: storeId ? () => productsService.findByStore(storeId) : skipToken,
   });
 
   useEffect(() => {

@@ -95,8 +95,8 @@ describe("StoreDetailSheet", () => {
 
     expect(screen.getByText("Empanada de carne")).toBeInTheDocument();
     expect(screen.getByText("Empanada de jamón y queso")).toBeInTheDocument();
-    expect(screen.getByText("$600")).toBeInTheDocument();
-    expect(screen.getByText("$550")).toBeInTheDocument();
+    expect(screen.getByText("$ 600")).toBeInTheDocument();
+    expect(screen.getByText("$ 550")).toBeInTheDocument();
   });
 
   it("shows loading state while products are loading", () => {

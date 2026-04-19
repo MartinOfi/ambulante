@@ -4,10 +4,7 @@ import Image from "next/image";
 import { X, Clock } from "lucide-react";
 import type { StoreDetailSheetProps } from "./StoreDetailSheet.types";
 import type { Product } from "@/shared/schemas/product";
-
-function formatPrice(priceArs: number): string {
-  return `$${priceArs.toLocaleString("es-AR")}`;
-}
+import { formatPrice } from "@/shared/utils/format";
 
 function ProductRow({ product }: { readonly product: Product }) {
   return (
@@ -40,6 +37,7 @@ export function StoreDetailSheet({
     <div
       className="absolute inset-x-0 bottom-0 z-20 flex flex-col rounded-t-sheet bg-surface-elevated shadow-sheet max-h-[85dvh] overflow-hidden pb-safe"
       role="dialog"
+      aria-modal="true"
       aria-label={store.name}
     >
       <div className="relative h-40 w-full shrink-0 bg-muted/20">
