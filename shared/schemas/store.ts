@@ -26,6 +26,8 @@ export const storeSchema = z
       .number({ required_error: "El precio es obligatorio" })
       .min(0, "El precio no puede ser negativo"),
     tagline: z.string({ required_error: "El tagline es obligatorio" }),
+    description: z.string().optional(),
+    hours: z.string().optional(),
   })
   .strict();
 

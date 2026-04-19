@@ -166,7 +166,7 @@
 
 - **Ruta:** `shared/query/keys.ts`
 - **Descripción:** Registro centralizado de query key factories para React Query v5. Organizado por dominio con jerarquía para invalidación parcial.
-- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`
+- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`, `queryKeys.products.all()`, `queryKeys.products.byStore(storeId)`
 - **Usado en:** hooks de data en `features/*/hooks/`.
 
 ### parseResponse + ParseError
@@ -216,6 +216,22 @@
 - **Service:** `features/orders/services/orders.mock.ts` — `ordersService.accept(orderId)` (stub; replace with real API).
 - **Pattern doc:** `docs/recipes/mutation-hook-pattern.md`
 - **Usado en:** F4.2 reference; future store-dashboard feature.
+
+### useStoreByIdQuery _(feature-local — map)_
+
+- **Ruta:** `features/map/hooks/useStoreByIdQuery.ts`
+- **Descripción:** Fetches a single store by ID. Disabled when `storeId` is `null`. Logs errors via `logger.error`. Returns the full React Query result.
+- **API:** `useStoreByIdQuery(storeId: string | null)`
+- **Query key:** `queryKeys.stores.byId(storeId)` when active.
+- **Usado en:** `features/map/components/StoreDetailSheet/StoreDetailSheet.container.tsx`.
+
+### useStoreProductsQuery _(feature-local — map)_
+
+- **Ruta:** `features/map/hooks/useStoreProductsQuery.ts`
+- **Descripción:** Fetches the product catalog for a store. Disabled when `storeId` is `null`. Logs errors via `logger.error`.
+- **API:** `useStoreProductsQuery(storeId: string | null)`
+- **Query key:** `queryKeys.products.byStore(storeId)` when active.
+- **Usado en:** `features/map/components/StoreDetailSheet/StoreDetailSheet.container.tsx`.
 
 ### useStoresNearbyQuery _(feature-local — map)_
 
@@ -275,7 +291,16 @@
 - **Descripción:** Cliente de tiendas detrás de una interfaz `StoresService`. Delega a `storeRepository` (F3.4). Swap a Supabase → solo cambiar el repository, sin tocar consumers.
 - **API:** `findNearby({ coords, radiusMeters })`, `findById(id)`
 - **Tipos:** `StoresService`, `FindNearbyInput` re-exportados desde `shared/repositories/store`
-- **Usado en:** `features/map/hooks/useStoresNearbyQuery`.
+- **Usado en:** `features/map/hooks/useStoresNearbyQuery`, `features/map/hooks/useStoreByIdQuery`.
+
+### productsService
+
+- **Ruta:** `shared/services/products.ts`
+- **Tipos:** `shared/services/products.types.ts`
+- **Descripción:** Cliente de productos detrás de `ProductsService`. Delega a `productRepository`. Swap a Supabase → reemplazar solo esta implementación.
+- **API:** `findByStore(storeId: string): Promise<readonly Product[]>`
+- **Tipo:** `ProductsService`
+- **Usado en:** `features/map/hooks/useStoreProductsQuery`.
 
 ---
 
@@ -423,7 +448,7 @@
 ### storeKindSchema, storeStatusSchema, storeSchema
 
 - **Ruta:** `shared/schemas/store.ts`
-- **Descripción:** Schemas de tienda ambulante; usa `coordinatesSchema` para el campo `location`.
+- **Descripción:** Schemas de tienda ambulante; usa `coordinatesSchema` para el campo `location`. Campos opcionales: `description` (texto largo de la tienda) y `hours` (horarios como string legible).
 - **API:** `storeSchema.parse(raw)` → `Store`; `storeKindSchema.options` para iterar valores.
 
 ### productSchema, Product
@@ -661,6 +686,16 @@
 
 > Shell de roles y bloques de UI específicos que no son candidatos a `shared/` porque pertenecen a un solo contexto de rol. Se documentan acá para evitar reimplementaciones.
 
+### StoreDetailSheet (F12.1)
+
+- **Ruta barrel:** `features/map/components/StoreDetailSheet/index.ts`
+- **Archivos:** `StoreDetailSheet.tsx` (dumb), `StoreDetailSheet.container.tsx` (smart), `StoreDetailSheet.types.ts`
+- **Descripción:** Bottom sheet overlay que muestra el detalle de una tienda seleccionada. Incluye foto, nombre, tagline, descripción, horarios, y catálogo de productos. Se renderiza sobre el mapa, reemplazando el `NearbyBottomSheet` cuando hay una tienda seleccionada.
+- **API dumb:** `<StoreDetailSheet store products isLoadingProducts onDismiss />`
+- **API smart:** `<StoreDetailSheetContainer storeId onDismiss />` — carga store + products, renderiza null si store no encontrado.
+- **Tipos exportados:** `StoreDetailSheetProps`, `StoreDetailSheetContainerProps`
+- **Usado en:** `features/map/components/MapScreen.tsx` (condicional sobre `selectedStoreId`).
+
 ### store-shell — Shell del rol Tienda
 
 - **Ruta barrel:** `features/store-shell/index.ts`
@@ -739,3 +774,4 @@
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
 | 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |
 | 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |
+| 2026-04-19 | F12.1: storeSchema extendido con `description?` y `hours?`; queryKeys.products añadido; productsService creado; StoreDetailSheet (dumb+container) documentado en §13; useStoreByIdQuery + useStoreProductsQuery en §3 | —     |
