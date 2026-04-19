@@ -1383,7 +1383,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.6 — Store profile management
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 11:00]
 - **Entregable:** `/store/profile` — datos, zona, horarios base.
 - **Depends on:** F4.2
 - **Estimación:** M
