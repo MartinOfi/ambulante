@@ -21,6 +21,9 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     priceFromArs: 800,
     tagline: "Empanadas salteñas recién horneadas",
     ownerId: SEED_USER_IDS.store,
+    description:
+      "Food truck familiar con más de 10 años de tradición. Masa casera y relleno al horno de barro.",
+    hours: "Lun–Vie 11:00–21:00 · Sáb–Dom 10:00–22:00",
   },
   {
     id: SEED_STORE_IDS.panchoParque,
@@ -33,6 +36,9 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     priceFromArs: 600,
     tagline: "Clásico pancho con papas al pie",
     ownerId: SEED_USER_IDS.store2,
+    description:
+      "El puesto de panchos más querido del parque. Con todas las salsas y acompañamientos.",
+    hours: "Todos los días 10:00–20:00",
   },
   {
     id: SEED_STORE_IDS.heladosTino,
@@ -45,6 +51,9 @@ const SEED_STORES: readonly Store[] = Object.freeze([
     priceFromArs: 1200,
     tagline: "Artesanal, rotativo por el barrio",
     ownerId: SEED_USER_IDS.store3,
+    description:
+      "Helados artesanales con ingredientes frescos de temporada. Gustos rotativos cada semana.",
+    hours: "Mar–Dom 13:00–21:00",
   },
 ]);
 

@@ -29,6 +29,8 @@ export const storeSchema = z
     ownerId: z
       .string({ required_error: "El ID del dueño es obligatorio" })
       .uuid("El ID del dueño debe ser un UUID válido"),
+    description: z.string().optional(),
+    hours: z.string().optional(),
   })
   .strict();
 
