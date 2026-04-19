@@ -1261,7 +1261,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 **No existe un bottleneck en F12.1.** F12.2 depende de F1.6 + F3.1, F12.7 depende de F2.6 — ninguno depende de F12.1. La única serialización obligatoria es F12.3 → F12.4 (cadena explícita).
 
 ### F12.1 — Store detail bottom sheet
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: now]
 - **Por qué:** Parte del flow desde el mapa.
 - **Entregable:** Bottom sheet con foto, descripción, catálogo, horarios. No es ruta aparte (decisión arquitectónica — ver análisis previo).
 - **Archivos:** `features/map/components/StoreDetailSheet/*`.
