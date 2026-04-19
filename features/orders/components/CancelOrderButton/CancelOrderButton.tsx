@@ -4,6 +4,7 @@ import type { CancelOrderButtonProps } from "./CancelOrderButton.types";
 export function CancelOrderButton({
   isConfirming,
   isLoading,
+  errorMessage,
   onCancelClick,
   onConfirmCancel,
   onDismissConfirm,
@@ -25,8 +26,11 @@ export function CancelOrderButton({
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={onCancelClick}>
-      Cancelar pedido
-    </Button>
+    <div className="flex flex-col gap-1">
+      <Button variant="outline" size="sm" onClick={onCancelClick}>
+        Cancelar pedido
+      </Button>
+      {errorMessage !== undefined && <p className="text-xs text-destructive">{errorMessage}</p>}
+    </div>
   );
 }

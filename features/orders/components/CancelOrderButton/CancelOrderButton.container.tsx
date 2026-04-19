@@ -26,7 +26,7 @@ export function CancelOrderButtonContainer({
 }: CancelOrderButtonContainerProps) {
   const session = useSession();
   const [isConfirming, setIsConfirming] = useState(false);
-  const { mutate: cancelOrder, isPending } = useCancelOrderMutation();
+  const { mutate: cancelOrder, isPending, isError } = useCancelOrderMutation();
 
   const isClient =
     session.status === "authenticated" && session.session.user.role === USER_ROLES.client;
@@ -46,6 +46,7 @@ export function CancelOrderButtonContainer({
     <CancelOrderButton
       isConfirming={isConfirming}
       isLoading={isPending}
+      errorMessage={isError ? "No se pudo cancelar el pedido. Intentá de nuevo." : undefined}
       onCancelClick={handleCancelClick}
       onConfirmCancel={handleConfirmCancel}
       onDismissConfirm={handleDismissConfirm}
