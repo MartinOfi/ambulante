@@ -166,7 +166,7 @@
 
 - **Ruta:** `shared/query/keys.ts`
 - **Descripción:** Registro centralizado de query key factories para React Query v5. Organizado por dominio con jerarquía para invalidación parcial.
-- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`, `queryKeys.products.all()`, `queryKeys.products.byStore(storeId)`
+- **API:** `queryKeys.stores.all()`, `queryKeys.stores.nearby(coords, radiusMeters)`, `queryKeys.stores.byId(id)`, `queryKeys.stores.profile(storeId)`, `queryKeys.orders.all()`, `queryKeys.orders.byUser(userId)`, `queryKeys.orders.byId(id)`, `queryKeys.products.all()`, `queryKeys.products.byStore(storeId)`
 - **Usado en:** hooks de data en `features/*/hooks/`.
 
 ### parseResponse + ParseError
@@ -206,6 +206,23 @@
 ## 3. Hooks (`shared/hooks/`)
 
 > Feature-local query hooks live in `features/<name>/hooks/`. They follow the canonical `useXxxQuery` pattern documented in `docs/recipes/query-hook-pattern.md`.
+
+### useStoreProfileQuery _(feature-local — store-profile)_
+
+- **Ruta:** `features/store-profile/hooks/useStoreProfileQuery.ts`
+- **Descripción:** Fetches the store profile for a given `storeId` using React Query v5 `useQuery`. Disabled automatically when `storeId` is `null` or empty. Logs errors with context on failure.
+- **API:** `useStoreProfileQuery(storeId: string | null)` → `UseQueryResult<StoreProfile>`
+- **Query key:** `queryKeys.stores.profile(storeId)`
+- **Service:** `features/store-profile/services/store-profile.mock.ts` — `storeProfileService.getProfile(storeId)`.
+- **Usado en:** `features/store-profile/components/StoreProfilePage/StoreProfilePage.container.tsx`.
+
+### useUpdateStoreProfileMutation _(feature-local — store-profile)_
+
+- **Ruta:** `features/store-profile/hooks/useUpdateStoreProfileMutation.ts`
+- **Descripción:** Canonical `useXxxMutation` hook con optimistic update. `onMutate` snapshot + optimistic write; `onError` rollback + `logger.error`; `onSettled` `invalidateQueries`. Input: `UpdateStoreProfileInput` (partial).
+- **API:** `useUpdateStoreProfileMutation(storeId: string)` → `UseMutationResult`; call `mutate(input)`.
+- **Service:** `features/store-profile/services/store-profile.mock.ts` — `storeProfileService.updateProfile(storeId, input)`.
+- **Usado en:** `features/store-profile/components/StoreProfilePage/StoreProfilePage.container.tsx`.
 
 ### useAcceptOrderMutation _(feature-local — orders)_
 
@@ -463,6 +480,15 @@
 - **Descripción:** Usuario con roles `client | store | admin`. `displayName` opcional. `sessionSchema` valida sesiones de Supabase Auth (accessToken, refreshToken, expiresAt positivo, user anidado).
 - **API:** `userSchema.parse(raw)` → `User`; `sessionSchema.parse(raw)` → `Session`; `userRoleSchema.options` para iterar roles.
 
+### storeProfileSchema, updateStoreProfileSchema, StoreProfile, UpdateStoreProfileInput
+
+- **Ruta:** `features/store-profile/schemas/store-profile.schemas.ts`
+- **Descripción:** Schemas Zod del perfil de tienda (F13.6). `storeProfileSchema` valida el modelo completo con `.refine()` que garantiza `closeTime > openTime`. `updateStoreProfileSchema` es la versión `.omit({ storeId }).partial()` para edición parcial.
+- **API:** `zodResolver(updateStoreProfileSchema)` en `StoreProfileForm`; tipos inferidos `StoreProfile`, `UpdateStoreProfileInput`.
+- **Tipos exportados:** `StoreProfile`, `UpdateStoreProfileInput`, `ProfileDay`, `PROFILE_DAYS`
+- **Constante:** `PROFILE_DAYS` — array readonly de los 7 días en español (alineado con `STORE_ONBOARDING_DAYS` pero feature-local por aislamiento).
+- **Nota:** esquema de feature — no en `shared/` porque solo lo consume `features/store-profile`.
+
 ### stepFiscalSchema, stepZoneSchema, stepHoursSchema, storeOnboardingSchema
 
 - **Ruta:** `features/store-onboarding/schemas/store-onboarding.schemas.ts`
@@ -708,6 +734,19 @@
   - `useAvailability` (`features/store-shell/hooks/useAvailability.ts`) — estado local de disponibilidad. Retorna `{ isAvailable, toggle, setAvailable }`.
 - **Usado en:** `app/(store)/layout.tsx`.
 
+### store-profile — Perfil de la tienda
+
+- **Ruta barrel:** `features/store-profile/index.ts`
+- **Componentes:**
+  - `StoreProfilePage` (`features/store-profile/components/StoreProfilePage/StoreProfilePage.tsx`) — dumb, renderiza `StoreProfileForm` con un heading. Props: `profile: StoreProfile`, `onSave: (data: UpdateStoreProfileInput) => void`, `isSaving: boolean`.
+  - `StoreProfilePageContainer` (`features/store-profile/components/StoreProfilePage/StoreProfilePage.container.tsx`) — `"use client"`, conecta `useStoreProfileQuery` + `useUpdateStoreProfileMutation`. Maneja loading/error states. Exportado como entry point en `features/store-profile/index.ts`.
+  - `StoreProfileForm` (`features/store-profile/components/StoreProfileForm/StoreProfileForm.tsx`) — `"use client"` dumb form. react-hook-form + `zodResolver(updateStoreProfileSchema)`. Campos: businessName, kind (select), neighborhood, coverageNotes (opcional), days (button toggles), openTime/closeTime (time inputs en grid).
+- **Hooks:** `useStoreProfileQuery`, `useUpdateStoreProfileMutation` — ver §3.
+- **Service:** `storeProfileService` en `features/store-profile/services/store-profile.mock.ts` — interfaz `StoreProfileService` (`getProfile`, `updateProfile`), mock con in-memory state y 300ms de latencia simulada. `MOCK_STORE_ID = "dona-rosa"`.
+- **Schemas:** `storeProfileSchema`, `updateStoreProfileSchema` — ver §7b.
+- **Ruta app:** `app/(store)/profile/page.tsx`
+- **Usado en:** `app/(store)/profile`.
+
 ---
 
 ## 14. Test utilities (`shared/test-utils/`)
@@ -779,3 +818,4 @@
 | 2026-04-19 | F12.7: feature `profile` completa — `useLocationPermission`, `useNotificationPrefs`, `ProfilePage`, `LocationPermission`, `NotificationPrefs`, constantes `LOCATION_PERMISSION_STATUS`, `NOTIFICATION_PERMISSION`, `NOTIFICATION_PREF_KEYS`, `NOTIFICATION_PREFS_STORAGE_KEY` (todos feature-local, no promovidos a shared) | —     |
 | 2026-04-19 | F13.2: `useLocationPublishing` hook en §13 (store-shell); storeSchema con `ownerId`; `storesService.findByOwnerId`/`updateLocation` implementados; `storeRepository.findByOwnerId` documentado en §11; geo constants "Usado en" actualizado | —     |
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
+| 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |

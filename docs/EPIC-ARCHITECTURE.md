@@ -1383,11 +1383,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:** Archivos creados: `features/orders/hooks/useRejectOrderMutation.ts`, `features/orders/hooks/useFinalizeOrderMutation.ts`, `features/orders/components/OrderActions/` (OrderActions.tsx dumb + OrderActions.container.tsx smart + types + barrel). `features/orders/services/orders.service.ts` y `orders.mock.ts` extendidos con `reject` y `finalize`. 27 tests, 0 errores TS. State machine enforcement: el dumb component solo renderiza botones válidos según el estado actual del pedido (RECIBIDO→Aceptar/Rechazar, EN_CAMINO→Finalizar, terminales→null). Optimistic updates + rollback en los 3 mutation hooks.
 
 ### F13.6 — Store profile management
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-19, completed: 2026-04-19]
 - **Entregable:** `/store/profile` — datos, zona, horarios base.
 - **Depends on:** F4.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** schemas + service mock + hooks (useStoreProfileQuery, useUpdateStoreProfileMutation con optimistic update) + StoreProfileForm + StoreProfilePage Container/Dumb + page route. 7 hook tests GREEN (591 total).
 
 ### F13.7 — Analytics básico
 - **Estado:** ⚪ pending
