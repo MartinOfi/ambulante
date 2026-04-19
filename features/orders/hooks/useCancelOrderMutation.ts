@@ -7,7 +7,7 @@ import { USER_ROLES } from "@/shared/constants/user";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type { Order, OrderCancelado } from "@/shared/domain/order-state-machine";
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { ordersService } from "@/features/orders/services";
 import { authService } from "@/shared/services/auth";
 
 interface MutateContext {

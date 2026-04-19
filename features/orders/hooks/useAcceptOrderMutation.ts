@@ -5,7 +5,7 @@ import { USER_ROLES } from "@/shared/constants/user";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type { Order } from "@/shared/schemas/order";
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { ordersService } from "@/features/orders/services";
 import { authService } from "@/shared/services/auth";
 
 interface MutateContext {

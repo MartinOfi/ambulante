@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { ordersService } from "@/features/orders/services";
 import type { SendOrderInput } from "@/features/orders/services/orders.service";
 
 export function useSendOrderMutation() {
