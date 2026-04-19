@@ -4,8 +4,12 @@ import type { Session, User } from "@/shared/types/user";
 import { USER_ROLES } from "@/shared/constants/user";
 import { userRoleSchema } from "@/shared/schemas/user";
 import { logger } from "@/shared/utils/logger";
-import { writeSessionCookie, clearSessionCookie } from "@/shared/utils/session-cookie";
-import { SESSION_COOKIE_MAX_AGE_SECONDS } from "@/shared/constants/auth";
+import {
+  writeSessionCookie,
+  clearSessionCookie,
+  parseSessionCookie,
+} from "@/shared/utils/session-cookie";
+import { SESSION_COOKIE_MAX_AGE_SECONDS, SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 import type { AuthService, AuthStateChangeCallback, SignInInput, SignUpInput } from "./auth.types";
 import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
 
@@ -175,7 +179,23 @@ export const authService: AuthService = {
 
   async getSession() {
     await seedPromise;
-    return currentSession;
+    if (currentSession) return currentSession;
+
+    // Hydrate from cookie after module reload (mock-only — Supabase will own this)
+    if (typeof document !== "undefined") {
+      const match = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${SESSION_COOKIE_NAME}=`));
+      if (match) {
+        const session = parseSessionCookie(match.split("=").slice(1).join("="));
+        if (session) {
+          currentSession = session;
+          return currentSession;
+        }
+      }
+    }
+
+    return null;
   },
 
   onAuthStateChange(callback: AuthStateChangeCallback) {
