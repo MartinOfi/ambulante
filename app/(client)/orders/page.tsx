@@ -1,3 +1,5 @@
+import { OrderHistoryScreenContainer } from "@/features/orders/components/OrderHistoryScreen";
+
 export default function OrdersPage() {
-  return <p>Pedidos — próximamente</p>;
+  return <OrderHistoryScreenContainer />;
 }

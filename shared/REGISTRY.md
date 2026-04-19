@@ -739,3 +739,4 @@
 | 2026-04-17 | F9.2: agregado `Text` (tipografía sistematizada) en §2 — 7 variantes polimórficas, migración de Hero/HowItWorks/Features/StoreCard | —     |
 | 2026-04-17 | F9.2 CR: promovido `SectionHeader` a §2 (era export cruzado entre features); `heading-sm` documentado como case-neutral; default genérico de `Text<T>` corregido a `"span"`; `caption` añade `leading-snug` | —     |
 | 2026-04-17 | F9.3: agregado Icon component en §2 — lazy-loaded lucide wrapper con token system (ICON_SIZE, ICON_COLOR) | —     |
+| 2026-04-19 | F12.5: `ordersService.findByUser` + seed data en orders.mock; `useOrdersQuery` hook; `OrderCard`/`OrderHistoryScreen` en features/orders | —     |
