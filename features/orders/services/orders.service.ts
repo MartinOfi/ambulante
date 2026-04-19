@@ -2,4 +2,5 @@ import type { Order } from "@/shared/domain/order-state-machine";
 
 export interface OrdersService {
   readonly accept: (orderId: string) => Promise<Order>;
+  readonly cancel: (orderId: string) => Promise<Order>;
 }
