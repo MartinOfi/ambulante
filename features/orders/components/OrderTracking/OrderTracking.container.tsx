@@ -4,6 +4,8 @@ import { queryKeys } from "@/shared/query/keys";
 import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
 import { REALTIME_CHANNELS } from "@/shared/services/realtime";
 import { useOrderQuery } from "@/features/orders/hooks/useOrderQuery";
+import { useCancelOrderMutation } from "@/features/orders/hooks/useCancelOrderMutation";
+import { useConfirmOnTheWayMutation } from "@/features/orders/hooks/useConfirmOnTheWayMutation";
 import { OrderTracking } from "./OrderTracking";
 
 interface OrderTrackingContainerProps {
@@ -12,6 +14,8 @@ interface OrderTrackingContainerProps {
 
 export function OrderTrackingContainer({ orderId }: OrderTrackingContainerProps) {
   const { data: order, isLoading, isError } = useOrderQuery(orderId);
+  const { mutate: cancel, isPending: isCancelling } = useCancelOrderMutation();
+  const { mutate: confirmOnTheWay, isPending: isConfirmingOnTheWay } = useConfirmOnTheWayMutation();
 
   useRealtimeInvalidation({
     channel: REALTIME_CHANNELS.orders,
@@ -24,10 +28,10 @@ export function OrderTrackingContainer({ orderId }: OrderTrackingContainerProps)
   return (
     <OrderTracking
       order={order}
-      onConfirmOnTheWay={() => undefined}
-      onCancel={() => undefined}
-      isCancelling={false}
-      isConfirmingOnTheWay={false}
+      onConfirmOnTheWay={() => confirmOnTheWay(orderId)}
+      onCancel={() => cancel(orderId)}
+      isCancelling={isCancelling}
+      isConfirmingOnTheWay={isConfirmingOnTheWay}
     />
   );
 }

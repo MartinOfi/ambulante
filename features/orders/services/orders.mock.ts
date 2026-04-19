@@ -7,10 +7,12 @@ import type { Order } from "@/shared/schemas/order";
 import type { OrdersService, FindByUserInput, SendOrderInput } from "./orders.service";
 
 const MOCK_NETWORK_DELAY_MS = 300;
+// Temporary stand-in until auth context is wired into the service layer
+const DEMO_CLIENT_ID = "demo-client-1" as const;
 
 const DEMO_SEEDS = [
   {
-    clientId: "demo-client-1",
+    clientId: DEMO_CLIENT_ID,
     storeId: "store-demo-1",
     status: ORDER_STATUS.ENVIADO,
     items: [
@@ -19,7 +21,7 @@ const DEMO_SEEDS = [
     notes: "Sin picante por favor",
   },
   {
-    clientId: "demo-client-1",
+    clientId: DEMO_CLIENT_ID,
     storeId: "store-demo-1",
     status: ORDER_STATUS.ACEPTADO,
     items: [
@@ -28,13 +30,13 @@ const DEMO_SEEDS = [
     ],
   },
   {
-    clientId: "demo-client-1",
+    clientId: DEMO_CLIENT_ID,
     storeId: "store-demo-2",
     status: ORDER_STATUS.FINALIZADO,
     items: [{ productId: "p4", productName: "Tacos x3", productPriceArs: 1800, quantity: 1 }],
   },
   {
-    clientId: "demo-client-1",
+    clientId: DEMO_CLIENT_ID,
     storeId: "store-demo-1",
     status: ORDER_STATUS.CANCELADO,
     items: [
@@ -68,13 +70,17 @@ function delay(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
 }
 
+type TransitionActor = (typeof ORDER_ACTOR)[keyof typeof ORDER_ACTOR];
+
 async function applyTransition({
   orderId,
   event,
+  actor,
   errorContext,
 }: {
   readonly orderId: string;
   readonly event: OrderEvent;
+  readonly actor: TransitionActor;
   readonly errorContext: string;
 }): Promise<Order> {
   await delay();
@@ -94,7 +100,7 @@ async function applyTransition({
     status: persisted.status as DomainOrder["status"],
   } as DomainOrder;
 
-  const result = transition({ order: domainOrder, event, actor: ORDER_ACTOR.TIENDA });
+  const result = transition({ order: domainOrder, event, actor });
 
   if (!result.ok) {
     logger.error(`${errorContext}: invalid transition`, { orderId, error: result.error });
@@ -107,17 +113,52 @@ async function applyTransition({
 export const ordersService: OrdersService = {
   accept: async (orderId: string): Promise<Order> => {
     const event: OrderEvent = { type: ORDER_EVENT.TIENDA_ACEPTA, occurredAt: new Date() };
-    return applyTransition({ orderId, event, errorContext: "ordersService.accept" });
+    return applyTransition({
+      orderId,
+      event,
+      actor: ORDER_ACTOR.TIENDA,
+      errorContext: "ordersService.accept",
+    });
   },
 
   reject: async (orderId: string): Promise<Order> => {
     const event: OrderEvent = { type: ORDER_EVENT.TIENDA_RECHAZA, occurredAt: new Date() };
-    return applyTransition({ orderId, event, errorContext: "ordersService.reject" });
+    return applyTransition({
+      orderId,
+      event,
+      actor: ORDER_ACTOR.TIENDA,
+      errorContext: "ordersService.reject",
+    });
   },
 
   finalize: async (orderId: string): Promise<Order> => {
     const event: OrderEvent = { type: ORDER_EVENT.TIENDA_FINALIZA, occurredAt: new Date() };
-    return applyTransition({ orderId, event, errorContext: "ordersService.finalize" });
+    return applyTransition({
+      orderId,
+      event,
+      actor: ORDER_ACTOR.TIENDA,
+      errorContext: "ordersService.finalize",
+    });
+  },
+
+  cancel: async (orderId: string): Promise<Order> => {
+    const event: OrderEvent = { type: ORDER_EVENT.CLIENTE_CANCELA, occurredAt: new Date() };
+    return applyTransition({
+      orderId,
+      event,
+      actor: ORDER_ACTOR.CLIENTE,
+      errorContext: "ordersService.cancel",
+    });
+  },
+
+  confirmOnTheWay: async (orderId: string): Promise<Order> => {
+    const event: OrderEvent = { type: ORDER_EVENT.CLIENTE_CONFIRMA_CAMINO, occurredAt: new Date() };
+    return applyTransition({
+      orderId,
+      event,
+      actor: ORDER_ACTOR.CLIENTE,
+      errorContext: "ordersService.confirmOnTheWay",
+    });
   },
 
   findByUser: async ({ clientId, status }: FindByUserInput): Promise<readonly Order[]> => {
@@ -125,15 +166,10 @@ export const ordersService: OrdersService = {
     return orderRepository.findAll({ clientId, status });
   },
 
-  cancel: async (_orderId: string) => {
-    await new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
-    throw new Error("ordersService.cancel: not implemented — replace with real API call");
-  },
-
   send: async ({ storeId, items, notes }: SendOrderInput): Promise<Order> => {
     await delay();
     return orderRepository.create({
-      clientId: "demo-client-1",
+      clientId: DEMO_CLIENT_ID,
       storeId,
       status: ORDER_STATUS.ENVIADO,
       items: [...items],

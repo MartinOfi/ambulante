@@ -13,5 +13,6 @@ export type { OrderActionsProps } from "./components/OrderActions";
 export type { OrdersService, FindByUserInput, SendOrderInput } from "./services/orders.service";
 export { useOrderQuery } from "./hooks/useOrderQuery";
 export { useSendOrderMutation } from "./hooks/useSendOrderMutation";
+export { useConfirmOnTheWayMutation } from "./hooks/useConfirmOnTheWayMutation";
 export { OrderTracking, OrderTrackingContainer } from "./components/OrderTracking";
 export type { OrderTrackingProps } from "./components/OrderTracking";
