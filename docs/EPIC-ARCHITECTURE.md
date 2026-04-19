@@ -1311,7 +1311,7 @@ Wave B (después de F12.3 ✅, via cadena C-F12-order):
 - **Notas:**
 
 ### F12.7 — Profile + preferences
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-19, started: 10:00]
 - **Entregable:** `/profile` con datos, permisos de ubicación, notificaciones.
 - **Depends on:** F2.3
 - **Estimación:** M
