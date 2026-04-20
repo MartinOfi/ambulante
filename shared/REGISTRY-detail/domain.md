@@ -202,6 +202,18 @@ Máquina de estados tipada del pedido (PRD §6). Discriminated union `Order` con
   - `EventBus.publish(event)` · `EventBus.subscribe(type, handler): () => void` · `EventBus.registerSerializationHook(hook): () => void`
 - **Tipo exportado:** `EventBus`
 
+### Client location privacy — `shared/domain/client-location-access.ts`
+
+Implementa el invariante PRD §9.4: la ubicación del cliente **nunca** se expone al actor TIENDA antes de que el pedido esté en estado `ACEPTADO`.
+
+- **API:**
+  - `getClientLocationForStore({ order, requesterRole, location }): LocationAccessResult`
+    - TIENDA: retorna `ok: true` solo en `ACEPTADO`, `EN_CAMINO`, `FINALIZADO`; `{ ok: false, error: { kind: "FORBIDDEN" } }` en todos los demás estados
+    - CLIENTE y SISTEMA: siempre retornan `ok: true` con las coordenadas
+    - Las coordenadas retornadas son una **copia nueva** (inmutabilidad garantizada)
+- **Tipos exportados:** `RequesterRole`, `LocationAccessError`, `LocationAccessResult`, `GetClientLocationInput`
+- **Nota:** usa `Result<T,E>` del state machine — mismo patrón sin excepciones
+
 ### Timeout policies + scheduler — `shared/domain/timeouts.ts`
 
 - **API:**
