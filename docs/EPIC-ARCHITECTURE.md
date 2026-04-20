@@ -1522,7 +1522,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Security audit con 0 críticos. Política de privacidad publicada. Rate limiting activo.
 
 ### F16.1 — Rate limiting
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f16-1, started: 2026-04-20]
 - **Entregable:** Upstash/Vercel KV para rate limit. Reglas por endpoint. PRD §9.5 — evitar pedidos falsos.
 - **Depends on:** —
 - **Estimación:** M
