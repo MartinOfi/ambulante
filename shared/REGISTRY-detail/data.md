@@ -15,11 +15,13 @@ queryKeys.stores.all()
 queryKeys.stores.nearby(coords, radiusMeters)
 queryKeys.stores.byId(id)
 queryKeys.stores.profile(storeId)
+queryKeys.stores.byOwner(userId)     // store-dashboard: resolve store from logged-in owner
 queryKeys.orders.all()
 queryKeys.orders.byUser(userId)
 queryKeys.orders.byStore(storeId)
 queryKeys.orders.byStorePrefix()  // prefix key — para invalidar todos los byStore en onSettled
 queryKeys.orders.byId(id)
+queryKeys.orders.byStore(storeId)    // store-side: fetch incoming orders
 queryKeys.products.all()
 queryKeys.products.byStore(storeId)
 queryKeys.catalog.byStore(storeId)
@@ -99,6 +101,13 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 | `useStoresNearbyQuery` | `features/map/hooks/useStoresNearbyQuery.ts` | `useStoresNearbyQuery({ coords: Coordinates \| null, radius: RadiusValue })` — disabled si `coords === null`; key: `queryKeys.stores.nearby(coords, radius)` |
 | `useStoreByIdQuery` | `features/map/hooks/useStoreByIdQuery.ts` | `useStoreByIdQuery(storeId: string \| null)` — disabled cuando `storeId` es null |
 | `useStoreProductsQuery` | `features/map/hooks/useStoreProductsQuery.ts` | `useStoreProductsQuery(storeId: string \| null)` — key: `queryKeys.products.byStore(storeId)` |
+
+### Hooks feature-local — store-dashboard
+
+| Nombre | Ruta | Descripción |
+|---|---|---|
+| `useCurrentStoreQuery` | `features/store-dashboard/hooks/useCurrentStoreQuery.ts` | Resuelve la tienda del usuario autenticado via `useSession` → `storesService.findByOwnerId`. Key: `queryKeys.stores.byOwner(userId)`. Disabled cuando `userId === null`. |
+| `useStoreOrdersQuery` | `features/orders/hooks/useStoreOrdersQuery.ts` | `useStoreOrdersQuery({ storeId, status? })` — fetches orders for a store. Key: `queryKeys.orders.byStore(storeId)`. Disabled cuando `storeId === null`. |
 
 ### Hooks feature-local — store-profile
 

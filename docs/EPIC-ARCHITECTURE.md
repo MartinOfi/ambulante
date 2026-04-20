@@ -1345,12 +1345,12 @@ Wave B (después de F8.3 ✅):
 **No existe un bottleneck en F13.1.** F13.2–F13.6 dependen de fases anteriores (F3, F4, F5), no de F13.1. La única serialización obligatoria es que F13.7 requiere F8.3 ✅.
 
 ### F13.1 — Dashboard home
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: claude, completed: 2026-04-20]
 - **Entregable:** `/store` con availability toggle, lista de pedidos entrantes, accesos directos.
-- **Archivos:** `app/(store)/page.tsx`, feature.
+- **Archivos:** `app/(store)/store/dashboard/page.tsx`, `features/store-dashboard/`, `features/orders/hooks/useStoreOrdersQuery.ts`
 - **Depends on:** F2.6, F4.1, F5.3
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Container/Presentational pattern. useCurrentStoreQuery resuelve storeId del dueño. Filtro ENVIADO+RECIBIDO. 10/10 tests GREEN.
 
 ### F13.2 — Availability toggle con location publishing
 - **Estado:** ✅ done [owner: chat-f13-2, completed: 2026-04-20]

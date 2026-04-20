@@ -10,7 +10,7 @@ import { logger } from "@/shared/utils/logger";
 import type { OrderStatus } from "@/shared/constants/order";
 import type { Order } from "@/shared/schemas/order";
 
-interface UseStoreOrdersQueryInput {
+export interface UseStoreOrdersQueryInput {
   readonly storeId: string | null;
   readonly status?: OrderStatus;
 }

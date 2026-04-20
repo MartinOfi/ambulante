@@ -106,6 +106,7 @@
 | storeValidationService / MockStoreValidationService | service | `features/store-validation/services/` | features.md §13 |
 | StoreDetailPanel / StoreDetailPanelContainer | feature-component | `features/store-validation/components/StoreDetailPanel/` | features.md §13 |
 | StoreDetailSheet / StoreDetailSheetContainer | feature-component | `features/map/components/StoreDetailSheet/` | features.md §13 |
+| StoreDashboard / StoreDashboardContainer | feature-component | `features/store-dashboard/components/StoreDashboard/` | features.md §13 |
 | StoreProfilePage / StoreProfileForm | feature-component | `features/store-profile/components/` | features.md §13 |
 | StoreShell / StoreShellContainer / StoreNav / AvailabilityToggle | feature-component | `features/store-shell/components/` | features.md §13 |
 | StoreValidationQueue / StoreValidationQueueContainer | feature-component | `features/store-validation/components/StoreValidationQueue/` | features.md §13 |
@@ -140,7 +141,9 @@
 | useDeleteProductMutation | hook | `features/catalog/hooks/useDeleteProductMutation.ts` | features.md §13 |
 | useGeolocation | hook | `shared/hooks/useGeolocation.ts` | data.md §3 |
 | useLocationPublishing | hook | `features/store-shell/hooks/useLocationPublishing.ts` | features.md §13 |
+| useCurrentStoreQuery | hook | `features/store-dashboard/hooks/useCurrentStoreQuery.ts` | data.md §3 |
 | useOrderQuery | hook | `features/orders/hooks/useOrderQuery.ts` | data.md §3 |
+| useStoreOrdersQuery | hook | `features/orders/hooks/useStoreOrdersQuery.ts` | data.md §3 |
 | useOrdersQuery | hook | `features/orders/hooks/useOrdersQuery.ts` | features.md §13 |
 | useRealtimeInvalidation | hook | `shared/query/useRealtimeInvalidation.ts` | data.md §2b |
 | useRealtimeStatus | hook | `shared/hooks/useRealtimeStatus.ts` | data.md §3 |

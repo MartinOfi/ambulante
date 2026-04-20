@@ -1,12 +1,5 @@
-import { getTranslations } from "next-intl/server";
+import { StoreDashboardContainer } from "@/features/store-dashboard";
 
-export default async function StoreDashboardPage() {
-  const t = await getTranslations("Pages.StoreDashboard");
-
-  return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
-      <p className="text-muted-foreground mt-2">{t("comingSoon")}</p>
-    </main>
-  );
+export default function StoreDashboardPage() {
+  return <StoreDashboardContainer />;
 }
