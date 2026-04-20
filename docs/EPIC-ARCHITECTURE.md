@@ -1493,7 +1493,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.4 — Edge caching strategy
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f15-4-chat, started: 2026-04-20]
 - **Entregable:** Rutas estáticas con ISR; APIs con cache headers correctos; Vercel Edge Config para flags.
 - **Depends on:** F8.4
 - **Estimación:** L
