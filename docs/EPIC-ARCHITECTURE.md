@@ -1014,7 +1014,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** `@sentry/nextjs@10.49.0`. DSN opcional (no rompe dev sin él). `logger.registerErrorHook` conecta `logger.error()` → Sentry. `instrumentation.ts` inicializa server-side.
 
 ### F8.2 — Analytics de producto (eventos)
-- **Estado:** 🟢 ready
+- **Estado:** ✅ done [owner: main-chat, completed: 2026-04-20T13:55]
 - **Por qué:** Vercel Analytics (DP-3 excluyó PostHog; Vercel Analytics es zero-config en el plan actual). Eventos del dominio (pedido enviado, aceptado, finalizado...).
 - **Entregable:** `shared/services/analytics.ts` con `track(event, props)`. Eventos tipados con zod. Integrado en transiciones de estado.
 - **Archivos:** `shared/services/analytics.ts`, `shared/constants/analytics-events.ts`.

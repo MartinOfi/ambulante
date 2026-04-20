@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
 import { Toaster } from "@/shared/components/ui/toaster";
 import { NuqsProvider } from "@/shared/providers/NuqsProvider";
 import { QueryProvider } from "@/shared/providers/QueryProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -153,6 +154,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               <ThemeProvider>
                 {children}
                 <Toaster />
+                <Analytics />
               </ThemeProvider>
             </QueryProvider>
           </NuqsProvider>
