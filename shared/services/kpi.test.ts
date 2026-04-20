@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { createKpiService } from "@/shared/services/kpi";
+import { createKpiService, computeDeltaMs } from "@/shared/services/kpi";
 import type { AnalyticsService } from "@/shared/services/analytics";
+import { ANALYTICS_EVENT } from "@/shared/constants/analytics-events";
 
 function makeMockAnalytics(): AnalyticsService & {
   calls: Array<{ event: string; props: unknown }>;
@@ -13,6 +14,25 @@ function makeMockAnalytics(): AnalyticsService & {
     },
   };
 }
+
+describe("computeDeltaMs", () => {
+  it("returns positive ms between two dates", () => {
+    const from = new Date("2026-01-01T10:00:00Z");
+    const to = new Date("2026-01-01T10:01:30Z");
+    expect(computeDeltaMs(from, to)).toBe(90_000);
+  });
+
+  it("returns 0 when dates are equal", () => {
+    const now = new Date("2026-01-01T10:00:00Z");
+    expect(computeDeltaMs(now, now)).toBe(0);
+  });
+
+  it("clamps negative delta to 0", () => {
+    const from = new Date("2026-01-01T10:01:00Z");
+    const to = new Date("2026-01-01T10:00:00Z");
+    expect(computeDeltaMs(from, to)).toBe(0);
+  });
+});
 
 describe("createKpiService", () => {
   let analytics: ReturnType<typeof makeMockAnalytics>;
@@ -27,7 +47,7 @@ describe("createKpiService", () => {
       kpi.trackOrderSent({ storeId: "s1", itemCount: 3 });
 
       expect(analytics.calls).toHaveLength(1);
-      expect(analytics.calls[0]?.event).toBe("ORDER_SENT");
+      expect(analytics.calls[0]?.event).toBe(ANALYTICS_EVENT.ORDER_SENT);
       expect(analytics.calls[0]?.props).toMatchObject({ storeId: "s1", itemCount: 3 });
     });
   });
@@ -64,7 +84,8 @@ describe("createKpiService", () => {
       const kpi = createKpiService(analytics);
       kpi.trackOrderRejected({ storeId: "s2" });
 
-      expect(analytics.calls[0]?.event).toBe("ORDER_REJECTED");
+      expect(analytics.calls[0]?.event).toBe(ANALYTICS_EVENT.ORDER_REJECTED);
+      expect(analytics.calls[0]?.props).toMatchObject({ storeId: "s2" });
     });
   });
 
@@ -73,7 +94,7 @@ describe("createKpiService", () => {
       const kpi = createKpiService(analytics);
       kpi.trackOrderExpired({ storeId: "s3" });
 
-      expect(analytics.calls[0]?.event).toBe("ORDER_EXPIRED");
+      expect(analytics.calls[0]?.event).toBe(ANALYTICS_EVENT.ORDER_EXPIRED);
       expect(analytics.calls[0]?.props).toMatchObject({ storeId: "s3" });
     });
   });
@@ -95,7 +116,7 @@ describe("createKpiService", () => {
       const kpi = createKpiService(analytics);
       kpi.trackStoreAvailabilityChanged({ storeId: "s5", available: true });
 
-      expect(analytics.calls[0]?.event).toBe("STORE_AVAILABILITY_CHANGED");
+      expect(analytics.calls[0]?.event).toBe(ANALYTICS_EVENT.STORE_AVAILABILITY_CHANGED);
       expect(analytics.calls[0]?.props).toMatchObject({ storeId: "s5", available: true });
     });
 

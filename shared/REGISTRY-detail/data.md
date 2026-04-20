@@ -115,6 +115,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Singleton:** `analyticsService` — usa `vercelTransport` en producción, `devTransport` (logger) en desarrollo.
 - **Tipos clave:** `AnalyticsTransport`, `AnalyticsPropertyValue`, `AnalyticsService`
 - **Constantes:** `ANALYTICS_EVENT` as const — eventos tipados; `analyticsEventSchemas` — schemas Zod por evento; `AnalyticsEventMap` — tipo de props por evento.
+- **Eventos registrados:** `ORDER_SENT`, `ORDER_ACCEPTED` (`waitMs`), `ORDER_REJECTED` (`reason?`), `ORDER_ON_THE_WAY`, `ORDER_FINISHED` (`totalMs`), `ORDER_CANCELLED`, `ORDER_EXPIRED`, `STORE_VIEWED`, `STORE_AVAILABILITY_CHANGED` (`available: boolean`), `MAP_OPENED`.
 - **Tests:** `shared/services/analytics.test.ts` (7 casos)
 - **Integración:** `<Analytics />` de `@vercel/analytics/next` inyectado en `app/layout.tsx`.
 
@@ -125,7 +126,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Singleton:** `kpiService`
 - **Helper puro:** `computeDeltaMs(from: Date, to: Date): number`
 - **Input interfaces:** `TrackOrderSentInput`, `TrackOrderAcceptedInput`, `TrackOrderRejectedInput`, `TrackOrderExpiredInput`, `TrackOrderFinalizedInput`, `TrackStoreAvailabilityChangedInput`
-- **Tests:** `shared/services/kpi.test.ts` (9 casos)
+- **Tests:** `shared/services/kpi.test.ts` (12 casos)
 - **Dashboard docs:** `docs/kpi-dashboard.md`
 
 ### `authService` — `shared/services/auth.ts`

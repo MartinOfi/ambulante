@@ -1,6 +1,7 @@
 import { ANALYTICS_EVENT } from "@/shared/constants/analytics-events";
 import type { AnalyticsService } from "@/shared/services/analytics";
 import { analyticsService } from "@/shared/services/analytics";
+import { logger } from "@/shared/utils/logger";
 
 // ── Input interfaces ──────────────────────────────────────────────────────────
 
@@ -49,7 +50,12 @@ export interface KpiService {
 // ── Pure timing helpers ───────────────────────────────────────────────────────
 
 export function computeDeltaMs(from: Date, to: Date): number {
-  return to.getTime() - from.getTime();
+  const delta = to.getTime() - from.getTime();
+  if (delta < 0) {
+    logger.warn("computeDeltaMs: negative delta clamped to 0", { from, to, delta });
+    return 0;
+  }
+  return delta;
 }
 
 // ── Factory ───────────────────────────────────────────────────────────────────

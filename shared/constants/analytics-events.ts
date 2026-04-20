@@ -24,14 +24,14 @@ export const analyticsEventSchemas = {
     itemCount: z.number().int().positive(),
   }),
   [ANALYTICS_EVENT.ORDER_ACCEPTED]: orderBaseSchema.extend({
-    waitMs: z.number().nonnegative().optional(),
+    waitMs: z.number().nonnegative(),
   }),
   [ANALYTICS_EVENT.ORDER_REJECTED]: orderBaseSchema.extend({
     reason: z.string().optional(),
   }),
   [ANALYTICS_EVENT.ORDER_ON_THE_WAY]: orderBaseSchema,
   [ANALYTICS_EVENT.ORDER_FINISHED]: orderBaseSchema.extend({
-    totalMs: z.number().nonnegative().optional(),
+    totalMs: z.number().nonnegative(),
   }),
   [ANALYTICS_EVENT.ORDER_CANCELLED]: orderBaseSchema,
   [ANALYTICS_EVENT.ORDER_EXPIRED]: orderBaseSchema,
