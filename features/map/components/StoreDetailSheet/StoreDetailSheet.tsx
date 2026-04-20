@@ -1,10 +1,12 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import { X, Clock } from "lucide-react";
 import type { StoreDetailSheetProps } from "./StoreDetailSheet.types";
 import type { Product } from "@/shared/schemas/product";
 import { formatPrice } from "@/shared/utils/format";
+import { useFocusTrap } from "@/shared/hooks/useFocusTrap";
 
 function ProductRow({ product }: { readonly product: Product }) {
   return (
@@ -33,8 +35,13 @@ export function StoreDetailSheet({
   isLoadingProducts,
   onDismiss,
 }: StoreDetailSheetProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap({ ref: containerRef, active: true, onEscape: onDismiss });
+
   return (
     <div
+      ref={containerRef}
       className="absolute inset-x-0 bottom-0 z-20 flex flex-col rounded-t-sheet bg-surface-elevated shadow-sheet max-h-[85dvh] overflow-hidden pb-safe"
       role="dialog"
       aria-modal="true"
