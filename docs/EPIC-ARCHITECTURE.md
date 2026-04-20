@@ -1169,13 +1169,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Mapa real con pins dinámicos, pan/zoom fluido en mobile, clustering con densidad alta.
 
 ### F11.1 — Decisión de tile provider
-- **Estado:** 🟡 in-progress [owner: main chat, started: 2026-04-20]
+- **Estado:** ✅ done
 - **Depends on:** DP-5
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Tile provider elegido: **OSM tiles directos vía MapLibre GL JS**. Sin API key externa, sin proveedor comercial (Mapbox, Google Maps). Tile server: `https://tile.openstreetmap.org/{z}/{x}/{y}.png` (uso con User-Agent respetuoso) o estilo vector via `https://demotiles.maplibre.org/style.json` para render vectorial sin raster. Stack: `react-map-gl` v8 (wrapper React para MapLibre) + `maplibre-gl` (motor de render). Razón: open source, sin API key, compatible con OSM, MapLibre es el fork libre de Mapbox GL JS. Implicancias para F11.2: instalar `react-map-gl` y `maplibre-gl`; configurar estilo base en `.env.example` como `NEXT_PUBLIC_MAP_STYLE_URL`. Decidido en DP-5 el 2026-04-16.
 
 ### F11.2 — Instalar react-map-gl + MapLibre
-- **Estado:** ⚪ pending
+- **Estado:** 🟢 ready
 - **Entregable:** Paquetes, estilo base, API keys en env.
 - **Archivos:** `package.json`, `.env.example`.
 - **Depends on:** F11.1, F0.2
