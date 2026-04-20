@@ -10,6 +10,7 @@ import {
 } from "@/shared/domain/order-state-machine";
 import type { AuditLogService } from "@/shared/services/audit-log";
 import { ORDER_STATUS } from "@/shared/constants/order";
+import { logger } from "@/shared/utils/logger";
 
 // ---- Fixtures ----
 
@@ -570,5 +571,22 @@ describe("transitionWithAudit", () => {
     });
     // State machine result is preserved even if audit logging fails
     expect(result.ok).toBe(true);
+  });
+
+  it("logs an error when auditLog.append throws", async () => {
+    const loggerSpy = vi.spyOn(logger, "error");
+    const auditLog: AuditLogService = {
+      append: vi.fn().mockRejectedValue(new Error("DB unavailable")),
+      findByOrderId: vi.fn().mockResolvedValue([]),
+    };
+    await transitionWithAudit({
+      order: baseOrderEnviado,
+      event: makeEvent(ORDER_EVENT.SISTEMA_RECIBE),
+      actor: ORDER_ACTOR.SISTEMA,
+      auditLog,
+    });
+    expect(loggerSpy).toHaveBeenCalledOnce();
+    expect(loggerSpy.mock.calls[0][1]).toMatchObject({ orderId: baseOrderEnviado.id });
+    loggerSpy.mockRestore();
   });
 });

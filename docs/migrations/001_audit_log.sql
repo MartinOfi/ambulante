@@ -6,9 +6,18 @@ create table if not exists order_audit_log (
   id           uuid        primary key default gen_random_uuid(),
   order_id     text        not null,
   actor        text        not null check (actor in ('CLIENTE', 'TIENDA', 'SISTEMA')),
-  event_type   text        not null,
-  from_status  text        not null,
-  to_status    text        not null,
+  event_type   text        not null check (event_type in (
+    'SISTEMA_RECIBE', 'TIENDA_ACEPTA', 'TIENDA_RECHAZA', 'TIENDA_FINALIZA',
+    'TIENDA_CANCELA', 'CLIENTE_CONFIRMA_CAMINO', 'CLIENTE_CANCELA', 'SISTEMA_EXPIRA'
+  )),
+  from_status  text        not null check (from_status in (
+    'ENVIADO', 'RECIBIDO', 'ACEPTADO', 'RECHAZADO',
+    'EN_CAMINO', 'FINALIZADO', 'CANCELADO', 'EXPIRADO'
+  )),
+  to_status    text        not null check (to_status in (
+    'ENVIADO', 'RECIBIDO', 'ACEPTADO', 'RECHAZADO',
+    'EN_CAMINO', 'FINALIZADO', 'CANCELADO', 'EXPIRADO'
+  )),
   occurred_at  timestamptz not null
 );
 

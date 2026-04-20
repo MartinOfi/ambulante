@@ -9,12 +9,6 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-let idCounter = 0;
-function nextId(): string {
-  idCounter += 1;
-  return `audit-mock-${idCounter}`;
-}
-
 const SEED_ENTRIES: AuditLogEntry[] = [
   // order-demo-completed: full happy path
   {
@@ -117,10 +111,12 @@ const SEED_ENTRIES: AuditLogEntry[] = [
 
 export function createMockAuditLogService(): AuditLogService {
   const entries: AuditLogEntry[] = [...SEED_ENTRIES];
+  let idCounter = 0;
 
   async function append(entry: NewAuditLogEntry): Promise<void> {
     await delay(MOCK_DELAY_MS);
-    entries.push({ ...entry, id: nextId() });
+    idCounter += 1;
+    entries.push({ ...entry, id: `audit-mock-${idCounter}` });
   }
 
   async function findByOrderId(orderId: string): Promise<readonly AuditLogEntry[]> {
