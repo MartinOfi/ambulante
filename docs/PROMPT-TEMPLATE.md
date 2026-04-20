@@ -351,7 +351,7 @@ Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
    - Cualquier otro caso → fixealo ahora. Severity baja no es excusa para diferir.
 4. Por cada fix, corré `npx tsc --noEmit` y `npx vitest run` para asegurarte que no rompiste nada.
 5. Si algún fix es complejo, aplicá el PASO 3 (auditoría) antes de escribirlo.
-6. Repetí el code review hasta que no queden issues sin fix ni entrada de deuda técnica que los justifique.
+6. **Segunda pasada obligatoria (gate duro):** una vez aplicados todos los fixes, volvé a ejecutar el agente de code review. Esta segunda pasada es la prueba objetiva — no tu declaración de que terminaste. **No podés avanzar al PASO 9.2 hasta que la segunda pasada devuelva 0 CRITICAL y 0 HIGH sin una entrada de deuda técnica que los justifique.** Si aparecen issues nuevos, fixealos y repetí la pasada. Declarar "listo" sin haber corrido la segunda pasada es una violación de protocolo.
 
 ### 9.2 · Verificación post-fix
 

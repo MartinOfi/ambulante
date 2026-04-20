@@ -30,4 +30,8 @@ export const queryKeys = {
     all: () => ["reports"] as const,
     byStatus: (status: ReportStatus) => ["reports", "by-status", status] as const,
   },
+  users: {
+    all: () => ["users"] as const,
+    byId: (id: string) => ["users", "by-id", id] as const,
+  },
 } as const;

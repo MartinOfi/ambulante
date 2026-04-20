@@ -26,9 +26,11 @@ queryKeys.catalog.byStore(storeId)
 queryKeys.catalog.byId(id)
 queryKeys.reports.all()
 queryKeys.reports.byStatus(status: ReportStatus)
+queryKeys.users.all()
+queryKeys.users.byId(id)
 ```
 
-**Nota:** `products.*` = catálogo read-only (client-facing). `catalog.*` = catálogo CRUD (store owner). Mutaciones de catálogo solo invalidan `catalog.*`. `reports.*` = cola de moderación de contenido admin (F14.3).
+**Nota:** `products.*` = catálogo read-only (client-facing). `catalog.*` = catálogo CRUD (store owner). Mutaciones de catálogo solo invalidan `catalog.*`. `reports.*` = cola de moderación de contenido admin (F14.3). `users.*` = gestión de usuarios (admin-only, F14.5).
 
 ### `shared/query/parseResponse.ts` — parseResponse + ParseError
 
@@ -104,6 +106,14 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 |---|---|---|
 | `useStoreProfileQuery` | `features/store-profile/hooks/useStoreProfileQuery.ts` | `useStoreProfileQuery(storeId: string \| null)` — disabled si storeId vacío; key: `queryKeys.stores.profile(storeId)` |
 | `useUpdateStoreProfileMutation` | `features/store-profile/hooks/useUpdateStoreProfileMutation.ts` | `useUpdateStoreProfileMutation(storeId: string)` — optimistic update pattern; `mutate(input: UpdateStoreProfileInput)` |
+
+### Hooks feature-local — user-management
+
+| Nombre | Ruta | Descripción |
+|---|---|---|
+| `useUsersQuery` | `features/user-management/hooks/useUsersQuery.ts` | `useUsersQuery({ service, role? })` — lista todos los usuarios; key: `queryKeys.users.all()` |
+| `useSuspendUserMutation` | `features/user-management/hooks/useSuspendUserMutation.ts` | `mutate(userId: string)` — suspende usuario y cancela pedidos activos; invalida `users.all()` |
+| `useReinstateUserMutation` | `features/user-management/hooks/useReinstateUserMutation.ts` | `mutate(userId: string)` — reactiva usuario suspendido; invalida `users.all()` |
 
 ---
 

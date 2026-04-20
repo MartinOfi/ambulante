@@ -154,9 +154,18 @@
 | useUpdateProductMutation | hook | `features/catalog/hooks/useUpdateProductMutation.ts` | features.md §13 |
 | useUpdateStoreProfileMutation | hook | `features/store-profile/hooks/useUpdateStoreProfileMutation.ts` | data.md §3 |
 | USER_ROLES | constant | `shared/constants/user.ts` | domain.md §8 |
+| USER_SUSPENSION_STATUS / UserSuspensionStatus | constant | `shared/constants/user-management.ts` | domain.md §8 |
 | User / UserRole / Session | type | `shared/types/user.ts` | domain.md §7 |
 | userRepository | repository | `shared/repositories/user.ts` | data.md §11 |
 | userSchema / sessionSchema | schema | `shared/schemas/user.ts` | domain.md §7b |
+| suspendUserSchema / reinstateUserSchema / SuspendUserInput / ReinstateUserInput | schema | `shared/schemas/user-management.ts` | domain.md §7b |
+| createUserManagementService / UserManagementService | service | `features/user-management/services/userManagement.service.ts` | data.md §4 |
+| useUsersQuery | hook | `features/user-management/hooks/useUsersQuery.ts` | data.md §3 |
+| useSuspendUserMutation | hook | `features/user-management/hooks/useSuspendUserMutation.ts` | data.md §3 |
+| useReinstateUserMutation | hook | `features/user-management/hooks/useReinstateUserMutation.ts` | data.md §3 |
+| UserManagementPage / UserManagementPageContainer | feature-component | `features/user-management/components/UserManagementPage/` | features.md §13 |
+| UserTable | feature-component | `features/user-management/components/UserTable/` | features.md §13 |
+| SuspendConfirmDialog | feature-component | `features/user-management/components/SuspendConfirmDialog/` | features.md §13 |
 
 ---
 

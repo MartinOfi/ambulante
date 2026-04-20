@@ -44,6 +44,7 @@ export const ROUTES = {
     moderation: "/admin/moderation",
     stores: "/admin/stores",
     storeDetail: "/admin/stores/:storeId",
+    users: "/admin/users",
   },
 } as const;
 
