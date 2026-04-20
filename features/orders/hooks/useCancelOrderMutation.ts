@@ -6,7 +6,7 @@ import { ORDER_STATUS } from "@/shared/constants/order";
 import { USER_ROLES } from "@/shared/constants/user";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import type { Order, OrderCancelado } from "@/shared/domain/order-state-machine";
+import type { Order } from "@/shared/schemas/order";
 import { ordersService } from "@/features/orders/services";
 import { authService } from "@/shared/services/auth";
 
@@ -37,15 +37,7 @@ export function useCancelOrderMutation() {
 
       queryClient.setQueryData<Order>(queryKeys.orders.byId(orderId), (old) => {
         if (old === undefined) return old;
-        const cancelled: OrderCancelado = {
-          id: old.id,
-          clientId: old.clientId,
-          storeId: old.storeId,
-          sentAt: old.sentAt,
-          status: ORDER_STATUS.CANCELADO,
-          cancelledAt: new Date(),
-        };
-        return cancelled;
+        return { ...old, status: ORDER_STATUS.CANCELADO };
       });
 
       return { previous };

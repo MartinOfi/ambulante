@@ -8,7 +8,7 @@ import { authService } from "@/shared/services/auth";
 import { ordersService } from "@/features/orders/services/orders.mock";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { queryKeys } from "@/shared/query/keys";
-import type { OrderEnviado, OrderCancelado } from "@/shared/domain/order-state-machine";
+import type { Order } from "@/shared/schemas/order";
 
 vi.mock("@/shared/services/auth", () => ({
   authService: { getSession: vi.fn() },
@@ -31,12 +31,14 @@ function makeWrapper(queryClient: QueryClient) {
   };
 }
 
-const STUB_ORDER_ENVIADO: OrderEnviado = {
+const STUB_ORDER_ENVIADO: Order = {
   id: "order-1",
   clientId: "client-1",
   storeId: "store-1",
-  sentAt: new Date("2026-01-01T00:00:00Z"),
   status: ORDER_STATUS.ENVIADO,
+  items: [{ productId: "p1", productName: "Empanada", productPriceArs: 500, quantity: 1 }],
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
 const STUB_SESSION_CLIENT = {
@@ -89,14 +91,7 @@ describe("useCancelOrderMutation", () => {
 
   it("calls ordersService.cancel with orderId when authenticated as client", async () => {
     mockGetSession.mockResolvedValueOnce(STUB_SESSION_CLIENT);
-    const cancelled: OrderCancelado = {
-      id: STUB_ORDER_ENVIADO.id,
-      clientId: STUB_ORDER_ENVIADO.clientId,
-      storeId: STUB_ORDER_ENVIADO.storeId,
-      sentAt: STUB_ORDER_ENVIADO.sentAt,
-      status: ORDER_STATUS.CANCELADO,
-      cancelledAt: new Date(),
-    };
+    const cancelled: Order = { ...STUB_ORDER_ENVIADO, status: ORDER_STATUS.CANCELADO };
     mockCancel.mockResolvedValueOnce(cancelled);
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
@@ -114,9 +109,9 @@ describe("useCancelOrderMutation", () => {
 
   it("applies optimistic CANCELADO status before the request resolves", async () => {
     mockGetSession.mockResolvedValue(STUB_SESSION_CLIENT);
-    let resolveCancel!: (value: OrderCancelado) => void;
+    let resolveCancel!: (value: Order) => void;
     mockCancel.mockReturnValueOnce(
-      new Promise<OrderCancelado>((res) => {
+      new Promise<Order>((res) => {
         resolveCancel = res;
       }),
     );
@@ -136,14 +131,7 @@ describe("useCancelOrderMutation", () => {
       return cached?.status === ORDER_STATUS.CANCELADO;
     });
 
-    const resolved: OrderCancelado = {
-      id: STUB_ORDER_ENVIADO.id,
-      clientId: STUB_ORDER_ENVIADO.clientId,
-      storeId: STUB_ORDER_ENVIADO.storeId,
-      sentAt: STUB_ORDER_ENVIADO.sentAt,
-      status: ORDER_STATUS.CANCELADO,
-      cancelledAt: new Date(),
-    };
+    const resolved: Order = { ...STUB_ORDER_ENVIADO, status: ORDER_STATUS.CANCELADO };
     await act(async () => {
       resolveCancel(resolved);
     });
