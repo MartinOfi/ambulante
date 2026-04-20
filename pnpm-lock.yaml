@@ -159,6 +159,12 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@8.57.0)
+      eslint-plugin-i18n-text:
+        specifier: ^1.0.1
+        version: 1.0.1(eslint@8.57.0)
+      eslint-plugin-local-rules:
+        specifier: ^3.0.2
+        version: 3.0.2
       fake-indexeddb:
         specifier: ^6.2.5
         version: 6.2.5
@@ -3196,6 +3202,11 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
 
+  eslint-plugin-i18n-text@1.0.1:
+    resolution: {integrity: sha512-3G3UetST6rdqhqW9SfcfzNYMpQXS7wNkJvp6dsXnjzGiku6Iu5hl3B0kmk6lIcFPwYjhQIY+tXVRtK9TlGT7RA==}
+    peerDependencies:
+      eslint: '>=5.0.0'
+
   eslint-plugin-import@2.32.0:
     resolution: {integrity: sha512-whOE1HFo/qJDyX4SnXzP4N6zOWn79WhnCUY/iDR0mPfQZO8wcYE4JClzI2oZrhBnnMUCBCHZhO6VQyoBU95mZA==}
     engines: {node: '>=4'}
@@ -3211,6 +3222,9 @@ packages:
     engines: {node: '>=4.0'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9
+
+  eslint-plugin-local-rules@3.0.2:
+    resolution: {integrity: sha512-IWME7GIYHXogTkFsToLdBCQVJ0U4kbSuVyDT+nKoR4UgtnVrrVeNWuAZkdEu1nxkvi9nsPccGehEEF6dgA28IQ==}
 
   eslint-plugin-react-hooks@5.2.0:
     resolution: {integrity: sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==}
@@ -8352,6 +8366,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  eslint-plugin-i18n-text@1.0.1(eslint@8.57.0):
+    dependencies:
+      eslint: 8.57.0
+
   eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.58.2(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.0):
     dependencies:
       '@rtsao/scc': 1.1.0
@@ -8399,6 +8417,8 @@ snapshots:
       object.fromentries: 2.0.8
       safe-regex-test: 1.1.0
       string.prototype.includes: 2.0.1
+
+  eslint-plugin-local-rules@3.0.2: {}
 
   eslint-plugin-react-hooks@5.2.0(eslint@8.57.0):
     dependencies:

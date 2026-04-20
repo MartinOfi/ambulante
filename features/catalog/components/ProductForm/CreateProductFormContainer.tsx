@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ROUTES } from "@/shared/constants/routes";
 import { useSession } from "@/shared/hooks/useSession";
 import {
@@ -14,6 +15,7 @@ import { useCreateProductMutation } from "@/features/catalog/hooks/useCreateProd
 import { ProductForm } from "./ProductForm";
 
 export function CreateProductFormContainer() {
+  const t = useTranslations("Catalog.CreateForm");
   const router = useRouter();
   const sessionState = useSession();
   const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : "";
@@ -28,7 +30,7 @@ export function CreateProductFormContainer() {
 
   async function handleSubmit(values: CreateProductValues): Promise<void> {
     if (!storeId) {
-      setServerError("Sesión expirada. Volvé a iniciar sesión.");
+      setServerError(t("sessionExpired"));
       return;
     }
     setServerError(null);
@@ -36,7 +38,7 @@ export function CreateProductFormContainer() {
       await createMutation.mutateAsync({ storeId, values });
       router.push(ROUTES.store.catalog);
     } catch {
-      setServerError("No se pudo crear el producto. Intentá de nuevo.");
+      setServerError(t("createError"));
     }
   }
 
@@ -46,7 +48,7 @@ export function CreateProductFormContainer() {
       onSubmit={handleSubmit}
       isLoading={createMutation.isPending}
       serverError={serverError}
-      submitLabel="Crear producto"
+      submitLabel={t("submit")}
     />
   );
 }

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderWithProviders } from "@/shared/test-utils";
 import { StoreOnboardingWizardContainer } from "./StoreOnboardingWizard.container";
 import type { StoreOnboardingService } from "@/features/store-onboarding/types";
 
@@ -43,13 +44,13 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("renders step 1 initially", () => {
-    render(<StoreOnboardingWizardContainer service={validService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={validService} />);
     expect(screen.getByText("Datos fiscales")).toBeInTheDocument();
     expect(screen.getByText(/Paso 1 de 3/i)).toBeInTheDocument();
   });
 
   it("advances to step 2 after valid fiscal submission", async () => {
-    render(<StoreOnboardingWizardContainer service={validService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={validService} />);
     fillAndSubmitFiscal();
     await waitFor(() => {
       expect(screen.getByText("Zona de operación")).toBeInTheDocument();
@@ -57,7 +58,7 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("advances to step 3 after valid zone submission", async () => {
-    render(<StoreOnboardingWizardContainer service={validService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={validService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
     fillAndSubmitZone();
@@ -67,7 +68,7 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("goes back from step 2 to step 1", async () => {
-    render(<StoreOnboardingWizardContainer service={validService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={validService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
     fireEvent.click(screen.getByRole("button", { name: /atrás/i }));
@@ -77,7 +78,7 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("calls service.submit and redirects on final step submission", async () => {
-    render(<StoreOnboardingWizardContainer service={validService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={validService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
     fillAndSubmitZone();
@@ -94,7 +95,7 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("shows server error when service returns failure", async () => {
-    render(<StoreOnboardingWizardContainer service={failingService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={failingService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
     fillAndSubmitZone();
@@ -109,7 +110,7 @@ describe("StoreOnboardingWizardContainer", () => {
   });
 
   it("shows network error and resets isSubmitting when service throws", async () => {
-    render(<StoreOnboardingWizardContainer service={throwingService} />);
+    renderWithProviders(<StoreOnboardingWizardContainer service={throwingService} />);
     fillAndSubmitFiscal();
     await waitFor(() => screen.getByText("Zona de operación"));
     fillAndSubmitZone();

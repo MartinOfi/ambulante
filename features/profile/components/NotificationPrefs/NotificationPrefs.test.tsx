@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithProviders } from "@/shared/test-utils";
 import { NotificationPrefs } from "./NotificationPrefs";
 import { NOTIFICATION_PERMISSION } from "@/features/profile/constants";
 import type { NotificationPrefs as NotificationPrefsType } from "@/features/profile/hooks/useNotificationPrefs";
@@ -12,7 +13,7 @@ const defaultPrefs: NotificationPrefsType = {
 
 describe("NotificationPrefs", () => {
   it("renders all three pref toggles", () => {
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.GRANTED}
@@ -27,7 +28,7 @@ describe("NotificationPrefs", () => {
   });
 
   it("shows 'Activar notificaciones' button when permission is default", () => {
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.DEFAULT}
@@ -40,7 +41,7 @@ describe("NotificationPrefs", () => {
   });
 
   it("does not show activate button when permission is already granted", () => {
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.GRANTED}
@@ -55,7 +56,7 @@ describe("NotificationPrefs", () => {
   });
 
   it("shows disabled toggles and message when permission is denied", () => {
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.DENIED}
@@ -69,7 +70,7 @@ describe("NotificationPrefs", () => {
 
   it("calls onToggle with the correct key when a switch is clicked", () => {
     const onToggle = vi.fn();
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.GRANTED}
@@ -85,7 +86,7 @@ describe("NotificationPrefs", () => {
 
   it("calls onRequestPermission when activate button is clicked", () => {
     const onRequestPermission = vi.fn();
-    render(
+    renderWithProviders(
       <NotificationPrefs
         prefs={defaultPrefs}
         notificationPermission={NOTIFICATION_PERMISSION.DEFAULT}

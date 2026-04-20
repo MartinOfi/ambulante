@@ -1,14 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
 import type { LocationPublishingStatus } from "@/features/store-shell/hooks/useLocationPublishing";
-
-const LOCATION_STATUS_LABEL: Record<LocationPublishingStatus, string> = {
-  idle: "",
-  publishing: "GPS activo",
-  stale: "GPS desactualizado",
-  error: "Error de GPS",
-};
 
 const LOCATION_STATUS_COLOR: Record<LocationPublishingStatus, string> = {
   idle: "",
@@ -28,14 +22,11 @@ export function AvailabilityToggle({
   locationStatus,
   onToggle,
 }: AvailabilityToggleProps) {
+  const t = useTranslations("StoreShell.AvailabilityToggle");
+
   const locationLabel =
-    locationStatus !== undefined && locationStatus !== "idle"
-      ? LOCATION_STATUS_LABEL[locationStatus]
-      : "";
-  const locationColor =
-    locationStatus !== undefined && locationStatus !== "idle"
-      ? LOCATION_STATUS_COLOR[locationStatus]
-      : "";
+    locationStatus && locationStatus !== "idle" ? t(`locationStatus.${locationStatus}`) : "";
+  const locationColor = locationStatus ? LOCATION_STATUS_COLOR[locationStatus] : "";
 
   return (
     <div className="flex flex-col gap-1">
@@ -43,7 +34,7 @@ export function AvailabilityToggle({
         <button
           role="switch"
           aria-checked={isAvailable}
-          aria-label={isAvailable ? "Disponible" : "No disponible"}
+          aria-label={isAvailable ? t("ariaAvailable") : t("ariaUnavailable")}
           onClick={onToggle}
           className={cn(
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
@@ -58,7 +49,7 @@ export function AvailabilityToggle({
           />
         </button>
         <span className="text-sm font-medium" aria-hidden="true">
-          {isAvailable ? "Disponible" : "No disponible"}
+          {isAvailable ? t("available") : t("unavailable")}
         </span>
       </div>
       {locationLabel && (

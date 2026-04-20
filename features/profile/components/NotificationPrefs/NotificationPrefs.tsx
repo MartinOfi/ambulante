@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Stack, Row } from "@/shared/components/layout";
 import { Text } from "@/shared/components/typography";
 import { Button } from "@/shared/components/ui/button";
@@ -16,12 +19,6 @@ interface NotificationPrefsProps {
   onToggle: (key: NotificationPrefKey) => void;
   onRequestPermission: () => void;
 }
-
-const PREF_LABELS: Record<NotificationPrefKey, string> = {
-  [NOTIFICATION_PREF_KEYS.ORDER_UPDATES]: "Actualizaciones de pedidos",
-  [NOTIFICATION_PREF_KEYS.STORE_ARRIVAL]: "Llegada de tienda cercana",
-  [NOTIFICATION_PREF_KEYS.MARKETING]: "Novedades y marketing",
-};
 
 const PREF_KEYS = [
   NOTIFICATION_PREF_KEYS.ORDER_UPDATES,
@@ -70,6 +67,8 @@ export function NotificationPrefs({
   onToggle,
   onRequestPermission,
 }: NotificationPrefsProps) {
+  const t = useTranslations("Profile.NotificationPrefs");
+
   const isDenied = notificationPermission === NOTIFICATION_PERMISSION.DENIED;
   const isDefault = notificationPermission === NOTIFICATION_PERMISSION.DEFAULT;
   const isUnsupported = notificationPermission === NOTIFICATION_PERMISSION.UNSUPPORTED;
@@ -79,30 +78,33 @@ export function NotificationPrefs({
     <Stack gap={3}>
       {isDenied && (
         <Text variant="body-sm" className="text-destructive">
-          Notificaciones denegadas — habilitá los permisos desde la configuración del navegador.
+          {t("deniedMessage")}
         </Text>
       )}
       {isUnsupported && (
         <Text variant="body-sm" className="text-muted-foreground">
-          Las notificaciones no están disponibles en este dispositivo o navegador.
+          {t("unsupportedMessage")}
         </Text>
       )}
       {isDefault && (
         <Row>
           <Button size="sm" variant="outline" onClick={onRequestPermission}>
-            Activar notificaciones
+            {t("enableButton")}
           </Button>
         </Row>
       )}
-      {PREF_KEYS.map((key) => (
-        <PrefToggle
-          key={key}
-          label={PREF_LABELS[key]}
-          checked={prefs[key]}
-          disabled={togglesDisabled}
-          onToggle={() => onToggle(key)}
-        />
-      ))}
+      {PREF_KEYS.map((key) => {
+        const prefKey = `pref${key.charAt(0).toUpperCase()}${key.slice(1)}` as const;
+        return (
+          <PrefToggle
+            key={key}
+            label={t(prefKey)}
+            checked={prefs[key]}
+            disabled={togglesDisabled}
+            onToggle={() => onToggle(key)}
+          />
+        );
+      })}
     </Stack>
   );
 }

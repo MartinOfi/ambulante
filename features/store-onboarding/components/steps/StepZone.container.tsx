@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -24,6 +25,8 @@ interface StepZoneProps {
 }
 
 export function StepZone({ defaultValues, onNext, onBack }: StepZoneProps) {
+  const t = useTranslations("StoreOnboarding.StepZone");
+
   const form = useForm<StepZoneValues>({
     resolver: zodResolver(stepZoneSchema),
     defaultValues: {
@@ -41,9 +44,9 @@ export function StepZone({ defaultValues, onNext, onBack }: StepZoneProps) {
           name="neighborhood"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Barrio donde operás</FormLabel>
+              <FormLabel>{t("neighborhoodLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Palermo, San Telmo…" {...field} />
+                <Input placeholder={t("neighborhoodPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -55,9 +58,9 @@ export function StepZone({ defaultValues, onNext, onBack }: StepZoneProps) {
           name="coverageNotes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notas de cobertura (opcional)</FormLabel>
+              <FormLabel>{t("coverageNotesLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Ej: Plaza Dorrego los domingos" {...field} />
+                <Input placeholder={t("coverageNotesPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,10 +69,10 @@ export function StepZone({ defaultValues, onNext, onBack }: StepZoneProps) {
 
         <div className="flex gap-3">
           <Button type="button" variant="outline" className="flex-1" onClick={onBack}>
-            Atrás
+            {t("back")}
           </Button>
           <Button type="submit" className="flex-1">
-            Siguiente
+            {t("next")}
           </Button>
         </div>
       </form>

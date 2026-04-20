@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { renderWithProviders } from "@/shared/test-utils";
 import { useAvailabilityStore } from "@/features/store-shell/stores/availability.store";
 import { StoreShellContainer } from "./StoreShell.container";
 
@@ -14,7 +15,7 @@ describe("StoreShellContainer", () => {
   });
 
   it("renders children", () => {
-    render(
+    renderWithProviders(
       <StoreShellContainer>
         <div data-testid="content">content</div>
       </StoreShellContainer>,
@@ -23,7 +24,7 @@ describe("StoreShellContainer", () => {
   });
 
   it("highlights the active route in nav", () => {
-    render(
+    renderWithProviders(
       <StoreShellContainer>
         <span />
       </StoreShellContainer>,
@@ -33,7 +34,7 @@ describe("StoreShellContainer", () => {
 
   it("reflects isAvailable=true from store", () => {
     useAvailabilityStore.setState({ isAvailable: true });
-    render(
+    renderWithProviders(
       <StoreShellContainer>
         <span />
       </StoreShellContainer>,
@@ -42,7 +43,7 @@ describe("StoreShellContainer", () => {
   });
 
   it("reflects isAvailable=false from store", () => {
-    render(
+    renderWithProviders(
       <StoreShellContainer>
         <span />
       </StoreShellContainer>,

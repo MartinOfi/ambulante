@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type {
   StoreProfile,
   UpdateStoreProfileInput,
@@ -11,9 +14,11 @@ interface StoreProfilePageProps {
 }
 
 export function StoreProfilePage({ profile, onSave, isSaving }: StoreProfilePageProps) {
+  const t = useTranslations("StoreProfile.Page");
+
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Perfil de la tienda</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
       <StoreProfileForm defaultValues={profile} onSubmit={onSave} isPending={isSaving} />
     </div>
   );

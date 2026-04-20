@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Stack } from "@/shared/components/layout";
 import { Text } from "@/shared/components/typography";
 import { Button } from "@/shared/components/ui/button";
@@ -17,10 +20,12 @@ export function ProfilePage({
   onRequestNotificationPermission,
   onSignOut,
 }: ProfilePageProps) {
+  const t = useTranslations("Profile.Page");
+
   return (
     <Stack gap={6} className="mx-auto max-w-lg p-4">
       <Stack gap={1}>
-        <Text variant="display-lg">{displayName ?? "Invitado"}</Text>
+        <Text variant="display-lg">{displayName ?? t("guest")}</Text>
         <Text variant="body-sm" className="text-muted-foreground">
           {email}
         </Text>
@@ -28,14 +33,14 @@ export function ProfilePage({
 
       <Card className="p-4">
         <Stack gap={3}>
-          <Text variant="heading-sm">Ubicación</Text>
+          <Text variant="heading-sm">{t("locationSection")}</Text>
           <LocationPermission status={locationStatus} onRequest={onRequestLocation} />
         </Stack>
       </Card>
 
       <Card className="p-4">
         <Stack gap={3}>
-          <Text variant="heading-sm">Notificaciones</Text>
+          <Text variant="heading-sm">{t("notificationsSection")}</Text>
           <NotificationPrefs
             prefs={prefs}
             notificationPermission={notificationPermission}
@@ -46,7 +51,7 @@ export function ProfilePage({
       </Card>
 
       <Button variant="outline" onClick={onSignOut} className="w-full">
-        Cerrar sesión
+        {t("signOut")}
       </Button>
     </Stack>
   );

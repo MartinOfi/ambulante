@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderWithProviders } from "@/shared/test-utils";
 import { StepFiscal } from "./StepFiscal.container";
 
 describe("StepFiscal", () => {
   it("renders all fields", () => {
-    render(<StepFiscal onNext={vi.fn()} />);
+    renderWithProviders(<StepFiscal onNext={vi.fn()} />);
     expect(screen.getByLabelText(/nombre del negocio/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/tipo de tienda/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/cuit/i)).toBeInTheDocument();
@@ -12,7 +13,7 @@ describe("StepFiscal", () => {
 
   it("calls onNext with valid values on submit", async () => {
     const onNext = vi.fn();
-    render(<StepFiscal onNext={onNext} />);
+    renderWithProviders(<StepFiscal onNext={onNext} />);
 
     fireEvent.change(screen.getByLabelText(/nombre del negocio/i), {
       target: { value: "El Rincón" },
@@ -32,7 +33,7 @@ describe("StepFiscal", () => {
   });
 
   it("shows validation error for empty businessName", async () => {
-    render(<StepFiscal onNext={vi.fn()} />);
+    renderWithProviders(<StepFiscal onNext={vi.fn()} />);
     fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
 
     await waitFor(() => {
@@ -41,7 +42,7 @@ describe("StepFiscal", () => {
   });
 
   it("shows validation error for invalid CUIT", async () => {
-    render(<StepFiscal onNext={vi.fn()} />);
+    renderWithProviders(<StepFiscal onNext={vi.fn()} />);
     fireEvent.change(screen.getByLabelText(/nombre del negocio/i), {
       target: { value: "Tienda" },
     });
@@ -56,7 +57,7 @@ describe("StepFiscal", () => {
   });
 
   it("pre-fills fields from defaultValues", () => {
-    render(
+    renderWithProviders(
       <StepFiscal
         defaultValues={{ businessName: "Prefilled", cuit: "20000000001", kind: "street-cart" }}
         onNext={vi.fn()}

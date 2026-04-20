@@ -6,8 +6,9 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "local-rules"],
   "rules": {
+    "local-rules/no-hardcoded-jsx-strings": "warn",
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/consistent-type-imports": [
       "error",

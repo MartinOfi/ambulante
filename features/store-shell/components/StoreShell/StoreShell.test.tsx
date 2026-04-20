@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { renderWithProviders } from "@/shared/test-utils";
 import { StoreShell } from "./StoreShell";
 
 const makeProps = () => ({
@@ -13,7 +14,7 @@ const makeProps = () => ({
 
 describe("StoreShell", () => {
   it("renders children", () => {
-    render(
+    renderWithProviders(
       <StoreShell {...makeProps()}>
         <div data-testid="child-content">contenido</div>
       </StoreShell>,
@@ -22,7 +23,7 @@ describe("StoreShell", () => {
   });
 
   it("renders navigation", () => {
-    render(
+    renderWithProviders(
       <StoreShell {...makeProps()}>
         <span />
       </StoreShell>,
@@ -31,7 +32,7 @@ describe("StoreShell", () => {
   });
 
   it("renders availability toggle", () => {
-    render(
+    renderWithProviders(
       <StoreShell {...makeProps()}>
         <span />
       </StoreShell>,
@@ -40,7 +41,7 @@ describe("StoreShell", () => {
   });
 
   it("passes isAvailable=true to toggle", () => {
-    render(
+    renderWithProviders(
       <StoreShell {...makeProps()} isAvailable={true}>
         <span />
       </StoreShell>,
@@ -49,7 +50,7 @@ describe("StoreShell", () => {
   });
 
   it("passes isAvailable=false to toggle", () => {
-    render(
+    renderWithProviders(
       <StoreShell {...makeProps()} isAvailable={false}>
         <span />
       </StoreShell>,
@@ -60,7 +61,7 @@ describe("StoreShell", () => {
   it("calls onToggleAvailability when switch is clicked", async () => {
     const props = makeProps();
     const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <StoreShell {...props}>
         <span />
       </StoreShell>,

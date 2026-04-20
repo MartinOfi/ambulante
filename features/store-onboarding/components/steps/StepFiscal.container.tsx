@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -17,11 +18,7 @@ import {
   type StepFiscalValues,
 } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 
-const STORE_KIND_LABELS: Record<StepFiscalValues["kind"], string> = {
-  "food-truck": "Food truck",
-  "street-cart": "Puesto callejero",
-  "ice-cream": "Heladería ambulante",
-};
+const STORE_KIND_KEYS: StepFiscalValues["kind"][] = ["food-truck", "street-cart", "ice-cream"];
 
 interface StepFiscalProps {
   readonly defaultValues?: Partial<StepFiscalValues>;
@@ -29,6 +26,8 @@ interface StepFiscalProps {
 }
 
 export function StepFiscal({ defaultValues, onNext }: StepFiscalProps) {
+  const t = useTranslations("StoreOnboarding.StepFiscal");
+
   const form = useForm<StepFiscalValues>({
     resolver: zodResolver(stepFiscalSchema),
     defaultValues: {
@@ -47,9 +46,9 @@ export function StepFiscal({ defaultValues, onNext }: StepFiscalProps) {
           name="businessName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del negocio</FormLabel>
+              <FormLabel>{t("businessNameLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="El Rincón del Sabor" {...field} />
+                <Input placeholder={t("businessNamePlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -61,19 +60,17 @@ export function StepFiscal({ defaultValues, onNext }: StepFiscalProps) {
           name="kind"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de tienda</FormLabel>
+              <FormLabel>{t("storeKindLabel")}</FormLabel>
               <FormControl>
                 <select
                   className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   {...field}
                 >
-                  {(Object.entries(STORE_KIND_LABELS) as [StepFiscalValues["kind"], string][]).map(
-                    ([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ),
-                  )}
+                  {STORE_KIND_KEYS.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`storeKinds.${value}`)}
+                    </option>
+                  ))}
                 </select>
               </FormControl>
               <FormMessage />
@@ -86,7 +83,7 @@ export function StepFiscal({ defaultValues, onNext }: StepFiscalProps) {
           name="cuit"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>CUIT (sin guiones)</FormLabel>
+              <FormLabel>{t("cuitLabel")}</FormLabel>
               <FormControl>
                 <Input placeholder="20304050607" maxLength={11} inputMode="numeric" {...field} />
               </FormControl>
@@ -96,7 +93,7 @@ export function StepFiscal({ defaultValues, onNext }: StepFiscalProps) {
         />
 
         <Button type="submit" className="w-full">
-          Siguiente
+          {t("next")}
         </Button>
       </form>
     </Form>

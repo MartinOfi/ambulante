@@ -1,10 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { renderWithProviders } from "@/shared/test-utils";
 import { ClientShell } from "./ClientShell";
 
 describe("ClientShell", () => {
   it("renders children inside main", () => {
-    render(
+    renderWithProviders(
       <ClientShell activePath="/map">
         <p>contenido de prueba</p>
       </ClientShell>,
@@ -14,7 +15,7 @@ describe("ClientShell", () => {
   });
 
   it("renders the bottom nav", () => {
-    render(
+    renderWithProviders(
       <ClientShell activePath="/map">
         <span />
       </ClientShell>,
@@ -23,7 +24,7 @@ describe("ClientShell", () => {
   });
 
   it("renders brand header with app name", () => {
-    render(
+    renderWithProviders(
       <ClientShell activePath="/map">
         <span />
       </ClientShell>,
@@ -33,7 +34,7 @@ describe("ClientShell", () => {
   });
 
   it("passes activePath down to ClientBottomNav", () => {
-    render(
+    renderWithProviders(
       <ClientShell activePath="/orders">
         <span />
       </ClientShell>,

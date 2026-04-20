@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithProviders } from "@/shared/test-utils";
 import { ProfilePage } from "./ProfilePage";
 import { LOCATION_PERMISSION_STATUS, NOTIFICATION_PERMISSION } from "@/features/profile/constants";
 import type { NotificationPrefs } from "@/features/profile/hooks/useNotificationPrefs";
@@ -25,37 +26,37 @@ const defaultProps: ProfilePageProps = {
 
 describe("ProfilePage", () => {
   it("renders the user display name", () => {
-    render(<ProfilePage {...defaultProps} />);
+    renderWithProviders(<ProfilePage {...defaultProps} />);
     expect(screen.getByText("Juan García")).toBeInTheDocument();
   });
 
   it("renders the user email", () => {
-    render(<ProfilePage {...defaultProps} />);
+    renderWithProviders(<ProfilePage {...defaultProps} />);
     expect(screen.getByText("juan@example.com")).toBeInTheDocument();
   });
 
   it("renders the location permissions section", () => {
-    render(<ProfilePage {...defaultProps} />);
+    renderWithProviders(<ProfilePage {...defaultProps} />);
     expect(screen.getByRole("heading", { name: /ubicación/i })).toBeInTheDocument();
   });
 
   it("renders the notifications section", () => {
-    render(<ProfilePage {...defaultProps} />);
+    renderWithProviders(<ProfilePage {...defaultProps} />);
     expect(screen.getByRole("heading", { name: /notificaciones/i })).toBeInTheDocument();
   });
 
   it("renders a sign out button", () => {
-    render(<ProfilePage {...defaultProps} />);
+    renderWithProviders(<ProfilePage {...defaultProps} />);
     expect(screen.getByRole("button", { name: /cerrar sesión/i })).toBeInTheDocument();
   });
 
   it("shows 'Invitado' as fallback when displayName is undefined", () => {
-    render(<ProfilePage {...defaultProps} displayName={undefined} />);
+    renderWithProviders(<ProfilePage {...defaultProps} displayName={undefined} />);
     expect(screen.getByText("Invitado")).toBeInTheDocument();
   });
 
   it("shows unsupported message when notification permission is unsupported", () => {
-    render(
+    renderWithProviders(
       <ProfilePage
         {...defaultProps}
         notificationPermission={NOTIFICATION_PERMISSION.UNSUPPORTED}
