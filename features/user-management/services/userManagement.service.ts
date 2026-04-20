@@ -4,6 +4,7 @@ import type { User, UserRole } from "@/shared/schemas/user";
 import type { UserRepository, UserFilters } from "@/shared/repositories/user";
 import type { OrderRepository } from "@/shared/repositories/order";
 import { TERMINAL_ORDER_STATUSES, ORDER_STATUS } from "@/shared/constants/order";
+import { USER_ROLES } from "@/shared/constants/user";
 import { logger } from "@/shared/utils/logger";
 
 export interface ListUsersInput {
@@ -58,9 +59,9 @@ export function createUserManagementService({
     }
 
     // Cancel active orders: client orders by clientId, store owner orders by storeId
-    if (user.role === "client") {
+    if (user.role === USER_ROLES.client) {
       await cancelActiveOrders(userId, "clientId", orderRepository);
-    } else if (user.role === "store") {
+    } else if (user.role === USER_ROLES.store) {
       await cancelActiveOrders(userId, "storeId", orderRepository);
     }
 

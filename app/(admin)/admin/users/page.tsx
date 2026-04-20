@@ -1,5 +1,7 @@
-import { UserManagementPageContainer } from "@/features/user-management";
-import { createUserManagementService } from "@/features/user-management";
+import {
+  UserManagementPageContainer,
+  createUserManagementService,
+} from "@/features/user-management";
 import { MockUserRepository } from "@/shared/repositories/mock/user.mock";
 import { MockOrderRepository } from "@/shared/repositories/mock/order.mock";
 
