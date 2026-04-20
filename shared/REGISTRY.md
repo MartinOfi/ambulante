@@ -302,6 +302,14 @@
 - **Estados:** `idle | loading | granted | denied | error`
 - **Usado en:** `features/map/components/MapScreen.container`.
 
+### useRealtimeStatus
+
+- **Ruta:** `shared/hooks/useRealtimeStatus.ts`
+- **Descripción:** Retorna el estado de conexión del realtime service y se actualiza en tiempo real via `onStatusChange`. Acepta un `service` opcional (default: singleton `realtimeService`) para facilitar tests. Doble lectura de `status()` — una en el `useState` inicial y otra en el `useEffect` — evita la race condition entre render y subscripción.
+- **API:** `useRealtimeStatus(service?: RealtimeService): RealtimeStatus`
+- **Valores:** `"online" | "connecting" | "offline"`
+- **Usado en:** indicadores de conexión en UI (F5.4+).
+
 ---
 
 ## 4. Services (`shared/services/`)
@@ -322,11 +330,13 @@
 - **Ruta:** `shared/services/realtime.ts`
 - **Tipos:** `shared/services/realtime.types.ts`
 - **Descripción:** Abstracción de transporte realtime. Interfaz `RealtimeService` swapeable (mock in-memory hoy → Supabase Realtime cuando llegue el backend). Se integra con el `eventBus` via `registerSerializationHook`: los domain events publicados al bus fluyen automáticamente al canal `"orders"`. Arranca en estado `"online"`.
-- **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `destroy()`
+- **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `reconnect()`, `destroy()`
+- **Reconnect:** exponential backoff — `RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR^attempt`, capped at `RECONNECT_MAX_DELAY_MS`, stops after `RECONNECT_MAX_ATTEMPTS`. Estados: `offline → connecting → online`. Llamar `reconnect()` cuando se detecte pérdida de conexión.
+- **Test escape hatches:** `_testSetStatus(status)` — fuerza el estado y participa en el loop de reconexión si `reconnecting=true`; `_testSimulateDisconnect()` — emite `"offline"` y arranca el loop.
 - **Factory exportada:** `createMockRealtimeService(options?)` — recibe `eventBus` opcional (para tests con bus aislado)
 - **Canales:** `REALTIME_CHANNELS` as const — `{ orders: "orders", stores: "stores" }`
 - **Tipos clave:** `RealtimeStatus` ("connecting" | "online" | "offline"), `RealtimeMessage<T>`, `RealtimeHandler<T>`, `RealtimeStatusHandler`, `RealtimeChannel`
-- **Usado en:** F5.3 (`useRealtimeInvalidation`), F5.4 (reconnect hook).
+- **Usado en:** F5.3 (`useRealtimeInvalidation`), F5.4 (`useRealtimeStatus`).
 
 ### storesService
 
@@ -601,6 +611,13 @@
 - **Ruta:** `shared/constants/auth.ts`
 - **Descripción:** Constantes de la cookie de sesión: nombre (`ambulante-session`) y max-age en segundos (3600 = 1h).
 - **Usado en:** `shared/utils/session-cookie.ts`, `middleware.ts`, futuros hooks de signIn/signOut.
+
+### RECONNECT_INITIAL_DELAY_MS, RECONNECT_MAX_DELAY_MS, RECONNECT_MAX_ATTEMPTS, RECONNECT_BACKOFF_FACTOR
+
+- **Ruta:** `shared/constants/realtime.ts`
+- **Descripción:** Parámetros del exponential backoff de reconexión del realtime service. `delay = min(INITIAL * FACTOR^attempt, MAX_DELAY)`. Stop tras `MAX_ATTEMPTS` intentos fallidos.
+- **Valores:** `RECONNECT_INITIAL_DELAY_MS` = 1000, `RECONNECT_MAX_DELAY_MS` = 30000, `RECONNECT_MAX_ATTEMPTS` = 6, `RECONNECT_BACKOFF_FACTOR` = 2
+- **Usado en:** `shared/services/realtime.ts`.
 
 ### USER_ROLES
 
