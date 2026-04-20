@@ -955,7 +955,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F7.3 — Tests de dominio (máquina de estados)
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:40]
 - **Por qué:** Es la invariante más crítica del producto.
 - **Entregable:** 100% coverage de `order-state-machine.ts` — todos los estados, todas las transiciones, todos los errores.
 - **Archivos:** `shared/domain/order-state-machine.test.ts`.
