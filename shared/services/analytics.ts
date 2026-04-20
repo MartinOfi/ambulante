@@ -6,10 +6,8 @@ import {
   type AnalyticsEventName,
 } from "@/shared/constants/analytics-events";
 
-export type AnalyticsPropertyValue = string | number | boolean | null | undefined;
-
 export interface AnalyticsTransport {
-  send(name: string, props: Record<string, AnalyticsPropertyValue>): void;
+  send(name: string, props: Record<string, unknown>): void;
 }
 
 export interface AnalyticsService {
@@ -23,9 +21,10 @@ export function createAnalyticsService(transport: AnalyticsTransport): Analytics
       const result = schema.safeParse(props);
       if (!result.success) {
         logger.error("Invalid analytics props", { event, issues: result.error.issues });
-        throw result.error;
+        if (process.env.NODE_ENV === "test") throw result.error;
+        return;
       }
-      transport.send(event, result.data as Record<string, AnalyticsPropertyValue>);
+      transport.send(event, result.data as Record<string, unknown>);
     },
   };
 }
@@ -34,7 +33,7 @@ export function createAnalyticsService(transport: AnalyticsTransport): Analytics
 
 const vercelTransport: AnalyticsTransport = {
   send(name, props) {
-    vercelTrack(name, props);
+    vercelTrack(name, props as Parameters<typeof vercelTrack>[1]);
   },
 };
 

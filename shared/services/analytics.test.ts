@@ -61,7 +61,25 @@ describe("analyticsService", () => {
     expect(transport.calls[0].props.storeId).toBe("s2");
   });
 
-  it("throws on invalid props (Zod validation failure)", () => {
+  it("tracks ORDER_CANCELLED", () => {
+    const svc = createAnalyticsService(transport);
+    svc.track(ANALYTICS_EVENT.ORDER_CANCELLED, { storeId: "s1" });
+    expect(transport.calls[0].name).toBe("ORDER_CANCELLED");
+  });
+
+  it("tracks ORDER_ON_THE_WAY", () => {
+    const svc = createAnalyticsService(transport);
+    svc.track(ANALYTICS_EVENT.ORDER_ON_THE_WAY, { storeId: "s1" });
+    expect(transport.calls[0].name).toBe("ORDER_ON_THE_WAY");
+  });
+
+  it("tracks MAP_OPENED with empty payload", () => {
+    const svc = createAnalyticsService(transport);
+    svc.track(ANALYTICS_EVENT.MAP_OPENED, {});
+    expect(transport.calls[0].name).toBe("MAP_OPENED");
+  });
+
+  it("throws on invalid props and does not call transport", () => {
     const svc = createAnalyticsService(transport);
     expect(() =>
       // @ts-expect-error intentional bad payload
