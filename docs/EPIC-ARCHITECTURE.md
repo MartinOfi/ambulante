@@ -1552,7 +1552,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.5 — Secret rotation process
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f16-5, started: 2026-04-20]
 - **Entregable:** Runbook en `docs/runbooks/secret-rotation.md`.
 - **Depends on:** —
 - **Estimación:** S
