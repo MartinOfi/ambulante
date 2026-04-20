@@ -1183,7 +1183,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** Instalado `react-map-gl@8.1.1` + `maplibre-gl@5.23.0`. Ambos son ESM-only → agregados a `transpilePackages` en `next.config.ts`. `NEXT_PUBLIC_MAP_STYLE_URL` agregado al schema Zod (opcional) y a `.env.example` con demotiles como default. Para F11.3: los componentes que usen `<Map>` deben ser `"use client"` + importados con `dynamic({ ssr: false })` por las APIs de browser de maplibre-gl.
 
 ### F11.3 — Reemplazar MapCanvas placeholder
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
 - **Entregable:** Mismo contrato de props, implementación real con `<Map>` de react-map-gl. Pins con coords reales.
 - **Archivos:** `features/map/components/MapCanvas.tsx`.
 - **Depends on:** F11.2
