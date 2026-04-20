@@ -1559,7 +1559,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.6 — Security audit externo o Snyk/Dependabot
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f16-6-chat, started: 2026-04-20]
 - **Entregable:** Dependabot activado; `pnpm audit` en CI.
 - **Depends on:** F0.7
 - **Estimación:** S
