@@ -1440,7 +1440,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.4 — Order audit log
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f14-4-chat, started: 2026-04-20]
 - **Entregable:** Búsqueda por id de pedido; timeline completo de transiciones con timestamps y actor.
 - **Depends on:** F3.2
 - **Estimación:** M
