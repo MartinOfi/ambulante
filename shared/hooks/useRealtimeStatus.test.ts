@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { RealtimeService, RealtimeStatus } from "@/shared/services/realtime";
+import type { RealtimeStatus, TestableRealtimeService } from "@/shared/services/realtime";
 import { useRealtimeStatus } from "./useRealtimeStatus";
 
-function makeMockService(initialStatus: RealtimeStatus = "online"): RealtimeService {
+function makeMockService(initialStatus: RealtimeStatus = "online"): TestableRealtimeService {
   let current = initialStatus;
-  let listeners: ((s: RealtimeStatus) => void)[] = [];
+  let listeners: ReadonlyArray<(s: RealtimeStatus) => void> = [];
 
   return {
     status: () => current,

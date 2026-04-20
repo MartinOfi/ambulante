@@ -2,3 +2,5 @@ export const RECONNECT_INITIAL_DELAY_MS = 1_000;
 export const RECONNECT_MAX_DELAY_MS = 30_000;
 export const RECONNECT_MAX_ATTEMPTS = 6;
 export const RECONNECT_BACKOFF_FACTOR = 2;
+
+export const ORDER_EVENT_PREFIX = "ORDER_";

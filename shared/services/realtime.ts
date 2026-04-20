@@ -2,6 +2,7 @@ import type { EventBus } from "@/shared/domain/event-bus";
 import { eventBus as defaultEventBus } from "@/shared/domain/event-bus";
 import type { SerializedDomainEvent } from "@/shared/domain/events";
 import {
+  ORDER_EVENT_PREFIX,
   RECONNECT_BACKOFF_FACTOR,
   RECONNECT_INITIAL_DELAY_MS,
   RECONNECT_MAX_ATTEMPTS,
@@ -14,10 +15,11 @@ import type {
   RealtimeService,
   RealtimeStatus,
   RealtimeStatusHandler,
+  TestableRealtimeService,
 } from "./realtime.types";
 
 export type { RealtimeHandler, RealtimeMessage, RealtimeService, RealtimeStatus };
-export type { RealtimeStatusHandler };
+export type { RealtimeStatusHandler, TestableRealtimeService };
 
 // ── Channel constants ──────────────────────────────────────────────────────────
 
@@ -29,8 +31,6 @@ export const REALTIME_CHANNELS = Object.freeze({
 export type RealtimeChannel = (typeof REALTIME_CHANNELS)[keyof typeof REALTIME_CHANNELS];
 
 // ── Channel routing ────────────────────────────────────────────────────────────
-
-const ORDER_EVENT_PREFIX = "ORDER_";
 
 function resolveChannel(eventType: string): RealtimeChannel | null {
   if (eventType.startsWith(ORDER_EVENT_PREFIX)) return REALTIME_CHANNELS.orders;
@@ -45,7 +45,7 @@ interface CreateMockRealtimeServiceOptions {
 
 export function createMockRealtimeService({
   eventBus = defaultEventBus,
-}: CreateMockRealtimeServiceOptions = {}): RealtimeService {
+}: CreateMockRealtimeServiceOptions = {}): TestableRealtimeService {
   const channelHandlers = new Map<string, Set<RealtimeHandler>>();
   let statusListeners: ReadonlyArray<RealtimeStatusHandler> = [];
   let currentStatus: RealtimeStatus = "online";
@@ -135,10 +135,9 @@ export function createMockRealtimeService({
 
   return {
     subscribe<T = unknown>(channel: string, handler: RealtimeHandler<T>): () => void {
-      if (!channelHandlers.has(channel)) {
-        channelHandlers.set(channel, new Set());
-      }
-      const handlers = channelHandlers.get(channel)!;
+      const existing = channelHandlers.get(channel);
+      const handlers = existing ?? new Set<RealtimeHandler>();
+      if (!existing) channelHandlers.set(channel, handlers);
       handlers.add(handler as RealtimeHandler);
       return () => {
         handlers.delete(handler as RealtimeHandler);
@@ -161,7 +160,7 @@ export function createMockRealtimeService({
     },
 
     reconnect(): void {
-      if (currentStatus === "online") return;
+      if (currentStatus === "online" || reconnecting) return;
       clearReconnectTimer();
       reconnecting = true;
       reconnectAttempt = 0;
@@ -184,14 +183,15 @@ export function createMockRealtimeService({
       if (status === "offline" && reconnecting) {
         clearReconnectTimer();
       }
+      if (status === "online") {
+        // Clear and reset before notifying so listener callbacks see clean state.
+        clearReconnectTimer();
+        reconnecting = false;
+        reconnectAttempt = 0;
+      }
       notifyStatusChange(status);
       if (status === "offline" && reconnecting) {
         scheduleNextAttempt();
-      }
-      if (status === "online") {
-        reconnecting = false;
-        reconnectAttempt = 0;
-        clearReconnectTimer();
       }
     },
 

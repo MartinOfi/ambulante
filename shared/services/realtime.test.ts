@@ -3,7 +3,7 @@ import { createEventBus } from "@/shared/domain/event-bus";
 import { ORDER_DOMAIN_EVENT } from "@/shared/domain/events";
 import type { OrderSentDomainEvent } from "@/shared/domain/events";
 import { createMockRealtimeService, REALTIME_CHANNELS } from "./realtime";
-import type { RealtimeMessage, RealtimeService } from "./realtime.types";
+import type { RealtimeMessage, TestableRealtimeService } from "./realtime.types";
 
 // Each test gets a fresh event bus and realtime service to avoid cross-test pollution.
 function makeTestBus() {
@@ -11,7 +11,7 @@ function makeTestBus() {
 }
 
 describe("createMockRealtimeService", () => {
-  let service: RealtimeService;
+  let service: TestableRealtimeService;
 
   beforeEach(() => {
     service = createMockRealtimeService({ eventBus: makeTestBus() });

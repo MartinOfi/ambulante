@@ -5,6 +5,7 @@ import {
   RECONNECT_MAX_ATTEMPTS,
   RECONNECT_MAX_DELAY_MS,
 } from "@/shared/constants/realtime";
+import type { RealtimeStatus } from "@/shared/services/realtime";
 import { createMockRealtimeService } from "./realtime";
 
 describe("createMockRealtimeService — reconnect / backoff", () => {
@@ -18,11 +19,11 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
   it("reconnect() transitions offline → connecting → online", async () => {
     const svc = createMockRealtimeService();
-    const statuses: string[] = [];
+    let statuses: RealtimeStatus[] = [];
     svc.onStatusChange((s) => statuses.push(s));
 
     svc._testSetStatus("offline");
-    statuses.length = 0; // reset after setup
+    statuses = []; // reset after setup
 
     svc.reconnect();
     expect(statuses[0]).toBe("connecting");
@@ -36,37 +37,33 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
   it("backoff delay doubles on each failed attempt", async () => {
     const svc = createMockRealtimeService();
-    // Force all reconnect attempts to fail by keeping status offline
     svc._testSetStatus("offline");
 
-    // Track when reconnect attempts happen by spying on _testSetStatus pattern
-    const delays: number[] = [];
-    let lastCallTime = 0;
+    const connectingTimestamps: number[] = [];
 
-    const original = svc._testSetStatus.bind(svc);
-    vi.spyOn(svc, "_testSetStatus").mockImplementation((status) => {
+    svc.onStatusChange((status) => {
       if (status === "connecting") {
-        const now = Date.now();
-        if (lastCallTime > 0) delays.push(now - lastCallTime);
-        lastCallTime = now;
-      }
-      original(status);
-      // Simulate a failed reconnect: immediately go back offline
-      if (status === "connecting") {
-        // The mock will try to go online after "connecting"; we simulate failure
-        // by not advancing far enough — the service schedules next attempt
+        connectingTimestamps.push(Date.now());
+        svc._testSetStatus("offline");
       }
     });
 
     svc.reconnect();
 
-    // Flush attempt 0 (delay = RECONNECT_INITIAL_DELAY_MS = 1000ms)
-    await vi.advanceTimersByTimeAsync(RECONNECT_INITIAL_DELAY_MS);
-    // Force failure
-    svc._testSetStatus("offline");
+    // attempt 0 fires immediately via performConnectAttempt (timestamp[0])
+    // scheduleNextAttempt(attempt=0) → delay=1000ms → fires at t=1000 (timestamp[1])
+    // scheduleNextAttempt(attempt=1) → delay=2000ms → fires at t=3000 (timestamp[2])
+    await vi.advanceTimersByTimeAsync(RECONNECT_INITIAL_DELAY_MS + 1);
+    await vi.advanceTimersByTimeAsync(RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR + 1);
 
-    // Flush attempt 1 (delay = RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR = 2000ms)
-    await vi.advanceTimersByTimeAsync(RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR);
+    expect(connectingTimestamps.length).toBeGreaterThanOrEqual(3);
+
+    if (connectingTimestamps.length >= 3) {
+      const gap1 = connectingTimestamps[1] - connectingTimestamps[0]; // ~1000ms
+      const gap2 = connectingTimestamps[2] - connectingTimestamps[1]; // ~2000ms
+      expect(gap2).toBeGreaterThanOrEqual(gap1 * (RECONNECT_BACKOFF_FACTOR - 0.1));
+    }
+
     svc.destroy();
   });
 
@@ -100,11 +97,14 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
     expect(connectingTimestamps.length).toBeGreaterThanOrEqual(3);
 
-    const gap1 = connectingTimestamps[1] - connectingTimestamps[0];
-    const gap2 = connectingTimestamps[2] - connectingTimestamps[1];
+    if (connectingTimestamps.length >= 3) {
+      const gap1 = connectingTimestamps[1] - connectingTimestamps[0];
+      const gap2 = connectingTimestamps[2] - connectingTimestamps[1];
 
-    // Each gap should be roughly double the previous (within a small tolerance)
-    expect(gap2).toBeGreaterThanOrEqual(gap1 * (RECONNECT_BACKOFF_FACTOR - 0.1));
+      // Each gap should be roughly double the previous (within a small tolerance)
+      expect(gap2).toBeGreaterThanOrEqual(gap1 * (RECONNECT_BACKOFF_FACTOR - 0.1));
+    }
+
     svc.destroy();
   });
 
@@ -188,11 +188,11 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
   it("status change listeners are notified on each transition", async () => {
     const svc = createMockRealtimeService();
-    const allStatuses: string[] = [];
+    let allStatuses: RealtimeStatus[] = [];
 
     svc.onStatusChange((s) => allStatuses.push(s));
     svc._testSetStatus("offline");
-    allStatuses.length = 0;
+    allStatuses = [];
 
     svc.reconnect();
     await vi.advanceTimersByTimeAsync(RECONNECT_INITIAL_DELAY_MS);
@@ -204,7 +204,7 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
   it("does not start backoff if already online", async () => {
     const svc = createMockRealtimeService(); // starts online
-    const statuses: string[] = [];
+    const statuses: RealtimeStatus[] = [];
     svc.onStatusChange((s) => statuses.push(s));
 
     svc.reconnect();
@@ -217,7 +217,7 @@ describe("createMockRealtimeService — reconnect / backoff", () => {
 
   it("_testSimulateDisconnect() triggers reconnect automatically", async () => {
     const svc = createMockRealtimeService();
-    const statuses: string[] = [];
+    const statuses: RealtimeStatus[] = [];
     svc.onStatusChange((s) => statuses.push(s));
 
     svc._testSimulateDisconnect();

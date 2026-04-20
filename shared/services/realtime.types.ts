@@ -17,10 +17,11 @@ export interface RealtimeService {
   onStatusChange(handler: RealtimeStatusHandler): () => void;
   reconnect(): void;
   destroy(): void;
-  /** @internal — test escape hatch; only available on mock implementation */
+}
+
+/** Extended interface with test-only escape hatches — only available on the mock implementation. */
+export interface TestableRealtimeService extends RealtimeService {
   _testDeliver(channel: string, event: string, payload: unknown): void;
-  /** @internal — test escape hatch; only available on mock implementation */
   _testSetStatus(status: RealtimeStatus): void;
-  /** @internal — test escape hatch; triggers offline + starts reconnect loop */
   _testSimulateDisconnect(): void;
 }

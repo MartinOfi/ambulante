@@ -8,7 +8,10 @@ export function useRealtimeStatus(service: RealtimeService = realtimeService): R
   const [status, setStatus] = useState<RealtimeStatus>(() => service.status());
 
   useEffect(() => {
-    setStatus(service.status());
+    setStatus((prev) => {
+      const current = service.status();
+      return current !== prev ? current : prev;
+    });
     return service.onStatusChange(setStatus);
   }, [service]);
 
