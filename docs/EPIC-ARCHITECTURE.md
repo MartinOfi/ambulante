@@ -1594,7 +1594,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F17.3 — Onboarding doc
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
 - **Entregable:** `docs/ONBOARDING.md` — setup paso a paso, diagrama de arquitectura, glosario.
 - **Depends on:** F0.*
 - **Estimación:** M
