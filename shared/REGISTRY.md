@@ -610,6 +610,14 @@
 - **Tipo `UserRole`:** importar desde `@/shared/schemas/user` o `@/shared/types/user` — no re-exportado desde constants para evitar colisión.
 - **Usado en:** guards de autorización, lógica de transición de estados (§7.3 aislamiento de roles).
 
+### STORE_KIND, STORE_STATUS
+
+- **Ruta:** `shared/constants/store.ts`
+- **Descripción:** Constantes del dominio de tiendas. Objetos frozen `as const` alineados con los enums Zod del schema. Evita magic strings al referenciar tipo/estado de tienda.
+- **API:** `STORE_KIND.foodTruck` (`"food-truck"`), `STORE_KIND.streetCart`, `STORE_KIND.iceCream`; `STORE_STATUS.open`, `STORE_STATUS.closed`, `STORE_STATUS.stale`
+- **Tipos:** `StoreKind`, `StoreStatus` — importar desde `@/shared/schemas/store`.
+- **Usado en:** `shared/test-utils/factories.ts`, guards de visualización de tienda.
+
 ---
 
 ## 9. Config (`shared/config/`)
@@ -886,3 +894,4 @@
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
 | 2026-04-20 | F7.2: agregadas test factories (`createUser`, `createStore`, `createOrderItem`, `createOrder`) en §14 | —     |
+| 2026-04-20 | F7.2 CR: `STORE_KIND`/`STORE_STATUS` en §8; factories refactorizadas a `crypto.randomUUID()` — elimina estado mutable global `_seq` | —     |

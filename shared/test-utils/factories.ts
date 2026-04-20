@@ -1,48 +1,41 @@
 import { ORDER_STATUS } from "@/shared/constants/order";
+import { STORE_KIND, STORE_STATUS } from "@/shared/constants/store";
+import { USER_ROLES } from "@/shared/constants/user";
 import { orderItemSchema, orderSchema, type Order, type OrderItem } from "@/shared/schemas/order";
 import { storeSchema, type Store } from "@/shared/schemas/store";
 import { userSchema, type User } from "@/shared/schemas/user";
 
-let _seq = 0;
-
-const nextSeq = (): number => ++_seq;
-
-const FAKE_UUID_PREFIX = "00000000-0000-0000-0000-";
-const toFakeUuid = (seqNum: number): string =>
-  `${FAKE_UUID_PREFIX}${String(seqNum).padStart(12, "0")}`;
-
 export function createUser(overrides: Partial<User> = {}): User {
-  const seqNum = nextSeq();
+  const id = crypto.randomUUID();
   return userSchema.parse({
-    id: `user-${seqNum}`,
-    email: `user${seqNum}@test.com`,
-    role: "client",
+    id: `user-${id}`,
+    email: `user-${id}@test.com`,
+    role: USER_ROLES.client,
     ...overrides,
   });
 }
 
 export function createStore(overrides: Partial<Store> = {}): Store {
-  const seqNum = nextSeq();
   return storeSchema.parse({
-    id: `store-${seqNum}`,
-    name: `Test Store ${seqNum}`,
-    kind: "food-truck",
+    id: `store-${crypto.randomUUID()}`,
+    name: `Test Store ${crypto.randomUUID().slice(0, 8)}`,
+    kind: STORE_KIND.foodTruck,
     photoUrl: "https://example.com/photo.jpg",
     location: { lat: -34.6037, lng: -58.3816 },
     distanceMeters: 500,
-    status: "open",
+    status: STORE_STATUS.open,
     priceFromArs: 1000,
     tagline: "La mejor comida de la cuadra",
-    ownerId: toFakeUuid(seqNum),
+    ownerId: crypto.randomUUID(),
     ...overrides,
   });
 }
 
 export function createOrderItem(overrides: Partial<OrderItem> = {}): OrderItem {
-  const seqNum = nextSeq();
+  const id = crypto.randomUUID();
   return orderItemSchema.parse({
-    productId: `product-${seqNum}`,
-    productName: `Product ${seqNum}`,
+    productId: `product-${id}`,
+    productName: `Product ${id.slice(0, 8)}`,
     productPriceArs: 500,
     quantity: 1,
     ...overrides,
@@ -50,12 +43,11 @@ export function createOrderItem(overrides: Partial<OrderItem> = {}): OrderItem {
 }
 
 export function createOrder(overrides: Partial<Order> = {}): Order {
-  const seqNum = nextSeq();
   const now = new Date().toISOString();
   return orderSchema.parse({
-    id: `order-${seqNum}`,
-    clientId: `client-${seqNum}`,
-    storeId: `store-${seqNum}`,
+    id: `order-${crypto.randomUUID()}`,
+    clientId: `client-${crypto.randomUUID()}`,
+    storeId: `store-${crypto.randomUUID()}`,
     status: ORDER_STATUS.ENVIADO,
     items: [createOrderItem()],
     createdAt: now,
