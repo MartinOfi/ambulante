@@ -1369,7 +1369,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:** Hooks con optimistic updates (create/update/delete). Container/Presentational. 26/26 tests GREEN.
 
 ### F13.4 — Incoming orders inbox
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f13-4, started: 2026-04-20]
 - **Entregable:** Vista realtime con nuevos pedidos, sort por tiempo, sound/vibration opcional.
 - **Depends on:** F5.3
 - **Estimación:** M
