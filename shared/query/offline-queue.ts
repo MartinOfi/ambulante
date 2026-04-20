@@ -58,7 +58,7 @@ interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
 // ---------------------------------------------------------------------------
 
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return crypto.randomUUID();
 }
 
 function openQueueDb(): Promise<IDBDatabase> {
@@ -110,6 +110,7 @@ export async function enqueueItem(input: CreateQueueItemInput): Promise<string> 
       logger.error("Failed to enqueue offline item", {
         error: (event.target as IDBRequest).error,
       });
+      db.close();
       reject((event.target as IDBRequest).error);
     };
     tx.oncomplete = () => db.close();
@@ -117,6 +118,7 @@ export async function enqueueItem(input: CreateQueueItemInput): Promise<string> 
       logger.error("Offline queue transaction failed", {
         error: (event.target as IDBTransaction).error,
       });
+      db.close();
       reject((event.target as IDBTransaction).error);
     };
   });
@@ -134,10 +136,12 @@ export async function dequeueAll(): Promise<readonly OfflineQueueItem[]> {
     const store = tx.objectStore(OFFLINE_QUEUE_STORE_NAME);
     const getAllRequest = store.getAll();
 
+    let validItems: readonly OfflineQueueItem[] = [];
+
     getAllRequest.onsuccess = (event) => {
       const rawItems = (event.target as IDBRequest<unknown[]>).result;
 
-      const validItems = rawItems.flatMap((raw) => {
+      validItems = rawItems.flatMap((raw) => {
         const parsed = offlineQueueItemSchema.safeParse(raw);
         if (!parsed.success) {
           logger.error("Skipping malformed offline queue item", {
@@ -149,21 +153,26 @@ export async function dequeueAll(): Promise<readonly OfflineQueueItem[]> {
       });
 
       store.clear();
-      resolve(validItems);
+      // Resolve in tx.oncomplete so the clear commits before the caller can enqueue again
     };
 
     getAllRequest.onerror = (event) => {
       logger.error("Failed to read offline queue", {
         error: (event.target as IDBRequest).error,
       });
+      db.close();
       reject((event.target as IDBRequest).error);
     };
 
-    tx.oncomplete = () => db.close();
+    tx.oncomplete = () => {
+      db.close();
+      resolve(validItems);
+    };
     tx.onerror = (event) => {
       logger.error("Offline dequeue transaction failed", {
         error: (event.target as IDBTransaction).error,
       });
+      db.close();
       reject((event.target as IDBTransaction).error);
     };
   });

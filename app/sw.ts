@@ -57,6 +57,37 @@ function openQueueDb(): Promise<IDBDatabase> {
   });
 }
 
+function isValidQueuedOrderItem(raw: unknown): raw is QueuedOrderItem {
+  if (typeof raw !== "object" || raw === null) return false;
+  const r = raw as Record<string, unknown>;
+  return (
+    typeof r.productId === "string" &&
+    typeof r.productName === "string" &&
+    typeof r.productPriceArs === "number" &&
+    typeof r.quantity === "number"
+  );
+}
+
+function isValidQueuedOrder(raw: unknown): raw is QueuedOrder {
+  if (typeof raw !== "object" || raw === null) return false;
+  const r = raw as Record<string, unknown>;
+  if (
+    typeof r.id !== "string" ||
+    r.type !== "SEND_ORDER" ||
+    typeof r.enqueuedAt !== "string" ||
+    typeof r.attempts !== "number"
+  )
+    return false;
+  if (typeof r.payload !== "object" || r.payload === null) return false;
+  const p = r.payload as Record<string, unknown>;
+  return (
+    typeof p.storeId === "string" &&
+    Array.isArray(p.items) &&
+    p.items.length > 0 &&
+    (p.items as unknown[]).every(isValidQueuedOrderItem)
+  );
+}
+
 function dequeueAllFromSw(): Promise<readonly QueuedOrder[]> {
   return new Promise((resolve, reject) => {
     openQueueDb()
@@ -64,17 +95,32 @@ function dequeueAllFromSw(): Promise<readonly QueuedOrder[]> {
         const tx = db.transaction(OFFLINE_QUEUE_STORE_NAME, "readwrite");
         const store = tx.objectStore(OFFLINE_QUEUE_STORE_NAME);
         const getAllRequest = store.getAll();
+        let validItems: readonly QueuedOrder[] = [];
 
         getAllRequest.onsuccess = (event) => {
-          const items = (event.target as IDBRequest<QueuedOrder[]>).result;
+          const rawItems = (event.target as IDBRequest<unknown[]>).result;
+          validItems = rawItems.filter((raw): raw is QueuedOrder => {
+            if (isValidQueuedOrder(raw)) return true;
+            console.error("[SW] Discarding malformed offline queue item", raw);
+            return false;
+          });
           store.clear();
-          resolve(items);
+          // Resolve in tx.oncomplete so the clear commits before caller can enqueue again
         };
 
-        getAllRequest.onerror = (event) => reject((event.target as IDBRequest).error);
+        getAllRequest.onerror = (event) => {
+          db.close();
+          reject((event.target as IDBRequest).error);
+        };
 
-        tx.oncomplete = () => db.close();
-        tx.onerror = (event) => reject((event.target as IDBTransaction).error);
+        tx.oncomplete = () => {
+          db.close();
+          resolve(validItems);
+        };
+        tx.onerror = (event) => {
+          db.close();
+          reject((event.target as IDBTransaction).error);
+        };
       })
       .catch(reject);
   });
@@ -103,7 +149,12 @@ async function processSyncQueue(): Promise<void> {
 
   for (const item of items) {
     if (item.attempts >= OFFLINE_QUEUE_MAX_ATTEMPTS) {
-      // Discard after max attempts — avoid infinite retry loops
+      console.error("[SW] Discarding offline queue item after max attempts", {
+        id: item.id,
+        type: item.type,
+        enqueuedAt: item.enqueuedAt,
+        attempts: item.attempts,
+      });
       continue;
     }
 
@@ -115,10 +166,17 @@ async function processSyncQueue(): Promise<void> {
       });
 
       if (!response.ok) {
+        console.error("[SW] Order sync failed — HTTP error, requeuing", {
+          id: item.id,
+          status: response.status,
+        });
         await requeueItem(item);
       }
-    } catch {
-      // Network failure — put back for next sync opportunity
+    } catch (error) {
+      console.error("[SW] Order sync failed — network error, requeuing", {
+        id: item.id,
+        error,
+      });
       await requeueItem(item);
     }
   }
