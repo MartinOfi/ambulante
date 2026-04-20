@@ -6,6 +6,9 @@ import "./shared/config/env.runtime";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // react-map-gl and maplibre-gl are ESM-only; Next.js needs to transpile them
+  // for webpack bundling, and maplibre-gl requires ssr:false at usage sites (F11.3)
+  transpilePackages: ["react-map-gl", "maplibre-gl"],
   eslint: {
     dirs: ["app", "features", "shared"],
   },
