@@ -21,4 +21,8 @@ export const queryKeys = {
     byStore: (storeId: string) => ["catalog", "by-store", storeId] as const,
     byId: (id: string) => ["catalog", "by-id", id] as const,
   },
+  reports: {
+    all: () => ["reports"] as const,
+    byStatus: (status: string) => ["reports", "by-status", status] as const,
+  },
 } as const;

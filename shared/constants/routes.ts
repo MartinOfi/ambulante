@@ -40,6 +40,7 @@ export const ROUTES = {
   },
   admin: {
     dashboard: "/admin/dashboard",
+    moderation: "/admin/moderation",
   },
 } as const;
 

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, ShieldAlert } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { ROUTES } from "@/shared/constants/routes";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.admin.dashboard, icon: LayoutDashboard },
+  { label: "Moderación", href: ROUTES.admin.moderation, icon: ShieldAlert },
 ] as const;
 
 interface AdminSidebarProps {

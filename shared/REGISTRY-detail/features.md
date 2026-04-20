@@ -85,6 +85,28 @@
 
 ---
 
+### `features/content-moderation/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `useReportsQuery` | `features/content-moderation/hooks/useReportsQuery.ts` | hook | Query de todos los reportes (`queryKeys.reports.all()`) |
+| `useRemoveContentMutation` | `features/content-moderation/hooks/useRemoveContentMutation.ts` | hook | Mutación: elimina contenido de un reporte; invalida `reports.all` |
+| `useDismissReportMutation` | `features/content-moderation/hooks/useDismissReportMutation.ts` | hook | Mutación: desestima un reporte; invalida `reports.all` |
+| `ModerationQueue` | `features/content-moderation/components/ModerationQueue/` | componente | Lista de reportes con cards de acción (dumb + container) |
+| `ReportCard` | `features/content-moderation/components/ReportCard/` | componente | Tarjeta de reporte individual con botones de moderar |
+| `contentModerationService` | `features/content-moderation/services/content-moderation.mock.ts` | service | Mock con 3 reportes semilla y delay 300ms |
+
+#### content-moderation feature (F14.3)
+- **Archivos:** `ReportCard.tsx` (dumb), `ModerationQueue.tsx` (dumb), `ModerationQueue.container.tsx` (smart, `"use client"`)
+- **API dumb ModerationQueue:** `<ModerationQueue reports isLoading removingId dismissingId onRemove onDismiss />`
+- **API smart:** `<ModerationQueueContainer />` — usa `useReportsQuery` + `useRemoveContentMutation` + `useDismissReportMutation`
+- **Constantes:** `REPORT_STATUS` (PENDING/RESOLVED/DISMISSED), `REPORT_REASON` (INAPPROPRIATE/SPAM/MISLEADING/OTHER) en `features/content-moderation/constants.ts`
+- **Schema Zod:** `reportSchema` → `Report` type en `features/content-moderation/schemas/content-moderation.schemas.ts`
+- **Ruta app:** `app/(admin)/admin/moderation/page.tsx` → `ROUTES.admin.moderation`
+- **Nav:** `AdminSidebar` incluye ítem "Moderación" con icono `ShieldAlert`
+
+---
+
 ### `features/catalog/`
 
 | Nombre | Ruta | Tipo | Descripción |
