@@ -921,7 +921,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F6.5 — Background sync
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:45]
 - **Por qué:** Cliente envía pedido offline → se sincroniza cuando hay red.
 - **Entregable:** Service worker con `sync` event; cola de mutations pendientes; integración con React Query mutations.
 - **Archivos:** `app/sw.ts`, `shared/query/offline-queue.ts`.
