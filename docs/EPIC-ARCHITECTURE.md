@@ -1544,12 +1544,12 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.4 — Privacidad de ubicación del cliente
-- **Estado:** 🟡 in-progress [owner: chat-f16-4, started: 2026-04-20]
+- **Estado:** ✅ done [owner: chat-f16-4, completed: 2026-04-20]
 - **Por qué:** PRD §9.4 — ubicación del cliente NUNCA se expone a la tienda antes de `ACEPTADO`. Invariante crítico.
-- **Entregable:** Test automático que intenta leer coords pre-accept desde contexto de tienda y espera `forbidden`.
+- **Entregable:** `shared/domain/client-location-access.ts` — función pura `getClientLocationForStore` con `Result<Coordinates, LocationAccessError>`. 18 tests (RED→GREEN). TIENDA: acceso solo en ACEPTADO/EN_CAMINO/FINALIZADO. CLIENTE y SISTEMA: siempre acceden. Copia inmutable de coords en retorno.
 - **Depends on:** F12.4, F13.4
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Pre-existing TS errors en AvailabilityToggle y StoreNav tests (no relacionados). REGISTRY.md y domain.md actualizados.
 
 ### F16.5 — Secret rotation process
 - **Estado:** ⚪ pending

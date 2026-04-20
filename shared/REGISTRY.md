@@ -54,6 +54,7 @@
 | FM_DURATIONS / FM_EASINGS / TRANSITIONS / FADE_IN_VARIANTS | util | `shared/styles/motion.ts` | infra.md §6 |
 | Form / FormField / FormItem / FormLabel | ui-component | `shared/components/ui/form.tsx` | ui.md §1 |
 | formatDistance / formatPrice | util | `shared/utils/format.ts` | infra.md §5 |
+| getClientLocationForStore / LocationAccessError / LocationAccessResult / RequesterRole | domain | `shared/domain/client-location-access.ts` | domain.md §12 |
 | getRequiredRole | util | `shared/utils/route-access.ts` | infra.md §5 |
 | Icon | ui-component | `shared/components/Icon/` | ui.md §2 |
 | Input | ui-component | `shared/components/ui/input.tsx` | ui.md §1 |
