@@ -4,7 +4,12 @@ import { orderRepository } from "@/shared/repositories";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { logger } from "@/shared/utils/logger";
 import type { Order } from "@/shared/schemas/order";
-import type { OrdersService, FindByUserInput, SendOrderInput } from "./orders.service";
+import type {
+  OrdersService,
+  FindByUserInput,
+  FindByStoreInput,
+  SendOrderInput,
+} from "./orders.service";
 
 const MOCK_NETWORK_DELAY_MS = 300;
 // Temporary stand-in until auth context is wired into the service layer
@@ -164,6 +169,11 @@ export const ordersService: OrdersService = {
   findByUser: async ({ clientId, status }: FindByUserInput): Promise<readonly Order[]> => {
     await delay();
     return orderRepository.findAll({ clientId, status });
+  },
+
+  findByStore: async ({ storeId, status }: FindByStoreInput): Promise<readonly Order[]> => {
+    await delay();
+    return orderRepository.findAll({ storeId, status });
   },
 
   send: async ({ storeId, items, notes }: SendOrderInput): Promise<Order> => {

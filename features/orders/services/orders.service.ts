@@ -6,6 +6,11 @@ export interface FindByUserInput {
   readonly status?: OrderStatus;
 }
 
+export interface FindByStoreInput {
+  readonly storeId: string;
+  readonly status?: OrderStatus;
+}
+
 export interface SendOrderInput {
   readonly storeId: string;
   readonly items: readonly OrderItem[];
@@ -19,6 +24,7 @@ export interface OrdersService {
   readonly reject: (orderId: string) => Promise<Order>;
   readonly finalize: (orderId: string) => Promise<Order>;
   readonly findByUser: (input: FindByUserInput) => Promise<readonly Order[]>;
+  readonly findByStore: (input: FindByStoreInput) => Promise<readonly Order[]>;
   readonly send: (input: SendOrderInput) => Promise<Order>;
   readonly getById: (orderId: string) => Promise<Order | null>;
 }

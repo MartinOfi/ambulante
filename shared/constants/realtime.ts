@@ -1,3 +1,8 @@
+export const REALTIME_CHANNELS = {
+  ORDERS: "orders",
+  STORES: "stores",
+} as const;
+
 export const RECONNECT_INITIAL_DELAY_MS = 1_000;
 export const RECONNECT_MAX_DELAY_MS = 30_000;
 export const RECONNECT_MAX_ATTEMPTS = 6;

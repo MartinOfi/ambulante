@@ -84,7 +84,7 @@
 | queryKeys | query | `shared/query/keys.ts` | data.md §2b |
 | RadialOrbitalTimeline | ui-component | `shared/components/ui/radial-orbital-timeline.tsx` | ui.md §1 |
 | RADIUS_OPTIONS / RadiusValue / DEFAULT_RADIUS | constant | `shared/constants/radius.ts` | domain.md §8 |
-| REALTIME_CHANNELS | constant | `shared/services/realtime.ts` | data.md §4 |
+| REALTIME_CHANNELS | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | RECONNECT_INITIAL_DELAY_MS (y otros) | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |
 | registerBackgroundSync | query | `shared/query/offline-queue.ts` | data.md §2b |
@@ -115,6 +115,9 @@
 | Toaster | ui-component | `shared/components/ui/toaster.tsx` | ui.md §1 |
 | transition / ORDER_EVENT / ORDER_ACTOR | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
 | useAcceptOrderMutation | hook | `features/orders/hooks/useAcceptOrderMutation.ts` | data.md §3 |
+| IncomingOrdersInbox / IncomingOrdersInboxContainer | feature-component | `features/orders/components/IncomingOrdersInbox/` | features.md §13 |
+| useNewOrderAlert | hook | `features/orders/hooks/useNewOrderAlert.ts` | features.md §13 |
+| useStoreOrdersQuery | hook | `features/orders/hooks/useStoreOrdersQuery.ts` | features.md §13 |
 | useAvailability | hook | `features/store-shell/hooks/useAvailability.ts` | features.md §13 |
 | useCartStore | store | `shared/stores/cart.ts` | infra.md §10 |
 | useCatalogQuery | hook | `features/catalog/hooks/useCatalogQuery.ts` | features.md §13 |
