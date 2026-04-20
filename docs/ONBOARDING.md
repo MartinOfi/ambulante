@@ -47,12 +47,15 @@ pnpm dev
 |---|---|---|
 | `NEXT_PUBLIC_APP_URL` | ✅ | URL base de la app |
 | `NEXT_PUBLIC_MAP_STYLE_URL` | ✅ | Estilo de MapLibre (default: demotiles, sin API key) |
-| `NEXT_PUBLIC_SENTRY_DSN` | ❌ | Solo para producción/staging |
+| `NEXT_PUBLIC_SENTRY_DSN` | ❌ | Sentry (browser); solo para producción/staging |
+| `SENTRY_DSN` | ❌ | Sentry (server-side); solo para producción/staging |
 | `SENTRY_AUTH_TOKEN` | ❌ | Solo para CI/CD (upload de source maps) |
 | `UPSTASH_REDIS_REST_URL` | ❌ | Rate limiting distribuido; en dev se usa limiter en memoria |
+| `UPSTASH_REDIS_REST_TOKEN` | ❌ | Token de autenticación para Upstash Redis |
+| `NODE_ENV` | — | Gestionado por Next.js; no configurar manualmente |
 
 Todas las vars son validadas con Zod al iniciar → si falta una requerida, el build falla con mensaje claro.
-Ver esquema: `shared/config/env.ts`.
+Ver esquema: `shared/config/env.schema.ts`.
 
 ---
 
@@ -68,7 +71,7 @@ pnpm typecheck     # TypeScript strict, 0 errores tolerados
 pnpm format        # Prettier (auto-fix)
 pnpm format:check  # Prettier (solo check, no modifica)
 
-pnpm test          # Vitest — unit + component tests
+pnpm test          # Vitest — unit + component tests (no interactivo, ideal para CI)
 pnpm test:watch    # Vitest en modo watch
 pnpm test:coverage # Vitest con cobertura (mínimo 80% en archivos nuevos)
 pnpm test:e2e      # Playwright — E2E tests
@@ -119,6 +122,8 @@ ambulante/
 │   ├── config/               # Config de entorno y caché
 │   ├── stores/               # Zustand stores (cart, ui)
 │   ├── providers/            # QueryProvider, NuqsProvider, FlagsProvider
+│   ├── query/                # React Query client y helpers
+│   ├── test-utils/           # Utilidades de testing (render, mocks, factories)
 │   └── REGISTRY.md           # 🔑 Índice vivo de todo lo disponible en shared/
 │
 ├── docs/                     # Documentación del proyecto
@@ -130,6 +135,9 @@ ambulante/
 ├── e2e/                      # Tests Playwright
 └── public/                   # Assets estáticos
 ```
+
+> **Nota:** `CLAUDE.md §4` usa nombres de feature ilustrativos (p.ej. `order-flow/`). El repo real usa nombres como `orders/`, `store-shell/`, etc. — los listados arriba son los nombres reales.
+> El grupo de rutas `(auth)/` existe en el repo pero no aparece en `CLAUDE.md §4`; es la sección de autenticación (`/login`, `/register`, `/reset-password`).
 
 ### 4.2 Regla de promoción a `shared/`
 
@@ -203,7 +211,8 @@ Administrador ────────► app/(admin)/
 ```
 [ENVIADO] ──► [RECIBIDO] ──► [ACEPTADO] ──► [EN_CAMINO] ──► [FINALIZADO]
                   │               │
-                  ├──► [EXPIRADO] └──► [CANCELADO]
+                  ├──► [RECHAZADO]└──► [CANCELADO]
+                  ├──► [EXPIRADO]
                   └──► [CANCELADO]
 ```
 
@@ -211,11 +220,13 @@ Administrador ────────► app/(admin)/
 |---|---|
 | `ENVIADO` | Cliente |
 | `RECIBIDO` | Sistema |
-| `ACEPTADO` / `RECHAZADO` | Tienda |
+| `ACEPTADO` | Tienda |
+| `RECHAZADO` | Tienda (desde `RECIBIDO`) — terminal |
 | `EN_CAMINO` | Cliente |
-| `FINALIZADO` | Tienda |
-| `CANCELADO` | Cliente o Tienda (según el momento) |
-| `EXPIRADO` | Sistema (timeout 10 min) |
+| `FINALIZADO` | Tienda — terminal |
+| `CANCELADO` (pre-`ACEPTADO`) | Cliente (desde `ENVIADO` o `RECIBIDO`) |
+| `CANCELADO` (post-`ACEPTADO`) | Cliente o Tienda (desde `ACEPTADO` o `EN_CAMINO`) |
+| `EXPIRADO` | Sistema (timeout 10 min desde `RECIBIDO`) — terminal |
 
 La implementación vive en `shared/domain/order-state-machine.ts`.
 
@@ -276,7 +287,7 @@ git push -u origin feat/mi-feature
 ### Gates del PR (bloqueantes)
 
 - [ ] `pnpm typecheck` → 0 errores
-- [ ] `pnpm lint` → 0 errores
+- [ ] `pnpm lint` → 0 errores, 0 warnings
 - [ ] `pnpm test` → todos verdes, coverage ≥80%
 - [ ] Ningún archivo de componente > 200 líneas
 - [ ] Ningún archivo > 300 líneas
