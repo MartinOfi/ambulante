@@ -1153,7 +1153,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** `@axe-core/playwright@4.11.2` instalado como devDependency. Spec audita `/` y `/map` con tags wcag2a/wcag2aa/wcag21aa. Falla si hay violations de impact `critical` o `serious`. `formatViolations` helper produce output legible en el assertion message.
 
 ### F10.4 — Keyboard navigation
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: agente, started: 2026-04-20]
 - **Por qué:** Todos los flujos deben ser navegables sin mouse.
 - **Entregable:** Focus management en bottom sheets, modals, nav. Test E2E.
 - **Archivos:** tests + fixes puntuales.
