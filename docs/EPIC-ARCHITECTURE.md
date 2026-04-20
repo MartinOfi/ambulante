@@ -1471,7 +1471,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Lighthouse mobile >90 en performance. Time-to-interactive <3s en conexión 4G.
 
 ### F15.1 — Bundle analysis
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f15-1-chat, started: 2026-04-20T16:00:00Z]
 - **Entregable:** `@next/bundle-analyzer` en CI, reporte en PRs grandes, umbral por chunk.
 - **Depends on:** F0.7
 - **Estimación:** S
