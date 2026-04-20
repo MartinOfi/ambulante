@@ -44,6 +44,10 @@
 | enqueueItem | query | `shared/query/offline-queue.ts` | data.md §2b |
 | env / parseEnv | config | `shared/config/env.ts` | infra.md §9 |
 | extractErrorMessage | util | `shared/utils/errorMessage.ts` | infra.md §5 |
+| FLAG_KEYS / FlagKey / FLAG_DEFAULTS | constant | `shared/constants/flags.ts` | infra.md §8b |
+| flagsService | service | `shared/services/flags.ts` | infra.md §8b |
+| FlagsProvider / useFlagsContext | provider | `shared/providers/FlagsProvider.tsx` | infra.md §8b |
+| useFlag | hook | `shared/hooks/useFlag.ts` | infra.md §8b |
 | FM_DURATIONS / FM_EASINGS / TRANSITIONS / FADE_IN_VARIANTS | util | `shared/styles/motion.ts` | infra.md §6 |
 | Form / FormField / FormItem / FormLabel | ui-component | `shared/components/ui/form.tsx` | ui.md §1 |
 | formatDistance / formatPrice | util | `shared/utils/format.ts` | infra.md §5 |
