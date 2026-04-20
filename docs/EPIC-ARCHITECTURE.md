@@ -1426,11 +1426,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.2 — Store validation queue
-- **Estado:** 🟡 in-progress [owner: f14-2-chat, started: now]
+- **Estado:** ✅ done [owner: f14-2-chat, completed: 2026-04-20]
 - **Entregable:** `/admin/stores` con filtro `pending`, detalle, approve/reject.
 - **Depends on:** F2.9, F4.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Implementado completo: StoreValidationQueue + StoreDetailPanel (dumb/container), RejectStoreDialog, hooks useApproveStoreMutation/useRejectStoreMutation/useStoreValidationQueueQuery, service mock, schemas Zod, tipos. Rutas app/(admin)/admin/stores/ y /admin/stores/[storeId]/. Mergeado en commit ccca10d.
 
 ### F14.3 — Content moderation
 - **Estado:** ✅ done [owner: f14-3-chat, completed: 2026-04-20]
