@@ -973,13 +973,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F7.5 — Component tests (smart vs dumb)
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-20]
 - **Por qué:** Dumb se testea con props; smart se testea con msw + providers.
 - **Entregable:** Ejemplo de cada tipo: `MapScreen.test.tsx`, `MapScreen.container.test.tsx`.
-- **Archivos:** tests correspondientes.
+- **Archivos:** `features/map/components/MapScreen.test.tsx`, `features/map/components/MapScreen.container.test.tsx`.
 - **Depends on:** F7.1, F7.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Dumb: 11 tests — sub-components mockeados con data-testid stubs, cubre conditional rendering (selectedStoreId, geo.status=denied) y callbacks. Smart: 11 tests — hooks mockeados (useGeolocation, useRadiusParam, useStoresNearbyQuery), MapScreen espiado para capturar props, verifica wiring completo. Sin MSW (no instalado) — container tests usan vi.mock de hooks directamente. 40 tests totales verdes.
 
 ### F7.6 — Coverage en CI con umbral
 - **Estado:** ⚪ pending

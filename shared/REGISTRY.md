@@ -895,3 +895,4 @@
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
 | 2026-04-20 | F7.2: agregadas test factories (`createUser`, `createStore`, `createOrderItem`, `createOrder`) en §14 | —     |
 | 2026-04-20 | F7.2 CR: `STORE_KIND`/`STORE_STATUS` en §8; factories refactorizadas a `crypto.randomUUID()` — elimina estado mutable global `_seq` | —     |
+| 2026-04-20 | F7.5: `MapScreen.test.tsx` + `MapScreen.container.test.tsx` — ejemplo canónico de tests dumb/smart | —     |
