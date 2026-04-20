@@ -49,7 +49,7 @@ Antes de que cualquier fase dependiente se destrabe, estas decisiones deben toma
 - [x] **DP-1 · Backend stack:** ✅ Supabase (Postgres + Auth + Realtime + Storage + PostGIS). Decidido 2026-04-16.
 - [x] **DP-2 · Auth provider:** ✅ Supabase Auth. Decidido 2026-04-16.
 - [x] **DP-3 · Observability stack:** ✅ Sentry (solo, sin PostHog por ahora). Decidido 2026-04-16.
-- [ ] **DP-4 · Feature flags:** GrowthBook self-hosted / LaunchDarkly / Vercel Edge Config. Afecta F8.
+- [x] **DP-4 · Feature flags:** ✅ Vercel Edge Config (flags binarios MVP; migrar a GrowthBook si se necesita % rollout o A/B). Decidido 2026-04-20.
 - [x] **DP-5 · Tile provider del mapa:** ✅ OSM tiles directos vía MapLibre (ya funcionando, sin proveedor externo). Decidido 2026-04-16.
 - [ ] **DP-6 · Payments out-of-scope:** confirmar que nunca habrá pagos (PRD §2.3) — si cambia, replanificar F12.
 - [x] **DP-7 · Multi-país:** ✅ MVP solo Argentina. Decidido 2026-04-16.
@@ -1014,8 +1014,8 @@ Wave 4 (al final — requiere features):
 - **Notas:** `@sentry/nextjs@10.49.0`. DSN opcional (no rompe dev sin él). `logger.registerErrorHook` conecta `logger.error()` → Sentry. `instrumentation.ts` inicializa server-side.
 
 ### F8.2 — Analytics de producto (eventos)
-- **Estado:** 🔴 blocked (DP-3)
-- **Por qué:** PostHog / Vercel Analytics. Eventos del dominio (pedido enviado, aceptado, finalizado...).
+- **Estado:** 🟢 ready
+- **Por qué:** Vercel Analytics (DP-3 excluyó PostHog; Vercel Analytics es zero-config en el plan actual). Eventos del dominio (pedido enviado, aceptado, finalizado...).
 - **Entregable:** `shared/services/analytics.ts` con `track(event, props)`. Eventos tipados con zod. Integrado en transiciones de estado.
 - **Archivos:** `shared/services/analytics.ts`, `shared/constants/analytics-events.ts`.
 - **Depends on:** DP-3, F3.2
@@ -1032,8 +1032,8 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.4 — Feature flags
-- **Estado:** 🔴 blocked (DP-4)
-- **Por qué:** Rollouts graduales, kill switches, A/B tests.
+- **Estado:** 🟢 ready
+- **Por qué:** Vercel Edge Config (DP-4 ✅). Rollouts graduales, kill switches, A/B tests.
 - **Entregable:** `shared/services/flags.ts` + hook `useFlag(key)`. Integración con provider elegido.
 - **Archivos:** `shared/services/flags.ts`, `shared/hooks/useFlag.ts`.
 - **Depends on:** DP-4
