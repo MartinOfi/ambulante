@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/shared/hooks/useSession";
 import { authService as defaultAuthService } from "@/shared/services/auth";
 import type { AuthService } from "@/shared/services/auth.types";
@@ -16,6 +17,7 @@ interface LoginFormContainerProps {
 }
 
 export function LoginFormContainer({ service = defaultAuthService }: LoginFormContainerProps) {
+  const router = useRouter();
   const sessionState = useSession(service);
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -27,10 +29,9 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
 
   useEffect(() => {
     if (sessionState.status === "authenticated") {
-      // Full navigation needed so the middleware reads the newly written cookie
-      window.location.href = getRoleRedirect(sessionState.session.user.role);
+      router.push(getRoleRedirect(sessionState.session.user.role));
     }
-  }, [sessionState]);
+  }, [sessionState, router]);
 
   async function handleSubmit(values: LoginValues): Promise<void> {
     setIsLoading(true);

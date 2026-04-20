@@ -93,7 +93,11 @@ const SEED_PRODUCTS: readonly Product[] = [
 ];
 
 export class MockProductRepository implements ProductRepository {
-  private products: Product[] = [...SEED_PRODUCTS];
+  private products: Product[];
+
+  constructor(initialProducts: readonly Product[] = []) {
+    this.products = [...initialProducts];
+  }
 
   async findAll(filters?: ProductFilters): Promise<readonly Product[]> {
     return applyFilters(this.products, filters);
@@ -130,4 +134,4 @@ export class MockProductRepository implements ProductRepository {
   }
 }
 
-export const productRepository: ProductRepository = new MockProductRepository();
+export const productRepository: ProductRepository = new MockProductRepository(SEED_PRODUCTS);
