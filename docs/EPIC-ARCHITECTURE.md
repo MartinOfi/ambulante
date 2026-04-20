@@ -1580,7 +1580,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Un dev nuevo puede levantar el proyecto y hacer su primer PR en <1 día.
 
 ### F17.1 — Contributing guide
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: now]
 - **Entregable:** `CONTRIBUTING.md` con setup, flow, convenciones.
 - **Depends on:** F0.*
 - **Estimación:** S
