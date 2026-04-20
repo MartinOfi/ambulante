@@ -1544,7 +1544,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.4 — Privacidad de ubicación del cliente
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f16-4, started: 2026-04-20]
 - **Por qué:** PRD §9.4 — ubicación del cliente NUNCA se expone a la tienda antes de `ACEPTADO`. Invariante crítico.
 - **Entregable:** Test automático que intenta leer coords pre-accept desde contexto de tienda y espera `forbidden`.
 - **Depends on:** F12.4, F13.4
