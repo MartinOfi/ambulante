@@ -1493,11 +1493,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Migración ya existía en StoreCard, StoreDetailSheet y StoreDetailPanel. `next.config.ts` tenía `remotePatterns` para `images.unsplash.com` (único dominio usado en mocks). Agregado test de invariante `shared/test-utils/no-raw-img.test.ts` que previene regresiones futuras.
 
 ### F15.4 — Edge caching strategy
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: f15-4-chat, completed: 2026-04-20]
 - **Entregable:** Rutas estáticas con ISR; APIs con cache headers correctos; Vercel Edge Config para flags.
 - **Depends on:** F8.4
 - **Estimación:** L
-- **Notas:**
+- **Notas:** `shared/config/cache-config.ts` centraliza todas las constantes de caché (sin magic strings/numbers). `flagsService` wrappea Edge Config con `unstable_cache` (TTL 60s, tag `"flags"`). `next.config.ts` agrega `headers()` para assets (`immutable`) y APIs (`no-store`). 6 páginas estáticas marcadas `force-static`: landing + 5 auth pages. REGISTRY actualizado (§9b en infra.md). 18 tests pasando (9 cache-config + 9 flags).
 
 ### F15.5 — Database query optimization
 - **Estado:** ✅ done

@@ -10,6 +10,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_MAP_STYLE_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+  EDGE_CONFIG: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

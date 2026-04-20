@@ -4,6 +4,7 @@ import withSerwist from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import "./shared/config/env.runtime";
+import { HTTP_CACHE_CONTROL } from "./shared/config/cache-config";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -19,6 +20,19 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+  },
+  async headers() {
+    return [
+      {
+        // Vercel sets immutable on /_next/static automatically; this applies to self-hosted
+        source: "/_next/static/(.*)",
+        headers: [{ key: "Cache-Control", value: HTTP_CACHE_CONTROL.IMMUTABLE_ASSET }],
+      },
+      {
+        source: "/api/(.*)",
+        headers: [{ key: "Cache-Control", value: HTTP_CACHE_CONTROL.API_NO_STORE }],
+      },
+    ];
   },
 };
 
