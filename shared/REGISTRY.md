@@ -101,9 +101,19 @@
 | Spacer | ui-component | `shared/components/layout/` | ui.md §2 |
 | Stack | ui-component | `shared/components/layout/` | ui.md §2 |
 | STORE_KIND / STORE_STATUS | constant | `shared/constants/store.ts` | domain.md §8 |
+| STORE_VALIDATION_STATUS / REJECTION_REASON_MIN_LENGTH / REJECTION_REASON_MAX_LENGTH | constant | `features/store-validation/constants.ts` | features.md §13 |
+| storeValidationService / MockStoreValidationService | service | `features/store-validation/services/` | features.md §13 |
+| StoreDetailPanel / StoreDetailPanelContainer | feature-component | `features/store-validation/components/StoreDetailPanel/` | features.md §13 |
 | StoreDetailSheet / StoreDetailSheetContainer | feature-component | `features/map/components/StoreDetailSheet/` | features.md §13 |
 | StoreProfilePage / StoreProfileForm | feature-component | `features/store-profile/components/` | features.md §13 |
 | StoreShell / StoreShellContainer / StoreNav / AvailabilityToggle | feature-component | `features/store-shell/components/` | features.md §13 |
+| StoreValidationQueue / StoreValidationQueueContainer | feature-component | `features/store-validation/components/StoreValidationQueue/` | features.md §13 |
+| RejectStoreDialog | feature-component | `features/store-validation/components/RejectStoreDialog/` | features.md §13 |
+| rejectStoreSchema / RejectStoreFormValues | schema | `features/store-validation/schemas/store-validation.schemas.ts` | features.md §13 |
+| PendingStore / ValidationStatus / RejectStoreInput | type | `features/store-validation/types/store-validation.types.ts` | features.md §13 |
+| useApproveStoreMutation | hook | `features/store-validation/hooks/useApproveStoreMutation.ts` | features.md §13 |
+| useRejectStoreMutation | hook | `features/store-validation/hooks/useRejectStoreMutation.ts` | features.md §13 |
+| useStoreValidationQueueQuery | hook | `features/store-validation/hooks/useStoreValidationQueueQuery.ts` | features.md §13 |
 | storeRepository | repository | `shared/repositories/store.ts` | data.md §11 |
 | Store / StoreKind / StoreStatus | type | `shared/types/store.ts` | domain.md §7 |
 | storeSchema | schema | `shared/schemas/store.ts` | domain.md §7b |

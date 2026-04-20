@@ -40,6 +40,8 @@ export const ROUTES = {
   },
   admin: {
     dashboard: "/admin/dashboard",
+    stores: "/admin/stores",
+    storeDetail: "/admin/stores/:storeId",
   },
 } as const;
 

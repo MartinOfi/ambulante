@@ -97,6 +97,46 @@
 
 ---
 
+### `features/store-validation/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `STORE_VALIDATION_STATUS` | `features/store-validation/constants.ts` | constant | Enum-like object: `pending`, `approved`, `rejected` |
+| `REJECTION_REASON_MIN_LENGTH` | `features/store-validation/constants.ts` | constant | Mínimo de caracteres para el motivo de rechazo (10) |
+| `REJECTION_REASON_MAX_LENGTH` | `features/store-validation/constants.ts` | constant | Máximo de caracteres para el motivo de rechazo (500) |
+| `PendingStore` | `features/store-validation/types/store-validation.types.ts` | type | Tienda en cola de validación (extiende `Store` con `validationStatus` y `rejectionReason?`) |
+| `ValidationStatus` | `features/store-validation/types/store-validation.types.ts` | type | Union: `"pending" \| "approved" \| "rejected"` |
+| `RejectStoreInput` | `features/store-validation/types/store-validation.types.ts` | type | `{ storeId: string; reason: string }` |
+| `rejectStoreSchema` | `features/store-validation/schemas/store-validation.schemas.ts` | schema | Zod schema para el formulario de rechazo; valida longitud del motivo |
+| `RejectStoreFormValues` | `features/store-validation/schemas/store-validation.schemas.ts` | type | `z.infer<typeof rejectStoreSchema>` |
+| `storeValidationService` | `features/store-validation/services/store-validation.service.mock.ts` | service | Instancia singleton del mock (`getPendingStores`, `getStoreById`, `approveStore`, `rejectStore`) |
+| `MockStoreValidationService` | `features/store-validation/services/store-validation.service.mock.ts` | class | Clase del mock con 3 tiendas seed y latencia simulada de 300ms |
+| `useStoreValidationQueueQuery` | `features/store-validation/hooks/useStoreValidationQueueQuery.ts` | hook | React Query: lista de tiendas con `validationStatus = "pending"` |
+| `useApproveStoreMutation` | `features/store-validation/hooks/useApproveStoreMutation.ts` | hook | Mutación: aprueba una tienda por `storeId`; devuelve `PendingStore` actualizado |
+| `useRejectStoreMutation` | `features/store-validation/hooks/useRejectStoreMutation.ts` | hook | Mutación: rechaza una tienda con `{ storeId, reason }`; devuelve `PendingStore` actualizado |
+| `StoreValidationQueue` | `features/store-validation/components/StoreValidationQueue/` | componente | Lista de tiendas pendientes (dumb): loading skeleton, empty state, botón por tienda |
+| `StoreValidationQueueContainer` | `features/store-validation/components/StoreValidationQueue/` | componente | Smart wrapper: conecta `useStoreValidationQueueQuery`; prop `onSelectStore` |
+| `StoreDetailPanel` | `features/store-validation/components/StoreDetailPanel/` | componente | Detalle de tienda pendiente (dumb): foto, nombre, tagline, kind, precio, distancia + botones Aprobar/Rechazar |
+| `StoreDetailPanelContainer` | `features/store-validation/components/StoreDetailPanel/` | componente | Smart wrapper: conecta `useApproveStoreMutation` + `useRejectStoreMutation`; gestiona `isRejectDialogOpen`; prop `onActionComplete` |
+| `RejectStoreDialog` | `features/store-validation/components/RejectStoreDialog/` | componente | Modal de rechazo (dumb, `role="dialog"`): textarea con validación Zod, botones Confirmar/Cancelar |
+
+#### store-validation feature completa (F14.2)
+
+- **Rutas app:**
+  - `app/(admin)/admin/stores/page.tsx` — lista de tiendas pendientes; navega a detalle al seleccionar
+  - `app/(admin)/admin/stores/[storeId]/page.tsx` — detalle de tienda; redirige a `/admin/stores` tras acción
+- **Componentes:**
+  - `StoreValidationQueue.tsx` (dumb) — Props: `stores: readonly PendingStore[]`, `isLoading: boolean`, `onSelectStore: (storeId: string) => void`. Renderiza `data-testid="queue-loading"` durante carga, `data-testid="queue-empty"` sin tiendas, y `<button aria-label={store.name}>` por tienda.
+  - `StoreValidationQueue.container.tsx` (smart, `"use client"`) — conecta `useStoreValidationQueueQuery`; prop `onSelectStore`.
+  - `StoreDetailPanel.tsx` (dumb) — Props: `store`, `isApproving`, `isRejecting`, `onApprove`, `onReject`. Botones con `aria-label="Aprobar tienda"` / `"Rechazar tienda"`, deshabilitados cuando `isBusy`.
+  - `StoreDetailPanel.container.tsx` (smart, `"use client"`) — encuentra tienda en la cola por `storeId`; renderiza `data-testid="store-not-found"` si no existe; gestiona `isRejectDialogOpen` con `useState`; llama mutaciones con `onSuccess: onActionComplete`.
+  - `RejectStoreDialog.tsx` (dumb, `"use client"`) — `react-hook-form` + `zodResolver(rejectStoreSchema)`; devuelve `null` cuando `open=false`; `<div role="dialog" aria-modal="true">`; textarea con `id="rejection-reason"`.
+- **Service:** `storeValidationService` en `features/store-validation/services/store-validation.service.mock.ts`; interfaz `StoreValidationService` con 4 métodos (`getPendingStores`, `getStoreById`, `approveStore`, `rejectStore`); 3 tiendas seed; latencia simulada 300ms.
+- **Sidebar:** `features/admin-shell/components/AdminSidebar/AdminSidebar.tsx` incluye nav item "Validación de tiendas" → `ROUTES.admin.stores`.
+- **Tests:** 45 tests en 9 archivos (service 10, hooks 8, components 27).
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:
