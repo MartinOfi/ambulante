@@ -1126,7 +1126,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Toda la copy vive en `messages/*.json`. Axe no reporta violations críticas.
 
 ### F10.1 — next-intl setup
-- **Estado:** 🟢 ready
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 13:30]
 - **Por qué:** Si es solo AR, es opcional; si es multi-país, es urgente.
 - **Entregable:** `next-intl` instalado, `messages/es.json`, locale routing opcional.
 - **Archivos:** `messages/*`, `i18n.ts`.
