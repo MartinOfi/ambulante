@@ -1023,7 +1023,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.3 — KPI instrumentation
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f8-3-chat, started: 2026-04-20T14:00]
 - **Por qué:** El §8 del PRD tiene 6 KPIs — cada uno debe tener su métrica.
 - **Entregable:** Eventos tipados para `order_sent`, `order_accepted`, `order_rejected`, `order_expired`, `order_finalized`, timings entre estados. Dashboard template documentado.
 - **Archivos:** `shared/services/kpi.ts`, `docs/kpi-dashboard.md`.
