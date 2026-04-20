@@ -25,6 +25,7 @@ import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/
 import { useApproveStoreMutation } from "@/features/store-validation/hooks/useApproveStoreMutation";
 import { useRejectStoreMutation } from "@/features/store-validation/hooks/useRejectStoreMutation";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/shared/constants/routes";
 import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
 const mockUseStoreValidationQueueQuery = vi.mocked(useStoreValidationQueueQuery);
@@ -136,6 +137,6 @@ describe("StoreDetailPanelContainer", () => {
     const { onSuccess } = approveMutate.mock.calls[0][1] as { onSuccess: () => void };
     onSuccess();
 
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("/admin/stores"));
+    expect(mockPush).toHaveBeenCalledWith(ROUTES.admin.stores);
   });
 });

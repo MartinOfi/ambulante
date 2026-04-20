@@ -6,7 +6,11 @@ interface PageProps {
   readonly params: Promise<{ readonly storeId: string }>;
 }
 
-const storeIdSchema = z.string().min(1);
+const storeIdSchema = z
+  .string()
+  .regex(/^[\w-]+$/)
+  .min(1)
+  .max(128);
 
 export default async function AdminStoreDetailPage({ params }: PageProps) {
   const { storeId } = await params;
