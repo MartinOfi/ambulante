@@ -1,23 +1,22 @@
 // @ts-check
-import { readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const MAX_CHUNK_SIZE_BYTES = 500_000;
+const DEFAULT_MAX_CHUNK_SIZE_KB = 500;
 const CHUNKS_DIR = ".next/static/chunks";
 
 /**
  * @param {Map<string, number>} sizeByFile
- * @param {number} maxChunkSizeBytes
+ * @param {number} maxChunkSizeKb
  * @returns {string[]}
  */
-export function findThresholdViolations(sizeByFile, maxChunkSizeBytes) {
+export function findThresholdViolations(sizeByFile, maxChunkSizeKb) {
   const violations = [];
-  const thresholdKb = Math.floor(maxChunkSizeBytes / 1024);
 
   for (const [file, bytes] of sizeByFile) {
-    if (bytes > maxChunkSizeBytes) {
-      const actualKb = Math.round(bytes / 1024);
-      violations.push(`${file}: ${actualKb} KB exceeds threshold of ${thresholdKb} KB`);
+    const actualKb = Math.round(bytes / 1024);
+    if (actualKb > maxChunkSizeKb) {
+      violations.push(`${file}: ${actualKb} KB exceeds threshold of ${maxChunkSizeKb} KB`);
     }
   }
 
@@ -26,25 +25,33 @@ export function findThresholdViolations(sizeByFile, maxChunkSizeBytes) {
 
 /**
  * @param {string} dir
+ * @param {Map<string, number>} sizeByFile
  * @returns {Map<string, number>}
  */
-function collectChunkSizes(dir) {
-  const sizeByFile = new Map();
-
+function collectChunkSizes(dir, sizeByFile = new Map()) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isFile() && entry.name.endsWith(".js")) {
-      const fullPath = join(dir, entry.name);
-      const { size } = statSync(fullPath);
-      sizeByFile.set(entry.name, size);
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      collectChunkSizes(fullPath, sizeByFile);
+    } else if (entry.isFile() && entry.name.endsWith(".js")) {
+      sizeByFile.set(fullPath, statSync(fullPath).size);
     }
   }
-
   return sizeByFile;
 }
 
 function main() {
+  if (!existsSync(CHUNKS_DIR)) {
+    process.stderr.write(`Error: '${CHUNKS_DIR}' not found. Run 'pnpm analyze' first.\n`);
+    process.exit(1);
+  }
+
+  const maxChunkSizeKb = process.env.MAX_CHUNK_SIZE_KB
+    ? Number(process.env.MAX_CHUNK_SIZE_KB)
+    : DEFAULT_MAX_CHUNK_SIZE_KB;
+
   const sizeByFile = collectChunkSizes(CHUNKS_DIR);
-  const violations = findThresholdViolations(sizeByFile, MAX_CHUNK_SIZE_BYTES);
+  const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
 
   if (violations.length > 0) {
     process.stderr.write("Bundle size violations found:\n");
@@ -54,9 +61,7 @@ function main() {
     process.exit(1);
   }
 
-  process.stdout.write(
-    `All ${sizeByFile.size} chunks within ${Math.floor(MAX_CHUNK_SIZE_BYTES / 1024)} KB threshold.\n`,
-  );
+  process.stdout.write(`All ${sizeByFile.size} chunks within ${maxChunkSizeKb} KB threshold.\n`);
 }
 
 // Only run when invoked directly, not when imported for testing

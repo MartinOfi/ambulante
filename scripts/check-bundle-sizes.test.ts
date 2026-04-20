@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { findThresholdViolations } from "./check-bundle-sizes.mjs";
 
 describe("findThresholdViolations", () => {
-  const maxChunkSizeBytes = 500_000;
+  const maxChunkSizeKb = 500;
 
   it("returns empty array when all chunks are within threshold", () => {
     const sizeByFile = new Map([
@@ -11,7 +11,7 @@ describe("findThresholdViolations", () => {
       ["vendors-def456.js", 400_000],
     ]);
 
-    const violations = findThresholdViolations(sizeByFile, maxChunkSizeBytes);
+    const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
 
     expect(violations).toEqual([]);
   });
@@ -22,12 +22,12 @@ describe("findThresholdViolations", () => {
       ["heavy-chunk-xyz.js", 600_000],
     ]);
 
-    const violations = findThresholdViolations(sizeByFile, maxChunkSizeBytes);
+    const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
 
     expect(violations).toHaveLength(1);
     expect(violations[0]).toContain("heavy-chunk-xyz.js");
-    expect(violations[0]).toContain("586 KB");
-    expect(violations[0]).toContain("488 KB");
+    expect(violations[0]).toContain("586 KB"); // Math.round(600_000 / 1024)
+    expect(violations[0]).toContain("500 KB"); // threshold displayed as-is
   });
 
   it("returns multiple violations when multiple chunks exceed threshold", () => {
@@ -37,7 +37,7 @@ describe("findThresholdViolations", () => {
       ["chunk-ok.js", 200_000],
     ]);
 
-    const violations = findThresholdViolations(sizeByFile, maxChunkSizeBytes);
+    const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
 
     expect(violations).toHaveLength(2);
   });
@@ -45,19 +45,19 @@ describe("findThresholdViolations", () => {
   it("returns empty array when map is empty", () => {
     const sizeByFile = new Map<string, number>();
 
-    const violations = findThresholdViolations(sizeByFile, maxChunkSizeBytes);
+    const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
 
     expect(violations).toEqual([]);
   });
 
   it("includes exact size and threshold in violation message", () => {
     const sizeByFile = new Map([["big-chunk.js", 1_000_000]]);
-    const threshold = 500_000;
+    const threshold = 500;
 
     const violations = findThresholdViolations(sizeByFile, threshold);
 
     expect(violations[0]).toMatch(/big-chunk\.js/);
-    expect(violations[0]).toMatch(/977 KB/); // 1_000_000 / 1024 ≈ 977 KB
-    expect(violations[0]).toMatch(/488 KB/); // 500_000 / 1024 ≈ 488 KB
+    expect(violations[0]).toMatch(/977 KB/); // Math.round(1_000_000 / 1024)
+    expect(violations[0]).toMatch(/500 KB/); // threshold in KB
   });
 });
