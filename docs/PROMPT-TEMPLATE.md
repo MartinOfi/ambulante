@@ -1,10 +1,10 @@
 # Prompt template para agentes paralelos
 
-> **Cómo usar:** copiá el bloque de abajo, reemplazá `{{TASK_IDS}}` por la(s) tarea(s) del epic que querés ejecutar en ese chat (ej. `F1.3` o `F1.3, F1.10`), y pegalo como primer mensaje en un chat nuevo de Claude Code.
+> **Cómo usar:** copiá el bloque de abajo, reemplazá `{{TASK_IDS}}` con la(s) tarea(s) del epic que querés ejecutar, y pegalo como primer mensaje en un chat nuevo de Claude Code.
 >
-> **Para paralelizar:** abrí varias ventanas y pegá el mismo template con distintos `{{TASK_IDS}}` en cada una. El epic garantiza que tareas del mismo wave no se pisan.
+> **Para paralelizar:** abrí varias ventanas con distintos `{{TASK_IDS}}` en cada una. El epic garantiza que tareas del mismo wave no se pisan.
 >
-> **Referencia de tareas disponibles:** ver `docs/EPIC-ARCHITECTURE.md`.
+> **Referencia de tareas disponibles:** `docs/EPIC-ARCHITECTURE.md`
 
 ---
 
@@ -13,26 +13,23 @@
 | Situación | Qué poner en `{{TASK_IDS}}` |
 |---|---|
 | Una sola tarea | `F0.1` |
-| Cabeza de una cadena (el chat auto-continúa por los eslabones) | `F0.1` — el agente va a leer `Continues with:` y seguir solo por F0.3 y F0.4 |
-| Varias tareas sueltas seriales (cuando no hay cadena definida en el epic) | `F1.3, F1.10` |
-| Un bloque completo de una feature sin cadenas | `F14.1, F14.2, F14.3, F14.4, F14.5` |
+| Cabeza de una cadena | `F0.1` — el agente lee `Continues with:` y sigue solo |
+| Varias tareas sueltas seriales (sin cadena en el epic) | `F1.3, F1.10` |
+| Bloque completo de una feature sin cadenas | `F14.1, F14.2, F14.3` |
 
-**Regla nueva (cadenas de auto-continuación):**
-Si la tarea tiene el campo `Continues with: Fx.y` en el epic, **con pasar el ID de la cabeza alcanza**. El agente va a seguir solo por la cadena completa sin necesidad de que vos listés todos los IDs.
+**Cadenas de auto-continuación:** si la tarea tiene `Continues with: Fx.y` en el epic, pasás solo la cabeza y el agente recorre la cadena completa solo.
 
-**Ejemplo:** para ejecutar F0.1 → F0.3 → F0.4, pasás solo `F0.1`. El agente lee en el epic que F0.1 tiene `Continues with: F0.3`, así que al terminar F0.1 arranca F0.3 sola, y al terminar F0.3 encuentra `Continues with: F0.4` y sigue. Termina cuando F0.4 no tenga `Continues with:`.
-
-**Cadenas definidas hoy** (ver epic para el detalle):
-- `F0.1` → F0.3 → F0.4 (ESLint pipeline)
-- `F1.1` → F1.2 (React Query)
-- `F1.3` → F1.10 (Logger + Sentry stub)
-- `F1.8` → F1.9 (Design tokens + primitives)
-- `F2.1` → F2.2 → F2.3 → F2.4 (Auth core)
-- `F2.8` → F2.9 (Login + onboarding)
-- `F3.2` → F3.5 → F3.6 (State machine + events + timeouts)
-- `F4.1` → F4.2 (Query + mutation patterns)
-- `F5.1` → F5.2 (Realtime decisión + abstraction)
-- `F12.3` → F12.4 (Submit order + tracking)
+**Cadenas definidas** (ver epic para el detalle actualizado):
+- `F0.1` → F0.3 → F0.4
+- `F1.1` → F1.2
+- `F1.3` → F1.10
+- `F1.8` → F1.9
+- `F2.1` → F2.2 → F2.3 → F2.4
+- `F2.8` → F2.9
+- `F3.2` → F3.5 → F3.6
+- `F4.1` → F4.2
+- `F5.1` → F5.2
+- `F12.3` → F12.4
 
 ---
 
@@ -40,658 +37,278 @@ Si la tarea tiene el campo `Continues with: Fx.y` en el epic, **con pasar el ID 
 
 ```
 # Rol
-Sos un agente senior ejecutando tareas del proyecto **Ambulante** (PWA de tiendas
-ambulantes con Next.js 15, TypeScript strict, Tailwind v4). Trabajás en paralelo
-con otros chats que están tomando tareas distintas. Tu responsabilidad es entregar
-código correcto, testeado y auditado contra las reglas del proyecto — no velocidad
-a costa de calidad.
+Sos un agente senior ejecutando tareas del proyecto Ambulante (PWA de tiendas ambulantes
+con Next.js 15, TypeScript strict, Tailwind v4). Trabajás en paralelo con otros chats.
+Tu responsabilidad es entregar código correcto, testeado y auditado — no velocidad a
+costa de calidad.
 
 # Tarea asignada
-- **Task IDs a ejecutar:** {{TASK_IDS}}
+Task IDs a ejecutar: {{TASK_IDS}}
 
-# PASO 0 · Setup del worktree (OBLIGATORIO — antes de leer nada)
+---
+## PASO 0 · Setup del worktree (OBLIGATORIO — antes de cualquier otra acción)
 
-**🚨 CREÁ EL WORKTREE. AHORA. SIN EXCUSAS.**
+AUTO-CHECK — ejecutá esto PRIMERO:
 
-## ⛔ AUTO-CHECK — ejecutá esto PRIMERO, antes de cualquier otra cosa
+  git branch --show-current
 
-```
-git branch --show-current
-```
+- feat/... → ya estás en tu worktree. Saltá a "Lectura obligatoria".
+- main     → estás en el principal. NO podés hacer nada todavía. Seguí los pasos abajo.
+- Otro     → STOP. Reportá al usuario antes de continuar.
 
-- Resultado `feat/...` → ya estás en tu worktree. Saltá directo a "Lectura obligatoria".
-- Resultado `main` → **estás en el principal. NO podés leer, escribir ni commitear nada todavía.**
-  Continuá con los pasos de abajo para crear el worktree y moverte a él.
-- Cualquier otro resultado → STOP. Reportá al usuario antes de continuar.
+Regla absoluta: TODO el trabajo ocurre DESDE el worktree. Si branch --show-current da
+main mientras trabajás → pararse.
 
-**Regla absoluta:** TODO el trabajo (Read, Write, Edit, Bash, commits) ocurre DESDE el worktree.
-Si `git branch --show-current` da `main` mientras estás trabajando → estás haciendo algo mal. Pararse.
+Crear el worktree:
 
-## Crear tu worktree
+  1. Verificá el principal limpio:
+       git branch --show-current    # debe ser "main"
+       git status --short           # debe estar vacío
+     Si no → STOP, reportá.
 
-1. Verificá que el principal esté en `main` con working tree limpio:
-   ```
-   git branch --show-current      # debe ser "main"
-   git status --short             # debe estar vacío
-   ```
-   Si no, **parate y reportá**.
+  2. Elegí nombre y branch con tu Task ID:
+       Worktree dir: ../ambulante-<task-id-con-guiones>
+       Branch:       feat/<task-id-con-guiones>-<slug-corto>
 
-2. Elegí el nombre del worktree y la branch usando tu Task ID:
-   - Worktree dir: `../ambulante-<task-id-en-minúsculas-con-guiones>`
-   - Branch: `feat/<task-id-en-minúsculas-con-guiones>-<slug-corto>`
+  3. Creá: git worktree add ../ambulante-<task-id> -b feat/<task-id>-<slug>
 
-   Ejemplos:
-   | Task ID | Worktree dir              | Branch                       |
-   |---------|---------------------------|------------------------------|
-   | F0.1    | `../ambulante-f0-1`       | `feat/f0-1-pnpm-migration`   |
-   | F0.2    | `../ambulante-f0-2`       | `feat/f0-2-env-vars-zod`     |
-   | F1.3    | `../ambulante-f1-3`       | `feat/f1-3-logger`           |
-   | F2.1    | `../ambulante-f2-1`       | `feat/f2-1-auth-provider`    |
+  4. Movete: cd ../ambulante-<task-id>
 
-3. Creá el worktree con branch nueva:
-   ```
-   git worktree add ../ambulante-<task-id> -b feat/<task-id>-<slug>
-   ```
+  5. Verificá aislamiento (los 4 deben dar lo esperado):
+       pwd                        # tu worktree dir
+       git branch --show-current  # tu branch nueva
+       git status --short         # vacío
+       git worktree list          # principal + tuyo (mínimo 2)
 
-4. Movete al worktree:
-   ```
-   cd ../ambulante-<task-id>
-   ```
+  6. Instalá dependencias (node_modules/ no se comparte):
+       pnpm-lock.yaml existe → pnpm install
+       package-lock.json existe → npm install
+       Si tu task ES la migración F0.1 → seguí su plan.
 
-5. Verificá aislamiento — los 4 comandos deben dar lo esperado:
-   ```
-   pwd                          # tu worktree dir
-   git branch --show-current    # tu branch nueva
-   git status --short           # vacío
-   git worktree list            # principal + tuyo (mínimo 2 entradas)
-   ```
+Reglas durante la ejecución:
+- Nunca cd al principal. Usá git -C /Users/martinoficialdegui/Desktop/ambulante <cmd>.
+- Paths absolutos siempre en Read/Edit/Write.
+- Cleanup al terminar la cadena: lo gestiona el PASO 9.
 
-6. Instalá dependencias en el worktree (`node_modules/` no se comparte):
-   - Si ya hay `pnpm-lock.yaml` en el repo → `pnpm install`
-   - Si todavía hay `package-lock.json` → `npm install`
-   - Excepción: si tu task ES la migración de package manager (F0.1), seguí el
-     plan de la task.
+---
+## Lectura obligatoria (en este orden, ANTES de planear nada)
 
-## Reglas durante el resto de la ejecución (no las olvides)
+Usá Read tool, no memoria.
 
-- **Nunca `cd` al directorio principal.** Si necesitás algo de ahí, usá
-  `git -C /Users/martinoficialdegui/Desktop/ambulante <comando>` o leé archivos
-  con su path absoluto.
-- **Paths absolutos siempre** en Read/Edit/Write. Tu raíz de trabajo es el
-  worktree, no el principal.
-- **Cleanup al terminar la cadena de tasks:** se gestiona en el PASO 9 — el agente
-  pregunta al usuario antes de borrar el worktree y mergear.
+1. /Users/martinoficialdegui/Desktop/ambulante/CLAUDE.md — completo.
+   Atención a §4 (arquitectura), §5 (REGISTRY), §6 (reglas), §7 (invariantes).
+2. /Users/martinoficialdegui/Desktop/ambulante/docs/PRD.md — secciones que toca tu tarea.
+3. /Users/martinoficialdegui/Desktop/ambulante/docs/EPIC-ARCHITECTURE.md:
+   - "Cómo usar este documento" y "Cómo leer dependencias y paralelismo"
+   - Bloque de cada tarea asignada con su fase completa.
+4. /Users/martinoficialdegui/Desktop/ambulante/shared/REGISTRY.md — índice rápido + routing.
+   Luego solo el detail file relevante de shared/REGISTRY-detail/ según tu tarea:
+   ui.md / data.md / domain.md / infra.md / features.md / testing.md
 
-# Lectura obligatoria (en este orden, ANTES de cualquier otra acción)
+---
+## Protocolo de CLAIM (antes del plan)
 
-Usá la tool Read, no resúmenes de memoria.
-
-1. `/Users/martinoficialdegui/Desktop/ambulante/CLAUDE.md` — **completo**.
-   Prestá atención obsesiva a: §4 (arquitectura features/shared), §5 (REGISTRY),
-   §6 (reglas de código — son invariantes duras), §7 (invariantes de dominio).
-2. `/Users/martinoficialdegui/Desktop/ambulante/docs/PRD.md` — las secciones
-   que toque tu tarea.
-3. `/Users/martinoficialdegui/Desktop/ambulante/docs/EPIC-ARCHITECTURE.md`:
-   - Sección "Cómo usar este documento"
-   - Sección "Cómo leer dependencias y paralelismo"
-   - Cada tarea asignada (buscar por ID, ej. `### F1.3`) con su fase contenedora
-     completa para entender contexto, dependencias y waves.
-4. `/Users/martinoficialdegui/Desktop/ambulante/shared/REGISTRY.md` — el orquestador (índice rápido + routing).
-   Luego, según la categoría de lo que toca tu tarea, leé **solo** el detail file relevante de `shared/REGISTRY-detail/`:
-   - `ui.md` → componentes UI, layout, providers
-   - `data.md` → query keys, hooks de datos, services, repositories
-   - `domain.md` → tipos, schemas, constantes, state machine
-   - `infra.md` → utils, config, stores Zustand
-   - `features.md` → componentes/hooks de features existentes
-   - `testing.md` → test utilities
-
-No empieces a planear nada hasta terminar de leer estos archivos.
-
-# Protocolo de CLAIM (obligatorio, antes del plan)
-
-1. Abrir `docs/EPIC-ARCHITECTURE.md`.
+1. Abrí docs/EPIC-ARCHITECTURE.md.
 2. Para cada ID en {{TASK_IDS}}:
-   - Verificá que esté 🟢 ready (todas las dependencias listadas en
-     `Depends on:` están ✅).
-   - Si está 🟡 in-progress: **DETENERTE**. Otro chat la tomó. Reportá y esperá
-     instrucciones del usuario.
-   - Si está 🟢: editá la línea `**Estado:**` a:
-     `🟡 in-progress [owner: chat-<fecha-hoy>, started: <hora>]`
-3. Commit inmediato de ese cambio: `chore(epic): claim {{TASK_IDS}}`.
-4. Antes de tocar código, listá en el chat: "Claim confirmado: {{TASK_IDS}}".
+   - 🟢 ready       → editá Estado a: 🟡 in-progress [owner: chat-<fecha>, started: <hora>]
+   - 🟡 in-progress → STOP. Otro chat la tomó. Reportá y esperá instrucciones.
+3. Commit inmediato: chore(epic): claim {{TASK_IDS}}
+4. Imprimí en el chat: "Claim confirmado: {{TASK_IDS}}"
 
-# Workflow obligatorio — 7 PASOS, NO SE SALTEAN
-
+---
 ## PASO 1 · Entender
 
 Imprimí en el chat:
-- **Qué pide la tarea** en tus palabras (1 párrafo max).
-- **Qué archivos vas a crear/modificar** (lista completa con paths absolutos).
-- **Qué vas a consumir de `shared/`** (verificalo contra `REGISTRY.md` y el detail file de la categoría).
-- **Qué invariantes del PRD/CLAUDE.md aplican** (listá secciones: "§6.4
-  smart/dumb, §7.1 state machine, …").
+- Qué pide la tarea (1 párrafo max).
+- Qué archivos vas a crear/modificar (paths absolutos).
+- Qué vas a consumir de shared/ (verificado contra REGISTRY).
+- Qué invariantes aplican (ej: "§6.4 smart/dumb, §7.1 state machine").
 
+---
 ## PASO 2 · Plan inicial
 
-Escribí un plan numerado con los pasos concretos: archivos, nombres de funciones,
-tipos, tests que vas a crear. Nada de pseudocódigo vago. Cada paso debe ser
-verificable.
+Plan numerado con pasos concretos: archivos, nombres de funciones, tipos, tests.
+Sin pseudocódigo vago. Cada paso debe ser verificable.
 
-## PASO 3 · AUDITORÍA del plan contra CLAUDE.md (CRÍTICO — GATE DURO)
+---
+## PASO 3 · Auditoría (GATE DURO — no escribir código hasta completar)
 
-**Antes de auditar:** releé el archivo de reglas completo desde disco para asegurarte de tener la versión vigente, no una versión compactada de memoria:
-```
-Read /Users/martinoficialdegui/Desktop/ambulante/docs/PROMPT-TEMPLATE.md  (sección PASO 3 — la tabla de 30 reglas)
-Read /Users/martinoficialdegui/Desktop/ambulante/CLAUDE.md  (§6 reglas de código, §7 invariantes de dominio)
-```
+1. Read /Users/martinoficialdegui/Desktop/ambulante/docs/workflows/audit-rules.md
+2. Imprimí la tabla completa en el chat con el status de cada regla.
+3. Si hay ❌ → reescribí el plan y volvé al punto 2.
+4. Solo pasás al PASO 4 con 0 ❌.
 
-**Esto es lo más importante del prompt.** Antes de escribir UNA línea de código,
-revisá tu plan contra esta tabla. Imprimila COMPLETA en el chat, con el status
-por cada regla (incluso las que den ✅ — quiero verlas todas). Si hay ❌,
-reescribí el plan y **volvé a auditar desde cero**. No pasés al PASO 4 hasta
-tener 0 ❌.
-
-Formato obligatorio del output:
-
-| # | Regla | Status | Violación / Fix |
-|---|---|---|---|
-| 1 | Sin `any` (§TS coding-style) | ✅/❌ | — o "violación X → fix Y" |
-| 2 | Sin casts `as` sin justificación | ✅/❌ | ... |
-| 3 | Props como `interface` nombrada, no `type Props = {…}` anónimo | ✅/❌ | ... |
-| 4 | Props `readonly` cuando aplique (§6.6) | ✅/❌ | ... |
-| 5 | Zod en TODOS los boundaries (input user, fetch externo, params URL) | ✅/❌ | ... |
-| 6 | Sin magic strings — a `shared/constants/` o `features/x/constants.ts` | ✅/❌ | ... |
-| 7 | Sin magic numbers — ídem | ✅/❌ | ... |
-| 8 | Sin variables de 1 letra (salvo `i` en for, `e` en handler corto) | ✅/❌ | ... |
-| 9 | Código en inglés, UI copy en español | ✅/❌ | ... |
-| 10 | Funciones ≤2 params posicionales; si hay 3+ → objeto con interfaz | ✅/❌ | ... |
-| 11 | Funciones ≤50 líneas | ✅/❌ | ... |
-| 12 | Una función = una responsabilidad (sin "y"/"and" en el nombre) | ✅/❌ | ... |
-| 13 | Componentes con datos/estado → split smart/dumb (`.container.tsx`) | ✅/❌ | ... |
-| 14 | Componentes ≤200 líneas; archivos ≤300 (hard 400) | ✅/❌ | ... |
-| 15 | Un componente por archivo | ✅/❌ | ... |
-| 16 | Server Components por default, `"use client"` solo cuando hace falta | ✅/❌ | ... |
-| 17 | Imports con alias `@/shared` / `@/features`, sin `../../../` | ✅/❌ | ... |
-| 18 | La feature NO importa de otra feature (§4 aislamiento) | ✅/❌ | ... |
-| 19 | Lo reutilizable vive en `shared/` y va al REGISTRY en el mismo commit | ✅/❌ | ... |
-| 20 | `catch` loguea con contexto (logger, no `console.log`) | ✅/❌ | ... |
-| 21 | Mensajes de error en UI humanos, en español | ✅/❌ | ... |
-| 22 | Inmutabilidad: nunca mutar, siempre `...spread`/`map`/`filter` | ✅/❌ | ... |
-| 23 | `const` por default, `let` solo si reasignación real | ✅/❌ | ... |
-| 24 | Sin comentarios "qué hace"; solo "por qué" cuando no es obvio | ✅/❌ | ... |
-| 25 | Respeta máquina de estados del pedido (§7.1 CLAUDE.md) | ✅/❌/N/A | ... |
-| 26 | Respeta privacidad ubicación cliente (§7.2) | ✅/❌/N/A | ... |
-| 27 | Respeta aislamiento de roles (§7.3) | ✅/❌/N/A | ... |
-| 28 | Respeta snapshot de productos (§7.4) | ✅/❌/N/A | ... |
-| 29 | **Scope check:** dentro del §5 del PRD; sin pagos/stock/ratings/chat | ✅/❌ | ... |
-| 30 | Sin features/refactors/abstractions/error-handling especulativo que la tarea NO pidió | ✅/❌ | ... |
-
-**Regla dura:** si hay aunque sea un solo ❌, reescribís el plan y volvés a
-auditar. No hay excepciones. No pasés al PASO 4 con ❌ pendientes.
-
+---
 ## PASO 4 · TDD — Tests primero
 
-Para cada pieza de lógica no trivial (no solo para "lo complicado"):
+Para cada pieza de lógica no trivial:
+1. Escribí el test (*.test.ts o *.test.tsx).
+2. npx vitest run <file> → debe estar RED. Pegá el output.
+3. Escribí el MÍNIMO código para que pase.
+4. npx vitest run <file> → GREEN. Pegá el output.
+5. Refactoreá manteniendo tests verdes.
 
-1. Escribí el archivo de test (`*.test.ts` o `*.test.tsx`).
-2. Corré `npx vitest run <file>` → el test debe estar **RED**.
-3. Pegá en el chat el output del test fallando. Sí, literalmente pegá el output.
-4. Escribí el MÍNIMO código para que pase.
-5. Corré el test → **GREEN**. Pegá el output.
-6. Refactoreá si hace falta manteniendo los tests verdes.
+Para código 100% trivial (re-export, type alias, layout dumb sin branching):
+documentalo: "Fx.y trivial — cubierto por E2E en F0.6".
 
-Para código 100% trivial (re-export, type alias, layout dumb sin branching),
-podés saltar TDD pero documentalo en una línea del chat:
-"Fx.y trivial — cubierto por E2E en F0.6".
-
+---
 ## PASO 5 · Implementación
 
-Ahora sí escribís el código según el plan auditado.
+Escribí el código según el plan auditado:
+- Archivos ≤300 líneas, componentes ≤200.
+- Componentes con datos → split smart/dumb (.container.tsx).
+- Si tocás shared/ → actualizar REGISTRY.md y el detail file en el mismo turno.
+- npx tsc --noEmit después de cada archivo.
 
-- Cada archivo nuevo respeta §6.5 (≤300 líneas) y §6.4 (≤200 para componentes).
-- Cada componente con datos → split smart/dumb.
-- Si tocás `shared/` → actualizar el índice de `shared/REGISTRY.md` Y el detail file de la categoría en el mismo turno.
-- Corré `npx tsc --noEmit` después de cada archivo.
+Si la tarea es UI/estética (diseño visual, componentes, animaciones, ilustraciones):
+  Read /Users/martinoficialdegui/Desktop/ambulante/docs/workflows/ui-toolchain.md
+  Seguí las instrucciones antes de escribir cualquier código visual.
 
-### Tareas estéticas / UI — toolchain obligatorio
-
-Si tu tarea implica diseño visual, componentes UI, animaciones, ilustraciones o cualquier aspecto estético, **debés usar estas herramientas en este orden**:
-
-| Herramienta | Cuándo usarla | Cómo invocarla |
-|---|---|---|
-| **`/ui-ux-pro-max`** | Siempre primero — orienta el diseño y las decisiones estéticas | Skill: `/ui-ux-pro-max` |
-| **21st.dev MCP** (`mcp__magic__*`) | Componentes UI listos: buscar inspiración, construir o refinar piezas | `mcp__magic__21st_magic_component_builder`, `mcp__magic__21st_magic_component_inspiration`, `mcp__magic__21st_magic_component_refiner` |
-| **MagicUI MCP** (`mcp__magicuidesign-mcp__*`) | Componentes animados del registry de Magic UI | `mcp__magicuidesign-mcp__searchRegistryItems`, `mcp__magicuidesign-mcp__getRegistryItem` |
-| **Nanobanana MCP** (`mcp__nanobanana__*`) | Generar o editar imágenes con IA | `mcp__nanobanana__generate_image` |
-| **Stitch MCP** (`mcp__stitch__*`) | Diseño de pantallas / interfaces completas | `mcp__stitch__generate_screen_from_text`, `mcp__stitch__edit_screens`, `mcp__stitch__fetch_screen_code` |
-
-**Regla:** no implementes UI "a mano" sin haber consultado primero las herramientas de arriba. Si una herramienta no tiene lo que necesitás, documentalo en el chat antes de continuar con código propio.
-
-**Regla de consistencia visual (no negociable):** antes de escribir cualquier estilo, leé `app/globals.css` y `tailwind.config.ts` para identificar los tokens de color, tipografía y espaciado del proyecto. Toda pieza UI nueva **debe usar exclusivamente esos tokens**. Prohibido introducir colores hardcodeados (`#fff`, `rgb(...)`, `hsl(...)`) o clases de Tailwind que no correspondan a la paleta existente. Si la tarea requiere un color nuevo, proponerlo como token en `globals.css` y justificarlo en el PASO 2 — no usarlo directamente en el componente.
-
+---
 ## PASO 6 · Verificación final
 
-**Antes de verificar:** re-leé los comandos exactos desde disco — no confíes en memoria si el chat compactó:
-```
-Read /Users/martinoficialdegui/Desktop/ambulante/docs/PROMPT-TEMPLATE.md  (sección PASO 6)
-```
+1. Read /Users/martinoficialdegui/Desktop/ambulante/docs/workflows/verification.md
+2. Ejecutá los 4 checks y pegá el output en el chat.
+3. Si algo falla → fijalo antes de continuar.
 
-Antes de marcar done, estas 4 cosas deben pasar y tenés que pegar el output:
-
-1. `npx tsc --noEmit` → 0 errores.
-2. `npx vitest run` → todos verdes; coverage ≥80% para archivos nuevos.
-3. `wc -l` sobre los archivos tocados → ningún componente >200, ningún
-   archivo >300.
-4. `grep -rn 'console\.log\|: any\b' <archivos>` → vacío.
-
-Si algo falla, fijalo. No cierres la tarea con algo roto.
-
+---
 ## PASO 7 · Completion protocol
 
-1. Abrir `docs/EPIC-ARCHITECTURE.md`.
+1. Abrí docs/EPIC-ARCHITECTURE.md.
 2. Para cada task completada:
-   - Cambiar estado a `✅ done`.
-   - Llenar `Notas:` con: archivos creados, decisiones tomadas, subtareas
-     descubiertas.
-3. Si descubriste tareas nuevas, agregalas al final de la fase con el próximo ID
-   libre.
-4. **Protocolo de deuda técnica** — al terminar cada tarea, revisá si quedó algo
-   diferido intencionalmente. Para decidir cómo tratarlo, usá esta tabla:
+   - Cambiá estado a ✅ done.
+   - Llenó Notas: con archivos creados, decisiones, subtareas descubiertas.
+3. Si descubriste tareas nuevas → agregalas al final de la fase con el próximo ID libre.
+4. Read /Users/martinoficialdegui/Desktop/ambulante/docs/workflows/debt-protocol.md
+   Aplicalo a todo lo que quedó diferido.
+5. Commit: feat(fX.Y): <descripción concisa imperativa>
+6. Imprimí resumen: tareas ✅ done | archivos | tests + coverage | próxima wave destrabada
+   | decisiones que requieren confirmación del usuario.
 
-   | Situación | Acción |
-   |---|---|
-   | El fix tiene ≥50% implementable **ahora** sin romper nada | Implementalo en esta misma tarea. Anotá en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` la parte pendiente con referencia a dónde completarla. |
-   | El fix depende **completamente** de algo que no existe todavía | No es deuda: es un **requisito** de la tarea futura. Anotalo en el campo `Notas:` de esa tarea en el epic, no en la sección de deuda. |
-   | El fix cambia el contrato de algo **ya existente** o requiere migración | Anotalo en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` con ID `DT-N` y agregá `Resuelve: DT-N` en la tarea futura que lo cierra. |
+---
+## PASO 8 · Auto-continuación por cadena
 
-   **Regla de oro:** la sección `## Deuda técnica` del epic es para cosas que
-   *existen pero están incompletas*. Si la base todavía no existe, va en la tarea
-   que la construye — no en deuda.
+No cierres el chat. Releé el bloque de la tarea en el epic y buscá Continues with:.
 
-5. Commit: `feat(fX.Y): <descripción concisa imperativa>`.
-6. En el chat, imprimí el resumen final:
-   - Tareas ✅ done
-   - Archivos creados/modificados
-   - Tests agregados + coverage
-   - Próxima wave que se destrabó
-   - Decisiones que requieren confirmación del usuario (si las hay)
+CASO A — No hay Continues with: o dice —
+  Imprimí: "Cadena cerrada. No hay continuación." → continuá con PASO 9.
 
-## PASO 8 · Auto-continuación por cadena (CRÍTICO)
+CASO B — Continues with: Fx.y
+  1. Verificá que todas las Depends on: de Fx.y estén ✅.
+  2. Verificá que Fx.y sea 🟢 (no 🟡 tomada por otro chat).
+  3. Si está tomada → imprimí advertencia y detenete.
+  4. Si está libre:
+     - Imprimí: "🔗 Auto-continuación activada: claim de Fx.y"
+     - Marcá 🟡 in-progress + commit: chore(epic): claim Fx.y (auto-continue)
+     - Reiniciá desde PASO 1 con la nueva tarea. NO saltees ningún paso.
+  5. Al terminar Fx.y, volvé a chequear Continues with: y repetí hasta que no haya más.
 
-**No cierres el chat todavía.** Verificá si tu tarea forma parte de una cadena:
+Regla: cada eslabón tiene su propio plan, auditoría (PASO 3), tests (PASO 4) y
+verificación (PASO 6). La auto-continuación ahorra fricción — no relaja estándares.
+Si la auditoría falla muchas veces o el PASO 6 no cierra → detené la cadena y reportá.
 
-1. Releé el bloque de la tarea recién completada en `docs/EPIC-ARCHITECTURE.md`.
-2. Buscá el campo `Continues with:` dentro del bloque.
+---
+## PASO 9 · Code review final + cierre
 
-### Caso A — No hay `Continues with:` o dice `—`
-La cadena cerró. Imprimí: "Cadena cerrada. No hay continuación." y continuá con el **PASO 9**.
+1. Read /Users/martinoficialdegui/Desktop/ambulante/docs/workflows/code-review-protocol.md
+2. Seguilo completo: code review con segunda pasada, verificación post-fix, y consulta
+   al usuario para commit + merge + borrado de worktree/branch.
 
-### Caso B — `Continues with: Fx.y` (hay sucesor)
+---
+## Reglas de paralelismo
 
-1. Abrí el bloque de `Fx.y` en el epic.
-2. Verificá que **todas** sus `Depends on:` estén `✅ done`.
-3. Verificá que su estado sea `🟢 ready` o `⚪ pending` (no `🟡 in-progress`
-   tomada por otro chat).
-4. Si está tomada por otro chat → imprimí advertencia y detenete.
-5. Si está libre → ejecutá esta secuencia:
-   - Imprimí: "🔗 Auto-continuación activada: claim de `Fx.y`".
-   - Marcá `Fx.y` como `🟡 in-progress [owner: <mismo chat>, started: <nueva hora>]`.
-   - Commit: `chore(epic): claim Fx.y (auto-continue)`.
-   - **Reiniciá el workflow desde el PASO 1** con la nueva tarea.
-   - **NO saltees pasos.** La nueva tarea debe pasar por su propia auditoría
-     contra CLAUDE.md (PASO 3), su propio TDD (PASO 4), su propia verificación
-     (PASO 6) y su propio completion (PASO 7).
-6. Al terminar esa tarea, volvé a chequear `Continues with:` y repetí. La cadena
-   se ejecuta entera en este mismo chat hasta que `Continues with: —` o ausente.
+Antes de editar estos archivos, verificá que ninguna tarea 🟡 ajena los necesite:
+  package.json / pnpm-lock.yaml | tailwind.config.ts | tsconfig.json | next.config.mjs
+  app/layout.tsx | app/globals.css | shared/REGISTRY.md | docs/EPIC-ARCHITECTURE.md
 
-## PASO 9 · Code review final + cierre del worktree
+Si hay dependencia oculta con una tarea 🟡 ajena → pausá y reportá.
 
-Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
+---
+## Prohibiciones duras (si las violás, la tarea no se acepta)
 
-> **Anti-compaction (igual que PASO 3 y PASO 6):** antes de ejecutar cualquier sub-paso, releé este PASO 9 completo desde disco (`docs/PROMPT-TEMPLATE.md` líneas del bloque PASO 9). La compaction borra detalles críticos de contexto — los comandos exactos y las reglas de gate duro se leen del archivo, no de memoria comprimida.
+1. any en cualquier archivo.
+2. @ts-ignore (si es inevitable: @ts-expect-error con comentario).
+3. console.log en código de runtime (tests OK, runtime NO).
+4. Archivos .md fuera de docs/ sin pedido explícito.
+5. Dependencias npm sin justificarlas en el PASO 2.
+6. git commit --no-verify o cualquier bypass de hooks.
+7. git push sin que el usuario lo pida.
+8. Modificar reglas de CLAUDE.md. Si una regla es imposible → parás y preguntás.
 
-### 9.1 · Code review
-
-1. Ejecutá el agente de code review:
-   ```
-   /everything-claude-code:code-reviewer
-   ```
-2. El agente va a revisar **todos los archivos creados o modificados en esta cadena**.
-3. Tomá **todos los issues** que reporte — critical, high, medium y low — y fixealos uno por uno.
-   **No existe prioridad que excuse dejar un issue sin resolver**, con una única excepción: el protocolo de deuda técnica del PASO 7. Aplicalo así:
-   - El fix depende completamente de algo que no existe todavía → no lo fixees acá; anotalo en el campo `Notas:` de la tarea futura que lo construye. No es deuda, es un requisito de esa tarea.
-   - El fix cambia el contrato de algo ya existente o requiere migración → registralo como `DT-N` en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` y agregá `Resuelve: DT-N` en la tarea futura que lo cierra.
-   - Cualquier otro caso → fixealo ahora. Severity baja no es excusa para diferir.
-4. Por cada fix, corré `npx tsc --noEmit` y `npx vitest run` para asegurarte que no rompiste nada.
-5. Si algún fix es complejo, aplicá el PASO 3 (auditoría) antes de escribirlo.
-6. **Segunda pasada obligatoria (gate duro):** una vez aplicados todos los fixes, volvé a ejecutar el agente de code review. Esta segunda pasada es la prueba objetiva — no tu declaración de que terminaste. **No podés avanzar al PASO 9.2 hasta que la segunda pasada devuelva 0 CRITICAL y 0 HIGH sin una entrada de deuda técnica que los justifique.** Si aparecen issues nuevos, fixealos y repetí la pasada. Declarar "listo" sin haber corrido la segunda pasada es una violación de protocolo.
-
-### 9.2 · Verificación post-fix
-
-Corré el PASO 6 completo una vez más y pegá el output:
-1. `npx tsc --noEmit` → 0 errores.
-2. `npx vitest run` → todos verdes; coverage ≥80%.
-3. `wc -l` sobre archivos tocados → sin exceder límites.
-4. `grep -rn 'console\.log\|: any\b' <archivos>` → vacío.
-
-### 9.3 · Consulta al usuario
-
-Una vez que el code review esté limpio y la verificación pase, imprimí **exactamente** esto:
-
-```
-✅ Code review completo. No quedan issues.
-
-¿Querés que:
-1. Commitee todos los cambios con el mensaje de cierre
-2. Mergee `<branch>` a `main`
-3. Borre el worktree `<dir>` y la branch `<branch>`
-
-Respondé s (sí a todo) o decime qué pasos omitir.
-```
-
-- Si el usuario responde **s** o equivalente → ejecutá los 3 pasos en orden:
-  1. `git add -p` (o por archivo) + `git commit -m "feat(fX.Y): <descripción>"`.
-  2. Desde el principal: `git -C /Users/martinoficialdegui/Desktop/ambulante merge --no-ff <branch>`.
-  3. Desde el principal: `git worktree remove <dir> && git branch -d <branch>`.
-- Si el usuario pide omitir algún paso → respetalo y reportá qué quedó pendiente.
-- Si hay conflictos en el merge → reportalos con detalle y esperá instrucciones. No fuerces.
-
-### Regla importante de la cadena
-
-Cada eslabón de la cadena es una tarea **independiente desde el punto de vista
-de calidad**: cada una tiene su propio plan, auditoría, tests e implementación.
-La auto-continuación solo **ahorra al usuario la fricción de abrir un chat
-nuevo**, no relaja los estándares.
-
-Si en algún eslabón la auditoría del PASO 3 falla muchas veces, o el PASO 6
-no cierra, **detené la cadena** ahí y reportá al usuario. No avances con deuda.
-
-# Reglas de paralelismo (respeto a otros chats)
-
-Archivos "compartidos calientes" — antes de editarlos, releé el epic y verificá
-que ninguna tarea 🟡 de otro chat los necesite:
-- `package.json` / `pnpm-lock.yaml`
-- `tailwind.config.ts`
-- `tsconfig.json`
-- `next.config.mjs`
-- `app/layout.tsx`
-- `app/globals.css`
-- `shared/REGISTRY.md`
-- `docs/EPIC-ARCHITECTURE.md`
-
-Si descubrís que tu tarea tiene dependencia oculta con una tarea 🟡 ajena,
-pausá y reportá al usuario.
-
-# Prohibiciones duras (si las violás, la tarea no se acepta)
-
-1. `any` en cualquier archivo.
-2. `@ts-ignore` (si hace falta `@ts-expect-error`, justificar con comentario).
-3. `console.log` en código de runtime (tests OK, debugging NO).
-4. Crear archivos `.md` fuera de `docs/` sin pedido explícito.
-5. Agregar dependencias npm sin justificarlas en el PASO 2 (plan).
-6. `git commit --no-verify` o cualquier bypass de hooks.
-7. `git push` sin que el usuario lo pida.
-8. Modificar reglas de CLAUDE.md para hacer encajar tu plan. Si sentís que una
-   regla es imposible, **parás y preguntás** — no la ignorás.
-
-# Formato de output durante el trabajo
+---
+## Formato de output
 
 Entre pasos mayores, imprimí un separador:
-
 ---
 ## PASO N · Nombre del paso
 
-Esto permite al usuario seguirte en tiempo real.
+---
+## Empezá ahora
 
-# Empezá ahora
-
-Arrancá por la LECTURA OBLIGATORIA. No me pidas confirmación — ejecutá el flujo
-completo. Si en algún paso tenés una duda genuina de scope/ambigüedad, pará y
-preguntá con opciones concretas (no con preguntas abiertas).
+Arrancá por PASO 0. No pidas confirmación — ejecutá el flujo completo.
+Si tenés duda genuina de scope/ambigüedad, pará y preguntá con opciones concretas.
 ```
 
 ---
 
-## Ejemplos concretos listos para copy-paste
+## Ejemplos concretos
 
-### Ejemplo 1 — Cabeza de cadena (auto-continuación)
-
-Querés ejecutar toda la cadena F0.1 → F0.3 → F0.4 en un solo chat:
-
+### Cabeza de cadena (auto-continuación)
 ```
 F0.1
 ```
+El agente lee `Continues with:` y recorre F0.1 → F0.3 → F0.4 sin intervención.
 
-**Eso es todo.** El agente lee en el epic que F0.1 tiene `Continues with: F0.3`, ejecuta F0.1, al terminar activa auto-continuación hacia F0.3, y así hasta F0.4. Vos no tocás nada.
-
-### Ejemplo 2 — Tarea standalone (sin cadena)
-
-Querés ejecutar solo F0.2 (env vars), que no tiene `Continues with:`:
-
+### Tarea standalone
 ```
 F0.2
 ```
+El chat termina al cerrar F0.2.
 
-El chat termina cuando cierra F0.2.
-
-### Ejemplo 3 — Auth core completa (4 eslabones en un chat)
-
-Querés ejecutar F2.1 → F2.2 → F2.3 → F2.4 (la parte serial de auth):
-
-```
-F2.1
-```
-
-El agente va a recorrer los 4 eslabones en secuencia, cada uno con su propio ciclo de 7 pasos, sin que vos intervengas.
-
-### Ejemplo 4 — Feature completa sin cadenas predefinidas (F14 Admin)
-
-Las tareas de F14 no tienen cadenas encadenadas en el epic porque son 100% paralelas entre sí. Si querés hacerlas todas en un solo chat (sin paralelismo), podés pasarlas manualmente:
-
+### Bloque sin cadenas predefinidas
 ```
 F14.1, F14.2, F14.3, F14.4, F14.5
 ```
-
-Este modo secuencial-manual solo tiene sentido cuando no hay cadenas definidas. Si hay cadena, siempre pasá solo la cabeza.
+Solo cuando no hay cadenas definidas en el epic. Si hay cadena, siempre pasá la cabeza.
 
 ---
 
 ## Protocolo para abrir chats paralelos
 
-1. Abrí el epic: `docs/EPIC-ARCHITECTURE.md`.
-2. Buscá la fase que querés ejecutar. Leé su bloque "Waves".
-3. **Para cada tarea en la wave activa, creá un `git worktree` dedicado
-   ANTES de abrir el chat:**
+1. Abrí `docs/EPIC-ARCHITECTURE.md` → buscá la fase y sus Waves.
+2. Para cada tarea en la wave activa, creá el worktree ANTES de abrir el chat:
    ```bash
-   # desde ~/Desktop/ambulante/ (worktree principal, branch main):
+   # desde ~/Desktop/ambulante/ (branch main, working tree limpio):
    git worktree add ../ambulante-<task-id> -b feat/<task-id>-<slug>
    ```
-   Ejemplo para arrancar la wave 1 de F0:
-   ```bash
-   git worktree add ../ambulante-f0-1 -b feat/f0-1-pnpm-migration
-   git worktree add ../ambulante-f0-2 -b feat/f0-2-env-vars-zod
-   git worktree add ../ambulante-f0-9 -b feat/f0-9-codeowners
-   ```
-4. Por cada tarea, abrí una ventana nueva de Claude Code **con `cd` al
-   worktree correspondiente antes de lanzar el CLI**:
+3. Por cada tarea, abrí una ventana de Claude Code con cd al worktree:
    ```bash
    cd ~/Desktop/ambulante-f0-1 && claude
    ```
-   Cada chat arranca con su `cwd` apuntando al worktree dedicado, lo que aísla
-   `HEAD`, índice y `node_modules` del resto.
-5. En cada chat, copiá el template de arriba, reemplazá `{{TASK_IDS}}` con el ID
-   de esa tarea, y pegalo como primer mensaje. El PASO 0 va a verificar
-   automáticamente que estés en el worktree correcto.
-6. Los chats arrancan solos. Leen el epic, claimean, planean, auditan, testean
-   e implementan.
-7. Cuando alguno termina, marcá ✅ en el epic (el propio chat lo hace en el
-   PASO 7) y limpiá el worktree desde el principal:
-   ```bash
-   git worktree remove ../ambulante-<task-id>
-   ```
-8. Cuando la wave entera esté ✅, la siguiente wave queda destrabada y repetís
-   el ciclo desde el paso 3 con los nuevos task IDs.
+4. Pegá el template con `{{TASK_IDS}}` correspondiente. El PASO 0 verifica el aislamiento automáticamente.
+5. Cuando alguno termina (el chat lo marca ✅ en PASO 7), la siguiente wave queda destrabada.
 
-### Por qué worktrees son obligatorios
-
-Un repo git tiene un único `.git/HEAD`. Si dos chats comparten el mismo
-directorio físico (`~/Desktop/ambulante/`), cada `git checkout -b` de un chat
-le mueve la branch al otro y los commits aterrizan en branches equivocadas.
-Es un race condition determinístico, no mala suerte.
-
-Worktrees comparten `.git/objects` y `.git/refs` (o sea, los commits viven en
-el mismo repo) pero cada uno tiene su propio `HEAD`, índice y `node_modules`.
-Git incluso bloquea checkear la misma branch en dos worktrees a la vez —
-el race condition se vuelve estructuralmente imposible.
+**Por qué worktrees son obligatorios:** un repo git tiene un único `.git/HEAD`. Si dos chats comparten el mismo directorio, cada `git checkout -b` le mueve la branch al otro — race condition determinístico. Worktrees comparten `.git/objects` pero cada uno tiene su propio `HEAD` e índice. Git impide checkout de la misma branch en dos worktrees a la vez.
 
 ---
 
-## Troubleshooting común
+## Troubleshooting
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|
-| El agente salta el PASO 3 (auditoría) | Template mal pegado o truncado | Volvé a pegar el template completo, verificá que la tabla de 30 reglas esté entera |
-| Dos chats agarraron la misma tarea | Uno no commiteó el claim rápido | Regla: claim + commit ANTES de leer archivos de código |
-| El agente agrega features no pedidas | Falta énfasis en regla 30 | Recordale explícitamente: "Regla 30: no agregar nada que la tarea no pidió" |
-| Falla al actualizar el epic en PASO 7 | Archivo modificado por otro chat entre claim y done | El agente debe releer el epic antes de editarlo, hacer rebase mental |
-| El agente pregunta por scope a mitad del trabajo | Es lo correcto — no lo castigues | Responder con opción concreta y seguir |
+| El agente salta el PASO 3 | Template mal pegado o truncado | Re-pegá el template completo, verificá que llegue hasta "Empezá ahora" |
+| Dos chats agarraron la misma tarea | Uno no commiteó el claim rápido | Regla: claim + commit ANTES de leer código |
+| El agente agrega features no pedidas | Regla 30 no internalizada | Recordale: "Regla 30: nada que la tarea no pidió" |
+| Falla al actualizar el epic en PASO 7 | Otro chat lo editó entre claim y done | El agente debe releer el epic antes de editar; resolver conflicto manualmente |
+| El agente pregunta scope a mitad del trabajo | Es correcto — no lo castigues | Respondá con opción concreta y seguí |
+| Chat compactó y el agente "olvida" reglas | Era el diseño anterior (monolito) | El template actual lee reglas desde disco en cada gate — no hay qué olvidar |
 
 ---
 
-## Apéndice — Prompt de migración a worktree (para chats ya en curso)
+## Migración a worktree para chats en curso
 
-Si un chat ya está corriendo en `~/Desktop/ambulante/` (sin worktree dedicado)
-y necesitás migrarlo en caliente — porque venías sin worktrees y querés
-arreglarlo sin perder el contexto del chat — pegale este prompt. Asume que
-ya hiciste merge del trabajo en curso a `main` y que el working tree del
-principal está limpio.
-
-```
-# Migración a git worktree (recuperación post race-condition)
-
-## Contexto
-
-Hasta ahora veníamos compartiendo el mismo directorio físico
-`~/Desktop/ambulante/` con otros chats paralelos, lo que comparte `.git/HEAD`
-y genera race conditions: cada `git checkout -b` de un chat le movía la branch
-a los otros, y los commits caían en branches equivocadas.
-
-La solución: cada chat tiene ahora su propio `git worktree` — directorio físico
-distinto, con HEAD e index propios, compartiendo `.git/objects` con el repo
-principal. Git impide que la misma branch esté checkout en dos worktrees a la
-vez, así que el race condition es estructuralmente imposible desde acá.
-
-Tu trabajo previo ya fue commiteado y mergeado a `main`. Vas a moverte a tu
-worktree y continuar tu task desde donde la dejaste, pero ahora aislado.
-
-## Tu task
-
-- **Task ID:** {{TASK_ID}}
-
-## Mapeo task_id → worktree
-
-| Task ID | Directorio del worktree                          | Branch                       |
-|---------|--------------------------------------------------|------------------------------|
-| F0.1    | /Users/martinoficialdegui/Desktop/ambulante-f0-1 | feat/f0-1-pnpm-migration     |
-| F0.2    | /Users/martinoficialdegui/Desktop/ambulante-f0-2 | feat/f0-2-env-vars-zod       |
-| F0.9    | /Users/martinoficialdegui/Desktop/ambulante-f0-9 | feat/f0-9-codeowners         |
-
-Buscá tu fila según tu Task ID. Esos son los valores que vas a usar abajo.
-
-## Pasos exactos — ejecutalos en orden, sin saltearte ninguno
-
-### 1. Verificar estado del directorio principal
-
-\`\`\`
-pwd
-git -C /Users/martinoficialdegui/Desktop/ambulante branch --show-current
-git -C /Users/martinoficialdegui/Desktop/ambulante status --short
-\`\`\`
-
-Esperado: `main`, status vacío. Si no es eso, **parate y reportá**.
-
-### 2. Asegurarte que main tenga los merges recientes
-
-\`\`\`
-git -C /Users/martinoficialdegui/Desktop/ambulante log --oneline -5
-\`\`\`
-
-Verificá que estén los commits del trabajo recién mergeado de F0.1/F0.2/F0.9.
-
-### 3. Crear tu worktree
-
-\`\`\`
-git -C /Users/martinoficialdegui/Desktop/ambulante worktree add \\
-  <DIR_DEL_WORKTREE> \\
-  -b <BRANCH>
-\`\`\`
-
-Si tira "fatal: A branch named '...' already exists" significa que la branch
-vieja no se borró antes del merge. Parate y reportá — no fuerces nada.
-
-### 4. Mover tu cwd al worktree
-
-\`\`\`
-cd <DIR_DEL_WORKTREE>
-\`\`\`
-
-### 5. Verificar aislamiento (CRÍTICO)
-
-\`\`\`
-pwd                          # debe mostrar tu worktree
-git branch --show-current    # debe mostrar tu branch
-git status --short           # debe estar limpio
-git worktree list            # debe mostrar el principal + el tuyo
-\`\`\`
-
-Si cualquiera de los 4 da un valor inesperado, **parate y reportá**.
-
-### 6. Instalar dependencias en el worktree
-
-`node_modules/` está en `.gitignore`, así que tu worktree arranca sin
-dependencias instaladas.
-
-- **Si sos F0.1:** este paso ES tu task. `corepack enable && corepack prepare
-  pnpm@latest --activate && pnpm install`. Eso instala pnpm y arranca la
-  migración real.
-- **Si sos F0.2 o F0.9 y F0.1 ya mergeó pnpm:** corré `pnpm install`.
-- **Si sos F0.2 o F0.9 y F0.1 todavía no mergeó:** corré `npm install`.
-- **Si sos F0.9 y tu task no necesita correr código:** podés saltar este paso.
-
-### 7. Re-claimear tu task en el epic
-
-Editá `docs/EPIC-ARCHITECTURE.md` y poné tu task como 🟡 in-progress con
-timestamp nuevo. Commit en tu branch:
-
-\`\`\`
-git add docs/EPIC-ARCHITECTURE.md
-git commit -m "chore(epic): re-claim {{TASK_ID}} (post-worktree migration)"
-\`\`\`
-
-### 8. Continuar tu workflow original
-
-Volvé al PASO donde habías quedado. Tu memoria de CLAUDE.md, PRD y el epic
-sigue siendo válida — son los mismos archivos en el mismo repo. Solo re-leé
-las partes que pudieron cambiar (epic, REGISTRY, los archivos que dejaste
-a medio editar).
-
-## Reglas para el resto de tu ejecución
-
-1. **NUNCA `cd` al directorio principal** (`~/Desktop/ambulante/`). Si necesitás
-   algo de ahí, usá `git -C /Users/martinoficialdegui/Desktop/ambulante <cmd>`
-   o leé archivos con su path absoluto.
-2. **Paths absolutos siempre** en Read/Edit/Write. Tu raíz de trabajo es
-   `<DIR_DEL_WORKTREE>`.
-3. **Nunca toques las branches de los otros chats.** Cada uno tiene la suya en
-   su propio worktree. `git worktree list` te dice cuáles existen.
-4. **Cuando termines toda la cadena de tasks:** desde el worktree principal,
-   `git worktree remove <DIR_DEL_WORKTREE>`.
-
-## Empezá ahora
-
-Ejecutá los 8 pasos en orden. Si algo da un valor inesperado, parate y reportá
-con el output exacto — no improvises.
-```
+Si un chat ya está corriendo sin worktree dedicado, ver:
+`docs/workflows/worktree-migration.md`
 
 ---
 
@@ -700,14 +317,12 @@ con el output exacto — no improvises.
 | Fecha | Cambio |
 |---|---|
 | 2026-04-15 | Creación del template inicial |
-| 2026-04-15 | Simplificado: eliminado campo Fase/Wave redundante, solo Task IDs |
-| 2026-04-15 | Agregado PASO 8 de auto-continuación por cadena (`Continues with:`) |
-| 2026-04-15 | Agregado PASO 0 de setup de worktree obligatorio + apéndice de migración para chats en curso (post race-condition de F0 wave 1) |
-| 2026-04-17 | Agregado toolchain obligatorio para tareas UI/estéticas en PASO 5: `/ui-ux-pro-max`, 21st.dev MCP, MagicUI MCP, Nanobanana MCP, Stitch MCP |
-| 2026-04-19 | Agregado PASO 9: code review final con `/everything-claude-code:code-reviewer` (todos los severities), fix obligatorio, y consulta al usuario para commit + merge a main + borrado de worktree/branch |
-| 2026-04-20 | Agregado auto-check al inicio del PASO 0: el agente corre `git branch --show-current` antes de cualquier acción y se bloquea si está en `main` |
-| 2026-04-20 | Agregado protocolo de deuda técnica en PASO 7: tres casos (implementar ahora, requisito de tarea futura, deuda con DT-N) con regla de oro |
-| 2026-04-20 | PASO 9.1: aclarado que todos los issues del code review deben resolverse (cualquier severity), con la única excepción del protocolo de deuda técnica del PASO 7 |
-| 2026-04-20 | PASO 3 y PASO 6: re-lectura obligatoria desde disco antes de ejecutar cada gate (anti-compaction: los comandos exactos se leen del archivo, no de memoria comprimida) |
-| 2026-04-20 | PASO 9: agregada instrucción anti-compaction igual que PASOes 3 y 6 — la segunda pasada de code review (9.1.6) era el paso que se perdía tras compaction |
-
+| 2026-04-15 | Simplificado: eliminado campo Fase/Wave redundante |
+| 2026-04-15 | Agregado PASO 8 de auto-continuación por cadena |
+| 2026-04-15 | Agregado PASO 0 de setup de worktree obligatorio |
+| 2026-04-17 | Agregado toolchain obligatorio para tareas UI/estéticas en PASO 5 |
+| 2026-04-19 | Agregado PASO 9: code review final con segunda pasada obligatoria |
+| 2026-04-20 | Agregado auto-check al inicio del PASO 0 |
+| 2026-04-20 | Agregado protocolo de deuda técnica en PASO 7 |
+| 2026-04-20 | PASO 9.1: todos los issues deben resolverse (excepción: protocolo de deuda) |
+| 2026-04-20 | Rediseño arquitectural: skeleton (~160 líneas pegadas) + docs/workflows/ (6 archivos de referencia). Reglas y tablas siempre leídas desde disco — no dependen de memoria comprimida |
