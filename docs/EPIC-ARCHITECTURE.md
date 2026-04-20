@@ -961,7 +961,7 @@ Wave 4 (al final — requiere features):
 - **Archivos:** `shared/domain/order-state-machine.test.ts`.
 - **Depends on:** F3.2, F7.1
 - **Estimación:** M
-- **Notas:** 24 tests (todos verdes). Coverage 100% statements/branches/functions/lines. Tests existentes de F3.2 ya cubrían el 100% — F7.3 verificó y certificó formalmente. No se requirieron tests adicionales.
+- **Notas:** 26 tests (todos verdes). Coverage 100% statements/branches/functions/lines. Tests existentes de F3.2 cubrían el 100% estructural; F7.3 agregó 2 tests de invariante de dominio faltantes: ACEPTADO+CLIENTE_CANCELA→INVALID_TRANSITION y EN_CAMINO+CLIENTE_CANCELA→INVALID_TRANSITION (cliente pierde derecho a cancelar post-aceptación, PRD §6.1).
 
 ### F7.4 — Tests de hooks críticos
 - **Estado:** ⚪ pending
