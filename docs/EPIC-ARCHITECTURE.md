@@ -1390,7 +1390,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:** schemas + service mock + hooks (useStoreProfileQuery, useUpdateStoreProfileMutation con optimistic update) + StoreProfileForm + StoreProfilePage Container/Dumb + page route. 7 hook tests GREEN (591 total).
 
 ### F13.7 — Analytics básico
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session-f13-7]
 - **Entregable:** `/store/analytics` con los KPIs del PRD §8 filtrados para esa tienda.
 - **Depends on:** F8.3
 - **Estimación:** M
@@ -1508,7 +1508,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Creado `docs/db-query-optimization.md`. Documenta: schema de 6 tablas (users, stores, products, orders, order_items, order_transitions), 7 hot queries con su SQL e índices, análisis EXPLAIN prospectivo para Q1 (geoquery crítica con/sin GIST), PostGIS setup (geography vs geometry, funciones usadas), RLS policies para aislamiento de roles, publicaciones Supabase Realtime, y checklist de verificación pre-producción. Sin código TypeScript — documentación pura. F15.6 (load testing) queda desbloqueada.
 
 ### F15.6 — Load testing
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
 - **Entregable:** k6 o Artillery con escenarios del §8. Baseline y goals documentados.
 - **Depends on:** F15.5
 - **Estimación:** L
