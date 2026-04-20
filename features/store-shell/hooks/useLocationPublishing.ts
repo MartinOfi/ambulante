@@ -53,6 +53,15 @@ export function useLocationPublishing(): UseLocationPublishingReturn {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           if (pos.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
+            if (staleTimerRef.current !== null) {
+              clearTimeout(staleTimerRef.current);
+              staleTimerRef.current = null;
+            }
+            logger.warn("useLocationPublishing: GPS accuracy too low", {
+              storeId,
+              accuracy: pos.coords.accuracy,
+              threshold: MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR,
+            });
             setLocationStatus("error");
             return;
           }
@@ -93,11 +102,21 @@ export function useLocationPublishing(): UseLocationPublishingReturn {
 
     let active = true;
 
-    void storesService.findByOwnerId(userId).then((store) => {
-      if (!active || !store) return;
-      publishOnce(store.id);
-      intervalRef.current = setInterval(() => publishOnce(store.id), STORE_LOCATION_REFRESH_MS);
-    });
+    void storesService
+      .findByOwnerId(userId)
+      .then((store) => {
+        if (!active || !store) return;
+        publishOnce(store.id);
+        intervalRef.current = setInterval(() => publishOnce(store.id), STORE_LOCATION_REFRESH_MS);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        logger.error("useLocationPublishing: findByOwnerId failed", {
+          userId,
+          error: err instanceof Error ? err.message : String(err),
+        });
+        setLocationStatus("error");
+      });
 
     return () => {
       active = false;

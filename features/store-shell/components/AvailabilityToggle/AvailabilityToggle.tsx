@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/shared/utils/cn";
 import type { LocationPublishingStatus } from "@/features/store-shell/hooks/useLocationPublishing";
 
@@ -26,8 +28,14 @@ export function AvailabilityToggle({
   locationStatus,
   onToggle,
 }: AvailabilityToggleProps) {
-  const locationLabel = locationStatus ? LOCATION_STATUS_LABEL[locationStatus] : "";
-  const locationColor = locationStatus ? LOCATION_STATUS_COLOR[locationStatus] : "";
+  const locationLabel =
+    locationStatus !== undefined && locationStatus !== "idle"
+      ? LOCATION_STATUS_LABEL[locationStatus]
+      : "";
+  const locationColor =
+    locationStatus !== undefined && locationStatus !== "idle"
+      ? LOCATION_STATUS_COLOR[locationStatus]
+      : "";
 
   return (
     <div className="flex flex-col gap-1">

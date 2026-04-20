@@ -239,13 +239,46 @@ describe("useLocationPublishing", () => {
     setAuthenticated(MOCK_USER_ID);
     mockGeo(MOCK_COORDS.lat, MOCK_COORDS.lng);
 
-    const { unmount } = renderHook(() => useLocationPublishing());
+    const { unmount, result } = renderHook(() => useLocationPublishing());
     await flushPromises();
 
     const callCountAfterPublish = vi.mocked(storesService.updateLocation).mock.calls.length;
     unmount();
 
-    vi.advanceTimersByTime(STORE_LOCATION_REFRESH_MS * 3);
+    await act(() => vi.advanceTimersByTimeAsync(STORE_LOCATION_REFRESH_MS * 3));
     expect(vi.mocked(storesService.updateLocation).mock.calls.length).toBe(callCountAfterPublish);
+
+    // Stale timer must also be cancelled — status must not flip to "stale"
+    await act(() => vi.advanceTimersByTimeAsync(STORE_LOCATION_STALE_MS + 1));
+    expect(result.current.locationStatus).toBe("publishing");
+  });
+
+  it("transitions to error and clears stale timer when accuracy is too low", async () => {
+    setAvailable(true);
+    setAuthenticated(MOCK_USER_ID);
+    // First call succeeds, second has poor accuracy
+    vi.mocked(storesService.updateLocation).mockResolvedValue(undefined);
+    const poorAccuracy = 300;
+    mockGeo(MOCK_COORDS.lat, MOCK_COORDS.lng, poorAccuracy);
+
+    const { result } = renderHook(() => useLocationPublishing());
+    await flushPromises();
+
+    expect(result.current.locationStatus).toBe("error");
+    // Stale timer must NOT fire and overwrite the error status
+    await act(() => vi.advanceTimersByTimeAsync(STORE_LOCATION_STALE_MS + 1));
+    expect(result.current.locationStatus).toBe("error");
+  });
+
+  it("transitions to error when findByOwnerId rejects", async () => {
+    setAvailable(true);
+    setAuthenticated(MOCK_USER_ID);
+    mockGeo(MOCK_COORDS.lat, MOCK_COORDS.lng);
+    vi.mocked(storesService.findByOwnerId).mockRejectedValue(new Error("network error"));
+
+    const { result } = renderHook(() => useLocationPublishing());
+    await flushPromises();
+
+    expect(result.current.locationStatus).toBe("error");
   });
 });
