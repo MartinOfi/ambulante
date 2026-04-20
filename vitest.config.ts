@@ -27,12 +27,13 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
-      include: ["shared/**/*.{ts,tsx}", "features/**/*.{ts,tsx}"],
+      include: ["shared/**/*.{ts,tsx}", "features/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
       exclude: [
         "**/*.test.{ts,tsx}",
         "**/*.spec.{ts,tsx}",
         "**/index.ts",
         "shared/components/ui/**",
+        "app/sw.ts",
       ],
       thresholds: {
         lines: 80,

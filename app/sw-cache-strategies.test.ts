@@ -55,6 +55,16 @@ describe("SW_ROUTE_MATCHERS.geolocations", () => {
   });
 });
 
+describe("SW_ROUTE_MATCHERS ordering invariant", () => {
+  it("geolocations also matches api — ordering in sw.ts runtimeCaching is critical", () => {
+    // Both matchers match /api/locations. The NetworkOnly geolocations entry
+    // MUST be listed before the NetworkFirst api entry in sw.ts runtimeCaching,
+    // otherwise live location data would be cached and served stale.
+    expect(SW_ROUTE_MATCHERS.geolocations.test("/api/locations")).toBe(true);
+    expect(SW_ROUTE_MATCHERS.api.test("/api/locations")).toBe(true);
+  });
+});
+
 describe("SW_ROUTE_MATCHERS.api", () => {
   const { api } = SW_ROUTE_MATCHERS;
 

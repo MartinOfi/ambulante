@@ -36,16 +36,20 @@ const serwist = new Serwist({
     // Geolocation must never be served stale — live data only.
     {
       matcher: SW_ROUTE_MATCHERS.geolocations,
-      handler: new NetworkOnly({
-        cacheName: SW_CACHE_NAMES.liveData,
-      }),
+      handler: new NetworkOnly(),
     },
-    // Other API calls: network-first, 10s timeout, then fall back to cache.
+    // Other API calls: network-first, 10s timeout, then fall back to cache (1h TTL).
     {
       matcher: SW_ROUTE_MATCHERS.api,
       handler: new NetworkFirst({
         cacheName: SW_CACHE_NAMES.liveData,
         networkTimeoutSeconds: 10,
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: SW_CACHE_MAX_ENTRIES.liveData,
+            maxAgeSeconds: SW_CACHE_TTL_SECONDS.liveData,
+          }),
+        ],
       }),
     },
     // Order history: stale-while-revalidate so offline reads still work (PRD §7.3).
@@ -75,6 +79,9 @@ const serwist = new Serwist({
       }),
     },
     // All other requests: serwist defaults (precached assets, navigation, etc.).
+    // Must remain last — the custom entries above are more specific and must take
+    // precedence. If defaultCache gains an API or navigation matcher in a future
+    // serwist release, verify it does not conflict with the entries above.
     ...defaultCache,
   ],
 });
