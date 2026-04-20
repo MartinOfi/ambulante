@@ -1169,7 +1169,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Mapa real con pins dinámicos, pan/zoom fluido en mobile, clustering con densidad alta.
 
 ### F11.1 — Decisión de tile provider
-- **Estado:** 🟢 ready
+- **Estado:** 🟡 in-progress [owner: main chat, started: 2026-04-20]
 - **Depends on:** DP-5
 - **Estimación:** S
 - **Notas:**
