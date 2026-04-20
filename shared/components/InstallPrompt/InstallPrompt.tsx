@@ -45,6 +45,7 @@ function IosSteps() {
 }
 
 export function InstallPrompt({
+  dialogRef,
   platform,
   isInstalled,
   canTriggerNativePrompt,
@@ -57,12 +58,16 @@ export function InstallPrompt({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-label="Instalar la app"
+      aria-modal="true"
+      tabIndex={-1}
       className={cn(
         "fixed bottom-4 left-4 right-4 z-50 rounded-2xl border border-border",
         "bg-surface/95 p-4 shadow-sheet backdrop-blur-md",
         "sm:left-auto sm:right-4 sm:w-80",
+        "outline-none",
       )}
     >
       <div className="flex items-start justify-between gap-2">

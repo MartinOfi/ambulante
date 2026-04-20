@@ -1,3 +1,5 @@
+import { type RefObject } from "react";
+
 export const INSTALL_PLATFORM = {
   ios: "ios",
   android: "android",
@@ -7,6 +9,7 @@ export const INSTALL_PLATFORM = {
 export type InstallPlatform = (typeof INSTALL_PLATFORM)[keyof typeof INSTALL_PLATFORM];
 
 export interface InstallPromptProps {
+  readonly dialogRef: RefObject<HTMLDivElement | null>;
   readonly platform: InstallPlatform;
   readonly isInstalled: boolean;
   readonly canTriggerNativePrompt: boolean;
