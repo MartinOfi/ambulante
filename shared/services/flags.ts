@@ -1,12 +1,14 @@
+import { unstable_cache } from "next/cache";
 import { get, getAll } from "@vercel/edge-config";
 import { FLAG_DEFAULTS, type FlagKey } from "@/shared/constants/flags";
+import { CACHE_REVALIDATION_SECONDS, CACHE_TAGS } from "@/shared/config/cache-config";
 import { logger } from "@/shared/utils/logger";
 
 function isEdgeConfigured(): boolean {
   return Boolean(process.env.EDGE_CONFIG);
 }
 
-async function getFlag(key: FlagKey): Promise<boolean> {
+async function getFlagRaw(key: FlagKey): Promise<boolean> {
   if (!isEdgeConfigured()) {
     return FLAG_DEFAULTS[key];
   }
@@ -23,7 +25,7 @@ async function getFlag(key: FlagKey): Promise<boolean> {
   }
 }
 
-async function getAllFlags(): Promise<Record<FlagKey, boolean>> {
+async function getAllFlagsRaw(): Promise<Record<FlagKey, boolean>> {
   if (!isEdgeConfigured()) {
     return { ...FLAG_DEFAULTS };
   }
@@ -46,5 +48,15 @@ async function getAllFlags(): Promise<Record<FlagKey, boolean>> {
     return { ...FLAG_DEFAULTS };
   }
 }
+
+const getFlag = unstable_cache(getFlagRaw, [CACHE_TAGS.FLAGS], {
+  revalidate: CACHE_REVALIDATION_SECONDS.FLAGS,
+  tags: [CACHE_TAGS.FLAGS],
+});
+
+const getAllFlags = unstable_cache(getAllFlagsRaw, [CACHE_TAGS.FLAGS], {
+  revalidate: CACHE_REVALIDATION_SECONDS.FLAGS,
+  tags: [CACHE_TAGS.FLAGS],
+});
 
 export const flagsService = { getFlag, getAllFlags };

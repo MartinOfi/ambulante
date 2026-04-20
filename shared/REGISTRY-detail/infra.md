@@ -159,8 +159,28 @@ Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en
 | `SENTRY_AUTH_TOKEN` | `string().optional()` | no |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | `string().optional()` | no |
 | `NEXT_PUBLIC_MAP_STYLE_URL` | `string().url().optional()` | no — URL del estilo MapLibre; default en `.env.example`: `https://demotiles.maplibre.org/style.json` |
+| `EDGE_CONFIG` | `string().url().optional()` | no — inyectado automáticamente por Vercel al conectar un Edge Config store; ausente en local dev |
 
 **Consumers TS:** importar `env` desde `@/shared/config/env.runtime`. `next.config.ts` importa el side-effect `shared/config/env.runtime` para validar al build.
+
+---
+
+## §9b — Configuración de caché
+
+Centraliza constantes de caché para que no haya magic numbers ni strings dispersos. Importar desde `@/shared/config/cache-config`.
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `CACHE_REVALIDATION_SECONDS` | `{ FLAGS: 60 }` | TTL en segundos para `unstable_cache`. `FLAGS`: Edge Config se revalida cada 60 s por nodo de Vercel. |
+| `CACHE_TAGS` | `{ FLAGS: "flags" }` | Tags para revalidación on-demand via `revalidateTag()` desde Server Actions. |
+| `CacheTag` | `type` | Unión literal de todos los valores de `CACHE_TAGS`. |
+| `HTTP_CACHE_CONTROL` | `{ IMMUTABLE_ASSET, PUBLIC_PAGE, PRIVATE_NO_CACHE, API_NO_STORE }` | Directivas `Cache-Control` listas para usar en `next.config.ts` `headers()`. |
+
+**Valores de `HTTP_CACHE_CONTROL`:**
+- `IMMUTABLE_ASSET` → `"public, max-age=31536000, immutable"` — assets con hash en nombre (JS, CSS)
+- `PUBLIC_PAGE` → `"public, s-maxage=3600, stale-while-revalidate=86400"` — páginas públicas servidas por CDN
+- `PRIVATE_NO_CACHE` → `"private, no-cache, no-store, must-revalidate"` — respuestas con datos de usuario
+- `API_NO_STORE` → `"no-store"` — endpoints de API; nunca cachear en CDN
 
 ---
 

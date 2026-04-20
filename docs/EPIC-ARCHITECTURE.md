@@ -1493,11 +1493,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.4 — Edge caching strategy
-- **Estado:** 🟡 in-progress [owner: f15-4-chat, started: 2026-04-20]
+- **Estado:** ✅ done [owner: f15-4-chat, completed: 2026-04-20]
 - **Entregable:** Rutas estáticas con ISR; APIs con cache headers correctos; Vercel Edge Config para flags.
 - **Depends on:** F8.4
 - **Estimación:** L
-- **Notas:**
+- **Notas:** `shared/config/cache-config.ts` centraliza todas las constantes de caché (sin magic strings/numbers). `flagsService` wrappea Edge Config con `unstable_cache` (TTL 60s, tag `"flags"`). `next.config.ts` agrega `headers()` para assets (`immutable`) y APIs (`no-store`). 6 páginas estáticas marcadas `force-static`: landing + 5 auth pages. REGISTRY actualizado (§9b en infra.md). 18 tests pasando (9 cache-config + 9 flags).
 
 ### F15.5 — Database query optimization
 - **Estado:** ⚪ pending

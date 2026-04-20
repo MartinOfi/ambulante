@@ -3,6 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import withSerwist from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import "./shared/config/env.runtime";
+import { HTTP_CACHE_CONTROL } from "./shared/config/cache-config";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -14,6 +15,18 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+  },
+  async headers() {
+    return [
+      {
+        source: "/_next/static/(.*)",
+        headers: [{ key: "Cache-Control", value: HTTP_CACHE_CONTROL.IMMUTABLE_ASSET }],
+      },
+      {
+        source: "/api/(.*)",
+        headers: [{ key: "Cache-Control", value: HTTP_CACHE_CONTROL.API_NO_STORE }],
+      },
+    ];
   },
 };
 

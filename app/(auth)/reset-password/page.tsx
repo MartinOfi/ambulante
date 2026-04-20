@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { AuthCard } from "@/features/auth/components/AuthCard/AuthCard";
 import { ResetPasswordFormContainer } from "@/features/auth/components/ResetPasswordForm";
 
+export const dynamic = "force-static";
 export const metadata = { title: "Restablecer contraseña — Ambulante" };
 
 export default function ResetPasswordPage() {

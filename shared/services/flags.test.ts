@@ -5,6 +5,10 @@ vi.mock("@vercel/edge-config", () => ({
   getAll: vi.fn(),
 }));
 
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: unknown) => fn,
+}));
+
 import { get, getAll } from "@vercel/edge-config";
 import { FLAG_KEYS } from "@/shared/constants/flags";
 import { flagsService } from "@/shared/services/flags";

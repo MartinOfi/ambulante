@@ -28,6 +28,7 @@
 | Badge | ui-component | `shared/components/ui/badge.tsx` | ui.md §1 |
 | Button | ui-component | `shared/components/ui/button.tsx` | ui.md §1 |
 | Card | ui-component | `shared/components/ui/card.tsx` | ui.md §1 |
+| CACHE_REVALIDATION_SECONDS / CACHE_TAGS / HTTP_CACHE_CONTROL / CacheTag | constant | `shared/config/cache-config.ts` | infra.md §9b |
 | cn | util | `shared/utils/cn.ts` | infra.md §5 |
 | catalogService | service | `features/catalog/services/` | features.md §13 |
 | computeRetryDelay | util | `shared/providers/QueryProvider.tsx` | ui.md §2c |

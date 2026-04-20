@@ -8,6 +8,7 @@ const envSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
   NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
   NEXT_PUBLIC_MAP_STYLE_URL: z.string().url().optional(),
+  EDGE_CONFIG: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
