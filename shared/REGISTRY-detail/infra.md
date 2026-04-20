@@ -120,15 +120,23 @@ Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en
 
 | Nombre | Ruta | Descripción |
 |---|---|---|
-| `env` | `shared/config/env.ts` | Objeto con todas las variables de entorno validadas y tipadas (resultado congelado de parsear `process.env` al import) |
-| `parseEnv` | `shared/config/env.ts` | `(raw: unknown) => Env` — valida con Zod; lanza si faltan vars requeridas |
-| `Env` | `shared/config/env.ts` | Tipo inferido del schema |
+| `env` | `shared/config/env.runtime.ts` | Objeto con todas las variables de entorno validadas y tipadas (resultado congelado de parsear `process.env` al import) |
+| `parseEnv` | `shared/config/env.schema.ts` | `(raw: Record<string, string \| undefined>) => Env` — valida con Zod; lanza si faltan vars requeridas |
+| `Env` | `shared/config/env.schema.ts` | Tipo inferido del schema |
 
-**Schema actual:** `NODE_ENV` (enum dev/test/prod, default dev) + `NEXT_PUBLIC_APP_URL` (url).
+**Schema actual (todos los campos):**
 
-**⚠️ Por qué dos archivos `.mjs`:** `shared/config/env.mjs` (schema puro ESM) + `shared/config/env.runtime.mjs` (side-effect de validación al boot). Next 14 no puede importar `.ts` desde `next.config.mjs` — el schema vive en ESM puro para ser consumible por ambos mundos. Con Next 15 existe la opción de unificar en `.ts` via `next.config.ts`; refactor queda como tarea futura.
+| Variable | Tipo Zod | Requerida |
+|---|---|---|
+| `NODE_ENV` | `enum("development","test","production")` default `"development"` | no |
+| `NEXT_PUBLIC_APP_URL` | `string().url()` | sí |
+| `NEXT_PUBLIC_SENTRY_DSN` | `string().url().optional()` | no |
+| `SENTRY_DSN` | `string().url().optional()` | no |
+| `SENTRY_AUTH_TOKEN` | `string().optional()` | no |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | `string().optional()` | no |
+| `NEXT_PUBLIC_MAP_STYLE_URL` | `string().url().optional()` | no — URL del estilo MapLibre; default en `.env.example`: `https://demotiles.maplibre.org/style.json` |
 
-**Consumers TS:** importar `env` desde `@/shared/config/env`. `next.config.mjs` importa el side-effect para validar al build.
+**Consumers TS:** importar `env` desde `@/shared/config/env.runtime`. `next.config.ts` importa el side-effect `shared/config/env.runtime` para validar al build.
 
 ---
 
