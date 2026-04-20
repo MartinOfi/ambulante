@@ -955,13 +955,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** 18 tests verdes. IDs únicos via `_seq` counter; `ownerId` como UUID fake `00000000-0000-0000-0000-XXXXXXXXXXXX` para pasar validación UUID de `storeSchema`.
 
 ### F7.3 — Tests de dominio (máquina de estados)
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Es la invariante más crítica del producto.
 - **Entregable:** 100% coverage de `order-state-machine.ts` — todos los estados, todas las transiciones, todos los errores.
 - **Archivos:** `shared/domain/order-state-machine.test.ts`.
 - **Depends on:** F3.2, F7.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 26 tests (todos verdes). Coverage 100% statements/branches/functions/lines. Tests existentes de F3.2 cubrían el 100% estructural; F7.3 agregó 2 tests de invariante de dominio faltantes: ACEPTADO+CLIENTE_CANCELA→INVALID_TRANSITION y EN_CAMINO+CLIENTE_CANCELA→INVALID_TRANSITION (cliente pierde derecho a cancelar post-aceptación, PRD §6.1).
 
 ### F7.4 — Tests de hooks críticos
 - **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:50]

@@ -298,6 +298,50 @@ describe("transition — invalid transitions", () => {
     );
     expect(error.kind).toBe("INVALID_TRANSITION");
   });
+
+  // Cliente pierde el derecho a cancelar una vez que la tienda aceptó (PRD §6.1)
+  it("ACEPTADO + CLIENTE_CANCELA → INVALID_TRANSITION (cliente no puede cancelar post-aceptación)", () => {
+    const orderAceptado: Order = {
+      ...baseOrderEnviado,
+      status: ORDER_STATUS.ACEPTADO,
+      receivedAt: LATER_DATE,
+      acceptedAt: LATER_DATE,
+    };
+    const error = assertErr(
+      transition({
+        order: orderAceptado,
+        event: makeEvent(ORDER_EVENT.CLIENTE_CANCELA),
+        actor: ORDER_ACTOR.CLIENTE,
+      }),
+    );
+    expect(error.kind).toBe("INVALID_TRANSITION");
+    if (error.kind === "INVALID_TRANSITION") {
+      expect(error.from).toBe(ORDER_STATUS.ACEPTADO);
+      expect(error.event).toBe(ORDER_EVENT.CLIENTE_CANCELA);
+    }
+  });
+
+  it("EN_CAMINO + CLIENTE_CANCELA → INVALID_TRANSITION (cliente no puede cancelar en tránsito)", () => {
+    const orderEnCamino: Order = {
+      ...baseOrderEnviado,
+      status: ORDER_STATUS.EN_CAMINO,
+      receivedAt: LATER_DATE,
+      acceptedAt: LATER_DATE,
+      onTheWayAt: LATER_DATE,
+    };
+    const error = assertErr(
+      transition({
+        order: orderEnCamino,
+        event: makeEvent(ORDER_EVENT.CLIENTE_CANCELA),
+        actor: ORDER_ACTOR.CLIENTE,
+      }),
+    );
+    expect(error.kind).toBe("INVALID_TRANSITION");
+    if (error.kind === "INVALID_TRANSITION") {
+      expect(error.from).toBe(ORDER_STATUS.EN_CAMINO);
+      expect(error.event).toBe(ORDER_EVENT.CLIENTE_CANCELA);
+    }
+  });
 });
 
 // ====================================================================
