@@ -86,6 +86,8 @@
 | queryKeys | query | `shared/query/keys.ts` | data.md §2b |
 | RadialOrbitalTimeline | ui-component | `shared/components/ui/radial-orbital-timeline.tsx` | ui.md §1 |
 | RADIUS_OPTIONS / RadiusValue / DEFAULT_RADIUS | constant | `shared/constants/radius.ts` | domain.md §8 |
+| RATE_LIMIT_RULES / RateLimitRule / RateLimitRouteGroup | constant | `shared/constants/rate-limit.ts` | infra.md §12 |
+| createRateLimitService / InMemoryRateLimiter / RateLimitService / RateLimitResult | service | `shared/services/rate-limit.ts` | infra.md §12 |
 | REALTIME_CHANNELS | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | RECONNECT_INITIAL_DELAY_MS (y otros) | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |

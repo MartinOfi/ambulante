@@ -1522,11 +1522,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Security audit con 0 críticos. Política de privacidad publicada. Rate limiting activo.
 
 ### F16.1 — Rate limiting
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-f16-1, completed: 2026-04-20]
 - **Entregable:** Upstash/Vercel KV para rate limit. Reglas por endpoint. PRD §9.5 — evitar pedidos falsos.
 - **Depends on:** —
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Infraestructura completa implementada en fase mock. `InMemoryRateLimiter` (fixed-window) detrás de interfaz `RateLimitService`. Factory `createRateLimitService()` como seam para swap a Upstash. Middleware integrado: `/api/orders` → 5 req/60s, `/api/*` → 60 req/60s. IP via `x-forwarded-for` (Edge Runtime compatible). Env vars `UPSTASH_REDIS_REST_URL/TOKEN` agregadas como opcionales al schema. 6 tests unitarios passing. Swap a Upstash queda como tarea del backend task cuando se configure Supabase.
 
 ### F16.2 — Audit log inmutable
 - **Estado:** ⚪ pending
