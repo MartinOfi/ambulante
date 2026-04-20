@@ -1,27 +1,37 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 
-const AUDIT_ROUTES = ["/", "/map"] as const;
+import { CLIENT_ROUTES, PUBLIC_ROUTES } from "./constants";
 
 const CRITICAL_IMPACTS = ["critical", "serious"] as const;
 
-test.describe("accessibility audit — WCAG AA", () => {
-  for (const route of AUDIT_ROUTES) {
-    test(`${route} has no critical or serious violations`, async ({ page }) => {
-      await page.goto(route);
+type CriticalImpact = (typeof CRITICAL_IMPACTS)[number];
 
-      const results = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-        .analyze();
+function isCriticalImpact(impact: string | null | undefined): impact is CriticalImpact {
+  return impact != null && (CRITICAL_IMPACTS as readonly string[]).includes(impact);
+}
 
-      const criticalViolations = results.violations.filter((violation) =>
-        CRITICAL_IMPACTS.includes(violation.impact as (typeof CRITICAL_IMPACTS)[number]),
-      );
+function makeClientSessionCookie(): string {
+  const session = {
+    accessToken: "mock-access-client",
+    refreshToken: "mock-refresh-client",
+    expiresAt: Math.floor(Date.now() / 1000) + 3600,
+    user: { id: "client-user-id", email: "client@test.com", role: "client" },
+  };
+  return btoa(JSON.stringify(session));
+}
 
-      expect(criticalViolations, formatViolations(criticalViolations)).toHaveLength(0);
-    });
-  }
-});
+async function setClientSession(context: BrowserContext): Promise<void> {
+  await context.addCookies([
+    {
+      name: SESSION_COOKIE_NAME,
+      value: makeClientSessionCookie(),
+      domain: "localhost",
+      path: "/",
+    },
+  ]);
+}
 
 function formatViolations(
   violations: Awaited<ReturnType<AxeBuilder["analyze"]>>["violations"],
@@ -35,3 +45,35 @@ function formatViolations(
     )
     .join("\n\n");
 }
+
+async function auditRoute(page: Page, route: string): Promise<void> {
+  await page.goto(route);
+  await page.waitForLoadState("networkidle");
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+    .analyze();
+
+  const criticalViolations = results.violations.filter((violation) =>
+    isCriticalImpact(violation.impact),
+  );
+
+  expect(criticalViolations, formatViolations(criticalViolations)).toHaveLength(0);
+}
+
+test.describe("accessibility audit — WCAG AA — public routes", () => {
+  for (const route of PUBLIC_ROUTES) {
+    test(`${route} has no critical or serious violations`, async ({ page }) => {
+      await auditRoute(page, route);
+    });
+  }
+});
+
+test.describe("accessibility audit — WCAG AA — client routes", () => {
+  for (const route of CLIENT_ROUTES) {
+    test(`${route} has no critical or serious violations`, async ({ page, context }) => {
+      await setClientSession(context);
+      await auditRoute(page, route);
+    });
+  }
+});
