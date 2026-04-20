@@ -33,13 +33,20 @@ export function createMockPushService(): PushService {
       return await notificationApi.requestPermission();
     } catch (error) {
       logger.error("Error solicitando permiso de notificaciones", { cause: error });
-      return "denied";
+      return notificationApi.permission;
     }
   }
 
   async function subscribe(): Promise<PushSubscriptionData | null> {
-    const permission = await requestPermission();
-    if (permission !== "granted") return null;
+    if (activeSubscription !== null) return activeSubscription;
+
+    const currentPermission = getPermissionStatus();
+    if (currentPermission === "denied" || currentPermission === "unavailable") return null;
+
+    if (currentPermission !== "granted") {
+      const requested = await requestPermission();
+      if (requested !== "granted") return null;
+    }
 
     activeSubscription = {
       endpoint: MOCK_PUSH_ENDPOINT,
@@ -60,12 +67,9 @@ export function createMockPushService(): PushService {
   // @mock-only — uses the Notification constructor directly (browser-only).
   // Real implementation must use ServiceWorkerRegistration.showNotification()
   // via the push subscription. See CLAUDE.md §9 (iOS Safari constraint).
-  // TODO: replace when backend VAPID + SW push is wired up.
+  // TODO(F6.5): replace when backend VAPID + SW push is wired up.
   async function sendTestNotification(title: string, body: string): Promise<void> {
-    const notificationApi = getNotificationApi();
-    if (notificationApi === null) return;
-
-    const permission = notificationApi.permission;
+    const permission = getPermissionStatus();
 
     if (permission !== "granted") {
       logger.warn("No se puede enviar la notificación de prueba: permiso no concedido", {
@@ -73,6 +77,9 @@ export function createMockPushService(): PushService {
       });
       return;
     }
+
+    const notificationApi = getNotificationApi();
+    if (notificationApi === null) return;
 
     try {
       new notificationApi(title, {

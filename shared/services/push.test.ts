@@ -10,16 +10,19 @@ type MockNotificationStatic = {
   requestPermission: ReturnType<typeof vi.fn>;
 };
 
-function makeMockNotification(
-  permission: NotificationPermission,
-): MockNotificationStatic & (new (title: string, options?: NotificationOptions) => Notification) {
-  const MockConstructor = vi.fn() as unknown as MockNotificationStatic &
-    (new (title: string, options?: NotificationOptions) => Notification);
+type MockNotification = MockNotificationStatic &
+  ReturnType<typeof vi.fn> &
+  (new (title: string, options?: NotificationOptions) => Notification);
 
-  MockConstructor.permission = permission;
-  MockConstructor.requestPermission = vi.fn().mockResolvedValue(permission);
-
-  return MockConstructor;
+function makeMockNotification(permission: NotificationPermission): MockNotification {
+  // vi.fn() cannot be directly typed as a newable constructor — the cast is intentional.
+  // Object.assign preserves the mock's call-tracking; the type assertion is the only
+  // way to satisfy the Notification constructor signature in vitest's type system.
+  const ctor = Object.assign(vi.fn(), {
+    permission,
+    requestPermission: vi.fn().mockResolvedValue(permission),
+  }) as unknown as MockNotification;
+  return ctor;
 }
 
 describe("createMockPushService", () => {
@@ -44,6 +47,12 @@ describe("createMockPushService", () => {
       vi.stubGlobal("Notification", makeMockNotification("denied"));
 
       expect(service.getPermissionStatus()).toBe("denied");
+    });
+
+    it("returns default when Notification.permission is default", () => {
+      vi.stubGlobal("Notification", makeMockNotification("default"));
+
+      expect(service.getPermissionStatus()).toBe("default");
     });
 
     it("returns unavailable when Notification is not available (SSR)", () => {
@@ -77,6 +86,16 @@ describe("createMockPushService", () => {
 
       expect(status).toBe("unavailable");
     });
+
+    it("returns actual browser permission state when requestPermission throws", async () => {
+      const mock = makeMockNotification("default");
+      mock.requestPermission.mockRejectedValueOnce(new Error("gesture required"));
+      vi.stubGlobal("Notification", mock);
+
+      const status = await service.requestPermission();
+
+      expect(status).toBe("default");
+    });
   });
 
   describe("subscribe", () => {
@@ -91,8 +110,26 @@ describe("createMockPushService", () => {
       expect(subscription?.keys.auth).toBeTruthy();
     });
 
+    it("returns the same subscription on repeated calls (idempotent)", async () => {
+      vi.stubGlobal("Notification", makeMockNotification("granted"));
+
+      const first = await service.subscribe();
+      const second = await service.subscribe();
+
+      expect(second).toBe(first);
+    });
+
     it("returns null when permission is denied", async () => {
       vi.stubGlobal("Notification", makeMockNotification("denied"));
+
+      const subscription = await service.subscribe();
+
+      expect(subscription).toBeNull();
+    });
+
+    it("returns null when permission is default and user dismisses", async () => {
+      const mock = makeMockNotification("default");
+      vi.stubGlobal("Notification", mock);
 
       const subscription = await service.subscribe();
 
@@ -146,6 +183,16 @@ describe("createMockPushService", () => {
 
     it("does not throw in SSR context", async () => {
       vi.stubGlobal("Notification", undefined);
+
+      await expect(service.sendTestNotification("Test", "Cuerpo")).resolves.toBeUndefined();
+    });
+
+    it("does not throw when Notification constructor throws", async () => {
+      const throwingMock = makeMockNotification("granted");
+      throwingMock.mockImplementationOnce(() => {
+        throw new Error("blocked by browser");
+      });
+      vi.stubGlobal("Notification", throwingMock);
 
       await expect(service.sendTestNotification("Test", "Cuerpo")).resolves.toBeUndefined();
     });

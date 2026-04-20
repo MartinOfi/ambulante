@@ -9,9 +9,9 @@ export interface PushSubscriptionData {
 }
 
 export interface PushService {
+  getPermissionStatus(): PushPermissionStatus;
   requestPermission(): Promise<PushPermissionStatus>;
   subscribe(): Promise<PushSubscriptionData | null>;
   unsubscribe(): Promise<boolean>;
   sendTestNotification(title: string, body: string): Promise<void>;
-  getPermissionStatus(): PushPermissionStatus;
 }
