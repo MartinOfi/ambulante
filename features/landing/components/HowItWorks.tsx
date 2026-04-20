@@ -1,5 +1,3 @@
-"use client";
-
 import { MapPinned, Radar, ShoppingBasket, Send, Handshake } from "lucide-react";
 import RadialOrbitalTimeline, {
   type TimelineItem,
