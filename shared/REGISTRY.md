@@ -112,6 +112,18 @@
 - **Tipos exportados:** `IconName`, `IconSize`, `IconColor`, `IconProps`
 - **Nota:** requiere `"use client"` (React.lazy). Usar dentro de Server Components sin `"use client"` propio — el boundary se toma del primer Client Component ancestro.
 
+### InstallPrompt
+
+- **Ruta barrel:** `shared/components/InstallPrompt/index.ts`
+- **Archivos:** `InstallPrompt.tsx` (dumb), `InstallPrompt.container.tsx` (smart, `"use client"`), `InstallPrompt.types.ts`, `InstallPrompt.test.tsx`
+- **Descripción:** Prompt de instalación PWA con detección de plataforma (iOS Safari / Android Chrome). En iOS muestra pasos paso a paso para instalar desde Safari (requerido para push notifications). En Android con soporte de `BeforeInstallPromptEvent`, ofrece instalación nativa directa. Persiste el dismiss en localStorage. Renderiza `null` si ya está instalado o si la plataforma es desconocida.
+- **API dumb:** `<InstallPrompt platform isInstalled canTriggerNativePrompt onTriggerNativePrompt onDismiss />`
+- **API smart:** `<InstallPromptContainer />` — sin props. Detecta plataforma, escucha `beforeinstallprompt`, persiste dismissed en `"ambulante-install-prompt-dismissed"`.
+- **Constantes exportadas:** `INSTALL_PLATFORM` — `{ ios, android, unknown }` as const
+- **Tipos exportados:** `InstallPlatform`, `InstallPromptProps`, `BeforeInstallPromptEvent`
+- **Gotcha:** `BeforeInstallPromptEvent` es una API no estándar de Chromium — tipada localmente, no augmenta `Window` global. `navigator.standalone` (iOS Safari) requiere `@ts-expect-error`.
+- **Usado en:** `app/layout.tsx` (a agregar en F6.5+).
+
 ### ThemeProvider
 
 - **Ruta:** `shared/components/theme/ThemeProvider.tsx`
@@ -868,3 +880,4 @@
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
+| 2026-04-20 | F6.4: `InstallPrompt` (dumb+container) en §2 — detección iOS/Android, pasos iOS, native prompt Android, persist dismiss en localStorage | —     |
