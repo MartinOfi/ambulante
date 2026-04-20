@@ -1,49 +1,55 @@
-"use client";
-
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { ROUTES } from "@/shared/constants/routes";
 import { Stack } from "@/shared/components/layout";
 import { Text } from "@/shared/components/typography";
+import { ROUTES } from "@/shared/constants/routes";
+import type { LegalSection } from "@/features/legal/types";
+import type { TermsPageProps } from "./TermsPage.types";
 
-export function TermsPage() {
-  const t = useTranslations("Pages.Terms");
-
+export function TermsPage({
+  title,
+  lastUpdated,
+  intro,
+  sections,
+  privacyLinkLabel,
+  backToHomeLabel,
+  relatedLinksLabel,
+}: TermsPageProps) {
   return (
     <main className="min-h-screen bg-surface">
       <div className="mx-auto max-w-2xl px-4 py-12">
         <Stack gap={8}>
           <Stack gap={2}>
             <Text as="h1" variant="display-lg">
-              {t("title")}
+              {title}
             </Text>
             <Text variant="caption" className="text-muted-foreground">
-              {t("lastUpdated")}
+              {lastUpdated}
             </Text>
           </Stack>
 
           <Text variant="body" className="text-foreground/80">
-            {t("intro")}
+            {intro}
           </Text>
 
-          <LegalSection title={t("section1Title")} body={t("section1Body")} />
-          <LegalSection title={t("section2Title")} body={t("section2Body")} />
-          <LegalSection title={t("section3Title")} body={t("section3Body")} />
-          <LegalSection title={t("section4Title")} body={t("section4Body")} />
-          <LegalSection title={t("section5Title")} body={t("section5Body")} />
+          {sections.map((section) => (
+            <LegalSectionBlock key={section.title} section={section} />
+          ))}
 
-          <nav className="flex flex-wrap gap-4 border-t border-border pt-6">
+          <nav
+            aria-label={relatedLinksLabel}
+            className="flex flex-wrap gap-4 border-t border-border pt-6"
+          >
             <Link
               href={ROUTES.legal.privacy}
               className="text-sm font-medium text-[hsl(var(--brand-primary))] underline-offset-2 hover:underline"
             >
-              {t("privacyLink")}
+              {privacyLinkLabel}
             </Link>
             <Link
               href={ROUTES.public.home}
               className="text-sm text-muted-foreground underline-offset-2 hover:underline"
             >
-              {t("backToHome")}
+              {backToHomeLabel}
             </Link>
           </nav>
         </Stack>
@@ -52,17 +58,14 @@ export function TermsPage() {
   );
 }
 
-interface LegalSectionProps {
-  readonly title: string;
-  readonly body: string;
-}
-
-function LegalSection({ title, body }: LegalSectionProps) {
+function LegalSectionBlock({ section }: { readonly section: LegalSection }) {
   return (
     <Stack gap={2}>
-      <Text variant="heading-sm">{title}</Text>
+      <Text as="h2" variant="heading-sm">
+        {section.title}
+      </Text>
       <Text variant="body-sm" className="text-foreground/80">
-        {body}
+        {section.body}
       </Text>
     </Stack>
   );

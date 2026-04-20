@@ -556,7 +556,8 @@
       "section5Title": "Contacto",
       "section5Body": "¿Tenés preguntas sobre esta política? Escribinos a privacidad@ambulante.app.",
       "termsLink": "Ver términos de uso",
-      "backToHome": "Volver al inicio"
+      "backToHome": "Volver al inicio",
+      "relatedLinksLabel": "Páginas relacionadas"
     },
     "Terms": {
       "title": "Términos de uso",
@@ -573,7 +574,8 @@
       "section5Title": "Ley aplicable",
       "section5Body": "Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia será resuelta ante los tribunales ordinarios competentes de la Ciudad Autónoma de Buenos Aires.",
       "privacyLink": "Ver política de privacidad",
-      "backToHome": "Volver al inicio"
+      "backToHome": "Volver al inicio",
+      "relatedLinksLabel": "Páginas relacionadas"
     }
   }
 }
