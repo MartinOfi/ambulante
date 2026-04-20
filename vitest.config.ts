@@ -26,7 +26,7 @@ export default defineConfig({
     exclude: ["node_modules/**", ".next/**", "e2e/**"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "lcov"],
       include: ["shared/**/*.{ts,tsx}", "features/**/*.{ts,tsx}"],
       exclude: [
         "**/*.test.{ts,tsx}",
@@ -34,6 +34,12 @@ export default defineConfig({
         "**/index.ts",
         "shared/components/ui/**",
       ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
     },
   },
 });

@@ -982,13 +982,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F7.6 — Coverage en CI con umbral
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** El número sin gate es decoración.
 - **Entregable:** `vitest --coverage`, umbral 80% en `vitest.config.ts`, CI falla si baja.
 - **Archivos:** `vitest.config.ts`, `.github/workflows/ci.yml`.
 - **Depends on:** F0.7, F7.1
 - **Estimación:** S
-- **Notas:**
+- **Notas:** `vitest.config.ts` — añadido `lcov` reporter + `thresholds` (lines/functions/branches/statements al 80%). `.github/workflows/ci.yml` — job `test-unit` ahora corre `pnpm test -- --coverage`; vitest falla con exit code 1 si coverage baja del umbral.
 
 ### F7.7 — Visual regression (opcional MVP)
 - **Estado:** ⏸️ deferred
