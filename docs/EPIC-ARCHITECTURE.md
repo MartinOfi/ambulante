@@ -894,13 +894,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** `app/sw.ts` excluido de tsconfig principal — `ServiceWorkerGlobalScope` vive en `lib.webworker`, incompatible con `lib.dom`. Serwist usa su propio bundler interno. `config.matcher` en `middleware.ts` requiere literales inline (Next.js no puede resolver identificadores en análisis estático). `public/sw.js` generado (52KB). 499 tests passing.
 
 ### F6.2 — Estrategia de caché offline
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** PRD §7.3 — "ver historial de pedidos" offline. Cacheo selectivo.
 - **Entregable:** Estrategias por ruta: network-first para datos vivos, cache-first para assets, stale-while-revalidate para historial.
-- **Archivos:** `app/sw.ts`.
+- **Archivos:** `app/sw.ts`, `app/sw-cache-strategies.ts`, `app/sw-cache-strategies.test.ts`.
 - **Depends on:** F6.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Constantes extraídas a `app/sw-cache-strategies.ts` (excluido de tsconfig SW scope). 4 estrategias: `NetworkOnly` para `/api/locations` (geolocalización nunca stale), `NetworkFirst` para `/api/*` genérico, `StaleWhileRevalidate` para `/orders` (historial offline PRD §7.3), `CacheFirst` para imágenes. 23 tests passing.
 
 ### F6.3 — Web Push notifications
 - **Estado:** ⚪ pending
