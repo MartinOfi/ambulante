@@ -1529,12 +1529,12 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Infraestructura completa implementada en fase mock. `InMemoryRateLimiter` (fixed-window) detrás de interfaz `RateLimitService`. Factory `createRateLimitService()` como seam para swap a Upstash. Middleware integrado: `/api/orders` → 5 req/60s, `/api/*` → 60 req/60s. IP via `x-forwarded-for` (Edge Runtime compatible). Env vars `UPSTASH_REDIS_REST_URL/TOKEN` agregadas como opcionales al schema. 6 tests unitarios passing. Swap a Upstash queda como tarea del backend task cuando se configure Supabase.
 
 ### F16.2 — Audit log inmutable
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Transiciones de pedido deben quedar registradas con actor + timestamp (PRD §6.2).
 - **Entregable:** Tabla append-only en backend; integración con state machine.
 - **Depends on:** F3.2, DP-1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `shared/domain/audit-log.ts` (Zod schemas + types), `shared/services/audit-log.ts` (interface), `shared/services/audit-log.mock.ts` (mock with 4 seed orders), `transitionWithAudit()` added to `shared/domain/order-state-machine.ts`, SQL migration `docs/migrations/001_audit_log.sql` (RLS append-only). 50 tests passing.
 
 ### F16.3 — Privacy policy + terms
 - **Estado:** ✅ done [2026-04-20]

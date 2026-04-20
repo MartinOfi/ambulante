@@ -130,6 +130,15 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 
 > Clientes de datos. Hoy devuelven mocks; mañana apuntarán a la API real. **No importar mocks directamente en componentes; siempre consumir vía los hooks de §3.**
 
+### `auditLogService` — `shared/services/audit-log.ts` / `shared/services/audit-log.mock.ts`
+
+- **Descripción:** Servicio append-only de auditoría de transiciones de pedidos (PRD §6.2). Semántica de solo-inserción — no hay métodos de update ni delete. En producción apuntará a la tabla `order_audit_log` (Supabase, migración `docs/migrations/001_audit_log.sql`); hoy implementado como mock en memoria.
+- **Interface:** `AuditLogService` — `append(entry: NewAuditLogEntry): Promise<void>`, `findByOrderId(orderId: string): Promise<readonly AuditLogEntry[]>`
+- **Factory exportada:** `createMockAuditLogService()` — instancia aislada con seed de 4 pedidos demo (happy path, rechazado, expirado, cancelado)
+- **Singleton:** `auditLogService` — exportado desde `audit-log.mock.ts` para uso en runtime
+- **Tipos clave:** `AuditLogEntry`, `NewAuditLogEntry` (en `shared/domain/audit-log.ts`)
+- **Tests:** `shared/services/audit-log.mock.test.ts` (7 casos), `shared/domain/audit-log.test.ts` (schemas)
+
 ### `analyticsService` — `shared/services/analytics.ts`
 - **Constants/schemas:** `shared/constants/analytics-events.ts`
 - **Descripción:** Servicio de analytics con transporte swapeable (Vercel Analytics en prod, logger en dev). Valida props con Zod antes de enviar — lanza `ZodError` si el payload es inválido.
