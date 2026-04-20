@@ -1537,11 +1537,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.3 — Privacy policy + terms
-- **Estado:** 🟡 in-progress [owner: this chat, started: 2026-04-20]
+- **Estado:** ✅ done [2026-04-20]
 - **Entregable:** `/legal/privacy`, `/legal/terms`. Cookie consent si DP-7 incluye UE.
 - **Depends on:** DP-7
 - **Estimación:** M
-- **Notas:**
+- **Notas:** DP-7 = Argentina only → no cookie consent needed. Pages at app/legal/privacy and app/legal/terms. Ley 25.326 referenced in privacy policy.
 
 ### F16.4 — Privacidad de ubicación del cliente
 - **Estado:** ⚪ pending
