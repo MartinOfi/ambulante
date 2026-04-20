@@ -903,7 +903,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F6.3 — Web Push notifications
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 14:00]
 - **Por qué:** PRD §5.1 C8 / §5.2 T8 — alertas de cambio de estado.
 - **Entregable:** `shared/services/push.ts` con `subscribe`, `unsubscribe`, `sendTestNotification`. VAPID keys en env. Flow de permisos.
 - **Archivos:** `shared/services/push.ts`.
