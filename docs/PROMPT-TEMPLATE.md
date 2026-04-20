@@ -179,6 +179,12 @@ verificable.
 
 ## PASO 3 · AUDITORÍA del plan contra CLAUDE.md (CRÍTICO — GATE DURO)
 
+**Antes de auditar:** releé el archivo de reglas completo desde disco para asegurarte de tener la versión vigente, no una versión compactada de memoria:
+```
+Read /Users/martinoficialdegui/Desktop/ambulante/docs/PROMPT-TEMPLATE.md  (sección PASO 3 — la tabla de 30 reglas)
+Read /Users/martinoficialdegui/Desktop/ambulante/CLAUDE.md  (§6 reglas de código, §7 invariantes de dominio)
+```
+
 **Esto es lo más importante del prompt.** Antes de escribir UNA línea de código,
 revisá tu plan contra esta tabla. Imprimila COMPLETA en el chat, con el status
 por cada regla (incluso las que den ✅ — quiero verlas todas). Si hay ❌,
@@ -265,6 +271,11 @@ Si tu tarea implica diseño visual, componentes UI, animaciones, ilustraciones o
 
 ## PASO 6 · Verificación final
 
+**Antes de verificar:** re-leé los comandos exactos desde disco — no confíes en memoria si el chat compactó:
+```
+Read /Users/martinoficialdegui/Desktop/ambulante/docs/PROMPT-TEMPLATE.md  (sección PASO 6)
+```
+
 Antes de marcar done, estas 4 cosas deben pasar y tenés que pegar el output:
 
 1. `npx tsc --noEmit` → 0 errores.
@@ -336,6 +347,8 @@ La cadena cerró. Imprimí: "Cadena cerrada. No hay continuación." y continuá 
 ## PASO 9 · Code review final + cierre del worktree
 
 Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
+
+> **Anti-compaction (igual que PASO 3 y PASO 6):** antes de ejecutar cualquier sub-paso, releé este PASO 9 completo desde disco (`docs/PROMPT-TEMPLATE.md` líneas del bloque PASO 9). La compaction borra detalles críticos de contexto — los comandos exactos y las reglas de gate duro se leen del archivo, no de memoria comprimida.
 
 ### 9.1 · Code review
 
@@ -695,4 +708,6 @@ con el output exacto — no improvises.
 | 2026-04-20 | Agregado auto-check al inicio del PASO 0: el agente corre `git branch --show-current` antes de cualquier acción y se bloquea si está en `main` |
 | 2026-04-20 | Agregado protocolo de deuda técnica en PASO 7: tres casos (implementar ahora, requisito de tarea futura, deuda con DT-N) con regla de oro |
 | 2026-04-20 | PASO 9.1: aclarado que todos los issues del code review deben resolverse (cualquier severity), con la única excepción del protocolo de deuda técnica del PASO 7 |
+| 2026-04-20 | PASO 3 y PASO 6: re-lectura obligatoria desde disco antes de ejecutar cada gate (anti-compaction: los comandos exactos se leen del archivo, no de memoria comprimida) |
+| 2026-04-20 | PASO 9: agregada instrucción anti-compaction igual que PASOes 3 y 6 — la segunda pasada de code review (9.1.6) era el paso que se perdía tras compaction |
 
