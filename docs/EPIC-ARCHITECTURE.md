@@ -964,13 +964,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** 26 tests (todos verdes). Coverage 100% statements/branches/functions/lines. Tests existentes de F3.2 cubrían el 100% estructural; F7.3 agregó 2 tests de invariante de dominio faltantes: ACEPTADO+CLIENTE_CANCELA→INVALID_TRANSITION y EN_CAMINO+CLIENTE_CANCELA→INVALID_TRANSITION (cliente pierde derecho a cancelar post-aceptación, PRD §6.1).
 
 ### F7.4 — Tests de hooks críticos
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:50]
+- **Estado:** ✅ done [owner: chat-2026-04-20]
 - **Por qué:** `useGeolocation`, `useSession`, `use*Query`.
 - **Entregable:** Tests con mock de `navigator.geolocation`, react-query provider wrapper.
 - **Archivos:** `shared/hooks/*.test.ts`.
 - **Depends on:** F7.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 27 tests verdes. `useGeolocation.test.ts` (12 tests — mock de navigator.geolocation, accuracy threshold, todos los error codes). `useRealtimeStatus.test.ts` (7 tests — subscribe/unsubscribe, transiciones de estado). `useSession.test.tsx` (8 tests — estados auth, signIn/signOut, cleanup en unmount). use*Query hooks cubiertos en sus propias features con tests independientes.
 
 ### F7.5 — Component tests (smart vs dumb)
 - **Estado:** ✅ done [owner: chat-2026-04-20]
@@ -1126,7 +1126,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Toda la copy vive en `messages/*.json`. Axe no reporta violations críticas.
 
 ### F10.1 — next-intl setup
-- **Estado:** 🔴 blocked (DP-7)
+- **Estado:** 🟢 ready
 - **Por qué:** Si es solo AR, es opcional; si es multi-país, es urgente.
 - **Entregable:** `next-intl` instalado, `messages/es.json`, locale routing opcional.
 - **Archivos:** `messages/*`, `i18n.ts`.
@@ -1169,7 +1169,7 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Mapa real con pins dinámicos, pan/zoom fluido en mobile, clustering con densidad alta.
 
 ### F11.1 — Decisión de tile provider
-- **Estado:** 🔴 blocked (DP-5)
+- **Estado:** 🟢 ready
 - **Depends on:** DP-5
 - **Estimación:** S
 - **Notas:**
