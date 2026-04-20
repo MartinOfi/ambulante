@@ -1,3 +1,4 @@
+import { PUSH_NOTIFICATION_ICON } from "@/shared/constants/push";
 import { logger } from "@/shared/utils/logger";
 
 import type { PushPermissionStatus, PushService, PushSubscriptionData } from "./push.types";
@@ -7,7 +8,6 @@ import type { PushPermissionStatus, PushService, PushSubscriptionData } from "./
 const MOCK_PUSH_ENDPOINT = "https://mock-push.ambulante.local/send/mock-device-id";
 const MOCK_P256DH_KEY = "BNcRdreALRFXTkOOUHK1EtK2wtd5uL7KYGFN0tmH4G89GF0";
 const MOCK_AUTH_KEY = "tBHIth2jVLrQl4k2e1K3Kg";
-const PUSH_NOTIFICATION_ICON = "/icons/icon-192x192.png";
 
 // SSR-safe: returns the Notification constructor only when in a browser context.
 function getNotificationApi(): typeof Notification | null {
@@ -17,15 +17,17 @@ function getNotificationApi(): typeof Notification | null {
 }
 
 export function createMockPushService(): PushService {
+  let activeSubscription: PushSubscriptionData | null = null;
+
   function getPermissionStatus(): PushPermissionStatus {
     const notificationApi = getNotificationApi();
-    if (notificationApi === null) return "denied";
+    if (notificationApi === null) return "unavailable";
     return notificationApi.permission;
   }
 
   async function requestPermission(): Promise<PushPermissionStatus> {
     const notificationApi = getNotificationApi();
-    if (notificationApi === null) return "denied";
+    if (notificationApi === null) return "unavailable";
 
     try {
       return await notificationApi.requestPermission();
@@ -39,19 +41,26 @@ export function createMockPushService(): PushService {
     const permission = await requestPermission();
     if (permission !== "granted") return null;
 
-    return {
+    activeSubscription = {
       endpoint: MOCK_PUSH_ENDPOINT,
       keys: {
         p256dh: MOCK_P256DH_KEY,
         auth: MOCK_AUTH_KEY,
       },
     };
+    return activeSubscription;
   }
 
   async function unsubscribe(): Promise<boolean> {
+    if (activeSubscription === null) return false;
+    activeSubscription = null;
     return true;
   }
 
+  // @mock-only — uses the Notification constructor directly (browser-only).
+  // Real implementation must use ServiceWorkerRegistration.showNotification()
+  // via the push subscription. See CLAUDE.md §9 (iOS Safari constraint).
+  // TODO: replace when backend VAPID + SW push is wired up.
   async function sendTestNotification(title: string, body: string): Promise<void> {
     const notificationApi = getNotificationApi();
     if (notificationApi === null) return;

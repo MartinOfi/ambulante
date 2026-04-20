@@ -344,7 +344,8 @@
 - **Interface:** `PushService` — `requestPermission()`, `subscribe()` → `PushSubscriptionData | null`, `unsubscribe()` → `boolean`, `sendTestNotification(title, body)`, `getPermissionStatus()` → `PushPermissionStatus`
 - **Factory exportada:** `createMockPushService()` — instancia aislada por test
 - **Singleton:** `pushService` — usado en runtime
-- **Tipos clave:** `PushPermissionStatus` ("default" | "granted" | "denied"), `PushSubscriptionData` (endpoint + keys p256dh/auth)
+- **Tipos clave:** `PushPermissionStatus` ("default" | "granted" | "denied" | "unavailable"), `PushSubscriptionData` (endpoint + keys p256dh/auth)
+- **Constante:** `PUSH_NOTIFICATION_ICON` en `shared/constants/push.ts`
 - **Env relacionada:** `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (opcional, se usa cuando llegue la implementación real)
 - **Usado en:** futuras features de notificaciones (F6.4+), profile de notificaciones.
 

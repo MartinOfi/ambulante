@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PUSH_NOTIFICATION_ICON } from "@/shared/constants/push";
+
 import { createMockPushService } from "./push";
 import type { PushService } from "./push.types";
 
@@ -44,10 +46,10 @@ describe("createMockPushService", () => {
       expect(service.getPermissionStatus()).toBe("denied");
     });
 
-    it("returns denied when Notification is not available (SSR)", () => {
+    it("returns unavailable when Notification is not available (SSR)", () => {
       vi.stubGlobal("Notification", undefined);
 
-      expect(service.getPermissionStatus()).toBe("denied");
+      expect(service.getPermissionStatus()).toBe("unavailable");
     });
   });
 
@@ -68,12 +70,12 @@ describe("createMockPushService", () => {
       expect(status).toBe("denied");
     });
 
-    it("resolves to denied in SSR context (Notification undefined)", async () => {
+    it("resolves to unavailable in SSR context (Notification undefined)", async () => {
       vi.stubGlobal("Notification", undefined);
 
       const status = await service.requestPermission();
 
-      expect(status).toBe("denied");
+      expect(status).toBe("unavailable");
     });
   });
 
@@ -107,7 +109,7 @@ describe("createMockPushService", () => {
   });
 
   describe("unsubscribe", () => {
-    it("returns true when unsubscribing", async () => {
+    it("returns true after a successful subscribe", async () => {
       vi.stubGlobal("Notification", makeMockNotification("granted"));
       await service.subscribe();
 
@@ -116,10 +118,10 @@ describe("createMockPushService", () => {
       expect(result).toBe(true);
     });
 
-    it("returns true even when not previously subscribed", async () => {
+    it("returns false when not previously subscribed", async () => {
       const result = await service.unsubscribe();
 
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
   });
 
@@ -132,7 +134,7 @@ describe("createMockPushService", () => {
 
       expect(mockNotification).toHaveBeenCalledWith("Pedido actualizado", {
         body: "Tu pedido fue aceptado",
-        icon: "/icons/icon-192x192.png",
+        icon: PUSH_NOTIFICATION_ICON,
       });
     });
 

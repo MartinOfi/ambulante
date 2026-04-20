@@ -1,4 +1,4 @@
-export type PushPermissionStatus = "default" | "granted" | "denied";
+export type PushPermissionStatus = "default" | "granted" | "denied" | "unavailable";
 
 export interface PushSubscriptionData {
   readonly endpoint: string;
