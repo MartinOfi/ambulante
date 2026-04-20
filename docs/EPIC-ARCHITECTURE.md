@@ -1369,11 +1369,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:** Hooks con optimistic updates (create/update/delete). Container/Presentational. 26/26 tests GREEN.
 
 ### F13.4 — Incoming orders inbox
-- **Estado:** 🟡 in-progress [owner: chat-f13-4, started: 2026-04-20]
+- **Estado:** ✅ done [owner: chat-f13-4, finished: 2026-04-20]
 - **Entregable:** Vista realtime con nuevos pedidos, sort por tiempo, sound/vibration opcional.
 - **Depends on:** F5.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `useStoreOrdersQuery` (React Query + realtime invalidation via `useRealtimeInvalidation`), `useNewOrderAlert` (vibrate + AudioContext tone, skips initial render via useRef), `IncomingOrdersInbox` dumb + container + types, `app/(store)/store/orders/page.tsx`. `queryKeys.orders.byStore`, `REALTIME_CHANNELS` constant, `FindByStoreInput` + `findByStore` en service + mock. 16 tests GREEN (3 test files). Sorted by `createdAt` desc. `pendingOrderId` prop disables buttons during in-flight mutations.
 
 ### F13.5 — Accept/reject/finalize flow
 - **Estado:** ✅ done [owner: chat-f13-5, finished: 2026-04-19]
