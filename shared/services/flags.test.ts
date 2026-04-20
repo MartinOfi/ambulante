@@ -6,7 +6,7 @@ vi.mock("@vercel/edge-config", () => ({
 }));
 
 vi.mock("next/cache", () => ({
-  unstable_cache: (fn: unknown) => fn,
+  unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
 }));
 
 import { get, getAll } from "@vercel/edge-config";

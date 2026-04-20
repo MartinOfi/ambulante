@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Vercel sets immutable on /_next/static automatically; this applies to self-hosted
         source: "/_next/static/(.*)",
         headers: [{ key: "Cache-Control", value: HTTP_CACHE_CONTROL.IMMUTABLE_ASSET }],
       },

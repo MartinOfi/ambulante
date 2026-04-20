@@ -49,12 +49,12 @@ async function getAllFlagsRaw(): Promise<Record<FlagKey, boolean>> {
   }
 }
 
-const getFlag = unstable_cache(getFlagRaw, [CACHE_TAGS.FLAGS], {
+const getFlag = unstable_cache(getFlagRaw, [`${CACHE_TAGS.FLAGS}-single`], {
   revalidate: CACHE_REVALIDATION_SECONDS.FLAGS,
   tags: [CACHE_TAGS.FLAGS],
 });
 
-const getAllFlags = unstable_cache(getAllFlagsRaw, [CACHE_TAGS.FLAGS], {
+const getAllFlags = unstable_cache(getAllFlagsRaw, [`${CACHE_TAGS.FLAGS}-all`], {
   revalidate: CACHE_REVALIDATION_SECONDS.FLAGS,
   tags: [CACHE_TAGS.FLAGS],
 });
