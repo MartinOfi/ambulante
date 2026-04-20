@@ -132,17 +132,27 @@ ambulante/
 
 ---
 
-## 5. El archivo `shared/REGISTRY.md` (fuente de verdad de lo reutilizable)
+## 5. El registro `shared/REGISTRY.md` (fuente de verdad de lo reutilizable)
 
-**Antes de crear cualquier componente, hook, util, service o constante nuevo, el agente DEBE leer `shared/REGISTRY.md` para verificar si ya existe algo reutilizable.**
+El registro tiene **dos niveles**:
 
-- Si existe algo que sirve → se reutiliza.
-- Si existe algo casi-casi → se extiende o se generaliza lo existente, no se duplica.
-- Si no existe y se crea → **se agrega al registry en el mismo commit**.
+1. **`shared/REGISTRY.md`** — orquestador liviano (~2k tokens). Contiene:
+   - Tabla de routing por categoría → qué detail file leer
+   - Índice rápido alfabético por nombre (Nombre | Tipo | Ruta | Detail)
+2. **`shared/REGISTRY-detail/<categoría>.md`** — detalle completo por dominio:
+   - `ui.md` — componentes UI primitivos, compuestos, layout y providers
+   - `data.md` — query keys, hooks de datos, services, repositories, offline queue
+   - `domain.md` — tipos TS, schemas Zod, state machine, domain events, constantes
+   - `infra.md` — utils puros, design tokens, config de entorno, stores Zustand
+   - `features.md` — componentes/hooks de features existentes
+   - `testing.md` — test utilities
 
-El registry lista: nombre, ruta, descripción breve en una línea, y props/args clave.
+**Protocolo de consulta (obligatorio antes de crear algo nuevo):**
 
-> **TODO:** crear un skill local (`shared-registry-updater`) que, mediante hook `PostToolUse` sobre `Write`/`Edit` dentro de `shared/`, recuerde al agente actualizar el `REGISTRY.md`. Mientras tanto, es responsabilidad del agente hacerlo manualmente.
+1. Leer `shared/REGISTRY.md` — ¿el nombre aparece en el índice rápido? ¿la categoría está en el routing?
+2. Si hay candidatos → leer solo el detail file correspondiente.
+3. Si ya existe → reutilizar o extender; no duplicar.
+4. Si no existe y se crea → actualizar el índice de `REGISTRY.md` Y el detail file correspondiente **en el mismo commit**.
 
 ---
 
@@ -254,14 +264,14 @@ Pagos, stock, ratings, chat. **Si aparece una tarea que los incluye, el agente d
 ## 8. Flujo de trabajo esperado del agente
 
 Antes de escribir código:
-1. **Leer `shared/REGISTRY.md`** — ¿ya existe lo que voy a crear?
+1. **Leer `shared/REGISTRY.md`** — ¿el nombre o categoría aparecen en el índice? Si hay candidatos, leer el detail file correspondiente (`shared/REGISTRY-detail/<categoría>.md`).
 2. **Verificar alcance** — ¿está en §5 del PRD? ¿respeta §7 (invariantes)?
 3. **Decidir ubicación** — ¿es de una sola feature o va a `shared/`?
 4. **Diseñar tipos primero** (Zod schema → TS type) antes de implementar.
 5. **Escribir el test primero** (TDD) para lógica no trivial.
 
 Al terminar código:
-1. Si tocó `shared/` → actualizar `REGISTRY.md`.
+1. Si tocó `shared/` → actualizar el índice de `REGISTRY.md` Y el detail file de la categoría.
 2. Correr `pnpm lint` + `pnpm typecheck`.
 3. Verificar que el archivo resultante cumpla los límites de §6.5 y §6.4.
 4. Commit con conventional commits.

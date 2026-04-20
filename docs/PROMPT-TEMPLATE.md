@@ -136,9 +136,16 @@ Usá la tool Read, no resúmenes de memoria.
    - Sección "Cómo leer dependencias y paralelismo"
    - Cada tarea asignada (buscar por ID, ej. `### F1.3`) con su fase contenedora
      completa para entender contexto, dependencias y waves.
-4. `/Users/martinoficialdegui/Desktop/ambulante/shared/REGISTRY.md` — completo.
+4. `/Users/martinoficialdegui/Desktop/ambulante/shared/REGISTRY.md` — el orquestador (índice rápido + routing).
+   Luego, según la categoría de lo que toca tu tarea, leé **solo** el detail file relevante de `shared/REGISTRY-detail/`:
+   - `ui.md` → componentes UI, layout, providers
+   - `data.md` → query keys, hooks de datos, services, repositories
+   - `domain.md` → tipos, schemas, constantes, state machine
+   - `infra.md` → utils, config, stores Zustand
+   - `features.md` → componentes/hooks de features existentes
+   - `testing.md` → test utilities
 
-No empieces a planear nada hasta terminar de leer estos 4 archivos.
+No empieces a planear nada hasta terminar de leer estos archivos.
 
 # Protocolo de CLAIM (obligatorio, antes del plan)
 
@@ -160,7 +167,7 @@ No empieces a planear nada hasta terminar de leer estos 4 archivos.
 Imprimí en el chat:
 - **Qué pide la tarea** en tus palabras (1 párrafo max).
 - **Qué archivos vas a crear/modificar** (lista completa con paths absolutos).
-- **Qué vas a consumir de `shared/`** (verificalo contra `REGISTRY.md`).
+- **Qué vas a consumir de `shared/`** (verificalo contra `REGISTRY.md` y el detail file de la categoría).
 - **Qué invariantes del PRD/CLAUDE.md aplican** (listá secciones: "§6.4
   smart/dumb, §7.1 state machine, …").
 
@@ -237,7 +244,7 @@ Ahora sí escribís el código según el plan auditado.
 
 - Cada archivo nuevo respeta §6.5 (≤300 líneas) y §6.4 (≤200 para componentes).
 - Cada componente con datos → split smart/dumb.
-- Si tocás `shared/` → actualizar `shared/REGISTRY.md` en el mismo turno.
+- Si tocás `shared/` → actualizar el índice de `shared/REGISTRY.md` Y el detail file de la categoría en el mismo turno.
 - Corré `npx tsc --noEmit` después de cada archivo.
 
 ### Tareas estéticas / UI — toolchain obligatorio
