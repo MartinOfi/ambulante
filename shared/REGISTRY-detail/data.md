@@ -22,9 +22,11 @@ queryKeys.products.all()
 queryKeys.products.byStore(storeId)
 queryKeys.catalog.byStore(storeId)
 queryKeys.catalog.byId(id)
+queryKeys.reports.all()
+queryKeys.reports.byStatus(status: ReportStatus)
 ```
 
-**Nota:** `products.*` = catálogo read-only (client-facing). `catalog.*` = catálogo CRUD (store owner). Mutaciones de catálogo solo invalidan `catalog.*`.
+**Nota:** `products.*` = catálogo read-only (client-facing). `catalog.*` = catálogo CRUD (store owner). Mutaciones de catálogo solo invalidan `catalog.*`. `reports.*` = cola de moderación de contenido admin (F14.3).
 
 ### `shared/query/parseResponse.ts` — parseResponse + ParseError
 

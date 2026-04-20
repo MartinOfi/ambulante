@@ -1,14 +1,6 @@
 import { Button } from "@/shared/components/ui/button";
 import { REPORT_STATUS } from "@/features/content-moderation/constants";
-import type { Report } from "@/features/content-moderation/schemas/content-moderation.schemas";
-
-interface ReportCardProps {
-  readonly report: Report;
-  readonly isRemoving: boolean;
-  readonly isDismissing: boolean;
-  readonly onRemove: (reportId: string) => void;
-  readonly onDismiss: (reportId: string) => void;
-}
+import type { ReportCardProps } from "./ReportCard.types";
 
 export function ReportCard({
   report,
