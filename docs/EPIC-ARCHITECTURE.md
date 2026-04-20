@@ -964,7 +964,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F7.4 — Tests de hooks críticos
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:50]
 - **Por qué:** `useGeolocation`, `useSession`, `use*Query`.
 - **Entregable:** Tests con mock de `navigator.geolocation`, react-query provider wrapper.
 - **Archivos:** `shared/hooks/*.test.ts`.
