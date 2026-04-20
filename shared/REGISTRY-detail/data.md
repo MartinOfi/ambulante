@@ -107,6 +107,17 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 
 > Clientes de datos. Hoy devuelven mocks; mañana apuntarán a la API real. **No importar mocks directamente en componentes; siempre consumir vía los hooks de §3.**
 
+### `analyticsService` — `shared/services/analytics.ts`
+- **Constants/schemas:** `shared/constants/analytics-events.ts`
+- **Descripción:** Servicio de analytics con transporte swapeable (Vercel Analytics en prod, logger en dev). Valida props con Zod antes de enviar — lanza `ZodError` si el payload es inválido.
+- **Interface:** `AnalyticsService` — `track<E>(event: E, props: AnalyticsEventMap[E]): void`
+- **Factory exportada:** `createAnalyticsService(transport: AnalyticsTransport)` — recibe transporte para tests aislados.
+- **Singleton:** `analyticsService` — usa `vercelTransport` en producción, `devTransport` (logger) en desarrollo.
+- **Tipos clave:** `AnalyticsTransport`, `AnalyticsPropertyValue`, `AnalyticsService`
+- **Constantes:** `ANALYTICS_EVENT` as const — eventos tipados; `analyticsEventSchemas` — schemas Zod por evento; `AnalyticsEventMap` — tipo de props por evento.
+- **Tests:** `shared/services/analytics.test.ts` (7 casos)
+- **Integración:** `<Analytics />` de `@vercel/analytics/next` inyectado en `app/layout.tsx`.
+
 ### `authService` — `shared/services/auth.ts`
 - **Tipos:** `shared/services/auth.types.ts`
 - **Descripción:** Implementación mock de `AuthService`. Gestiona sesión en memoria, pre-seed 3 usuarios (`client/store/admin @test.com`, password `"password"`).
