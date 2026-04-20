@@ -74,6 +74,45 @@ Primitivas de animación derivadas de `MOTION` en `tokens.ts`.
 
 ---
 
+## §8b — Feature Flags
+
+Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en desarrollo.
+
+### Constantes — `shared/constants/flags.ts`
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `FLAG_KEYS` | `as const object` | Claves de todos los flags: `ENABLE_ORDERS`, `ENABLE_REALTIME`, `ENABLE_PUSH_NOTIFICATIONS`, `ENABLE_STORE_DASHBOARD` |
+| `FlagKey` | `type` | Union de los valores de `FLAG_KEYS` — e.g. `"enable_orders"` |
+| `FLAG_DEFAULTS` | `Readonly<Record<FlagKey, boolean>>` | Valores por defecto usados en dev/test y como fallback si Edge Config falla |
+
+### Service (server-side) — `shared/services/flags.ts`
+
+- **Import:** `import { flagsService } from "@/shared/services/flags"`
+- **Uso:** solo en Server Components, Route Handlers o Server Actions
+- **Env var:** `EDGE_CONFIG` (URL de Vercel Edge Config); si no está seteada, devuelve defaults sin llamar a la API
+- **API:**
+  - `flagsService.getFlag(key: FlagKey): Promise<boolean>` — lee un flag individual
+  - `flagsService.getAllFlags(): Promise<Record<FlagKey, boolean>>` — lee todos los flags de una vez (más eficiente para hidratar el provider)
+- **Fallback:** si `EDGE_CONFIG` no está seteado o Edge Config lanza, loguea el error y devuelve el valor de `FLAG_DEFAULTS`
+
+### Provider (client-side) — `shared/providers/FlagsProvider.tsx`
+
+- **Import:** `import { FlagsProvider } from "@/shared/providers/FlagsProvider"`
+- `"use client"` — envoltura de contexto React para client components
+- **Props:** `flags: Record<FlagKey, boolean>` (obtenido del server via `getAllFlags()`) + `children`
+- **Uso típico:** en un layout server component, llamar `getAllFlags()` y pasar el resultado al `<FlagsProvider flags={...}>`
+
+### Hook (client-side) — `shared/hooks/useFlag.ts`
+
+- **Import:** `import { useFlag } from "@/shared/hooks/useFlag"`
+- `"use client"`
+- **Firma:** `useFlag(key: FlagKey): boolean`
+- **Requiere:** estar dentro de `<FlagsProvider>`. Lanza si se usa fuera.
+- **Fallback:** si el key no está en el contexto, devuelve `false`
+
+---
+
 ## §9 — Configuración de entorno
 
 | Nombre | Ruta | Descripción |

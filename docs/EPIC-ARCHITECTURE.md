@@ -1032,13 +1032,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.4 — Feature flags
-- **Estado:** 🟡 in-progress [owner: main-chat, started: 2026-04-20]
+- **Estado:** ✅ done [2026-04-20]
 - **Por qué:** Vercel Edge Config (DP-4 ✅). Rollouts graduales, kill switches, A/B tests.
 - **Entregable:** `shared/services/flags.ts` + hook `useFlag(key)`. Integración con provider elegido.
-- **Archivos:** `shared/services/flags.ts`, `shared/hooks/useFlag.ts`.
+- **Archivos:** `shared/services/flags.ts`, `shared/hooks/useFlag.ts`, `shared/constants/flags.ts`, `shared/providers/FlagsProvider.tsx`.
 - **Depends on:** DP-4
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Implementado con Vercel Edge Config (`@vercel/edge-config@1.4.3`). Fallback automático a `FLAG_DEFAULTS` cuando `EDGE_CONFIG` env var no está seteada (dev/test). `FlagsProvider` inyecta flags en client components vía React context. Server components consumen `flagsService.getAllFlags()` directamente. FLAG_KEYS tipados con `as const` para type safety en compile time.
 
 ### F8.5 — Structured logging server-side
 - **Estado:** ⚪ pending

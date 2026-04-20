@@ -1,0 +1,108 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("@vercel/edge-config", () => ({
+  get: vi.fn(),
+  getAll: vi.fn(),
+}));
+
+import { get, getAll } from "@vercel/edge-config";
+import { FLAG_KEYS } from "@/shared/constants/flags";
+import { flagsService } from "@/shared/services/flags";
+
+const mockGet = vi.mocked(get);
+const mockGetAll = vi.mocked(getAll);
+
+describe("flagsService", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("getFlag", () => {
+    it("returns value from Edge Config when EDGE_CONFIG is set", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGet.mockResolvedValueOnce(false);
+
+      const result = await flagsService.getFlag(FLAG_KEYS.ENABLE_ORDERS);
+
+      expect(mockGet).toHaveBeenCalledWith(FLAG_KEYS.ENABLE_ORDERS);
+      expect(result).toBe(false);
+    });
+
+    it("returns default value when Edge Config value is undefined", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGet.mockResolvedValueOnce(undefined);
+
+      const result = await flagsService.getFlag(FLAG_KEYS.ENABLE_ORDERS);
+
+      expect(result).toBe(true);
+    });
+
+    it("returns default value when EDGE_CONFIG env var is not set", async () => {
+      delete process.env.EDGE_CONFIG;
+
+      const result = await flagsService.getFlag(FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS);
+
+      expect(mockGet).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+
+    it("returns default and logs error when Edge Config throws", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGet.mockRejectedValueOnce(new Error("Edge Config unreachable"));
+
+      const result = await flagsService.getFlag(FLAG_KEYS.ENABLE_REALTIME);
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("getAllFlags", () => {
+    it("returns all flags from Edge Config when available", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGetAll.mockResolvedValueOnce({
+        enable_orders: true,
+        enable_realtime: false,
+        enable_push_notifications: true,
+        enable_store_dashboard: true,
+      });
+
+      const result = await flagsService.getAllFlags();
+
+      expect(result[FLAG_KEYS.ENABLE_ORDERS]).toBe(true);
+      expect(result[FLAG_KEYS.ENABLE_REALTIME]).toBe(false);
+      expect(result[FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]).toBe(true);
+    });
+
+    it("returns defaults when EDGE_CONFIG is not set", async () => {
+      delete process.env.EDGE_CONFIG;
+
+      const result = await flagsService.getAllFlags();
+
+      expect(mockGetAll).not.toHaveBeenCalled();
+      expect(result[FLAG_KEYS.ENABLE_ORDERS]).toBe(true);
+      expect(result[FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]).toBe(false);
+    });
+
+    it("returns defaults and logs error when Edge Config throws", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGetAll.mockRejectedValueOnce(new Error("Edge Config unreachable"));
+
+      const result = await flagsService.getAllFlags();
+
+      expect(result[FLAG_KEYS.ENABLE_ORDERS]).toBe(true);
+    });
+
+    it("falls back to defaults for flags missing in partial Edge Config response", async () => {
+      process.env.EDGE_CONFIG = "https://edge-config.vercel.com/ecfg_test?token=test";
+      mockGetAll.mockResolvedValueOnce({
+        enable_orders: false,
+      });
+
+      const result = await flagsService.getAllFlags();
+
+      expect(result[FLAG_KEYS.ENABLE_ORDERS]).toBe(false);
+      expect(result[FLAG_KEYS.ENABLE_REALTIME]).toBe(true);
+      expect(result[FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]).toBe(false);
+    });
+  });
+});
