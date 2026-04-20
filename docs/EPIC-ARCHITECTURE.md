@@ -1594,11 +1594,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F17.3 — Onboarding doc
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
+- **Estado:** ✅ done
 - **Entregable:** `docs/ONBOARDING.md` — setup paso a paso, diagrama de arquitectura, glosario.
 - **Depends on:** F0.*
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creado `docs/ONBOARDING.md` (300 líneas). Secciones: prerequisitos, setup inicial (5 min), comandos, arquitectura de carpetas con ASCII diagram, tabla del stack, flujo de roles, máquina de estados del pedido, glosario de 18 términos de dominio, checklist del primer PR, links útiles. Sin código nuevo — solo documentación.
 
 ### F17.4 — Changelog automatizado
 - **Estado:** ⚪ pending
