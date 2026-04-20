@@ -1144,7 +1144,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F10.3 — ARIA audit
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: main-chat, started: 2026-04-20]
 - **Por qué:** Cumplimiento WCAG AA.
 - **Entregable:** `axe-playwright` en E2E suite. 0 violations críticas en landing y map.
 - **Archivos:** `e2e/a11y.spec.ts`.
