@@ -187,3 +187,27 @@ Para estado global del cliente. Usar solo cuando React state local no alcance.
 - **Acciones:** `setTheme(theme)`, `toggleSidebar()`, `setSidebarOpen(isOpen)`
 - **Persistencia:** key `"ambulante-ui-preferences"` en localStorage (solo state, sin acciones)
 - **Tipo re-exportado:** `Theme = "light" | "dark" | "system"`
+
+---
+
+## §12 — Rate Limiting
+
+### Constants — `shared/constants/rate-limit.ts`
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `RateLimitRule` | interface | `{ windowMs: number; maxRequests: number }` |
+| `RATE_LIMIT_RULES` | constant | Reglas por grupo: `orders` (5 req/60s), `api` (60 req/60s) |
+| `RateLimitRouteGroup` | type | `keyof typeof RATE_LIMIT_RULES` — `"orders" | "api"` |
+
+### Service — `shared/services/rate-limit.ts`
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `RateLimitService` | interface | `check(input): Promise<RateLimitResult>` |
+| `RateLimitCheckInput` | interface | `{ identifier: string; rule: RateLimitRule }` |
+| `RateLimitResult` | interface | `{ allowed: boolean; remaining: number; resetAtMs: number }` |
+| `InMemoryRateLimiter` | class | Implementa `RateLimitService` con `Map` en memoria (dev only — per-isolate) |
+| `createRateLimitService` | factory | Retorna `InMemoryRateLimiter`; swap a Upstash cuando las env vars estén presentes (futuro backend task) |
+
+**Notas de producción:** `InMemoryRateLimiter` usa un `Map` por isolate de Edge Runtime — no comparte estado entre instancias de Vercel. Swappear a `@upstash/ratelimit` cuando se configure Supabase/backend.
