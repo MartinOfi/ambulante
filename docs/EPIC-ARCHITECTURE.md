@@ -1683,6 +1683,16 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 
 ---
 
+## Deuda técnica
+
+Items diferidos intencionalmente durante la implementación. Cada uno tiene un lugar natural donde resolverse.
+
+| ID | Descripción | Origen | Dónde resolver |
+|---|---|---|---|
+| DT-1 | **`BroadcastUpdatePlugin` para historial de órdenes offline.** `StaleWhileRevalidate` en `/orders/**` actualiza el cache en background, pero el componente React no se entera. El usuario puede ver datos stale sin feedback. Fix: agregar `BroadcastUpdatePlugin` en `sw.ts` + listener `BroadcastChannel` en el hook de historial que invalide la query de React Query al recibir el mensaje. | F6.2 (2026-04-20) | Al implementar el componente real de historial de órdenes (feature `order-flow`) |
+
+---
+
 ## Changelog de este documento
 
 | Fecha | Cambio | Autor |
