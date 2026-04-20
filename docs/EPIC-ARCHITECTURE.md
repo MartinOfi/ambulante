@@ -1353,7 +1353,7 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.2 — Availability toggle con location publishing
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f13-2, started: 2026-04-20]
 - **Por qué:** Al activar, arranca el reporting de ubicación cada 30-60s (PRD §7.1).
 - **Entregable:** Toggle, intervalo de publicación, estado "ubicación desactualizada".
 - **Archivos:** `features/store-dashboard/hooks/useLocationPublishing.ts`.
