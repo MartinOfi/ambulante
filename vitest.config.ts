@@ -22,12 +22,18 @@ export default defineConfig({
       "shared/**/*.{test,spec}.{ts,tsx}",
       "features/**/*.{test,spec}.{ts,tsx}",
       "app/**/*.{test,spec}.{ts,tsx}",
+      "i18n/**/*.{test,spec}.{ts,tsx}",
     ],
     exclude: ["node_modules/**", ".next/**", "e2e/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
-      include: ["shared/**/*.{ts,tsx}", "features/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
+      include: [
+        "shared/**/*.{ts,tsx}",
+        "features/**/*.{ts,tsx}",
+        "app/**/*.{ts,tsx}",
+        "i18n/**/*.{ts,tsx}",
+      ],
       exclude: [
         "**/*.test.{ts,tsx}",
         "**/*.spec.{ts,tsx}",

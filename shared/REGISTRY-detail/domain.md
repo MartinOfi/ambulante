@@ -142,6 +142,12 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 | `STORE_KIND` | `{ foodTruck: "food-truck", streetCart: ..., iceCream: ... }` frozen as const |
 | `STORE_STATUS` | `{ open: "open", closed: "closed", stale: "stale" }` frozen as const |
 
+### `shared/constants/i18n.ts`
+| Nombre | Descripción |
+|---|---|
+| `LOCALE` | `"es" as const` — locale único del MVP (Argentina-only per DP-7) |
+| `SupportedLocale` | `typeof LOCALE` — tipo literal `"es"` |
+
 ### `shared/constants/user.ts`
 | Nombre | Descripción |
 |---|---|
