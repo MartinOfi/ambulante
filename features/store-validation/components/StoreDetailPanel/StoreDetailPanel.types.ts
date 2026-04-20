@@ -10,5 +10,4 @@ export interface StoreDetailPanelProps {
 
 export interface StoreDetailPanelContainerProps {
   readonly storeId: string;
-  readonly onActionComplete: () => void;
 }

@@ -17,14 +17,20 @@ vi.mock("@/features/store-validation/hooks/useRejectStoreMutation", () => ({
   useRejectStoreMutation: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(),
+}));
+
 import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
 import { useApproveStoreMutation } from "@/features/store-validation/hooks/useApproveStoreMutation";
 import { useRejectStoreMutation } from "@/features/store-validation/hooks/useRejectStoreMutation";
+import { useRouter } from "next/navigation";
 import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
 const mockUseStoreValidationQueueQuery = vi.mocked(useStoreValidationQueueQuery);
 const mockUseApproveStoreMutation = vi.mocked(useApproveStoreMutation);
 const mockUseRejectStoreMutation = vi.mocked(useRejectStoreMutation);
+const mockUseRouter = vi.mocked(useRouter);
 
 const PENDING_STORE: PendingStore = {
   id: "store-1",
@@ -52,8 +58,13 @@ function buildMutationMock(overrides: Record<string, unknown> = {}) {
 }
 
 describe("StoreDetailPanelContainer", () => {
+  const mockPush = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseRouter.mockReturnValue({
+      push: mockPush,
+    } as unknown as ReturnType<typeof useRouter>);
     mockUseApproveStoreMutation.mockReturnValue(buildMutationMock());
     mockUseRejectStoreMutation.mockReturnValue(
       buildMutationMock() as unknown as ReturnType<typeof useRejectStoreMutation>,
@@ -68,9 +79,7 @@ describe("StoreDetailPanelContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(
-      <StoreDetailPanelContainer storeId="non-existent" onActionComplete={vi.fn()} />,
-    );
+    renderWithProviders(<StoreDetailPanelContainer storeId="non-existent" />);
 
     expect(screen.getByTestId("store-not-found")).toBeInTheDocument();
   });
@@ -83,7 +92,7 @@ describe("StoreDetailPanelContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" onActionComplete={vi.fn()} />);
+    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" />);
 
     expect(screen.getByText("Taco Loco")).toBeInTheDocument();
   });
@@ -98,12 +107,12 @@ describe("StoreDetailPanelContainer", () => {
 
     mockUseApproveStoreMutation.mockReturnValue(buildMutationMock({ isPending: true }));
 
-    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" onActionComplete={vi.fn()} />);
+    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" />);
 
     expect(screen.getByRole("button", { name: /aprobar/i })).toBeDisabled();
   });
 
-  it("calls approve mutation when onApprove is triggered", async () => {
+  it("calls approve mutation and navigates to stores list on success", async () => {
     const approveMutate = vi.fn();
     mockUseStoreValidationQueueQuery.mockReturnValue({
       data: [PENDING_STORE],
@@ -114,7 +123,7 @@ describe("StoreDetailPanelContainer", () => {
 
     mockUseApproveStoreMutation.mockReturnValue(buildMutationMock({ mutate: approveMutate }));
 
-    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" onActionComplete={vi.fn()} />);
+    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" />);
 
     screen.getByRole("button", { name: /aprobar/i }).click();
 
@@ -122,5 +131,11 @@ describe("StoreDetailPanelContainer", () => {
       "store-1",
       expect.objectContaining({ onSuccess: expect.any(Function) }),
     );
+
+    // Simulate the onSuccess callback being invoked
+    const { onSuccess } = approveMutate.mock.calls[0][1] as { onSuccess: () => void };
+    onSuccess();
+
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("/admin/stores"));
   });
 });

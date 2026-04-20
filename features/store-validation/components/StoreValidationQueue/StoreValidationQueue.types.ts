@@ -5,7 +5,3 @@ export interface StoreValidationQueueProps {
   readonly isLoading: boolean;
   readonly onSelectStore: (storeId: string) => void;
 }
-
-export interface StoreValidationQueueContainerProps {
-  readonly onSelectStore: (storeId: string) => void;
-}

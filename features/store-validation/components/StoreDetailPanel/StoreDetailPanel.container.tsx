@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/shared/constants/routes";
 import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
 import { useApproveStoreMutation } from "@/features/store-validation/hooks/useApproveStoreMutation";
 import { useRejectStoreMutation } from "@/features/store-validation/hooks/useRejectStoreMutation";
@@ -8,10 +10,8 @@ import { RejectStoreDialog } from "@/features/store-validation/components/Reject
 import { StoreDetailPanel } from "./StoreDetailPanel";
 import type { StoreDetailPanelContainerProps } from "./StoreDetailPanel.types";
 
-export function StoreDetailPanelContainer({
-  storeId,
-  onActionComplete,
-}: StoreDetailPanelContainerProps) {
+export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainerProps) {
+  const router = useRouter();
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
 
   const { data: stores = [] } = useStoreValidationQueueQuery();
@@ -29,7 +29,9 @@ export function StoreDetailPanelContainer({
   }
 
   function handleApprove() {
-    approveMutation.mutate(storeId, { onSuccess: onActionComplete });
+    approveMutation.mutate(storeId, {
+      onSuccess: () => router.push(ROUTES.admin.stores),
+    });
   }
 
   function handleRejectConfirm(reason: string) {
@@ -38,7 +40,7 @@ export function StoreDetailPanelContainer({
       {
         onSuccess: () => {
           setIsRejectDialogOpen(false);
-          onActionComplete();
+          router.push(ROUTES.admin.stores);
         },
       },
     );

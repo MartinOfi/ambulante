@@ -9,10 +9,16 @@ vi.mock("@/features/store-validation/hooks/useStoreValidationQueueQuery", () => 
   useStoreValidationQueueQuery: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(),
+}));
+
 import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
+import { useRouter } from "next/navigation";
 import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
 const mockUseStoreValidationQueueQuery = vi.mocked(useStoreValidationQueueQuery);
+const mockUseRouter = vi.mocked(useRouter);
 
 const PENDING_STORE: PendingStore = {
   id: "store-1",
@@ -29,8 +35,13 @@ const PENDING_STORE: PendingStore = {
 };
 
 describe("StoreValidationQueueContainer", () => {
+  const mockPush = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseRouter.mockReturnValue({
+      push: mockPush,
+    } as unknown as ReturnType<typeof useRouter>);
   });
 
   it("renders loading skeleton while query is loading", () => {
@@ -41,7 +52,7 @@ describe("StoreValidationQueueContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(<StoreValidationQueueContainer onSelectStore={vi.fn()} />);
+    renderWithProviders(<StoreValidationQueueContainer />);
 
     expect(screen.getByTestId("queue-loading")).toBeInTheDocument();
   });
@@ -54,7 +65,7 @@ describe("StoreValidationQueueContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(<StoreValidationQueueContainer onSelectStore={vi.fn()} />);
+    renderWithProviders(<StoreValidationQueueContainer />);
 
     expect(screen.getByText("Taco Loco")).toBeInTheDocument();
   });
@@ -67,13 +78,12 @@ describe("StoreValidationQueueContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(<StoreValidationQueueContainer onSelectStore={vi.fn()} />);
+    renderWithProviders(<StoreValidationQueueContainer />);
 
     expect(screen.getByTestId("queue-empty")).toBeInTheDocument();
   });
 
-  it("propagates onSelectStore callback to the dumb component", () => {
-    const onSelectStore = vi.fn();
+  it("navigates to store detail when a store row is clicked", () => {
     mockUseStoreValidationQueueQuery.mockReturnValue({
       data: [PENDING_STORE],
       isLoading: false,
@@ -81,10 +91,10 @@ describe("StoreValidationQueueContainer", () => {
       error: null,
     } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
 
-    renderWithProviders(<StoreValidationQueueContainer onSelectStore={onSelectStore} />);
+    renderWithProviders(<StoreValidationQueueContainer />);
 
     screen.getByRole("button", { name: /taco loco/i }).click();
 
-    expect(onSelectStore).toHaveBeenCalledWith("store-1");
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("store-1"));
   });
 });
