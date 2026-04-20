@@ -4,16 +4,29 @@ import { FLAG_KEYS, type FlagKey } from "@/shared/constants/flags";
 import { FlagsProvider } from "@/shared/providers/FlagsProvider";
 import { useFlag } from "@/shared/hooks/useFlag";
 
-function makeWrapper(flags: Partial<Record<FlagKey, boolean>>) {
+function makeWrapper(flags: Record<FlagKey, boolean>) {
   return function Wrapper({ children }: { readonly children: React.ReactNode }) {
-    return <FlagsProvider flags={flags as Record<FlagKey, boolean>}>{children}</FlagsProvider>;
+    return <FlagsProvider flags={flags}>{children}</FlagsProvider>;
+  };
+}
+
+function makePartialWrapper(flags: Partial<Record<FlagKey, boolean>>) {
+  return makeWrapper({ ...defaultFlags(), ...flags });
+}
+
+function defaultFlags(): Record<FlagKey, boolean> {
+  return {
+    [FLAG_KEYS.ENABLE_ORDERS]: false,
+    [FLAG_KEYS.ENABLE_REALTIME]: false,
+    [FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]: false,
+    [FLAG_KEYS.ENABLE_STORE_DASHBOARD]: false,
   };
 }
 
 describe("useFlag", () => {
   it("returns the flag value from context when flag is true", () => {
     const { result } = renderHook(() => useFlag(FLAG_KEYS.ENABLE_ORDERS), {
-      wrapper: makeWrapper({ [FLAG_KEYS.ENABLE_ORDERS]: true }),
+      wrapper: makePartialWrapper({ [FLAG_KEYS.ENABLE_ORDERS]: true }),
     });
 
     expect(result.current).toBe(true);
@@ -21,15 +34,15 @@ describe("useFlag", () => {
 
   it("returns the flag value from context when flag is false", () => {
     const { result } = renderHook(() => useFlag(FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS), {
-      wrapper: makeWrapper({ [FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]: false }),
+      wrapper: makePartialWrapper({ [FLAG_KEYS.ENABLE_PUSH_NOTIFICATIONS]: false }),
     });
 
     expect(result.current).toBe(false);
   });
 
-  it("returns false when flag key is not in the flags map", () => {
+  it("returns false when flag defaults to false", () => {
     const { result } = renderHook(() => useFlag(FLAG_KEYS.ENABLE_REALTIME), {
-      wrapper: makeWrapper({}),
+      wrapper: makePartialWrapper({ [FLAG_KEYS.ENABLE_REALTIME]: false }),
     });
 
     expect(result.current).toBe(false);
@@ -38,6 +51,6 @@ describe("useFlag", () => {
   it("throws when used outside FlagsProvider", () => {
     expect(() => {
       renderHook(() => useFlag(FLAG_KEYS.ENABLE_ORDERS));
-    }).toThrow();
+    }).toThrow("useFlagsContext must be used within FlagsProvider");
   });
 });

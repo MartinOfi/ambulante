@@ -29,14 +29,16 @@ async function getAllFlags(): Promise<Record<FlagKey, boolean>> {
   }
 
   try {
-    const remoteFlags = await getAll<Partial<Record<FlagKey, boolean>>>();
+    const remoteFlags = await getAll<Record<string, unknown>>();
 
-    return Object.fromEntries(
-      Object.entries(FLAG_DEFAULTS).map(([key]) => {
-        const remote = remoteFlags?.[key as FlagKey];
-        return [key, remote !== undefined ? remote : FLAG_DEFAULTS[key as FlagKey]];
-      }),
-    ) as Record<FlagKey, boolean>;
+    return (Object.keys(FLAG_DEFAULTS) as FlagKey[]).reduce<Record<FlagKey, boolean>>(
+      (acc, key) => {
+        const remote = remoteFlags?.[key];
+        acc[key] = typeof remote === "boolean" ? remote : FLAG_DEFAULTS[key];
+        return acc;
+      },
+      { ...FLAG_DEFAULTS },
+    );
   } catch (error: unknown) {
     logger.error("Failed to read all feature flags from Edge Config", {
       error: error instanceof Error ? error.message : String(error),

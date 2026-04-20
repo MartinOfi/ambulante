@@ -5,5 +5,5 @@ import { useFlagsContext } from "@/shared/providers/FlagsProvider";
 
 export function useFlag(key: FlagKey): boolean {
   const flags = useFlagsContext();
-  return flags[key] ?? false;
+  return flags[key];
 }
