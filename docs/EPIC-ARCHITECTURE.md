@@ -1135,7 +1135,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** MVP Argentina-only → "without i18n routing" mode. LOCALE constant en `shared/constants/i18n.ts`. 6 tests verdes, 107 archivos / 919 tests totales pasan.
 
 ### F10.2 — Migrar copy a messages
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f10-2, started: 2026-04-20]
 - **Por qué:** Hoy todo está hardcoded.
 - **Entregable:** 100% de los strings de UI en `messages/es.json`. Eslint rule que detecta strings hardcoded en JSX.
 - **Archivos:** `messages/es.json`, features todas.
