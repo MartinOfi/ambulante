@@ -47,4 +47,28 @@ describe("parseEnv", () => {
       }),
     ).toThrowError(/NODE_ENV/);
   });
+
+  describe("NEXT_PUBLIC_MAP_STYLE_URL", () => {
+    it("is optional — parses without the field", () => {
+      const parsed = parseEnv(validRawEnv);
+      expect(parsed.NEXT_PUBLIC_MAP_STYLE_URL).toBeUndefined();
+    });
+
+    it("accepts a valid URL", () => {
+      const parsed = parseEnv({
+        ...validRawEnv,
+        NEXT_PUBLIC_MAP_STYLE_URL: "https://demotiles.maplibre.org/style.json",
+      });
+      expect(parsed.NEXT_PUBLIC_MAP_STYLE_URL).toBe("https://demotiles.maplibre.org/style.json");
+    });
+
+    it("rejects an invalid URL", () => {
+      expect(() =>
+        parseEnv({
+          ...validRawEnv,
+          NEXT_PUBLIC_MAP_STYLE_URL: "not-a-url",
+        }),
+      ).toThrowError(/NEXT_PUBLIC_MAP_STYLE_URL/);
+    });
+  });
 });
