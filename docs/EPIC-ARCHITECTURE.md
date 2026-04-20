@@ -1426,7 +1426,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.2 — Store validation queue
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f14-2-chat, started: now]
 - **Entregable:** `/admin/stores` con filtro `pending`, detalle, approve/reject.
 - **Depends on:** F2.9, F4.2
 - **Estimación:** M
