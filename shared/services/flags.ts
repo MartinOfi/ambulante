@@ -36,10 +36,10 @@ async function getAllFlagsRaw(): Promise<Record<FlagKey, boolean>> {
     return (Object.keys(FLAG_DEFAULTS) as FlagKey[]).reduce<Record<FlagKey, boolean>>(
       (acc, key) => {
         const remote = remoteFlags?.[key];
-        acc[key] = typeof remote === "boolean" ? remote : FLAG_DEFAULTS[key];
-        return acc;
+        const value = typeof remote === "boolean" ? remote : FLAG_DEFAULTS[key];
+        return { ...acc, [key]: value };
       },
-      { ...FLAG_DEFAULTS },
+      {} as Record<FlagKey, boolean>,
     );
   } catch (error: unknown) {
     logger.error("Failed to read all feature flags from Edge Config", {
