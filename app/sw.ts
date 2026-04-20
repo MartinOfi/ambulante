@@ -1,5 +1,6 @@
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import {
+  BroadcastUpdatePlugin,
   CacheFirst,
   ExpirationPlugin,
   NetworkFirst,
@@ -53,6 +54,9 @@ const serwist = new Serwist({
       }),
     },
     // Order history: stale-while-revalidate so offline reads still work (PRD §7.3).
+    // BroadcastUpdatePlugin notifies open tabs when fresher data arrives from the
+    // background revalidation. The React listener (queryClient.invalidateQueries)
+    // lives in the order-history feature hook — see DT-1 in EPIC-ARCHITECTURE.md.
     {
       matcher: SW_ROUTE_MATCHERS.orderHistory,
       handler: new StaleWhileRevalidate({
@@ -62,6 +66,7 @@ const serwist = new Serwist({
             maxEntries: SW_CACHE_MAX_ENTRIES.orderHistory,
             maxAgeSeconds: SW_CACHE_TTL_SECONDS.orderHistory,
           }),
+          new BroadcastUpdatePlugin(),
         ],
       }),
     },

@@ -53,6 +53,20 @@ a costa de calidad.
 
 **🚨 CREÁ EL WORKTREE. AHORA. SIN EXCUSAS.**
 
+## ⛔ AUTO-CHECK — ejecutá esto PRIMERO, antes de cualquier otra cosa
+
+```
+git branch --show-current
+```
+
+- Resultado `feat/...` → ya estás en tu worktree. Saltá directo a "Lectura obligatoria".
+- Resultado `main` → **estás en el principal. NO podés leer, escribir ni commitear nada todavía.**
+  Continuá con los pasos de abajo para crear el worktree y moverte a él.
+- Cualquier otro resultado → STOP. Reportá al usuario antes de continuar.
+
+**Regla absoluta:** TODO el trabajo (Read, Write, Edit, Bash, commits) ocurre DESDE el worktree.
+Si `git branch --show-current` da `main` mientras estás trabajando → estás haciendo algo mal. Pararse.
+
 ## Crear tu worktree
 
 1. Verificá que el principal esté en `main` con working tree limpio:
@@ -263,8 +277,21 @@ Si algo falla, fijalo. No cierres la tarea con algo roto.
      descubiertas.
 3. Si descubriste tareas nuevas, agregalas al final de la fase con el próximo ID
    libre.
-4. Commit: `feat(fX.Y): <descripción concisa imperativa>`.
-5. En el chat, imprimí el resumen final:
+4. **Protocolo de deuda técnica** — al terminar cada tarea, revisá si quedó algo
+   diferido intencionalmente. Para decidir cómo tratarlo, usá esta tabla:
+
+   | Situación | Acción |
+   |---|---|
+   | El fix tiene ≥50% implementable **ahora** sin romper nada | Implementalo en esta misma tarea. Anotá en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` la parte pendiente con referencia a dónde completarla. |
+   | El fix depende **completamente** de algo que no existe todavía | No es deuda: es un **requisito** de la tarea futura. Anotalo en el campo `Notas:` de esa tarea en el epic, no en la sección de deuda. |
+   | El fix cambia el contrato de algo **ya existente** o requiere migración | Anotalo en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` con ID `DT-N` y agregá `Resuelve: DT-N` en la tarea futura que lo cierra. |
+
+   **Regla de oro:** la sección `## Deuda técnica` del epic es para cosas que
+   *existen pero están incompletas*. Si la base todavía no existe, va en la tarea
+   que la construye — no en deuda.
+
+5. Commit: `feat(fX.Y): <descripción concisa imperativa>`.
+6. En el chat, imprimí el resumen final:
    - Tareas ✅ done
    - Archivos creados/modificados
    - Tests agregados + coverage
@@ -311,9 +338,13 @@ Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
    ```
 2. El agente va a revisar **todos los archivos creados o modificados en esta cadena**.
 3. Tomá **todos los issues** que reporte — critical, high, medium y low — y fixealos uno por uno.
+   **No existe prioridad que excuse dejar un issue sin resolver**, con una única excepción: el protocolo de deuda técnica del PASO 7. Aplicalo así:
+   - El fix depende completamente de algo que no existe todavía → no lo fixees acá; anotalo en el campo `Notas:` de la tarea futura que lo construye. No es deuda, es un requisito de esa tarea.
+   - El fix cambia el contrato de algo ya existente o requiere migración → registralo como `DT-N` en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` y agregá `Resuelve: DT-N` en la tarea futura que lo cierra.
+   - Cualquier otro caso → fixealo ahora. Severity baja no es excusa para diferir.
 4. Por cada fix, corré `npx tsc --noEmit` y `npx vitest run` para asegurarte que no rompiste nada.
 5. Si algún fix es complejo, aplicá el PASO 3 (auditoría) antes de escribirlo.
-6. Repetí el code review hasta que no queden issues.
+6. Repetí el code review hasta que no queden issues sin fix ni entrada de deuda técnica que los justifique.
 
 ### 9.2 · Verificación post-fix
 
@@ -654,4 +685,7 @@ con el output exacto — no improvises.
 | 2026-04-15 | Agregado PASO 0 de setup de worktree obligatorio + apéndice de migración para chats en curso (post race-condition de F0 wave 1) |
 | 2026-04-17 | Agregado toolchain obligatorio para tareas UI/estéticas en PASO 5: `/ui-ux-pro-max`, 21st.dev MCP, MagicUI MCP, Nanobanana MCP, Stitch MCP |
 | 2026-04-19 | Agregado PASO 9: code review final con `/everything-claude-code:code-reviewer` (todos los severities), fix obligatorio, y consulta al usuario para commit + merge a main + borrado de worktree/branch |
+| 2026-04-20 | Agregado auto-check al inicio del PASO 0: el agente corre `git branch --show-current` antes de cualquier acción y se bloquea si está en `main` |
+| 2026-04-20 | Agregado protocolo de deuda técnica en PASO 7: tres casos (implementar ahora, requisito de tarea futura, deuda con DT-N) con regla de oro |
+| 2026-04-20 | PASO 9.1: aclarado que todos los issues del code review deben resolverse (cualquier severity), con la única excepción del protocolo de deuda técnica del PASO 7 |
 

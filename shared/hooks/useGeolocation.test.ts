@@ -62,13 +62,18 @@ describe("useGeolocation", () => {
     vi.unstubAllGlobals();
   });
 
-  it("initializes to idle status before request fires", () => {
-    geoMock.getCurrentPosition.mockImplementation(() => {
-      // never resolves — inspect initial state synchronously before useEffect runs
+  it("initializes to idle before effects run", () => {
+    geoMock.getCurrentPosition.mockImplementation(() => {});
+
+    let initialStatus: string | undefined;
+    renderHook(() => {
+      const geo = useGeolocation();
+      // Capture only on the very first render, before useEffect fires
+      if (initialStatus === undefined) initialStatus = geo.status;
+      return geo;
     });
-    const { result } = renderHook(() => useGeolocation());
-    // useEffect fires async; the very first render is idle
-    expect(["idle", "loading"]).toContain(result.current.status);
+
+    expect(initialStatus).toBe("idle");
   });
 
   it("fires request() automatically on mount", () => {
@@ -196,11 +201,15 @@ describe("useGeolocation", () => {
     expect(typeof result.current.request).toBe("function");
   });
 
-  it("re-requests position when request() is called manually", async () => {
+  it("re-requests position and transitions through loading then granted", async () => {
     const position = makePosition(-34.6037, -58.3816, GOOD_ACCURACY);
-    geoMock.getCurrentPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
-      onSuccess(position);
-    });
+
+    geoMock.getCurrentPosition
+      .mockImplementationOnce((onSuccess: GeolocationSuccessCallback) => {
+        onSuccess(position);
+      })
+      // second call never resolves so we can assert the loading intermediate state
+      .mockImplementationOnce(() => {});
 
     const { result } = renderHook(() => useGeolocation());
     await waitFor(() => expect(result.current.status).toBe("granted"));
@@ -209,7 +218,7 @@ describe("useGeolocation", () => {
       result.current.request();
     });
 
+    await waitFor(() => expect(result.current.status).toBe("loading"));
     expect(geoMock.getCurrentPosition).toHaveBeenCalledTimes(2);
-    await waitFor(() => expect(result.current.status).toBe("granted"));
   });
 });

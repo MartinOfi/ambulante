@@ -1689,7 +1689,7 @@ Items diferidos intencionalmente durante la implementación. Cada uno tiene un l
 
 | ID | Descripción | Origen | Dónde resolver |
 |---|---|---|---|
-| DT-1 | **`BroadcastUpdatePlugin` para historial de órdenes offline.** `StaleWhileRevalidate` en `/orders/**` actualiza el cache en background, pero el componente React no se entera. El usuario puede ver datos stale sin feedback. Fix: agregar `BroadcastUpdatePlugin` en `sw.ts` + listener `BroadcastChannel` en el hook de historial que invalide la query de React Query al recibir el mensaje. | F6.2 (2026-04-20) | Al implementar el componente real de historial de órdenes (feature `order-flow`) |
+| DT-1 | **`BroadcastUpdatePlugin` — listener React pendiente.** ~~Plugin agregado en `sw.ts`~~ ✅ El SW ya emite mensajes via `BroadcastChannel("serwist-broadcast-update")` cuando el cache de `/orders/**` se actualiza en background. Falta la otra mitad: en el hook de historial de órdenes, suscribirse al canal y llamar `queryClient.invalidateQueries({ queryKey: ["orders"] })` para refrescar la UI automáticamente. | F6.2 (2026-04-20) | Al implementar el hook `useOrderHistory` en la feature `order-flow` |
 
 ---
 
