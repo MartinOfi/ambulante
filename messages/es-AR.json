@@ -1,0 +1,64 @@
+{
+  "Landing": {
+    "Hero": {
+      "badge": "Tiendas ambulantes en vivo",
+      "heading": "Todo lo ambulante, cerca tuyo, ahora mismo.",
+      "description": "Aparecen y desaparecen. Ambulante te muestra qué tiendas están activas hoy, para que no camines en vano. No procesamos pagos, no manejamos stock — solo el mapa que te dice quién está ahí.",
+      "ctaRegister": "Registrá tu tienda · Gratis",
+      "ctaMap": "Ver quién está activo",
+      "activeNearby": "Activas ahora en tu zona"
+    },
+    "Nav": {
+      "cta": "Registrá tu tienda",
+      "howItWorks": "Cómo funciona",
+      "product": "Producto",
+      "forStores": "Para tiendas",
+      "resources": "Recursos",
+      "liveMap": "Mapa en vivo",
+      "liveMapDescription": "Encontrá tiendas ambulantes activas cerca tuyo en tiempo real.",
+      "ordersNoPay": "Pedidos sin pago",
+      "ordersNoPayDescription": "Coordiná el encuentro físico, la venta sigue ocurriendo en la calle.",
+      "installablePwa": "PWA instalable",
+      "installablePwaDescription": "Funciona como app nativa, sin pasar por las tiendas oficiales.",
+      "addStore": "Sumá tu puesto",
+      "orderInbox": "Bandeja de pedidos",
+      "availabilityToggle": "Toggle de disponibilidad",
+      "assistedOnboarding": "Onboarding asistido",
+      "faq": "Preguntas frecuentes",
+      "support": "Soporte",
+      "about": "Sobre Ambulante"
+    },
+    "Faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "title": "Lo que todos quieren saber.",
+      "paymentsQuestion": "¿Se procesan pagos en la app?",
+      "paymentsAnswer": "No. Ambulante no toca dinero en ningún momento. La venta ocurre físicamente entre vos y la tienda, como siempre. Nosotros solo facilitamos el encuentro.",
+      "freeQuestion": "¿Es gratis para los clientes y para las tiendas?",
+      "freeAnswer": "Sí, 100% gratis en el MVP. No hay comisiones por venta, ni suscripciones, ni costos ocultos para nadie.",
+      "privacyQuestion": "¿Cómo protegen mi ubicación?",
+      "privacyAnswer": "Tu ubicación exacta nunca se expone a la tienda antes de que acepte tu pedido. Todo lo que ve es tu distancia aproximada. Vos decidís cuándo compartir más.",
+      "stockQuestion": "¿Qué pasa si la tienda no tiene stock de lo que pedí?",
+      "stockAnswer": "La tienda puede rechazar tu intención de compra con un click. Como no hay pago involucrado, no hay reembolsos ni trámites — simplemente buscás otra opción.",
+      "iosQuestion": "¿Funciona en iPhone?",
+      "iosAnswer": "Sí. Ambulante es una PWA instalable en iOS y Android. Desde Safari, tocá 'Compartir' y 'Añadir a pantalla de inicio'."
+    }
+  },
+  "Common": {
+    "errors": {
+      "generic": "Algo salió mal. Intentá de nuevo.",
+      "network": "Sin conexión. Verificá tu internet.",
+      "notFound": "No encontramos lo que buscabas.",
+      "unauthorized": "No tenés permiso para hacer esto."
+    },
+    "actions": {
+      "retry": "Reintentar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "back": "Volver",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  }
+}

@@ -1126,13 +1126,13 @@ Wave 4 (al final — requiere features):
 **Acceptance criteria:** Toda la copy vive en `messages/*.json`. Axe no reporta violations críticas.
 
 ### F10.1 — next-intl setup
-- **Estado:** 🟢 ready
+- **Estado:** ✅ done [owner: chat-2026-04-20, completed: 13:46]
 - **Por qué:** Si es solo AR, es opcional; si es multi-país, es urgente.
 - **Entregable:** `next-intl` instalado, `messages/es.json`, locale routing opcional.
-- **Archivos:** `messages/*`, `i18n.ts`.
+- **Archivos:** `messages/es.json`, `i18n/request.ts`, `shared/constants/i18n.ts`, `next.config.ts`, `app/layout.tsx`.
 - **Depends on:** DP-7
 - **Estimación:** L
-- **Notas:**
+- **Notas:** MVP Argentina-only → "without i18n routing" mode. LOCALE constant en `shared/constants/i18n.ts`. 6 tests verdes, 107 archivos / 919 tests totales pasan.
 
 ### F10.2 — Migrar copy a messages
 - **Estado:** ⚪ pending

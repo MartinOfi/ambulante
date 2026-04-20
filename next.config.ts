@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 import withSerwist from "@serwist/next";
+import createNextIntlPlugin from "next-intl/plugin";
 import "./shared/config/env.runtime";
 
 const nextConfig: NextConfig = {
@@ -20,7 +21,9 @@ const withSerwistConfig = withSerwist({
   disable: process.env.NODE_ENV === "development",
 });
 
-export default withSentryConfig(withSerwistConfig(nextConfig), {
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withSentryConfig(withNextIntl(withSerwistConfig(nextConfig)), {
   silent: true,
   disableLogger: true,
   widenClientFileUpload: true,

@@ -53,6 +53,7 @@
 | InstallPrompt / InstallPromptContainer | ui-component | `shared/components/InstallPrompt/` | ui.md §2 |
 | isClientError | util | `shared/providers/QueryProvider.tsx` | ui.md §2c |
 | Label | ui-component | `shared/components/ui/label.tsx` | ui.md §1 |
+| LOCALE / SupportedLocale | constant | `shared/constants/i18n.ts` | domain.md §8 |
 | LiveMiniMap | ui-component | `shared/components/LiveMiniMap/` | ui.md §2 |
 | logger | util | `shared/utils/logger.ts` | infra.md §5 |
 | NavigationMenu | ui-component | `shared/components/ui/navigation-menu.tsx` | ui.md §1 |

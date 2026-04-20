@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import Script from "next/script";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getLocale } from "next-intl/server";
 import "./globals.css";
 import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
 import { Toaster } from "@/shared/components/ui/toaster";
@@ -119,10 +121,13 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="es-AR"
+      lang={locale}
       className={`${spaceGrotesk.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
@@ -142,14 +147,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Script id="ld-software-app" type="application/ld+json">
           {JSON.stringify(softwareAppSchema)}
         </Script>
-        <NuqsProvider>
-          <QueryProvider>
-            <ThemeProvider>
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </QueryProvider>
-        </NuqsProvider>
+        <NextIntlClientProvider messages={messages}>
+          <NuqsProvider>
+            <QueryProvider>
+              <ThemeProvider>
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </QueryProvider>
+          </NuqsProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
