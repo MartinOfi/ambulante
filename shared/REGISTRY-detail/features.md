@@ -33,9 +33,20 @@
 |---|---|---|---|
 | `useOrderQuery` | `features/orders/hooks/useOrderQuery.ts` | hook | Query de un pedido por ID |
 | `useOrdersQuery` | `features/orders/hooks/useOrdersQuery.ts` | hook | Query de todos los pedidos del usuario |
+| `useStoreOrdersQuery` | `features/orders/hooks/useStoreOrdersQuery.ts` | hook | Query de pedidos de una tienda, ordenados por fecha descendente, con invalidación realtime |
+| `useNewOrderAlert` | `features/orders/hooks/useNewOrderAlert.ts` | hook | Dispara vibración + tono cuando llegan nuevos pedidos accionables; skips primera renderización |
 | `useAcceptOrderMutation` | `features/orders/hooks/useAcceptOrderMutation.ts` | hook | Mutación: tienda acepta pedido |
 | `useSendOrderMutation` | `features/orders/hooks/useSendOrderMutation.ts` | hook | Mutación: cliente envía pedido |
 | `OrderTracking` | `features/orders/components/OrderTracking/` | componente | Pantalla de seguimiento de pedido en tiempo real |
+| `IncomingOrdersInbox` | `features/orders/components/IncomingOrdersInbox/` | componente | Bandeja de pedidos entrantes para la tienda (dumb + container) |
+
+#### IncomingOrdersInbox (F13.4)
+- **Archivos:** `IncomingOrdersInbox.tsx` (dumb), `IncomingOrdersInbox.container.tsx` (smart), `IncomingOrdersInbox.types.ts`
+- **Descripción:** Bandeja de pedidos entrantes para el rol tienda. Lista todos los pedidos de la tienda ordenados por `createdAt` desc. Muestra botones Aceptar/Rechazar para estado RECIBIDO y Finalizar para EN_CAMINO. Bloquea botones del `pendingOrderId` mientras la mutación está en vuelo.
+- **API dumb:** `<IncomingOrdersInbox orders isLoading onAccept onReject onFinalize pendingOrderId />`
+- **API smart:** `<IncomingOrdersInboxContainer />` — deriva `storeId` de la sesión; conecta `useStoreOrdersQuery`, `useNewOrderAlert`, y las mutaciones accept/reject/finalize.
+- **Hooks asociados:** `useStoreOrdersQuery` (datos + realtime), `useNewOrderAlert` (vibración/audio)
+- **Ruta app:** `app/(store)/store/orders/page.tsx`
 
 #### OrderTracking (F12.4)
 - **Archivos:** `OrderTracking.tsx` (dumb), `OrderTracking.container.tsx` (smart), `OrderTracking.types.ts`

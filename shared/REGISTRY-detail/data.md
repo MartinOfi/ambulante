@@ -17,6 +17,8 @@ queryKeys.stores.byId(id)
 queryKeys.stores.profile(storeId)
 queryKeys.orders.all()
 queryKeys.orders.byUser(userId)
+queryKeys.orders.byStore(storeId)
+queryKeys.orders.byStorePrefix()  // prefix key — para invalidar todos los byStore en onSettled
 queryKeys.orders.byId(id)
 queryKeys.products.all()
 queryKeys.products.byStore(storeId)

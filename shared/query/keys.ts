@@ -11,6 +11,8 @@ export const queryKeys = {
   orders: {
     all: () => ["orders"] as const,
     byUser: (userId: string) => ["orders", "by-user", userId] as const,
+    byStore: (storeId: string) => ["orders", "by-store", storeId] as const,
+    byStorePrefix: () => ["orders", "by-store"] as const,
     byId: (id: string) => ["orders", "by-id", id] as const,
   },
   products: {
