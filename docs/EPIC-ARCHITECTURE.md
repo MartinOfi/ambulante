@@ -1032,7 +1032,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.4 — Feature flags
-- **Estado:** 🟢 ready
+- **Estado:** 🟡 in-progress [owner: main-chat, started: 2026-04-20]
 - **Por qué:** Vercel Edge Config (DP-4 ✅). Rollouts graduales, kill switches, A/B tests.
 - **Entregable:** `shared/services/flags.ts` + hook `useFlag(key)`. Integración con provider elegido.
 - **Archivos:** `shared/services/flags.ts`, `shared/hooks/useFlag.ts`.
