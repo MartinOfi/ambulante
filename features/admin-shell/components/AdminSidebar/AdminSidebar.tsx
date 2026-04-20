@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, ClipboardList, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, ClipboardList, ShieldAlert, ShieldCheck } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { ROUTES } from "@/shared/constants/routes";
 
@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.admin.dashboard, icon: LayoutDashboard },
   { label: "Pedidos", href: ROUTES.admin.orders, icon: ClipboardList },
   { label: "Moderación", href: ROUTES.admin.moderation, icon: ShieldAlert },
+  { label: "Validación de tiendas", href: ROUTES.admin.stores, icon: ShieldCheck },
 ] as const;
 
 interface AdminSidebarProps {
