@@ -1,11 +1,31 @@
 import "fake-indexeddb/auto";
 import { describe, it, expect, beforeEach } from "vitest";
 import { enqueueItem, dequeueAll, type SendOrderPayload } from "./offline-queue";
+import { shouldDiscardQueueItem } from "./idb-queue-helpers";
+import { OFFLINE_QUEUE_MAX_ATTEMPTS } from "@/shared/constants/background-sync";
 import {
   OFFLINE_QUEUE_DB_NAME,
   OFFLINE_QUEUE_STORE_NAME,
   OFFLINE_QUEUE_DB_VERSION,
 } from "@/shared/constants/background-sync";
+
+describe("shouldDiscardQueueItem", () => {
+  it("returns false when attempts is 0", () => {
+    expect(shouldDiscardQueueItem(0)).toBe(false);
+  });
+
+  it("returns false when attempts is below max", () => {
+    expect(shouldDiscardQueueItem(OFFLINE_QUEUE_MAX_ATTEMPTS - 1)).toBe(false);
+  });
+
+  it("returns true when attempts equals max", () => {
+    expect(shouldDiscardQueueItem(OFFLINE_QUEUE_MAX_ATTEMPTS)).toBe(true);
+  });
+
+  it("returns true when attempts exceeds max", () => {
+    expect(shouldDiscardQueueItem(OFFLINE_QUEUE_MAX_ATTEMPTS + 1)).toBe(true);
+  });
+});
 
 const VALID_PAYLOAD: SendOrderPayload = {
   storeId: "store-1",

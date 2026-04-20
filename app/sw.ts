@@ -1,13 +1,8 @@
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { Serwist } from "serwist";
 import { defaultCache } from "@serwist/next/worker";
-import {
-  SYNC_TAG,
-  OFFLINE_QUEUE_DB_NAME,
-  OFFLINE_QUEUE_DB_VERSION,
-  OFFLINE_QUEUE_STORE_NAME,
-  OFFLINE_QUEUE_MAX_ATTEMPTS,
-} from "@/shared/constants/background-sync";
+import { SYNC_TAG } from "@/shared/constants/background-sync";
+import { openQueueDb, shouldDiscardQueueItem } from "@/shared/query/idb-queue-helpers";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -38,23 +33,6 @@ interface QueuedOrder {
   };
   enqueuedAt: string;
   attempts: number;
-}
-
-function openQueueDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(OFFLINE_QUEUE_DB_NAME, OFFLINE_QUEUE_DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(OFFLINE_QUEUE_STORE_NAME)) {
-        db.createObjectStore(OFFLINE_QUEUE_STORE_NAME, { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result);
-
-    request.onerror = (event) => reject((event.target as IDBOpenDBRequest).error);
-  });
 }
 
 function isValidQueuedOrderItem(raw: unknown): raw is QueuedOrderItem {
@@ -148,7 +126,7 @@ async function processSyncQueue(): Promise<void> {
   const items = await dequeueAllFromSw();
 
   for (const item of items) {
-    if (item.attempts >= OFFLINE_QUEUE_MAX_ATTEMPTS) {
+    if (shouldDiscardQueueItem(item.attempts)) {
       console.error("[SW] Discarding offline queue item after max attempts", {
         id: item.id,
         type: item.type,

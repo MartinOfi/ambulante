@@ -1,11 +1,7 @@
 import { z } from "zod";
 import { logger } from "@/shared/utils/logger";
-import {
-  OFFLINE_QUEUE_DB_NAME,
-  OFFLINE_QUEUE_DB_VERSION,
-  OFFLINE_QUEUE_STORE_NAME,
-  SYNC_TAG,
-} from "@/shared/constants/background-sync";
+import { SYNC_TAG, OFFLINE_QUEUE_STORE_NAME } from "@/shared/constants/background-sync";
+import { openQueueDb } from "@/shared/query/idb-queue-helpers";
 
 // ---------------------------------------------------------------------------
 // Schemas & types
@@ -36,10 +32,12 @@ export const offlineQueueItemSchema = z.object({
 
 export type OfflineQueueItem = z.infer<typeof offlineQueueItemSchema>;
 
-export interface CreateQueueItemInput {
-  readonly type: OfflineQueueItem["type"];
-  readonly payload: SendOrderPayload;
-}
+export const createQueueItemInputSchema = z.object({
+  type: z.literal("SEND_ORDER"),
+  payload: sendOrderPayloadSchema,
+});
+
+export type CreateQueueItemInput = z.infer<typeof createQueueItemInputSchema>;
 
 // ---------------------------------------------------------------------------
 // Internal: SyncManager type (not in lib.dom yet)
@@ -61,23 +59,6 @@ function generateId(): string {
   return crypto.randomUUID();
 }
 
-function openQueueDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(OFFLINE_QUEUE_DB_NAME, OFFLINE_QUEUE_DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(OFFLINE_QUEUE_STORE_NAME)) {
-        db.createObjectStore(OFFLINE_QUEUE_STORE_NAME, { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = (event) => resolve((event.target as IDBOpenDBRequest).result);
-
-    request.onerror = (event) => reject((event.target as IDBOpenDBRequest).error);
-  });
-}
-
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -88,11 +69,12 @@ function openQueueDb(): Promise<IDBDatabase> {
  * Returns the generated item id.
  */
 export async function enqueueItem(input: CreateQueueItemInput): Promise<string> {
-  const validatedPayload = sendOrderPayloadSchema.parse(input.payload);
+  const validated = createQueueItemInputSchema.parse(input);
+  const validatedPayload = validated.payload;
 
   const item: OfflineQueueItem = {
     id: generateId(),
-    type: input.type,
+    type: validated.type,
     payload: validatedPayload,
     enqueuedAt: new Date().toISOString(),
     attempts: 0,
