@@ -56,6 +56,18 @@ const item = createOrderItem({ productName: "Pizza" });
 
 ---
 
+### Invariant tests — `shared/test-utils/no-raw-img.test.ts`
+
+Architectural fitness function: scans all `.tsx`/`.jsx` files and fails if any raw `<img>` tag is found. Enforces that all images go through `next/image`.
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `Image optimization invariant` | fitness-fn test | Prohíbe `<img` nativo en componentes; solo `next/image` permitido |
+
+No importar ni reutilizar — es un test standalone que corre con el suite normal.
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`
