@@ -1,11 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   ORDER_ACTOR,
   ORDER_EVENT,
   transition,
+  transitionWithAudit,
   type Order,
   type OrderEvent,
+  type TransitionWithAuditInput,
 } from "@/shared/domain/order-state-machine";
+import type { AuditLogService } from "@/shared/services/audit-log";
 import { ORDER_STATUS } from "@/shared/constants/order";
 
 // ---- Fixtures ----
@@ -481,5 +484,91 @@ describe("transition — timestamp propagation through full chain", () => {
     expect((finalizado as { acceptedAt: Date }).acceptedAt).toEqual(t3);
     expect((finalizado as { onTheWayAt: Date }).onTheWayAt).toEqual(t4);
     expect((finalizado as { finishedAt: Date }).finishedAt).toEqual(t5);
+  });
+});
+
+// ====================================================================
+// transitionWithAudit — integración con audit log service
+// ====================================================================
+
+describe("transitionWithAudit", () => {
+  function makeAuditLogService(): AuditLogService {
+    return {
+      append: vi.fn().mockResolvedValue(undefined),
+      findByOrderId: vi.fn().mockResolvedValue([]),
+    };
+  }
+
+  it("returns the same TransitionResult as transition() on success", async () => {
+    const auditLog = makeAuditLogService();
+    const input: TransitionWithAuditInput = {
+      order: baseOrderEnviado,
+      event: makeEvent(ORDER_EVENT.SISTEMA_RECIBE),
+      actor: ORDER_ACTOR.SISTEMA,
+      auditLog,
+    };
+    const result = await transitionWithAudit(input);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.status).toBe(ORDER_STATUS.RECIBIDO);
+    }
+  });
+
+  it("calls auditLog.append with correct fields on successful transition", async () => {
+    const auditLog = makeAuditLogService();
+    const event = makeEvent(ORDER_EVENT.SISTEMA_RECIBE, LATER_DATE);
+    await transitionWithAudit({
+      order: baseOrderEnviado,
+      event,
+      actor: ORDER_ACTOR.SISTEMA,
+      auditLog,
+    });
+    expect(auditLog.append).toHaveBeenCalledOnce();
+    const callArg = (auditLog.append as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(callArg.orderId).toBe(baseOrderEnviado.id);
+    expect(callArg.actor).toBe(ORDER_ACTOR.SISTEMA);
+    expect(callArg.eventType).toBe(ORDER_EVENT.SISTEMA_RECIBE);
+    expect(callArg.fromStatus).toBe(ORDER_STATUS.ENVIADO);
+    expect(callArg.toStatus).toBe(ORDER_STATUS.RECIBIDO);
+    expect(callArg.occurredAt).toEqual(LATER_DATE);
+  });
+
+  it("does NOT call auditLog.append when transition fails (invalid)", async () => {
+    const auditLog = makeAuditLogService();
+    const result = await transitionWithAudit({
+      order: baseOrderEnviado,
+      event: makeEvent(ORDER_EVENT.TIENDA_ACEPTA),
+      actor: ORDER_ACTOR.TIENDA,
+      auditLog,
+    });
+    expect(result.ok).toBe(false);
+    expect(auditLog.append).not.toHaveBeenCalled();
+  });
+
+  it("does NOT call auditLog.append when actor is unauthorized", async () => {
+    const auditLog = makeAuditLogService();
+    const result = await transitionWithAudit({
+      order: baseOrderEnviado,
+      event: makeEvent(ORDER_EVENT.SISTEMA_RECIBE),
+      actor: ORDER_ACTOR.CLIENTE,
+      auditLog,
+    });
+    expect(result.ok).toBe(false);
+    expect(auditLog.append).not.toHaveBeenCalled();
+  });
+
+  it("returns transition result even when auditLog.append throws", async () => {
+    const auditLog: AuditLogService = {
+      append: vi.fn().mockRejectedValue(new Error("DB unavailable")),
+      findByOrderId: vi.fn().mockResolvedValue([]),
+    };
+    const result = await transitionWithAudit({
+      order: baseOrderEnviado,
+      event: makeEvent(ORDER_EVENT.SISTEMA_RECIBE),
+      actor: ORDER_ACTOR.SISTEMA,
+      auditLog,
+    });
+    // State machine result is preserved even if audit logging fails
+    expect(result.ok).toBe(true);
   });
 });

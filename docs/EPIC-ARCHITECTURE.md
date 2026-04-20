@@ -1529,12 +1529,12 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.2 — Audit log inmutable
-- **Estado:** 🟡 in-progress [owner: f16-2-chat, started: 2026-04-20]
+- **Estado:** ✅ done
 - **Por qué:** Transiciones de pedido deben quedar registradas con actor + timestamp (PRD §6.2).
 - **Entregable:** Tabla append-only en backend; integración con state machine.
 - **Depends on:** F3.2, DP-1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `shared/domain/audit-log.ts` (Zod schemas + types), `shared/services/audit-log.ts` (interface), `shared/services/audit-log.mock.ts` (mock with 4 seed orders), `transitionWithAudit()` added to `shared/domain/order-state-machine.ts`, SQL migration `docs/migrations/001_audit_log.sql` (RLS append-only). 50 tests passing.
 
 ### F16.3 — Privacy policy + terms
 - **Estado:** ⚪ pending

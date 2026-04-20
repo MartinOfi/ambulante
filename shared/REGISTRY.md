@@ -24,6 +24,9 @@
 | ANALYTICS_EVENT / analyticsEventSchemas / AnalyticsEventMap | constant | `shared/constants/analytics-events.ts` | data.md §4 |
 | analyticsService / createAnalyticsService / AnalyticsTransport | service | `shared/services/analytics.ts` | data.md §4 |
 | kpiService / createKpiService / KpiService / computeDeltaMs | service | `shared/services/kpi.ts` | data.md §4 |
+| AuditLogEntry / NewAuditLogEntry | type | `shared/domain/audit-log.ts` | domain.md §12 |
+| auditLogEntrySchema / newAuditLogEntrySchema | schema | `shared/domain/audit-log.ts` | domain.md §12 |
+| auditLogService / createMockAuditLogService / AuditLogService | service | `shared/services/audit-log.ts` | data.md §4 |
 | authService | service | `shared/services/auth.ts` | data.md §4 |
 | Badge | ui-component | `shared/components/ui/badge.tsx` | ui.md §1 |
 | Button | ui-component | `shared/components/ui/button.tsx` | ui.md §1 |
@@ -126,8 +129,8 @@
 | ThemeToggle | ui-component | `shared/components/theme/ThemeToggle.tsx` | ui.md §2 |
 | Toaster | ui-component | `shared/components/ui/toaster.tsx` | ui.md §1 |
 | transition / ORDER_EVENT / ORDER_ACTOR | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
+| transitionWithAudit / TransitionWithAuditInput | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
 | OrderAuditLogContainer | feature-component | `features/admin-audit-log/components/OrderAuditLog/` | features.md §13 |
-| auditLogService / AuditLogService | service | `features/admin-audit-log/services/audit-log.mock.ts` | features.md §13 |
 | useAuditLogQuery | hook | `features/admin-audit-log/hooks/useAuditLogQuery.ts` | features.md §13 |
 | useAcceptOrderMutation | hook | `features/orders/hooks/useAcceptOrderMutation.ts` | data.md §3 |
 | IncomingOrdersInbox / IncomingOrdersInboxContainer | feature-component | `features/orders/components/IncomingOrdersInbox/` | features.md §13 |

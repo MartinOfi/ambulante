@@ -1,4 +1,7 @@
 import { ORDER_STATUS, type OrderStatus } from "@/shared/constants/order";
+import { logger } from "@/shared/utils/logger";
+import type { AuditLogService } from "@/shared/services/audit-log";
+import type { NewAuditLogEntry } from "@/shared/domain/audit-log";
 
 // ── Actors ────────────────────────────────────────────────────────────────────
 
@@ -324,4 +327,41 @@ export function transition({ order, event, actor }: TransitionInput): Transition
   }
 
   return { ok: true, value: def.apply(order, event.occurredAt) };
+}
+
+// ── transitionWithAudit ───────────────────────────────────────────────────────
+
+export interface TransitionWithAuditInput extends TransitionInput {
+  readonly auditLog: AuditLogService;
+}
+
+export async function transitionWithAudit({
+  order,
+  event,
+  actor,
+  auditLog,
+}: TransitionWithAuditInput): Promise<TransitionResult> {
+  const result = transition({ order, event, actor });
+
+  if (!result.ok) {
+    return result;
+  }
+
+  const entry: NewAuditLogEntry = {
+    orderId: order.id,
+    actor,
+    eventType: event.type,
+    fromStatus: order.status,
+    toStatus: result.value.status,
+    occurredAt: event.occurredAt,
+  };
+
+  try {
+    await auditLog.append(entry);
+  } catch (error: unknown) {
+    // Audit log failure must not block the state transition
+    logger.error("transitionWithAudit: failed to append audit entry", { orderId: order.id, error });
+  }
+
+  return result;
 }

@@ -181,11 +181,22 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 Máquina de estados tipada del pedido (PRD §6). Discriminated union `Order` con 8 variantes.
 
 - **API:**
-  - `transition({ order, event, actor }): TransitionResult` — sin excepciones; retorna `Result<Order, TransitionError>`
+  - `transition({ order, event, actor }): TransitionResult` — puro, sin excepciones; retorna `Result<Order, TransitionError>`
+  - `transitionWithAudit({ order, event, actor, auditLog }): Promise<TransitionResult>` — wrapper async que llama a `transition()` y, en éxito, hace `auditLog.append()`. Si el append falla, loguea y devuelve el resultado igualmente — la auditoría nunca bloquea la transición.
   - `ORDER_ACTOR` — `{ CLIENTE, TIENDA, SISTEMA }` as const
   - `ORDER_EVENT` — 8 eventos as const (son *comandos* — distintos de `ORDER_DOMAIN_EVENT` que son *hechos*)
 - **Errores posibles:** `TERMINAL_STATE` | `INVALID_TRANSITION` | `UNAUTHORIZED_ACTOR`
-- **Tipos exportados:** `Order`, `OrderActor`, `OrderEvent`, `TransitionError`, `TransitionResult`, `Result<T,E>`, variantes `OrderEnviado` … `OrderExpirado`
+- **Tipos exportados:** `Order`, `OrderActor`, `OrderEvent`, `TransitionError`, `TransitionResult`, `Result<T,E>`, `TransitionWithAuditInput`, variantes `OrderEnviado` … `OrderExpirado`
+
+### Audit log domain — `shared/domain/audit-log.ts`
+
+Schemas Zod y tipos TS para las entradas del log de auditoría inmutable (PRD §6.2).
+
+- **API:**
+  - `auditLogEntrySchema` — schema completo con `id`; para parsear entradas leídas desde BD
+  - `newAuditLogEntrySchema` — `auditLogEntrySchema.omit({ id }).strict()` — rechaza `id` en insert; para validar `NewAuditLogEntry` antes de persistir
+- **Campos:** `id`, `orderId`, `actor` (enum CLIENTE/TIENDA/SISTEMA), `eventType` (8 eventos), `fromStatus`, `toStatus`, `occurredAt: Date`
+- **Tipos exportados:** `AuditLogEntry`, `NewAuditLogEntry`
 
 ### Domain events + event bus
 
