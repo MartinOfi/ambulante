@@ -1419,7 +1419,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Por qué todo en paralelo:** cada sección del admin es una ruta independiente (`/admin/stores`, `/admin/moderation`, `/admin/orders`, `/admin/users`) sin estado compartido entre ellas. Si hay recursos (equipo o chats), F14 se puede terminar en una fracción del tiempo serial.
 
 ### F14.1 — Dashboard KPIs
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 09:00]
 - **Entregable:** `/admin` con los 6 KPIs del §8.
 - **Depends on:** F8.3
 - **Estimación:** M
