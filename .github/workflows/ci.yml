@@ -141,3 +141,30 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  bundle-analysis:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        node-version: [20]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build with bundle analyzer
+        run: pnpm analyze
+
+      - name: Check bundle sizes
+        run: node scripts/check-bundle-sizes.mjs

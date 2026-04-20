@@ -24,6 +24,7 @@ export default defineConfig({
       "app/**/*.{test,spec}.{ts,tsx}",
       "i18n/**/*.{test,spec}.{ts,tsx}",
       "middleware.test.{ts,tsx}",
+      "scripts/**/*.{test,spec}.{ts,tsx}",
     ],
     exclude: ["node_modules/**", ".next/**", "e2e/**"],
     coverage: {
