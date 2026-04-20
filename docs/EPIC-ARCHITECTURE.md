@@ -1500,12 +1500,12 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.5 — Database query optimization
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Cuando entre Supabase real, queries mal indexadas matan el servicio.
 - **Entregable:** Índices documentados por query. `EXPLAIN` de las hot queries. PostGIS para geoqueries.
 - **Depends on:** DP-1
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Creado `docs/db-query-optimization.md`. Documenta: schema de 6 tablas (users, stores, products, orders, order_items, order_transitions), 7 hot queries con su SQL e índices, análisis EXPLAIN prospectivo para Q1 (geoquery crítica con/sin GIST), PostGIS setup (geography vs geometry, funciones usadas), RLS policies para aislamiento de roles, publicaciones Supabase Realtime, y checklist de verificación pre-producción. Sin código TypeScript — documentación pura. F15.6 (load testing) queda desbloqueada.
 
 ### F15.6 — Load testing
 - **Estado:** ⚪ pending
