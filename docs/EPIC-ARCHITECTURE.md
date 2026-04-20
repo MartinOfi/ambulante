@@ -903,7 +903,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** Constantes extraídas a `app/sw-cache-strategies.ts` (excluido de tsconfig SW scope). 4 estrategias: `NetworkOnly` para `/api/locations` (geolocalización nunca stale), `NetworkFirst` para `/api/*` genérico, `StaleWhileRevalidate` para `/orders` (historial offline PRD §7.3), `CacheFirst` para imágenes. 23 tests passing.
 
 ### F6.3 — Web Push notifications
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-20, completed: 2026-04-20]
 - **Por qué:** PRD §5.1 C8 / §5.2 T8 — alertas de cambio de estado.
 - **Entregable:** `shared/services/push.ts` con `subscribe`, `unsubscribe`, `sendTestNotification`. VAPID keys en env. Flow de permisos.
 - **Archivos:** `shared/services/push.ts`.
