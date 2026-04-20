@@ -7,3 +7,4 @@ export {
 } from "./render";
 // Shadow RTL's `render` so the providers-wrapped version is the default
 export { renderWithProviders as render } from "./render";
+export { createUser, createStore, createOrderItem, createOrder } from "./factories";

@@ -946,13 +946,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** Creados `shared/test-utils/render.tsx` (`renderWithProviders`, `createTestQueryClient`) y `shared/test-utils/index.ts` (barrel con RTL + userEvent). Usa `nuqs/adapters/react` para compatibilidad con jsdom. 4 tests verdes. 499/499 tests totales verdes. 0 errores TS.
 
 ### F7.2 — Test factories y fixtures
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:45]
+- **Estado:** ✅ done [owner: chat-2026-04-20, finished: 11:52]
 - **Por qué:** Construir entidades de test manualmente genera duplicación y tests frágiles.
 - **Entregable:** `shared/test-utils/factories.ts` con `createStore()`, `createUser()`, `createOrder()` usando los schemas Zod.
-- **Archivos:** `shared/test-utils/factories.ts`.
+- **Archivos:** `shared/test-utils/factories.ts`, `shared/test-utils/factories.test.ts`.
 - **Depends on:** F3.1, F7.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 18 tests verdes. IDs únicos via `_seq` counter; `ownerId` como UUID fake `00000000-0000-0000-0000-XXXXXXXXXXXX` para pasar validación UUID de `storeSchema`.
 
 ### F7.3 — Tests de dominio (máquina de estados)
 - **Estado:** ⚪ pending

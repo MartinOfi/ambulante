@@ -817,6 +817,23 @@
   ```
 - **Nota:** Usa `nuqs/adapters/react` (no el adaptador Next.js) para compatibilidad con jsdom.
 
+### Test factories
+
+- **Ruta barrel:** `shared/test-utils/index.ts`
+- **Ruta impl:** `shared/test-utils/factories.ts`
+- **Descripción:** Fábricas de entidades de dominio para tests. Cada fábrica acepta overrides opcionales y valida el resultado con el schema Zod correspondiente. IDs únicos garantizados por secuencia global.
+- **API:**
+  - `createUser(overrides?: Partial<User>): User` — default: `role: "client"`
+  - `createStore(overrides?: Partial<Store>): Store` — default: `status: "open"`, kind: `"food-truck"`
+  - `createOrderItem(overrides?: Partial<OrderItem>): OrderItem` — default: `quantity: 1`
+  - `createOrder(overrides?: Partial<Order>): Order` — default: `status: ORDER_STATUS.ENVIADO`, incluye 1 item
+- **Uso canónico:**
+  ```ts
+  import { createStore, createOrder } from '@/shared/test-utils';
+  const store = createStore({ status: "closed" });
+  const order = createOrder({ items: [createOrderItem({ productName: "Pizza" })] });
+  ```
+
 ---
 
 ## Changelog del registry
@@ -868,3 +885,4 @@
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
+| 2026-04-20 | F7.2: agregadas test factories (`createUser`, `createStore`, `createOrderItem`, `createOrder`) en §14 | —     |
