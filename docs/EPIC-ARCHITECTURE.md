@@ -1144,13 +1144,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F10.3 — ARIA audit
-- **Estado:** 🟡 in-progress [owner: main-chat, started: 2026-04-20]
+- **Estado:** ✅ done
 - **Por qué:** Cumplimiento WCAG AA.
 - **Entregable:** `axe-playwright` en E2E suite. 0 violations críticas en landing y map.
 - **Archivos:** `e2e/a11y.spec.ts`.
 - **Depends on:** F0.6
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `@axe-core/playwright@4.11.2` instalado como devDependency. Spec audita `/` y `/map` con tags wcag2a/wcag2aa/wcag21aa. Falla si hay violations de impact `critical` o `serious`. `formatViolations` helper produce output legible en el assertion message.
 
 ### F10.4 — Keyboard navigation
 - **Estado:** ⚪ pending
