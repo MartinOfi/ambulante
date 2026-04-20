@@ -1478,12 +1478,12 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.2 — RSC boundaries review
-- **Estado:** 🟡 in-progress [owner: main-chat-2026-04-20, started: 15:45]
+- **Estado:** ✅ done
 - **Por qué:** Hoy casi todo es `"use client"`. Revisar qué puede ser Server Component.
 - **Entregable:** Auditoría route-por-route, mover data fetching a server cuando se pueda.
 - **Depends on:** F4.*
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Convertidos a RSC: `app/(admin)/admin/stores/page.tsx`, `app/(admin)/admin/stores/[storeId]/page.tsx`. Removida directiva innecesaria en `LandingNav.tsx` y `HowItWorks.tsx`. Navegación internalizada en `StoreValidationQueueContainer` y `StoreDetailPanelContainer`. Todos los demás `"use client"` son legítimos (hooks, Radix interactivos, formularios, MapLibre).
 
 ### F15.3 — Image optimization
 - **Estado:** ⚪ pending
