@@ -336,6 +336,18 @@
 - **Tipos:** `StoresService`, `FindNearbyInput` re-exportados desde `shared/repositories/store`
 - **Usado en:** `features/map/hooks/useStoresNearbyQuery`, `features/map/hooks/useStoreByIdQuery`.
 
+### pushService
+
+- **Ruta:** `shared/services/push.ts`
+- **Tipos:** `shared/services/push.types.ts`
+- **Descripción:** Abstracción de notificaciones push. Interfaz `PushService` swapeable (mock fase actual → Web Push API real + VAPID cuando llegue el backend). SSR-safe: todas las rutas verifican `typeof window / typeof Notification` antes de tocar APIs del browser.
+- **Interface:** `PushService` — `requestPermission()`, `subscribe()` → `PushSubscriptionData | null`, `unsubscribe()` → `boolean`, `sendTestNotification(title, body)`, `getPermissionStatus()` → `PushPermissionStatus`
+- **Factory exportada:** `createMockPushService()` — instancia aislada por test
+- **Singleton:** `pushService` — usado en runtime
+- **Tipos clave:** `PushPermissionStatus` ("default" | "granted" | "denied"), `PushSubscriptionData` (endpoint + keys p256dh/auth)
+- **Env relacionada:** `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (opcional, se usa cuando llegue la implementación real)
+- **Usado en:** futuras features de notificaciones (F6.4+), profile de notificaciones.
+
 ### productsService
 
 - **Ruta:** `shared/services/products.ts`
@@ -868,3 +880,4 @@
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
+| 2026-04-20 | F6.3: agregado `pushService` + `PushService` interface en §4; `NEXT_PUBLIC_VAPID_PUBLIC_KEY` en env.schema | —     |
