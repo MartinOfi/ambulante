@@ -1440,11 +1440,21 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.4 — Order audit log
-- **Estado:** 🟡 in-progress [owner: f14-4-chat, started: 2026-04-20]
+- **Estado:** ✅ done [owner: f14-4-chat, completed: 2026-04-20]
 - **Entregable:** Búsqueda por id de pedido; timeline completo de transiciones con timestamps y actor.
 - **Depends on:** F3.2
 - **Estimación:** M
 - **Notas:**
+  - Ruta: `app/(admin)/admin/orders/page.tsx`
+  - Componentes: `OrderAuditLog` (dumb) + `OrderAuditLogContainer` (smart, "use client")
+  - `AuditLogSearch` — react-hook-form + zod; campo `orderId` validado
+  - `TransitionTimeline` — ordena por `occurredAt` ASC; colores por estado terminal
+  - `auditLogService` (mock) — 4 seed orders; interfaz `AuditLogService { findByOrderId }`
+  - `useAuditLogQuery` — TanStack Query, `enabled` guard, `staleTime: 30s`
+  - Schemas Zod: `auditLogEntrySchema`, `auditLogResultSchema`, `orderIdSearchSchema`
+  - `result` prop usa semántica tres valores: `undefined` = idle, `null` = no encontrado, `AuditLogResult` = encontrado
+  - Cobertura final: Statements 94.91%, Branches 88.88%, Functions 100%, Lines 96.49%
+  - 37 tests en 6 archivos; 0 errores TypeScript nuevos
 
 ### F14.5 — User management
 - **Estado:** ⚪ pending

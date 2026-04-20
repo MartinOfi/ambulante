@@ -114,6 +114,9 @@
 | ThemeToggle | ui-component | `shared/components/theme/ThemeToggle.tsx` | ui.md §2 |
 | Toaster | ui-component | `shared/components/ui/toaster.tsx` | ui.md §1 |
 | transition / ORDER_EVENT / ORDER_ACTOR | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
+| OrderAuditLogContainer | feature-component | `features/admin-audit-log/components/OrderAuditLog/` | features.md §13 |
+| auditLogService / AuditLogService | service | `features/admin-audit-log/services/audit-log.mock.ts` | features.md §13 |
+| useAuditLogQuery | hook | `features/admin-audit-log/hooks/useAuditLogQuery.ts` | features.md §13 |
 | useAcceptOrderMutation | hook | `features/orders/hooks/useAcceptOrderMutation.ts` | data.md §3 |
 | useAvailability | hook | `features/store-shell/hooks/useAvailability.ts` | features.md §13 |
 | useCartStore | store | `shared/stores/cart.ts` | infra.md §10 |

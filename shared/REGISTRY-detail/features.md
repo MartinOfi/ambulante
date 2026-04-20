@@ -97,6 +97,30 @@
 
 ---
 
+### `features/admin-audit-log/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `OrderAuditLogContainer` | `features/admin-audit-log/components/OrderAuditLog/` | componente | Página de auditoría de pedidos (smart + dumb) |
+| `AuditLogSearch` | `features/admin-audit-log/components/AuditLogSearch/` | componente | Formulario de búsqueda por ID de pedido |
+| `TransitionTimeline` | `features/admin-audit-log/components/TransitionTimeline/` | componente | Timeline de transiciones de estado con actor y timestamp |
+| `useAuditLogQuery` | `features/admin-audit-log/hooks/useAuditLogQuery.ts` | hook | Query de historial de transiciones por orderId |
+| `auditLogService` | `features/admin-audit-log/services/audit-log.mock.ts` | service | Mock service — interfaz `AuditLogService { findByOrderId }` |
+
+#### admin-audit-log feature completa (F14.4)
+- **Ruta app:** `app/(admin)/admin/orders/page.tsx`
+- **Componentes:**
+  - `OrderAuditLog.tsx` (dumb) — Props: `result: AuditLogResult | null`, `isSearching: boolean`, `error: string | null`, `onSearch: (orderId) => void`
+  - `OrderAuditLog.container.tsx` (smart, `"use client"`) — conecta `useAuditLogQuery` + estado de búsqueda; extrae mensaje de error
+  - `AuditLogSearch.tsx` (dumb, `"use client"`) — react-hook-form + `zodResolver(orderIdSearchSchema)`; campo: `orderId` con validación de min 1 y max 128
+  - `TransitionTimeline.tsx` (dumb) — ordena entradas por `occurredAt` ASC; muestra estado, actor, timestamp y eventType; detecta estados terminales con color
+- **Schemas:** `auditLogEntrySchema`, `auditLogResultSchema`, `orderIdSearchSchema` en `features/admin-audit-log/schemas/`
+- **Tipos:** `AuditLogEntry`, `AuditLogResult`, `OrderIdSearchValues` derivados de los schemas
+- **Constantes:** `AUDIT_LOG_MOCK_DELAY_MS`, `AUDIT_LOG_MAX_ORDER_ID_LENGTH`, `AUDIT_LOG_ACTOR_LABEL`, `AUDIT_LOG_STATUS_LABEL`
+- **Seed orders (mock):** `order-demo-completed`, `order-demo-rejected`, `order-demo-expired`, `order-demo-cancelled`
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:
