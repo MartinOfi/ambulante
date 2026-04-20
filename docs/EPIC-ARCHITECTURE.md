@@ -1486,11 +1486,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.3 — Image optimization
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-f15-3, completed: 2026-04-20]
 - **Entregable:** Todas las `<img>` migradas a `next/image`. Remote patterns en `next.config.mjs`.
 - **Depends on:** —
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Migración ya existía en StoreCard, StoreDetailSheet y StoreDetailPanel. `next.config.ts` tenía `remotePatterns` para `images.unsplash.com` (único dominio usado en mocks). Agregado test de invariante `shared/test-utils/no-raw-img.test.ts` que previene regresiones futuras.
 
 ### F15.4 — Edge caching strategy
 - **Estado:** ⚪ pending

@@ -91,6 +91,7 @@
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |
 | registerBackgroundSync | query | `shared/query/offline-queue.ts` | data.md §2b |
 | renderWithProviders | test-util | `shared/test-utils/render.tsx` | testing.md §14 |
+| no-raw-img (invariant test) | fitness-fn | `shared/test-utils/no-raw-img.test.ts` | testing.md §14 |
 | ROUTES / Route / buildHref | constant | `shared/constants/routes.ts` | domain.md §8 |
 | Row | ui-component | `shared/components/layout/` | ui.md §2 |
 | Screen | ui-component | `shared/components/layout/` | ui.md §2 |
