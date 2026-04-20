@@ -8,10 +8,23 @@ import { createRateLimitService } from "@/shared/services/rate-limit";
 
 const rateLimiter = createRateLimitService();
 
-function extractIp(request: NextRequest): string {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+// x-real-ip is set by Vercel's reverse proxy and cannot be forged by the client.
+// x-forwarded-for rightmost entry is the one appended by the trusted proxy.
+function extractIp(request: NextRequest): string | null {
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const entries = forwarded.split(",");
+    return entries[entries.length - 1]?.trim() ?? null;
+  }
+
+  return null;
 }
 
+// Rate limiting applies only to /api/* routes.
+// Non-API routes (map, orders, profile, store, admin) pass through to auth middleware below.
 async function applyRateLimit(request: NextRequest): Promise<NextResponse | null> {
   const { pathname } = request.nextUrl;
 
@@ -19,8 +32,15 @@ async function applyRateLimit(request: NextRequest): Promise<NextResponse | null
     return null;
   }
 
-  const rule = pathname.startsWith("/api/orders") ? RATE_LIMIT_RULES.orders : RATE_LIMIT_RULES.api;
   const ip = extractIp(request);
+  if (!ip) {
+    return NextResponse.json(
+      { error: "No se pudo identificar el origen de la solicitud." },
+      { status: 400 },
+    );
+  }
+
+  const rule = pathname.startsWith("/api/orders") ? RATE_LIMIT_RULES.orders : RATE_LIMIT_RULES.api;
   const result = await rateLimiter.check({ identifier: ip, rule });
 
   if (!result.allowed) {

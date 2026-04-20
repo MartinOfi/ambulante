@@ -23,6 +23,7 @@ export default defineConfig({
       "features/**/*.{test,spec}.{ts,tsx}",
       "app/**/*.{test,spec}.{ts,tsx}",
       "i18n/**/*.{test,spec}.{ts,tsx}",
+      "middleware.test.{ts,tsx}",
     ],
     exclude: ["node_modules/**", ".next/**", "e2e/**"],
     coverage: {

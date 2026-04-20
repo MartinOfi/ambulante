@@ -20,6 +20,9 @@ interface WindowEntry {
   readonly windowStart: number;
 }
 
+// Fixed-window algorithm: window starts at first request, not at a calendar boundary.
+// Known burst: a client can fire maxRequests at end of window + maxRequests at start of next,
+// sending 2×maxRequests in a ~1ms span. Acceptable for dev; swap to Upstash sliding-window before prod.
 export class InMemoryRateLimiter implements RateLimitService {
   private readonly store = new Map<string, WindowEntry>();
 

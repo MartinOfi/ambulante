@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { InMemoryRateLimiter } from "./rate-limit";
 import type { RateLimitRule } from "@/shared/constants/rate-limit";
 
@@ -13,6 +13,10 @@ describe("InMemoryRateLimiter", () => {
   beforeEach(() => {
     limiter = new InMemoryRateLimiter();
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("allows requests within the limit", async () => {
