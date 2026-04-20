@@ -1471,11 +1471,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Lighthouse mobile >90 en performance. Time-to-interactive <3s en conexión 4G.
 
 ### F15.1 — Bundle analysis
-- **Estado:** 🟡 in-progress [owner: f15-1-chat, started: 2026-04-20T16:00:00Z]
+- **Estado:** ✅ done
 - **Entregable:** `@next/bundle-analyzer` en CI, reporte en PRs grandes, umbral por chunk.
 - **Depends on:** F0.7
 - **Estimación:** S
-- **Notas:**
+- **Notas:** `@next/bundle-analyzer` integrado en `next.config.ts` (activado con `ANALYZE=true`). Script `scripts/check-bundle-sizes.mjs` falla CI si algún chunk supera 500 KB. Job `bundle-analysis` en `.github/workflows/ci.yml` corre solo en PRs. Script `analyze` en `package.json`.
 
 ### F15.2 — RSC boundaries review
 - **Estado:** ⚪ pending

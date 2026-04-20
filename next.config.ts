@@ -2,7 +2,12 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 import withSerwist from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
+import bundleAnalyzer from "@next/bundle-analyzer";
 import "./shared/config/env.runtime";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -26,9 +31,11 @@ const withSerwistConfig = withSerwist({
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-export default withSentryConfig(withNextIntl(withSerwistConfig(nextConfig)), {
-  silent: true,
-  disableLogger: true,
-  widenClientFileUpload: true,
-  automaticVercelMonitors: false,
-});
+export default withBundleAnalyzer(
+  withSentryConfig(withNextIntl(withSerwistConfig(nextConfig)), {
+    silent: true,
+    disableLogger: true,
+    widenClientFileUpload: true,
+    automaticVercelMonitors: false,
+  }),
+);
