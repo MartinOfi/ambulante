@@ -24,8 +24,6 @@ export function useFocusTrap({ ref, active, onEscape }: UseFocusTrapOptions): vo
     }
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (!active) return;
-
       if (event.key === "Escape") {
         onEscape?.();
         return;
