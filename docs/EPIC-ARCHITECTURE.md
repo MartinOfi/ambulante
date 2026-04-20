@@ -1559,11 +1559,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.6 — Security audit externo o Snyk/Dependabot
-- **Estado:** 🟡 in-progress [owner: f16-6-chat, started: 2026-04-20]
+- **Estado:** ✅ done
 - **Entregable:** Dependabot activado; `pnpm audit` en CI.
 - **Depends on:** F0.7
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creados `.github/dependabot.yml` (ecosistemas npm + github-actions, schedule semanal) y job `audit` en `.github/workflows/ci.yml` que corre `pnpm audit --audit-level=high` — bloquea merge ante vulnerabilidades high/critical. No se tocó shared/.
 
 ### F16.7 — GDPR/LGPD readiness
 - **Estado:** 🔴 blocked (DP-7)

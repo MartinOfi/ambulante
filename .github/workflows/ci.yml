@@ -99,6 +99,26 @@ jobs:
 
       - run: pnpm build
 
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Fails the job on high or critical vulnerabilities
+      - run: pnpm audit --audit-level=high
+
   test-e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
