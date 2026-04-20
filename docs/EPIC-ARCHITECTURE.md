@@ -912,13 +912,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F6.4 — Install prompt + guideline iOS
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-20]
 - **Por qué:** iOS Safari: push solo funciona si la PWA está instalada (CLAUDE §9). Hay que guiar al usuario.
 - **Entregable:** Componente `<InstallPrompt />` con detección de plataforma. Onboarding step que explica instalación en iOS.
 - **Archivos:** `shared/components/InstallPrompt/*`.
 - **Depends on:** F6.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Dumb + container pattern. iOS: 3 pasos paso a paso (Share2 → PlusSquare → Smartphone). Android: botón native prompt via `BeforeInstallPromptEvent`. Dismiss persistido en localStorage. iPadOS detectado via `navigator.maxTouchPoints > 1`. 7/7 tests GREEN.
 
 ### F6.5 — Background sync
 - **Estado:** ⚪ pending
