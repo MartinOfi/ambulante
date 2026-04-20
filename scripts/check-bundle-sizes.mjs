@@ -46,9 +46,13 @@ function main() {
     process.exit(1);
   }
 
-  const maxChunkSizeKb = process.env.MAX_CHUNK_SIZE_KB
-    ? Number(process.env.MAX_CHUNK_SIZE_KB)
-    : DEFAULT_MAX_CHUNK_SIZE_KB;
+  const rawEnv = process.env.MAX_CHUNK_SIZE_KB;
+  const maxChunkSizeKb = rawEnv ? Number(rawEnv) : DEFAULT_MAX_CHUNK_SIZE_KB;
+
+  if (!Number.isFinite(maxChunkSizeKb) || maxChunkSizeKb <= 0) {
+    process.stderr.write(`Error: MAX_CHUNK_SIZE_KB="${rawEnv}" is not a valid positive number.\n`);
+    process.exit(1);
+  }
 
   const sizeByFile = collectChunkSizes(CHUNKS_DIR);
   const violations = findThresholdViolations(sizeByFile, maxChunkSizeKb);
