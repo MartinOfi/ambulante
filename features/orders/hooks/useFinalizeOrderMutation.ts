@@ -56,6 +56,7 @@ export function useFinalizeOrderMutation() {
     onSettled: (_data: Order | undefined, _error: unknown, orderId: string) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.byId(orderId) });
       void queryClient.invalidateQueries({ queryKey: queryKeys.orders.all() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.orders.byStorePrefix() });
     },
   });
 }

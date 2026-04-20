@@ -37,7 +37,8 @@ describe("ORDER_STATUS", () => {
 });
 
 describe("TERMINAL_ORDER_STATUSES", () => {
-  it("contains the three terminal states (RECHAZADO, FINALIZADO, EXPIRADO)", () => {
+  it("contains the four terminal states (CANCELADO, RECHAZADO, FINALIZADO, EXPIRADO)", () => {
+    expect(TERMINAL_ORDER_STATUSES).toContain(ORDER_STATUS.CANCELADO);
     expect(TERMINAL_ORDER_STATUSES).toContain(ORDER_STATUS.RECHAZADO);
     expect(TERMINAL_ORDER_STATUSES).toContain(ORDER_STATUS.FINALIZADO);
     expect(TERMINAL_ORDER_STATUSES).toContain(ORDER_STATUS.EXPIRADO);
@@ -49,15 +50,14 @@ describe("TERMINAL_ORDER_STATUSES", () => {
       ORDER_STATUS.RECIBIDO,
       ORDER_STATUS.ACEPTADO,
       ORDER_STATUS.EN_CAMINO,
-      ORDER_STATUS.CANCELADO,
     ];
     for (const state of nonTerminal) {
       expect(TERMINAL_ORDER_STATUSES).not.toContain(state);
     }
   });
 
-  it("has exactly 3 terminal states", () => {
-    expect(TERMINAL_ORDER_STATUSES).toHaveLength(3);
+  it("has exactly 4 terminal states", () => {
+    expect(TERMINAL_ORDER_STATUSES).toHaveLength(4);
   });
 });
 

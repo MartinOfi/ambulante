@@ -1,2 +1,2 @@
 export { ordersService } from "./orders.mock";
-export type { OrdersService, FindByUserInput } from "./orders.service";
+export type { OrdersService, FindByUserInput, FindByStoreInput } from "./orders.service";

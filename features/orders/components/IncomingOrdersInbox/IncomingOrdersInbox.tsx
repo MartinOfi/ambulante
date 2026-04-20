@@ -33,7 +33,7 @@ function OrderRow({
             </Button>
           </>
         )}
-        {order.status === ORDER_STATUS.EN_CAMINO && (
+        {order.status === ORDER_STATUS.ACEPTADO && (
           <Button disabled={isPending} onClick={() => onFinalize(order.id)}>
             Finalizar
           </Button>

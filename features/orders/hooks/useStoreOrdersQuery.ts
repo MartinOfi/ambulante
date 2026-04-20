@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { ordersService } from "@/features/orders/services";
 import { queryKeys } from "@/shared/query/keys";
 import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
 import { REALTIME_CHANNELS } from "@/shared/constants/realtime";
