@@ -955,13 +955,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F7.3 — Tests de dominio (máquina de estados)
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 11:40]
+- **Estado:** ✅ done
 - **Por qué:** Es la invariante más crítica del producto.
 - **Entregable:** 100% coverage de `order-state-machine.ts` — todos los estados, todas las transiciones, todos los errores.
 - **Archivos:** `shared/domain/order-state-machine.test.ts`.
 - **Depends on:** F3.2, F7.1
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 24 tests (todos verdes). Coverage 100% statements/branches/functions/lines. Tests existentes de F3.2 ya cubrían el 100% — F7.3 verificó y certificó formalmente. No se requirieron tests adicionales.
 
 ### F7.4 — Tests de hooks críticos
 - **Estado:** ⚪ pending
