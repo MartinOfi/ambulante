@@ -540,6 +540,40 @@
       "description": "Recibimos los datos de tu tienda. Un administrador los revisará y te notificará cuando tu cuenta esté habilitada para operar.",
       "needHelp": "¿Necesitás ayuda?",
       "backToLogin": "Volvé al inicio de sesión"
+    },
+    "PrivacyPolicy": {
+      "title": "Política de privacidad",
+      "lastUpdated": "Última actualización: abril de 2026",
+      "intro": "En Ambulante nos importa tu privacidad. Esta política explica qué datos recopilamos, cómo los usamos y cuáles son tus derechos según la Ley 25.326 de Protección de Datos Personales de Argentina.",
+      "section1Title": "¿Qué datos recopilamos?",
+      "section1Body": "Recopilamos tu dirección de correo electrónico y nombre al registrarte, y tu geolocalización aproximada mientras usás la app para mostrarte tiendas ambulantes cercanas. La ubicación exacta del cliente nunca se comparte con la tienda hasta que un pedido sea aceptado.",
+      "section2Title": "¿Cómo usamos tus datos?",
+      "section2Body": "Tus datos se usan exclusivamente para brindarte el servicio: conectarte con tiendas ambulantes cercanas y coordinar el encuentro físico. No vendemos ni compartimos tu información con terceros.",
+      "section3Title": "Seguridad",
+      "section3Body": "Aplicamos medidas técnicas razonables para proteger tus datos. Tu información se almacena en servidores con acceso restringido.",
+      "section4Title": "Tus derechos",
+      "section4Body": "Conforme a la Ley 25.326 de Protección de Datos Personales, podés acceder, rectificar, actualizar o suprimir tus datos en cualquier momento. Para ejercer estos derechos, escribinos a privacidad@ambulante.app.",
+      "section5Title": "Contacto",
+      "section5Body": "¿Tenés preguntas sobre esta política? Escribinos a privacidad@ambulante.app.",
+      "termsLink": "Ver términos de uso",
+      "backToHome": "Volver al inicio"
+    },
+    "Terms": {
+      "title": "Términos de uso",
+      "lastUpdated": "Última actualización: abril de 2026",
+      "intro": "Al usar Ambulante aceptás estos términos. Si no estás de acuerdo con alguna de las condiciones, por favor no utilices el servicio.",
+      "section1Title": "Descripción del servicio",
+      "section1Body": "Ambulante es una aplicación web que muestra en tiempo real qué tiendas ambulantes están activas cerca tuyo, para facilitar el encuentro físico. No procesamos pagos ni gestionamos inventarios.",
+      "section2Title": "Condiciones de uso",
+      "section2Body": "Debés tener al menos 18 años o contar con autorización de un adulto responsable. Te comprometés a usar el servicio de forma lícita y a no interferir con su funcionamiento ni con el de otros usuarios.",
+      "section3Title": "Responsabilidades",
+      "section3Body": "Ambulante actúa como intermediario entre clientes y tiendas ambulantes. No somos responsables por la calidad de los productos, el cumplimiento de los vendedores ni por daños derivados de las transacciones físicas entre las partes.",
+      "section4Title": "Limitación de responsabilidad",
+      "section4Body": "En la máxima medida permitida por la ley, Ambulante no será responsable por daños indirectos, incidentales o consecuentes. Nuestra responsabilidad máxima está limitada al monto pagado por el servicio, que es gratuito en la versión actual.",
+      "section5Title": "Ley aplicable",
+      "section5Body": "Estos términos se rigen por las leyes de la República Argentina. Cualquier controversia será resuelta ante los tribunales ordinarios competentes de la Ciudad Autónoma de Buenos Aires.",
+      "privacyLink": "Ver política de privacidad",
+      "backToHome": "Volver al inicio"
     }
   }
 }

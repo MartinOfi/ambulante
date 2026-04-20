@@ -38,6 +38,10 @@ export const ROUTES = {
     order: "/store/order/:orderId",
     pendingApproval: "/store/pending-approval",
   },
+  legal: {
+    privacy: "/legal/privacy",
+    terms: "/legal/terms",
+  },
   admin: {
     dashboard: "/admin/dashboard",
     orders: "/admin/orders",
