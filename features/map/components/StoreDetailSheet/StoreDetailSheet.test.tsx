@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
 
@@ -139,5 +139,52 @@ describe("StoreDetailSheet", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /cerrar/i }));
     expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it("focuses the close button on mount for keyboard users", () => {
+    render(
+      <StoreDetailSheet
+        store={MOCK_STORE}
+        products={[]}
+        isLoadingProducts={false}
+        onDismiss={vi.fn()}
+      />,
+    );
+
+    const closeButton = screen.getByRole("button", { name: /cerrar/i });
+    expect(document.activeElement).toBe(closeButton);
+  });
+
+  it("calls onDismiss when Escape key is pressed", () => {
+    const onDismiss = vi.fn();
+    const { container } = render(
+      <StoreDetailSheet
+        store={MOCK_STORE}
+        products={[]}
+        isLoadingProducts={false}
+        onDismiss={onDismiss}
+      />,
+    );
+
+    act(() => {
+      fireEvent.keyDown(container.firstElementChild as Element, { key: "Escape" });
+    });
+
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
+  it("has role=dialog with aria-modal=true and accessible label", () => {
+    render(
+      <StoreDetailSheet
+        store={MOCK_STORE}
+        products={[]}
+        isLoadingProducts={false}
+        onDismiss={vi.fn()}
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(dialog).toHaveAttribute("aria-label", "Empanadas Don Pedro");
   });
 });

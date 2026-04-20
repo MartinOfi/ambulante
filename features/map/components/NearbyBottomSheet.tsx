@@ -49,6 +49,8 @@ export function NearbyBottomSheet({
         type="button"
         onClick={cycleSnap}
         aria-label="Expandir o colapsar hoja"
+        aria-expanded={snap !== BOTTOM_SHEET_SNAP.COLLAPSED}
+        aria-controls="nearby-sheet-content"
         className="flex h-8 items-center justify-center"
       >
         <span className="h-1.5 w-12 rounded-full bg-border" />
@@ -61,7 +63,7 @@ export function NearbyBottomSheet({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
+      <div id="nearby-sheet-content" className="flex-1 overflow-y-auto px-4 pb-4">
         {stores.length === 0 ? (
           <EmptyRadius radius={radius} onExpandRadius={onExpandRadius} />
         ) : (

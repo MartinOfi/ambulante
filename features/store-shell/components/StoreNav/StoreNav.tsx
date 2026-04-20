@@ -22,6 +22,7 @@ export function StoreNav({ currentPath }: StoreNavProps) {
           <li key={href}>
             <Link
               href={href}
+              aria-current={currentPath === href ? "page" : undefined}
               className={cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
                 currentPath === href ? "bg-accent text-accent-foreground" : "text-muted-foreground",

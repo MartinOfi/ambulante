@@ -1153,13 +1153,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** `@axe-core/playwright@4.11.2` instalado como devDependency. Spec audita `/` y `/map` con tags wcag2a/wcag2aa/wcag21aa. Falla si hay violations de impact `critical` o `serious`. `formatViolations` helper produce output legible en el assertion message.
 
 ### F10.4 — Keyboard navigation
-- **Estado:** 🟡 in-progress [owner: agente, started: 2026-04-20]
+- **Estado:** ✅ done [owner: agente, completed: 2026-04-20]
 - **Por qué:** Todos los flujos deben ser navegables sin mouse.
 - **Entregable:** Focus management en bottom sheets, modals, nav. Test E2E.
-- **Archivos:** tests + fixes puntuales.
+- **Archivos:** `shared/hooks/useFocusTrap.ts`, `shared/hooks/useFocusTrap.test.ts`, `features/map/components/StoreDetailSheet/StoreDetailSheet.tsx`, `features/map/components/StoreDetailSheet/StoreDetailSheet.test.tsx`, `features/map/components/NearbyBottomSheet.tsx`, `features/map/components/NearbyBottomSheet.test.tsx`, `features/store-shell/components/StoreNav/StoreNav.tsx`, `features/store-shell/components/StoreNav/StoreNav.test.tsx`, `e2e/keyboard-navigation.spec.ts`.
 - **Depends on:** F10.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `useFocusTrap` hook reutilizable en `shared/hooks/` — foca primer elemento focusable, atrapa Tab/Shift+Tab, llama onEscape en Escape. StoreDetailSheet usa `useFocusTrap` + `role="dialog"` + `aria-modal="true"` + `aria-label`. NearbyBottomSheet handle button tiene `aria-expanded` que refleja estado del snap (HALF/FULL=true, COLLAPSED=false). StoreNav links tienen `aria-current="page"` en el activo. 12 E2E Playwright tests en `keyboard-navigation.spec.ts`. 974 unit tests passing, TypeScript clean.
 
 ---
 

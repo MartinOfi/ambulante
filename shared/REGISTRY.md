@@ -118,6 +118,7 @@
 | useAvailability | hook | `features/store-shell/hooks/useAvailability.ts` | features.md §13 |
 | useCartStore | store | `shared/stores/cart.ts` | infra.md §10 |
 | useCatalogQuery | hook | `features/catalog/hooks/useCatalogQuery.ts` | features.md §13 |
+| useFocusTrap / UseFocusTrapOptions | hook | `shared/hooks/useFocusTrap.ts` | infra.md §11 |
 | useCreateProductMutation | hook | `features/catalog/hooks/useCreateProductMutation.ts` | features.md §13 |
 | useDeleteProductMutation | hook | `features/catalog/hooks/useDeleteProductMutation.ts` | features.md §13 |
 | useGeolocation | hook | `shared/hooks/useGeolocation.ts` | data.md §3 |

@@ -116,6 +116,30 @@ Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en
 
 ---
 
+## §11 — Hooks de accesibilidad
+
+### useFocusTrap — `shared/hooks/useFocusTrap.ts`
+
+- **Import:** `import { useFocusTrap } from "@/shared/hooks/useFocusTrap"`
+- **Firma:** `useFocusTrap(options: UseFocusTrapOptions): void`
+- **Tipo de options:**
+  ```ts
+  interface UseFocusTrapOptions {
+    readonly ref: { current: HTMLElement | null };
+    readonly active: boolean;
+    readonly onEscape?: () => void;
+  }
+  ```
+- **Comportamiento:**
+  - Cuando `active=true`: foca el primer elemento focusable dentro de `ref.current`
+  - Atrapa Tab / Shift+Tab dentro del contenedor (wrapping circular)
+  - Llama `onEscape` cuando el usuario presiona Escape (si `active=true`)
+  - Limpia los event listeners en unmount / cuando `active` cambia a `false`
+- **Uso típico:** dialogs, bottom sheets modales, cualquier región que requiera focus trap WCAG
+- **Test:** `shared/hooks/useFocusTrap.test.ts` — 8 casos
+
+---
+
 ## §9 — Configuración de entorno
 
 | Nombre | Ruta | Descripción |
