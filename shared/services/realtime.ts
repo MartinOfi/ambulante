@@ -1,6 +1,13 @@
 import type { EventBus } from "@/shared/domain/event-bus";
 import { eventBus as defaultEventBus } from "@/shared/domain/event-bus";
 import type { SerializedDomainEvent } from "@/shared/domain/events";
+import {
+  ORDER_EVENT_PREFIX,
+  RECONNECT_BACKOFF_FACTOR,
+  RECONNECT_INITIAL_DELAY_MS,
+  RECONNECT_MAX_ATTEMPTS,
+  RECONNECT_MAX_DELAY_MS,
+} from "@/shared/constants/realtime";
 import { logger } from "@/shared/utils/logger";
 import type {
   RealtimeHandler,
@@ -8,10 +15,11 @@ import type {
   RealtimeService,
   RealtimeStatus,
   RealtimeStatusHandler,
+  TestableRealtimeService,
 } from "./realtime.types";
 
 export type { RealtimeHandler, RealtimeMessage, RealtimeService, RealtimeStatus };
-export type { RealtimeStatusHandler };
+export type { RealtimeStatusHandler, TestableRealtimeService };
 
 // ── Channel constants ──────────────────────────────────────────────────────────
 
@@ -23,9 +31,6 @@ export const REALTIME_CHANNELS = Object.freeze({
 export type RealtimeChannel = (typeof REALTIME_CHANNELS)[keyof typeof REALTIME_CHANNELS];
 
 // ── Channel routing ────────────────────────────────────────────────────────────
-
-// Domain event types that belong to the orders channel
-const ORDER_EVENT_PREFIX = "ORDER_";
 
 function resolveChannel(eventType: string): RealtimeChannel | null {
   if (eventType.startsWith(ORDER_EVENT_PREFIX)) return REALTIME_CHANNELS.orders;
@@ -40,10 +45,15 @@ interface CreateMockRealtimeServiceOptions {
 
 export function createMockRealtimeService({
   eventBus = defaultEventBus,
-}: CreateMockRealtimeServiceOptions = {}): RealtimeService {
+}: CreateMockRealtimeServiceOptions = {}): TestableRealtimeService {
   const channelHandlers = new Map<string, Set<RealtimeHandler>>();
   let statusListeners: ReadonlyArray<RealtimeStatusHandler> = [];
   let currentStatus: RealtimeStatus = "online";
+
+  // Reconnect state
+  let reconnecting = false;
+  let reconnectAttempt = 0;
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   function deliverToChannel(channel: string, event: string, payload: unknown): void {
     const handlers = channelHandlers.get(channel);
@@ -69,8 +79,52 @@ export function createMockRealtimeService({
     }
   }
 
-  // Forward domain events from the event bus to the appropriate realtime channel.
-  // F5 (realtime) registers here so serialized events reach connected clients.
+  function clearReconnectTimer(): void {
+    if (reconnectTimer !== null) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+  }
+
+  // Schedule the next reconnect attempt using exponential backoff.
+  // When the timer fires, the attempt either succeeds (mock: always succeeds unless test
+  // intervenes by calling _testSetStatus("offline")) or gives up after MAX_ATTEMPTS.
+  function scheduleNextAttempt(): void {
+    const delay = Math.min(
+      RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR ** reconnectAttempt,
+      RECONNECT_MAX_DELAY_MS,
+    );
+
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      reconnectAttempt++;
+
+      if (reconnectAttempt >= RECONNECT_MAX_ATTEMPTS) {
+        logger.error("Realtime: max reconnect attempts reached, staying offline");
+        reconnecting = false;
+        return;
+      }
+
+      performConnectAttempt();
+    }, delay);
+  }
+
+  // Emit "connecting" and schedule an optimistic success.
+  // The mock always succeeds after RECONNECT_INITIAL_DELAY_MS unless a test calls
+  // _testSetStatus("offline") first, which cancels the success timer.
+  function performConnectAttempt(): void {
+    notifyStatusChange("connecting");
+
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
+      if (currentStatus === "connecting") {
+        notifyStatusChange("online");
+        reconnecting = false;
+        reconnectAttempt = 0;
+      }
+    }, RECONNECT_INITIAL_DELAY_MS);
+  }
+
   const unregisterSerializationHook = eventBus.registerSerializationHook(
     (serialized: SerializedDomainEvent) => {
       const channel = resolveChannel(serialized.type);
@@ -81,10 +135,9 @@ export function createMockRealtimeService({
 
   return {
     subscribe<T = unknown>(channel: string, handler: RealtimeHandler<T>): () => void {
-      if (!channelHandlers.has(channel)) {
-        channelHandlers.set(channel, new Set());
-      }
-      const handlers = channelHandlers.get(channel)!;
+      const existing = channelHandlers.get(channel);
+      const handlers = existing ?? new Set<RealtimeHandler>();
+      if (!existing) channelHandlers.set(channel, handlers);
       handlers.add(handler as RealtimeHandler);
       return () => {
         handlers.delete(handler as RealtimeHandler);
@@ -106,7 +159,17 @@ export function createMockRealtimeService({
       };
     },
 
+    reconnect(): void {
+      if (currentStatus === "online" || reconnecting) return;
+      clearReconnectTimer();
+      reconnecting = true;
+      reconnectAttempt = 0;
+      performConnectAttempt();
+    },
+
     destroy(): void {
+      clearReconnectTimer();
+      reconnecting = false;
       channelHandlers.clear();
       statusListeners = [];
       unregisterSerializationHook();
@@ -117,7 +180,27 @@ export function createMockRealtimeService({
     },
 
     _testSetStatus(status: RealtimeStatus): void {
+      if (status === "offline" && reconnecting) {
+        clearReconnectTimer();
+      }
+      if (status === "online") {
+        // Clear and reset before notifying so listener callbacks see clean state.
+        clearReconnectTimer();
+        reconnecting = false;
+        reconnectAttempt = 0;
+      }
       notifyStatusChange(status);
+      if (status === "offline" && reconnecting) {
+        scheduleNextAttempt();
+      }
+    },
+
+    _testSimulateDisconnect(): void {
+      clearReconnectTimer();
+      reconnecting = true;
+      reconnectAttempt = 0;
+      notifyStatusChange("offline");
+      scheduleNextAttempt();
     },
   };
 }

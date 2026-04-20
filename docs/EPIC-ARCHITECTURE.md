@@ -860,7 +860,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F5.4 — Reconnect y backoff
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-20, completed: 2026-04-20]
 - **Por qué:** La conexión se cae; tiene que reconectarse sin intervención del usuario.
 - **Entregable:** Lógica de reconnect con backoff exponencial, estado `connecting | online | offline`. Hook `useRealtimeStatus` para mostrar indicador de conexión en UI.
 - **Archivos:** `shared/services/realtime.ts`, `shared/hooks/useRealtimeStatus.ts`.
