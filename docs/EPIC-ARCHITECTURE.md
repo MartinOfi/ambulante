@@ -1587,7 +1587,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F17.2 — ADRs (Architecture Decision Records)
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session-start]
 - **Entregable:** `docs/adr/` con template. Primeros ADRs: estructura features/shared, auth provider, realtime transport.
 - **Depends on:** —
 - **Estimación:** M
