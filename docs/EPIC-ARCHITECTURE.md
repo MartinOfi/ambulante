@@ -1023,13 +1023,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.3 — KPI instrumentation
-- **Estado:** 🟡 in-progress [owner: f8-3-chat, started: 2026-04-20T14:00]
+- **Estado:** ✅ done [owner: f8-3-chat, completed: 2026-04-20T14:20]
 - **Por qué:** El §8 del PRD tiene 6 KPIs — cada uno debe tener su métrica.
 - **Entregable:** Eventos tipados para `order_sent`, `order_accepted`, `order_rejected`, `order_expired`, `order_finalized`, timings entre estados. Dashboard template documentado.
 - **Archivos:** `shared/services/kpi.ts`, `docs/kpi-dashboard.md`.
 - **Depends on:** F8.2
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `kpiService` wrappea `analyticsService` con 6 funciones KPI-específicas. `trackOrderAccepted` y `trackOrderFinalized` calculan `waitMs`/`totalMs` automáticamente a partir de fechas. Agregado `STORE_AVAILABILITY_CHANGED` a `analytics-events.ts` para el KPI "tiendas activas concurrentes". `computeDeltaMs` helper puro exportado. 9 tests, 100% coverage. REGISTRY actualizado.
 
 ### F8.4 — Feature flags
 - **Estado:** ✅ done [2026-04-20]

@@ -9,6 +9,7 @@ export const ANALYTICS_EVENT = {
   ORDER_CANCELLED: "ORDER_CANCELLED",
   ORDER_EXPIRED: "ORDER_EXPIRED",
   STORE_VIEWED: "STORE_VIEWED",
+  STORE_AVAILABILITY_CHANGED: "STORE_AVAILABILITY_CHANGED",
   MAP_OPENED: "MAP_OPENED",
 } as const;
 
@@ -35,6 +36,10 @@ export const analyticsEventSchemas = {
   [ANALYTICS_EVENT.ORDER_CANCELLED]: orderBaseSchema,
   [ANALYTICS_EVENT.ORDER_EXPIRED]: orderBaseSchema,
   [ANALYTICS_EVENT.STORE_VIEWED]: z.object({ storeId: z.string() }),
+  [ANALYTICS_EVENT.STORE_AVAILABILITY_CHANGED]: z.object({
+    storeId: z.string(),
+    available: z.boolean(),
+  }),
   [ANALYTICS_EVENT.MAP_OPENED]: z.object({}),
 } as const satisfies Record<AnalyticsEventName, z.ZodTypeAny>;
 

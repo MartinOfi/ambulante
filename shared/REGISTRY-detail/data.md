@@ -118,6 +118,16 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Tests:** `shared/services/analytics.test.ts` (7 casos)
 - **Integración:** `<Analytics />` de `@vercel/analytics/next` inyectado en `app/layout.tsx`.
 
+### `kpiService` — `shared/services/kpi.ts`
+- **Descripción:** KPI instrumentation service. Wrapper sobre `analyticsService` con funciones tipadas por KPI (PRD §8). Calcula automáticamente `waitMs` y `totalMs` desde fechas de transición.
+- **Interface:** `KpiService` — `trackOrderSent`, `trackOrderAccepted`, `trackOrderRejected`, `trackOrderExpired`, `trackOrderFinalized`, `trackStoreAvailabilityChanged`
+- **Factory exportada:** `createKpiService(analytics: AnalyticsService)` — para tests aislados.
+- **Singleton:** `kpiService`
+- **Helper puro:** `computeDeltaMs(from: Date, to: Date): number`
+- **Input interfaces:** `TrackOrderSentInput`, `TrackOrderAcceptedInput`, `TrackOrderRejectedInput`, `TrackOrderExpiredInput`, `TrackOrderFinalizedInput`, `TrackStoreAvailabilityChangedInput`
+- **Tests:** `shared/services/kpi.test.ts` (9 casos)
+- **Dashboard docs:** `docs/kpi-dashboard.md`
+
 ### `authService` — `shared/services/auth.ts`
 - **Tipos:** `shared/services/auth.types.ts`
 - **Descripción:** Implementación mock de `AuthService`. Gestiona sesión en memoria, pre-seed 3 usuarios (`client/store/admin @test.com`, password `"password"`).
