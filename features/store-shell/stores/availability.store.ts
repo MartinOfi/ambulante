@@ -1,7 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-
-const AVAILABILITY_STORE_KEY = "ambulante-store-availability" as const;
 
 interface AvailabilityState {
   readonly isAvailable: boolean;
@@ -18,18 +15,8 @@ const INITIAL_STATE: AvailabilityState = {
   isAvailable: false,
 };
 
-export const useAvailabilityStore = create<AvailabilityStore>()(
-  persist(
-    (set) => ({
-      ...INITIAL_STATE,
-      toggleAvailability: () => set((state) => ({ ...state, isAvailable: !state.isAvailable })),
-      setAvailable: (value) => set((state) => ({ ...state, isAvailable: value })),
-    }),
-    {
-      name: AVAILABILITY_STORE_KEY,
-      partialize: (state): AvailabilityState => ({
-        isAvailable: state.isAvailable,
-      }),
-    },
-  ),
-);
+export const useAvailabilityStore = create<AvailabilityStore>()((set) => ({
+  ...INITIAL_STATE,
+  toggleAvailability: () => set((state) => ({ isAvailable: !state.isAvailable })),
+  setAvailable: (value) => set({ isAvailable: value }),
+}));

@@ -7,6 +7,7 @@ import { useAvailability } from "./useAvailability";
 describe("useAvailability", () => {
   beforeEach(() => {
     useAvailabilityStore.setState({ isAvailable: false });
+    localStorage.clear();
   });
 
   it("starts as unavailable", () => {

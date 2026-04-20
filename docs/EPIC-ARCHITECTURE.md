@@ -1353,13 +1353,13 @@ Wave B (después de F8.3 ✅):
 - **Notas:**
 
 ### F13.2 — Availability toggle con location publishing
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-f13-2, completed: 2026-04-20]
 - **Por qué:** Al activar, arranca el reporting de ubicación cada 30-60s (PRD §7.1).
 - **Entregable:** Toggle, intervalo de publicación, estado "ubicación desactualizada".
-- **Archivos:** `features/store-dashboard/hooks/useLocationPublishing.ts`.
+- **Archivos:** `features/store-shell/hooks/useLocationPublishing.ts`, `features/store-shell/hooks/useAvailability.ts`, `features/store-shell/components/AvailabilityToggle/`, `features/store-shell/stores/availability.store.ts`.
 - **Depends on:** F3.4, shared/constants/geo.ts
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Implementación encontrada completa al iniciar tarea. `useLocationPublishing` publica coords cada `STORE_LOCATION_REFRESH_MS` (45s), marca `stale` a los `STORE_LOCATION_STALE_MS` (120s), descarta lecturas con accuracy > `MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR`. `AvailabilityToggle` muestra label de estado GPS. Zustand store con `persist`. 36/36 tests ✅, 0 errores TypeScript.
 
 ### F13.3 — Catálogo CRUD
 - **Estado:** ✅ done [owner: chat-2026-04-19, completed: 2026-04-19]
