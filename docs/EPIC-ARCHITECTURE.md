@@ -1500,7 +1500,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.5 — Database query optimization
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f15-5, started: 2026-04-20]
 - **Por qué:** Cuando entre Supabase real, queries mal indexadas matan el servicio.
 - **Entregable:** Índices documentados por query. `EXPLAIN` de las hot queries. PostGIS para geoqueries.
 - **Depends on:** DP-1
