@@ -1433,7 +1433,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.3 — Content moderation
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: f14-3-chat, completed: 2026-04-20]
 - **Entregable:** Cola de reportes, acción de remover contenido.
 - **Depends on:** F4.2
 - **Estimación:** M

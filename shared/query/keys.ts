@@ -1,4 +1,5 @@
 import type { Coordinates } from "@/shared/types/store";
+import type { ReportStatus } from "@/features/content-moderation/constants";
 
 export const queryKeys = {
   stores: {
@@ -22,5 +23,9 @@ export const queryKeys = {
   catalog: {
     byStore: (storeId: string) => ["catalog", "by-store", storeId] as const,
     byId: (id: string) => ["catalog", "by-id", id] as const,
+  },
+  reports: {
+    all: () => ["reports"] as const,
+    byStatus: (status: ReportStatus) => ["reports", "by-status", status] as const,
   },
 } as const;

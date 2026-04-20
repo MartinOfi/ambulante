@@ -41,6 +41,7 @@ export const ROUTES = {
   admin: {
     dashboard: "/admin/dashboard",
     orders: "/admin/orders",
+    moderation: "/admin/moderation",
   },
 } as const;
 
