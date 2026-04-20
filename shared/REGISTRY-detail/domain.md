@@ -153,6 +153,20 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 |---|---|
 | `USER_ROLES` | `{ client: "client", store: "store", admin: "admin" }` frozen as const |
 
+### `shared/constants/user-management.ts`
+| Nombre | Descripción |
+|---|---|
+| `USER_SUSPENSION_STATUS` | `{ ACTIVE: "active", SUSPENDED: "suspended" }` frozen as const |
+| `UserSuspensionStatus` | TS type derivado de `USER_SUSPENSION_STATUS` |
+
+### `shared/schemas/user-management.ts`
+| Nombre | Descripción |
+|---|---|
+| `suspendUserSchema` | Zod schema para input de suspensión: `{ userId: string }` |
+| `reinstateUserSchema` | Zod schema para input de reactivación: `{ userId: string }` |
+| `SuspendUserInput` | TS type inferido de `suspendUserSchema` |
+| `ReinstateUserInput` | TS type inferido de `reinstateUserSchema` |
+
 ### `shared/constants/push.ts`
 | Nombre | Descripción |
 |---|---|

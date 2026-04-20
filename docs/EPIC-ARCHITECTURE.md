@@ -1447,11 +1447,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F14.5 — User management
-- **Estado:** 🟡 in-progress [owner: f14-5-chat, started: 2026-04-20T00:00:00Z]
+- **Estado:** ✅ done [owner: f14-5-chat, completed: 2026-04-20T00:00:00Z]
 - **Entregable:** Suspender cliente o tienda. Consecuencias del §9.5 del PRD.
 - **Depends on:** F2.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Implementado TDD. Servicio `createUserManagementService` cancela pedidos activos al suspender (PRD §9.5). Página `/admin/users` con `UserManagementPageContainer`. Sidebar admin actualizado con enlace "Usuarios". 987 tests pasando. AdminSidebar actualizado con ícono `Users` de lucide-react.
 
 ---
 

@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, Users } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { ROUTES } from "@/shared/constants/routes";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: ROUTES.admin.dashboard, icon: LayoutDashboard },
+  { label: "Usuarios", href: ROUTES.admin.users, icon: Users },
 ] as const;
 
 interface AdminSidebarProps {

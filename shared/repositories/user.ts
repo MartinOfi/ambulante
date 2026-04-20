@@ -3,6 +3,7 @@ import type { Repository } from "./base";
 
 export interface UserFilters {
   readonly role?: UserRole;
+  readonly suspended?: boolean;
 }
 
 export type CreateUserInput = User;

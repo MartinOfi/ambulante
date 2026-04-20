@@ -11,6 +11,9 @@ function applyFilters(users: readonly User[], filters?: UserFilters): readonly U
   if (!filters) return users;
   return users.filter((user) => {
     if (filters.role !== undefined && user.role !== filters.role) return false;
+    if (filters.suspended !== undefined && (user.suspended ?? false) !== filters.suspended) {
+      return false;
+    }
     return true;
   });
 }

@@ -97,6 +97,27 @@
 
 ---
 
+### `features/user-management/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `UserManagementPage` | `features/user-management/components/UserManagementPage/UserManagementPage.tsx` | componente dumb | Página de gestión de usuarios: listado con acciones de suspensión/reactivación |
+| `UserManagementPageContainer` | `features/user-management/components/UserManagementPage/UserManagementPage.container.tsx` | componente smart | Conecta hooks de data y estado local del diálogo de confirmación |
+| `UserTable` | `features/user-management/components/UserTable/UserTable.tsx` | componente dumb | Tabla de usuarios con badges de rol/estado y botones de acción |
+| `SuspendConfirmDialog` | `features/user-management/components/SuspendConfirmDialog/SuspendConfirmDialog.tsx` | componente dumb | Modal de confirmación de suspensión con overlay; accesible vía `role="dialog"` |
+| `useUsersQuery` | `features/user-management/hooks/useUsersQuery.ts` | hook | Lista usuarios vía React Query; key: `queryKeys.users.all()` |
+| `useSuspendUserMutation` | `features/user-management/hooks/useSuspendUserMutation.ts` | hook | Suspende usuario y cancela pedidos activos; invalida `users.all()` |
+| `useReinstateUserMutation` | `features/user-management/hooks/useReinstateUserMutation.ts` | hook | Reactiva usuario suspendido; invalida `users.all()` |
+| `createUserManagementService` | `features/user-management/services/userManagement.service.ts` | service factory | Crea `UserManagementService` — `listUsers`, `suspendUser` (+ cancelOrderActivos), `reinstateUser` |
+
+#### Detalle de componentes
+- `UserManagementPage` — Props: `users`, `isLoading`, `errorMessage`, `pendingUserId`, `suspendDialogEmail`, `isSuspendPending`, `onSuspendRequest`, `onSuspendConfirm`, `onSuspendCancel`, `onReinstate`
+- `UserTable` — Props: `users: readonly User[]`, `pendingUserId: string | null`, `onSuspend`, `onReinstate`. Admin no puede suspenderse.
+- `SuspendConfirmDialog` — Props: `isOpen`, `userEmail`, `isPending`, `onConfirm`, `onCancel`. Render null si `!isOpen`.
+- **Usado en:** `app/(admin)/admin/users/page.tsx`
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:
