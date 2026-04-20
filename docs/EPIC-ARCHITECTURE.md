@@ -1552,11 +1552,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.5 — Secret rotation process
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [2026-04-20]
 - **Entregable:** Runbook en `docs/runbooks/secret-rotation.md`.
 - **Depends on:** —
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creado `docs/runbooks/secret-rotation.md` (113 líneas). Cubre inventario de secrets (SENTRY_AUTH_TOKEN, DSNs, MAP_STYLE_URL), criterios de rotación preventiva vs. emergencia, procedimiento por secret, checklist post-rotación y tabla de responsabilidades. Cuando se implemente Supabase backend, crear runbook separado `docs/runbooks/supabase-credentials.md`.
 
 ### F16.6 — Security audit externo o Snyk/Dependabot
 - **Estado:** ✅ done
