@@ -1486,7 +1486,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F15.3 — Image optimization
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-f15-3, started: 2026-04-20]
 - **Entregable:** Todas las `<img>` migradas a `next/image`. Remote patterns en `next.config.mjs`.
 - **Depends on:** —
 - **Estimación:** M
