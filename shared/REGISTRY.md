@@ -183,6 +183,20 @@
   ```
 - **Usado en:** cualquier `queryFn` que consuma datos externos (features/*/hooks/).
 
+### offlineQueue (enqueueItem, dequeueAll, registerBackgroundSync)
+
+- **Ruta:** `shared/query/offline-queue.ts`
+- **Descripción:** Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB (`ambulante-offline-queue`). Valida con Zod en el boundary antes de guardar. Limpia la cola de forma atómica en `dequeueAll`. `registerBackgroundSync` registra la Background Sync API degradando silenciosamente en iOS Safari.
+- **API:**
+  - `enqueueItem({ type, payload }): Promise<string>` — encola un pedido, retorna el id generado
+  - `dequeueAll(): Promise<readonly OfflineQueueItem[]>` — lee y limpia la cola; items malformados se omiten con log
+  - `registerBackgroundSync(): Promise<void>` — registra tag `ambulante-sync-orders` (no-op si API no disponible)
+- **Schemas exportados:** `sendOrderPayloadSchema`, `offlineQueueItemSchema`
+- **Tipos exportados:** `SendOrderPayload`, `OfflineQueueItem`, `CreateQueueItemInput`
+- **Constantes:** ver `shared/constants/background-sync.ts`
+- **Tests:** `shared/query/offline-queue.test.ts` (10 casos, usa `fake-indexeddb`)
+- **Usado en:** `app/sw.ts` (sync handler), `features/orders/hooks/useSendOrderMutation` (F6.6+)
+
 ### useRealtimeInvalidation
 
 - **Ruta:** `shared/query/useRealtimeInvalidation.ts`
@@ -596,6 +610,13 @@
 - **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
 - **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
 
+### SYNC_TAG, OFFLINE_QUEUE_DB_NAME, OFFLINE_QUEUE_DB_VERSION, OFFLINE_QUEUE_STORE_NAME, OFFLINE_QUEUE_MAX_ATTEMPTS
+
+- **Ruta:** `shared/constants/background-sync.ts`
+- **Descripción:** Constantes de la cola offline e integración con Background Sync API. Context-agnostic: seguro de importar tanto desde código de página como desde el Service Worker.
+- **API:** `SYNC_TAG` (`"ambulante-sync-orders"`), `OFFLINE_QUEUE_DB_NAME`, `OFFLINE_QUEUE_DB_VERSION` (1), `OFFLINE_QUEUE_STORE_NAME` (`"pending-mutations"`), `OFFLINE_QUEUE_MAX_ATTEMPTS` (3)
+- **Usado en:** `shared/query/offline-queue.ts`, `app/sw.ts`.
+
 ### SESSION_COOKIE_NAME, SESSION_COOKIE_MAX_AGE_SECONDS
 
 - **Ruta:** `shared/constants/auth.ts`
@@ -868,3 +889,4 @@
 | 2026-04-19 | F13.3: agregada sección 13 catalog — CatalogService interface, catalogService mock, 4 hooks RQ (useCatalogQuery, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation), 3 componentes (ProductCard, CatalogList+container, ProductForm+2 containers), createProductSchema/editProductSchema; ROUTES.store extendido con catalogNew y catalogEdit | —     |
 | 2026-04-19 | F13.6: `queryKeys.stores.profile` en §2b; `useStoreProfileQuery`/`useUpdateStoreProfileMutation` en §3; `storeProfileSchema`/`updateStoreProfileSchema` en §7b; store-profile feature en §13 | —     |
 | 2026-04-19 | F5.3: `useRealtimeInvalidation` en §2b.Query; F12.2: `useCartStore` en §10; F12.3: `useSendOrderMutation` en §3; `OrdersService.send`/`getById` en §4; F12.4: `useOrderQuery` en §3; `OrderTracking`/`OrderTrackingContainer` en §13 | —     |
+| 2026-04-20 | F6.5: `offlineQueue` (enqueueItem/dequeueAll/registerBackgroundSync) en §2b.Query; constantes background-sync en §8; sync handler en `app/sw.ts` | —     |
