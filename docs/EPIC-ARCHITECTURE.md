@@ -1529,7 +1529,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F16.2 — Audit log inmutable
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: f16-2-chat, started: 2026-04-20]
 - **Por qué:** Transiciones de pedido deben quedar registradas con actor + timestamp (PRD §6.2).
 - **Entregable:** Tabla append-only en backend; integración con state machine.
 - **Depends on:** F3.2, DP-1

@@ -130,7 +130,6 @@
 
 ---
 
-<<<<<<< HEAD
 ### `features/admin-audit-log/`
 
 | Nombre | Ruta | Tipo | Descripción |
