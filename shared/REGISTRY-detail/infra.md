@@ -13,6 +13,9 @@ Viven en `shared/utils/`. Funciones puras sin efectos secundarios.
 | `cn` | `shared/utils/cn.ts` | `(...classes: ClassValue[]) => string` — combina clases Tailwind con `clsx` + `tailwind-merge`; usar para condicionales de clase |
 | `createLogger` | `shared/utils/logger.ts` | `(namespace: string) => Logger` — crea un logger con prefijo; ver también `logger` (instancia global) |
 | `logger` | `shared/utils/logger.ts` | Instancia global de logger. API: `logger.debug(msg, ctx?)`, `logger.info`, `logger.warn`, `logger.error`, `logger.registerErrorHook(hook)`. Dev: imprime a consola. Prod: silencioso salvo `error`. Tipos: `Logger`, `LogContext`, `ErrorHook` |
+| `serverLogger` | `shared/utils/server-logger.ts` | Singleton server-only logger (pino). API idéntica a `Logger`: `debug`, `info`, `warn`, `error`, `registerErrorHook`. JSON en prod, pretty en dev. **No importar en client components.** |
+| `createRequestLogger` | `shared/utils/server-logger.ts` | `(requestId: string) => Logger` — crea un child logger pino con `requestId` binding. Usar en Route Handlers y Server Actions para correlacionar logs por request. |
+| `generateRequestId` | `shared/utils/server-logger.ts` | `() => string` — genera un UUID v4 via `crypto.randomUUID()`. Usar al inicio de cada Route Handler: `const reqId = generateRequestId()`. |
 | `extractErrorMessage` | `shared/utils/errorMessage.ts` | `(error: unknown, context?: "query" \| "mutation") => string \| null` — extrae mensaje legible en español. Retorna `null` para errores 4xx (manejados en-feature). |
 | `formatDistance` | `shared/utils/format.ts` | `(meters: number) => string` — ej. `"1.2 km"` o `"300 m"` |
 | `formatPrice` | `shared/utils/format.ts` | `(amount: number, currency?: string) => string` — formatea a moneda `es-AR` (default ARS) |

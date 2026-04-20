@@ -87,6 +87,9 @@
 | Screen | ui-component | `shared/components/layout/` | ui.md §2 |
 | SectionHeader | ui-component | `shared/components/typography/SectionHeader.tsx` | ui.md §2 |
 | SESSION_COOKIE_NAME / SESSION_COOKIE_MAX_AGE_SECONDS | constant | `shared/constants/auth.ts` | domain.md §8 |
+| serverLogger | util | `shared/utils/server-logger.ts` | infra.md §5 |
+| createRequestLogger | util | `shared/utils/server-logger.ts` | infra.md §5 |
+| generateRequestId | util | `shared/utils/server-logger.ts` | infra.md §5 |
 | shouldRetry | util | `shared/providers/QueryProvider.tsx` | ui.md §2c |
 | Spacer | ui-component | `shared/components/layout/` | ui.md §2 |
 | Stack | ui-component | `shared/components/layout/` | ui.md §2 |

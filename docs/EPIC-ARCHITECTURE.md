@@ -1041,13 +1041,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F8.5 — Structured logging server-side
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: worktree-f8-5, finished: 2026-04-20T13:43]
 - **Por qué:** Logs de Route Handlers y Server Actions deben ser queryables.
 - **Entregable:** `pino` o equivalente; formato JSON; request-id correlativo.
 - **Archivos:** `shared/utils/server-logger.ts`.
 - **Depends on:** F1.3
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creados `shared/utils/server-logger.ts` (implementación) y `shared/utils/server-logger.test.ts` (14 tests, todos pasan). Exports: `serverLogger` (singleton), `createRequestLogger(requestId)` (child logger con requestId binding), `generateRequestId()` (UUID v4 via crypto.randomUUID). Usa `pino` v10 con JSON en prod y pino-pretty en dev. Guard `server-only` impide bundle en cliente. Deps agregadas: `pino`, `server-only` (prod), `pino-pretty` (dev). REGISTRY.md y infra.md actualizados. tsc: 0 errores. Coverage server-logger.ts: 95% statements, 100% branches.
 
 ---
 
