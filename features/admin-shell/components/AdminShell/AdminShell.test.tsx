@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderWithProviders } from "@/shared/test-utils";
 import { AdminShell } from "./AdminShell";
 import type { User } from "@/shared/types/user";
 
@@ -24,40 +25,40 @@ describe("AdminShell", () => {
   });
 
   it("renders page content", () => {
-    render(<AdminShell {...baseProps} />);
+    renderWithProviders(<AdminShell {...baseProps} />);
     expect(screen.getByTestId("page-content")).toBeInTheDocument();
   });
 
   it("renders the user display name in the header", () => {
-    render(<AdminShell {...baseProps} />);
+    renderWithProviders(<AdminShell {...baseProps} />);
     expect(screen.getByText("Admin User")).toBeInTheDocument();
   });
 
   it("falls back to email when displayName is undefined", () => {
     const user = { ...ADMIN_USER, displayName: undefined };
-    render(<AdminShell {...baseProps} user={user} />);
+    renderWithProviders(<AdminShell {...baseProps} user={user} />);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
   });
 
   it("calls onSignOut when sign-out button is clicked", () => {
-    render(<AdminShell {...baseProps} />);
+    renderWithProviders(<AdminShell {...baseProps} />);
     fireEvent.click(screen.getByRole("button", { name: /cerrar sesión/i }));
     expect(baseProps.onSignOut).toHaveBeenCalledOnce();
   });
 
   it("shows sidebar nav links when sidebar is open", () => {
-    render(<AdminShell {...baseProps} isSidebarOpen={true} />);
+    renderWithProviders(<AdminShell {...baseProps} isSidebarOpen={true} />);
     expect(screen.getByRole("navigation", { name: /admin/i })).toBeVisible();
   });
 
   it("calls onToggleSidebar when toggle button is clicked", () => {
-    render(<AdminShell {...baseProps} />);
+    renderWithProviders(<AdminShell {...baseProps} />);
     fireEvent.click(screen.getByRole("button", { name: /menú/i }));
     expect(baseProps.onToggleSidebar).toHaveBeenCalledOnce();
   });
 
   it("renders the Dashboard nav link", () => {
-    render(<AdminShell {...baseProps} />);
+    renderWithProviders(<AdminShell {...baseProps} />);
     expect(screen.getByRole("link", { name: /dashboard/i })).toHaveAttribute(
       "href",
       "/admin/dashboard",

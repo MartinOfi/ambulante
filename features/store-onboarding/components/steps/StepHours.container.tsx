@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -16,18 +17,7 @@ import {
   stepHoursSchema,
   STORE_ONBOARDING_DAYS,
   type StepHoursValues,
-  type OnboardingDay,
 } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
-
-const DAY_LABELS: Record<OnboardingDay, string> = {
-  lunes: "Lun",
-  martes: "Mar",
-  miercoles: "Mié",
-  jueves: "Jue",
-  viernes: "Vie",
-  sabado: "Sáb",
-  domingo: "Dom",
-};
 
 interface StepHoursProps {
   readonly defaultValues?: Partial<StepHoursValues>;
@@ -37,6 +27,8 @@ interface StepHoursProps {
 }
 
 export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: StepHoursProps) {
+  const t = useTranslations("StoreOnboarding.StepHours");
+
   const form = useForm<StepHoursValues>({
     resolver: zodResolver(stepHoursSchema),
     defaultValues: {
@@ -55,7 +47,7 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
           name="days"
           render={({ field, fieldState }) => (
             <FormItem>
-              <label className="text-sm font-medium leading-none">Días de operación</label>
+              <label className="text-sm font-medium leading-none">{t("daysLabel")}</label>
               <div className="flex flex-wrap gap-2">
                 {STORE_ONBOARDING_DAYS.map((day) => {
                   const selected = field.value.includes(day);
@@ -76,7 +68,7 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
                           : "border-border bg-surface text-foreground hover:bg-muted"
                       }`}
                     >
-                      {DAY_LABELS[day]}
+                      {t(`days.${day}`)}
                     </button>
                   );
                 })}
@@ -94,7 +86,7 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
             name="openTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Apertura</FormLabel>
+                <FormLabel>{t("openTimeLabel")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -108,7 +100,7 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
             name="closeTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cierre</FormLabel>
+                <FormLabel>{t("closeTimeLabel")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -126,10 +118,10 @@ export function StepHours({ defaultValues, onNext, onBack, isLoading = false }: 
             onClick={onBack}
             disabled={isLoading}
           >
-            Atrás
+            {t("back")}
           </Button>
           <Button type="submit" className="flex-1" disabled={isLoading}>
-            {isLoading ? "Enviando…" : "Enviar solicitud"}
+            {isLoading ? t("submitting") : t("submit")}
           </Button>
         </div>
       </form>

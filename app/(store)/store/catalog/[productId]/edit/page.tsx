@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/shared/constants/routes";
 import { EditProductFormContainer } from "@/features/catalog/components/ProductForm";
 
@@ -10,7 +11,7 @@ interface EditProductPageProps {
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
-  const { productId } = await params;
+  const [{ productId }, t] = await Promise.all([params, getTranslations("Pages.StoreCatalogEdit")]);
 
   return (
     <div className="space-y-6 p-4">
@@ -19,9 +20,9 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           href={ROUTES.store.catalog}
           className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
         >
-          ← Catálogo
+          {t("backLink")}
         </Link>
-        <h1 className="text-xl font-semibold">Editar producto</h1>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
       </div>
 
       <EditProductFormContainer productId={productId} />

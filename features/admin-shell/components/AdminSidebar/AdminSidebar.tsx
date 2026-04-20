@@ -1,17 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { LayoutDashboard } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/shared/utils/cn";
 import { ROUTES } from "@/shared/constants/routes";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: ROUTES.admin.dashboard, icon: LayoutDashboard },
-] as const;
+const NAV_ITEM_CONFIGS = [
+  { key: "dashboard" as const, href: ROUTES.admin.dashboard, icon: LayoutDashboard },
+];
 
 interface AdminSidebarProps {
   isOpen: boolean;
 }
 
 export function AdminSidebar({ isOpen }: AdminSidebarProps) {
+  const t = useTranslations("AdminShell.Sidebar");
+
   return (
     <aside
       className={cn(
@@ -19,23 +24,26 @@ export function AdminSidebar({ isOpen }: AdminSidebarProps) {
         isOpen ? "w-56" : "w-14",
       )}
     >
-      <nav aria-label="Admin navigation" className="flex-1 py-4">
+      <nav aria-label={t("ariaLabel")} className="flex-1 py-4">
         <ul className="flex flex-col gap-1 px-2">
-          {NAV_ITEMS.map(({ label, href, icon: Icon }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                aria-label={isOpen ? undefined : label}
-                className={cn(
-                  "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium",
-                  "hover:bg-zinc-700 transition-colors",
-                )}
-              >
-                <Icon size={18} aria-hidden="true" />
-                {isOpen && <span>{label}</span>}
-              </Link>
-            </li>
-          ))}
+          {NAV_ITEM_CONFIGS.map(({ key, href, icon: Icon }) => {
+            const label = t(`items.${key}`);
+            return (
+              <li key={href}>
+                <Link
+                  href={href}
+                  aria-label={isOpen ? undefined : label}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium",
+                    "hover:bg-zinc-700 transition-colors",
+                  )}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  {isOpen && <span>{label}</span>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </aside>

@@ -71,6 +71,8 @@
     "eslint": "8.57.0",
     "eslint-config-next": "15.5.15",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-i18n-text": "^1.0.1",
+    "eslint-plugin-local-rules": "^3.0.2",
     "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "^25.0.1",

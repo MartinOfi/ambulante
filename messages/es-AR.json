@@ -10,6 +10,10 @@
     },
     "Nav": {
       "cta": "Registrá tu tienda",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "seeMap": "Ver mapa",
+      "openApp": "Abrir la app",
       "howItWorks": "Cómo funciona",
       "product": "Producto",
       "forStores": "Para tiendas",
@@ -28,6 +32,88 @@
       "support": "Soporte",
       "about": "Sobre Ambulante"
     },
+    "Features": {
+      "eyebrow": "Por qué Ambulante",
+      "title": "Lo justo. Nada más.",
+      "items": {
+        "liveMap": {
+          "title": "Mapa en tiempo real",
+          "body": "Ve exactamente dónde están las tiendas activas en este momento, sin actualizaciones manuales."
+        },
+        "noPayments": {
+          "title": "Sin pagos en la app",
+          "body": "No intermediamos dinero. La transacción ocurre cara a cara, como siempre debió ser."
+        },
+        "instantOrders": {
+          "title": "Pedidos instantáneos",
+          "body": "Avisá que vas en camino con un click. La tienda lo sabe antes de que llegues."
+        },
+        "pwa": {
+          "title": "Instalable como app",
+          "body": "Sin pasar por las tiendas oficiales. Funciona offline y usa notificaciones nativas."
+        },
+        "privacy": {
+          "title": "Privacidad por defecto",
+          "body": "Tu ubicación exacta solo se comparte cuando es necesario y vos lo aceptás."
+        },
+        "free": {
+          "title": "100% gratis",
+          "body": "Sin comisiones, sin suscripciones, sin sorpresas. Para clientes y tiendas, siempre."
+        }
+      }
+    },
+    "HowItWorks": {
+      "eyebrow": "Cómo funciona",
+      "title": "Cinco pasos. Cero fricción.",
+      "description": "Desde que abrís la app hasta que tenés lo que querés en la mano.",
+      "steps": {
+        "openMap": {
+          "title": "Abrís el mapa",
+          "content": "Ves en tiempo real qué tiendas están activas cerca tuyo.",
+          "category": "Cliente"
+        },
+        "chooseStore": {
+          "title": "Elegís una tienda",
+          "content": "Ves su carta, distancia y estado. Sin registro previo.",
+          "category": "Cliente"
+        },
+        "sendOrder": {
+          "title": "Enviás tu intención",
+          "content": "La tienda recibe tu pedido y lo acepta o rechaza en segundos.",
+          "category": "Pedido"
+        },
+        "confirmOnTheWay": {
+          "title": "Confirmás que vas en camino",
+          "content": "La tienda te espera. Llegás, pagás, listo.",
+          "category": "Encuentro"
+        },
+        "done": {
+          "title": "Listo",
+          "content": "Compraste en la calle, como siempre, pero sin caminar en vano.",
+          "category": "Fin"
+        }
+      }
+    },
+    "ForVendors": {
+      "eyebrow": "Para tiendas",
+      "heading": "Tu puesto, en el mapa. Sin complicaciones.",
+      "description": "Registrate gratis, activá tu disponibilidad y empezá a recibir clientes que ya saben dónde estás.",
+      "cta": "Registrá tu puesto",
+      "benefits": {
+        "visibility": {
+          "title": "Visibilidad instantánea",
+          "body": "Aparecés en el mapa apenas activás tu disponibilidad. Tus clientes te encuentran sin buscarte."
+        },
+        "orders": {
+          "title": "Pedidos sin fricción",
+          "body": "Recibís la intención de compra antes de que llegue el cliente. Podés aceptar o rechazar con un click."
+        },
+        "free": {
+          "title": "Siempre gratis",
+          "body": "Sin comisiones por venta, sin suscripciones, sin letra chica. Ambulante es y seguirá siendo gratuito."
+        }
+      }
+    },
     "Faq": {
       "eyebrow": "Preguntas frecuentes",
       "title": "Lo que todos quieren saber.",
@@ -41,6 +127,32 @@
       "stockAnswer": "La tienda puede rechazar tu intención de compra con un click. Como no hay pago involucrado, no hay reembolsos ni trámites — simplemente buscás otra opción.",
       "iosQuestion": "¿Funciona en iPhone?",
       "iosAnswer": "Sí. Ambulante es una PWA instalable en iOS y Android. Desde Safari, tocá 'Compartir' y 'Añadir a pantalla de inicio'."
+    },
+    "Footer": {
+      "copyright": "© {year} Ambulante. Todos los derechos reservados.",
+      "tagline": "Hecho para la calle",
+      "openApp": "Abrir la app",
+      "contact": "Contacto",
+      "columns": {
+        "product": {
+          "title": "Producto",
+          "map": "Mapa en vivo",
+          "howItWorks": "Cómo funciona",
+          "pwa": "PWA"
+        },
+        "stores": {
+          "title": "Para tiendas",
+          "register": "Registrá tu puesto",
+          "orders": "Bandeja de pedidos",
+          "availability": "Toggle de disponibilidad"
+        },
+        "resources": {
+          "title": "Recursos",
+          "faq": "Preguntas frecuentes",
+          "support": "Soporte",
+          "about": "Sobre Ambulante"
+        }
+      }
     }
   },
   "Common": {
@@ -58,7 +170,372 @@
       "close": "Cerrar",
       "save": "Guardar",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "next": "Siguiente",
+      "previous": "Atrás",
+      "submit": "Enviar"
+    },
+    "appName": "Ambulante"
+  },
+  "Auth": {
+    "Card": {
+      "tagline": "Tu mercado en movimiento",
+      "headline": "Todo lo ambulante, cerca tuyo.",
+      "subheadline": "Tiendas activas en tu zona, ahora mismo."
+    },
+    "Login": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submitting": "Iniciando sesión…",
+      "submit": "Iniciar sesión",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tenés cuenta?",
+      "register": "Registrate"
+    },
+    "Register": {
+      "email": "Correo electrónico",
+      "accountType": "Tipo de cuenta",
+      "roleClient": "Cliente",
+      "roleStore": "Tienda",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submitting": "Creando cuenta…",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tenés cuenta?",
+      "signIn": "Iniciá sesión"
+    },
+    "ForgotPassword": {
+      "email": "Correo electrónico",
+      "submitting": "Enviando…",
+      "submit": "Enviar enlace",
+      "backToLogin": "Volver al inicio de sesión",
+      "successTitle": "Revisá tu correo",
+      "successDescription": "Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu contraseña.",
+      "instructions": "Ingresá tu correo y te enviamos un enlace para restablecer tu contraseña."
+    },
+    "ResetPassword": {
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "submitting": "Guardando…",
+      "submit": "Restablecer contraseña",
+      "successMessage": "Tu contraseña fue restablecida exitosamente.",
+      "signIn": "Iniciá sesión"
+    }
+  },
+  "Map": {
+    "EmptyRadius": {
+      "title": "Nada por acá todavía",
+      "hint": "Probá ampliando el radio.",
+      "staleHint": "Volvé a intentarlo en unos minutos.",
+      "expandAction": "Ampliar a 5km",
+      "distanceLabel": "a {distance} km"
+    },
+    "LocationDenied": {
+      "title": "Necesitamos saber dónde estás",
+      "description": "Para mostrarte las tiendas más cercanas necesitamos acceder a tu ubicación. No la compartimos con nadie sin tu permiso.",
+      "enableLocation": "Activar ubicación",
+      "searchManually": "Buscar por zona manualmente"
+    },
+    "NearbySheet": {
+      "title": "Cerca tuyo",
+      "expandCollapse": "Expandir o colapsar hoja",
+      "storeCount": "{count, plural, one {# tienda} other {# tiendas}}"
+    },
+    "StoreDetailSheet": {
+      "emptyStock": "Sin stock",
+      "menuHeading": "Carta",
+      "closeAriaLabel": "Cerrar detalle",
+      "loadingAriaLabel": "Cargando productos"
+    },
+    "StoreCard": {
+      "openNow": "Abierto ahora",
+      "fromPrice": "desde {price}"
+    },
+    "RecenterFAB": {
+      "ariaLabel": "Recentrar en mi ubicación"
+    }
+  },
+  "Orders": {
+    "status": {
+      "ENVIADO": "Enviado",
+      "RECIBIDO": "Recibido",
+      "ACEPTADO": "Aceptado",
+      "EN_CAMINO": "En camino",
+      "FINALIZADO": "Finalizado",
+      "CANCELADO": "Cancelado",
+      "RECHAZADO": "Rechazado",
+      "EXPIRADO": "Expirado"
+    },
+    "Tracking": {
+      "terminalCancelled": "Pedido cancelado",
+      "terminalRejected": "Pedido rechazado",
+      "terminalExpired": "Pedido expirado",
+      "cancelOrder": "Cancelar pedido",
+      "confirmOnTheWay": "Confirmar en camino"
+    },
+    "TrackingContainer": {
+      "loading": "Cargando pedido…",
+      "notFound": "No se encontró el pedido."
+    },
+    "Card": {
+      "productCount": "{count, plural, one {# producto} other {# productos}}"
+    },
+    "History": {
+      "filterAll": "Todos",
+      "filterPending": "Pendientes",
+      "filterActive": "Activos",
+      "filterCompleted": "Finalizados",
+      "filterCancelled": "Cancelados",
+      "filterRejected": "Rechazados",
+      "filterExpired": "Expirados",
+      "emptyAll": "No tenés pedidos",
+      "emptyFiltered": "No tenés pedidos con ese estado"
+    },
+    "Actions": {
+      "acceptPending": "Aceptar...",
+      "accept": "Aceptar",
+      "rejectPending": "Rechazar...",
+      "reject": "Rechazar",
+      "finalizePending": "Finalizar...",
+      "finalize": "Finalizar"
+    },
+    "CancelButton": {
+      "confirmTitle": "¿Cancelar tu pedido?",
+      "cancelling": "Cancelando…",
+      "confirmYes": "Sí, cancelar",
+      "confirmNo": "No, volver",
+      "trigger": "Cancelar pedido"
+    }
+  },
+  "Cart": {
+    "SummaryBar": {
+      "productCount": "{count, plural, one {# producto} other {# productos}}",
+      "sendOrder": "Enviar pedido",
+      "ariaLabel": "Resumen del carrito"
+    }
+  },
+  "Catalog": {
+    "ProductCard": {
+      "available": "Disponible",
+      "unavailable": "No disponible",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "deleting": "Eliminando…"
+    },
+    "ProductForm": {
+      "nameLabel": "Nombre del producto",
+      "namePlaceholder": "Empanada de carne",
+      "descriptionLabel": "Descripción (opcional)",
+      "descriptionPlaceholder": "Breve descripción del producto…",
+      "priceLabel": "Precio (ARS)",
+      "photoUrlLabel": "URL de foto (opcional)",
+      "availableLabel": "Disponible",
+      "saving": "Guardando…"
+    },
+    "CreateForm": {
+      "submit": "Crear producto",
+      "sessionExpired": "Sesión expirada. Volvé a iniciar sesión.",
+      "createError": "No se pudo crear el producto. Intentá de nuevo."
+    },
+    "EditForm": {
+      "submit": "Guardar cambios",
+      "loading": "Cargando producto…",
+      "notFound": "Producto no encontrado.",
+      "sessionExpired": "Sesión expirada. Volvé a iniciar sesión.",
+      "updateError": "No se pudo actualizar el producto. Intentá de nuevo."
+    },
+    "List": {
+      "empty": "Todavía no tenés productos. Agregá el primero.",
+      "loading": "Cargando catálogo…",
+      "loadError": "No se pudo cargar el catálogo. Intentá de nuevo más tarde."
+    }
+  },
+  "StoreOnboarding": {
+    "Wizard": {
+      "stepIndicator": "Paso {step} de 3",
+      "stepTitles": {
+        "1": "Datos fiscales",
+        "2": "Zona de operación",
+        "3": "Horarios"
+      }
+    },
+    "StepFiscal": {
+      "businessNameLabel": "Nombre del negocio",
+      "businessNamePlaceholder": "El Rincón del Sabor",
+      "storeKindLabel": "Tipo de tienda",
+      "cuitLabel": "CUIT (sin guiones)",
+      "next": "Siguiente",
+      "storeKinds": {
+        "food-truck": "Food truck",
+        "street-cart": "Puesto callejero",
+        "ice-cream": "Heladería ambulante"
+      }
+    },
+    "StepZone": {
+      "neighborhoodLabel": "Barrio donde operás",
+      "neighborhoodPlaceholder": "Palermo, San Telmo…",
+      "coverageNotesLabel": "Notas de cobertura (opcional)",
+      "coverageNotesPlaceholder": "Ej: Plaza Dorrego los domingos",
+      "back": "Atrás",
+      "next": "Siguiente"
+    },
+    "StepHours": {
+      "daysLabel": "Días de operación",
+      "openTimeLabel": "Apertura",
+      "closeTimeLabel": "Cierre",
+      "back": "Atrás",
+      "submitting": "Enviando…",
+      "submit": "Enviar solicitud",
+      "days": {
+        "lunes": "Lun",
+        "martes": "Mar",
+        "miercoles": "Mié",
+        "jueves": "Jue",
+        "viernes": "Vie",
+        "sabado": "Sáb",
+        "domingo": "Dom"
+      }
+    }
+  },
+  "StoreProfile": {
+    "Page": {
+      "title": "Perfil de la tienda"
+    },
+    "Form": {
+      "businessNameLabel": "Nombre del negocio",
+      "businessNamePlaceholder": "El Rincón del Sabor",
+      "storeKindLabel": "Tipo de tienda",
+      "neighborhoodLabel": "Barrio operativo",
+      "neighborhoodPlaceholder": "Palermo",
+      "coverageNotesLabel": "Notas de cobertura (opcional)",
+      "coverageNotesPlaceholder": "Zona SoHo y Hollywood",
+      "daysLabel": "Días de operación",
+      "openTimeLabel": "Apertura",
+      "closeTimeLabel": "Cierre",
+      "saving": "Guardando…",
+      "save": "Guardar cambios",
+      "storeKinds": {
+        "food-truck": "Food truck",
+        "street-cart": "Puesto callejero",
+        "ice-cream": "Heladería ambulante"
+      },
+      "days": {
+        "lunes": "Lun",
+        "martes": "Mar",
+        "miercoles": "Mié",
+        "jueves": "Jue",
+        "viernes": "Vie",
+        "sabado": "Sáb",
+        "domingo": "Dom"
+      }
+    }
+  },
+  "StoreShell": {
+    "AvailabilityToggle": {
+      "available": "Disponible",
+      "unavailable": "No disponible",
+      "ariaAvailable": "Disponible",
+      "ariaUnavailable": "No disponible",
+      "locationStatus": {
+        "publishing": "GPS activo",
+        "stale": "GPS desactualizado",
+        "error": "Error de GPS"
+      }
+    },
+    "StoreNav": {
+      "items": {
+        "dashboard": "Dashboard",
+        "orders": "Pedidos",
+        "catalog": "Catálogo",
+        "profile": "Perfil"
+      },
+      "ariaLabel": "Navegación tienda"
+    }
+  },
+  "ClientShell": {
+    "appName": "Ambulante",
+    "BottomNav": {
+      "ariaLabel": "Navegación principal",
+      "items": {
+        "map": "Mapa",
+        "orders": "Pedidos",
+        "profile": "Perfil"
+      }
+    }
+  },
+  "AdminShell": {
+    "Header": {
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "signOut": "Cerrar sesión",
+      "signOutAriaLabel": "Cerrar sesión"
+    },
+    "Sidebar": {
+      "ariaLabel": "Admin navigation",
+      "items": {
+        "dashboard": "Dashboard"
+      }
+    }
+  },
+  "Profile": {
+    "Page": {
+      "guest": "Invitado",
+      "locationSection": "Ubicación",
+      "notificationsSection": "Notificaciones",
+      "signOut": "Cerrar sesión"
+    },
+    "LocationPermission": {
+      "statusGranted": "Ubicación activa",
+      "statusDenied": "Ubicación denegada — cambiá el permiso en tu navegador",
+      "statusPrompt": "Permiso de ubicación no solicitado",
+      "statusUnsupported": "Geolocalización no disponible en este dispositivo",
+      "enableButton": "Activar ubicación"
+    },
+    "NotificationPrefs": {
+      "prefOrderUpdates": "Actualizaciones de pedidos",
+      "prefStoreArrival": "Llegada de tienda cercana",
+      "prefMarketing": "Novedades y marketing",
+      "deniedMessage": "Notificaciones denegadas — habilitá los permisos desde la configuración del navegador.",
+      "unsupportedMessage": "Las notificaciones no están disponibles en este dispositivo o navegador.",
+      "enableButton": "Activar notificaciones"
+    }
+  },
+  "Pages": {
+    "NotFound": {
+      "title": "Página no encontrada",
+      "description": "La página que buscás no existe o fue movida.",
+      "backToHome": "Volver al inicio"
+    },
+    "Error": {
+      "title": "Algo salió mal",
+      "description": "Ocurrió un error inesperado. Podés intentar de nuevo o volver más tarde.",
+      "retry": "Intentar de nuevo"
+    },
+    "AdminDashboard": {
+      "title": "Panel de administración",
+      "comingSoon": "Próximamente."
+    },
+    "StoreDashboard": {
+      "title": "Dashboard de tienda",
+      "comingSoon": "Próximamente."
+    },
+    "StoreCatalog": {
+      "title": "Mi catálogo",
+      "addProduct": "+ Agregar producto"
+    },
+    "StoreCatalogNew": {
+      "backLink": "← Catálogo",
+      "title": "Nuevo producto"
+    },
+    "StoreCatalogEdit": {
+      "backLink": "← Catálogo",
+      "title": "Editar producto"
+    },
+    "PendingApproval": {
+      "title": "Tu solicitud está en revisión",
+      "description": "Recibimos los datos de tu tienda. Un administrador los revisará y te notificará cuando tu cuenta esté habilitada para operar.",
+      "needHelp": "¿Necesitás ayuda?",
+      "backToLogin": "Volvé al inicio de sesión"
     }
   }
 }

@@ -1,13 +1,10 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { StepFiscal } from "@/features/store-onboarding/components/steps/StepFiscal.container";
 import { StepZone } from "@/features/store-onboarding/components/steps/StepZone.container";
 import { StepHours } from "@/features/store-onboarding/components/steps/StepHours.container";
 import type { StoreOnboardingWizardProps } from "./StoreOnboardingWizard.types";
-
-const STEP_TITLES: Record<1 | 2 | 3, string> = {
-  1: "Datos fiscales",
-  2: "Zona de operación",
-  3: "Horarios",
-};
 
 export function StoreOnboardingWizard({
   step,
@@ -21,11 +18,13 @@ export function StoreOnboardingWizard({
   onHoursNext,
   onBack,
 }: StoreOnboardingWizardProps) {
+  const t = useTranslations("StoreOnboarding.Wizard");
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">Paso {step} de 3</p>
-        <h2 className="text-lg font-semibold">{STEP_TITLES[step]}</h2>
+        <p className="text-xs text-muted-foreground">{t("stepIndicator", { step })}</p>
+        <h2 className="text-lg font-semibold">{t(`stepTitles.${step}`)}</h2>
         <div className="flex gap-1" aria-hidden="true">
           {([1, 2, 3] as const).map((n) => (
             <div

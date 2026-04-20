@@ -2,7 +2,9 @@ import type { ReactElement, ReactNode } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, type RenderOptions } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
 import { NuqsAdapter } from "nuqs/adapters/react";
+import messages from "@/messages/es-AR.json";
 
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
@@ -27,9 +29,11 @@ export interface RenderWithProvidersOptions extends Omit<RenderOptions, "wrapper
 function buildWrapper(queryClient: QueryClient) {
   function AllTheProviders({ children }: { readonly children: ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>{children}</NuqsAdapter>
-      </QueryClientProvider>
+      <NextIntlClientProvider locale="es-AR" messages={messages}>
+        <QueryClientProvider client={queryClient}>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </QueryClientProvider>
+      </NextIntlClientProvider>
     );
   }
   return AllTheProviders;

@@ -1,13 +1,14 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { ProductCard } from "@/features/catalog/components/ProductCard";
 import type { CatalogListProps } from "./CatalogList.types";
 
 export function CatalogList({ products, onEdit, onDelete, deletingId }: CatalogListProps) {
+  const t = useTranslations("Catalog.List");
+
   if (products.length === 0) {
-    return (
-      <p className="py-12 text-center text-sm text-muted-foreground">
-        Todavía no tenés productos. Agregá el primero.
-      </p>
-    );
+    return <p className="py-12 text-center text-sm text-muted-foreground">{t("empty")}</p>;
   }
 
   return (

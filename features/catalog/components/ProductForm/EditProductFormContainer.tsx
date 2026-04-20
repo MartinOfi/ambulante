@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ROUTES } from "@/shared/constants/routes";
 import { useSession } from "@/shared/hooks/useSession";
 import { useCatalogQuery } from "@/features/catalog/hooks/useCatalogQuery";
@@ -19,6 +20,7 @@ interface EditProductFormContainerProps {
 }
 
 export function EditProductFormContainer({ productId }: EditProductFormContainerProps) {
+  const t = useTranslations("Catalog.EditForm");
   const router = useRouter();
   const sessionState = useSession();
   const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : "";
@@ -48,7 +50,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
 
   async function handleSubmit(values: EditProductValues): Promise<void> {
     if (!storeId) {
-      setServerError("Sesión expirada. Volvé a iniciar sesión.");
+      setServerError(t("sessionExpired"));
       return;
     }
     setServerError(null);
@@ -56,18 +58,18 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
       await updateMutation.mutateAsync({ storeId, productId, values });
       router.push(ROUTES.store.catalog);
     } catch {
-      setServerError("No se pudo actualizar el producto. Intentá de nuevo.");
+      setServerError(t("updateError"));
     }
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Cargando producto…</p>;
+    return <p className="text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
   if (!product) {
     return (
       <p className="text-sm text-destructive" role="alert">
-        Producto no encontrado.
+        {t("notFound")}
       </p>
     );
   }
@@ -78,7 +80,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
       onSubmit={handleSubmit}
       isLoading={updateMutation.isPending}
       serverError={serverError}
-      submitLabel="Guardar cambios"
+      submitLabel={t("submit")}
     />
   );
 }

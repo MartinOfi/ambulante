@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/shared/constants/routes";
 
 export const metadata = { title: "Solicitud en revisión — Ambulante" };
 
-export default function PendingApprovalPage() {
+export default async function PendingApprovalPage() {
+  const t = await getTranslations("Pages.PendingApproval");
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
       <div
@@ -13,19 +16,16 @@ export default function PendingApprovalPage() {
         ⏳
       </div>
       <div className="max-w-sm space-y-2">
-        <h1 className="text-xl font-semibold">Tu solicitud está en revisión</h1>
-        <p className="text-sm text-muted-foreground">
-          Recibimos los datos de tu tienda. Un administrador los revisará y te notificará cuando tu
-          cuenta esté habilitada para operar.
-        </p>
+        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
       <p className="text-xs text-muted-foreground">
-        ¿Necesitás ayuda?{" "}
+        {t("needHelp")}{" "}
         <Link
           href={ROUTES.auth.login}
           className="underline underline-offset-4 hover:text-foreground"
         >
-          Volvé al inicio de sesión
+          {t("backToLogin")}
         </Link>
       </p>
     </div>

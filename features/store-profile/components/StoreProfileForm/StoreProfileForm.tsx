@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -17,32 +18,19 @@ import {
   PROFILE_DAYS,
   type UpdateStoreProfileInput,
   type StoreProfile,
-  type ProfileDay,
 } from "@/features/store-profile/schemas/store-profile.schemas";
 import type { StoreKind } from "@/shared/schemas/store";
 import type { StoreProfileFormProps } from "./StoreProfileForm.types";
 
-const STORE_KIND_LABELS: Record<StoreKind, string> = {
-  "food-truck": "Food truck",
-  "street-cart": "Puesto callejero",
-  "ice-cream": "Heladería ambulante",
-};
-
-const DAY_LABELS: Record<ProfileDay, string> = {
-  lunes: "Lun",
-  martes: "Mar",
-  miercoles: "Mié",
-  jueves: "Jue",
-  viernes: "Vie",
-  sabado: "Sáb",
-  domingo: "Dom",
-};
+const STORE_KIND_KEYS: StoreKind[] = ["food-truck", "street-cart", "ice-cream"];
 
 function buildDefaultValues({ storeId: _, ...rest }: StoreProfile): UpdateStoreProfileInput {
   return rest;
 }
 
 export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StoreProfileFormProps) {
+  const t = useTranslations("StoreProfile.Form");
+
   const form = useForm<UpdateStoreProfileInput>({
     resolver: zodResolver(updateStoreProfileSchema),
     defaultValues: buildDefaultValues(defaultValues),
@@ -56,9 +44,9 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
           name="businessName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del negocio</FormLabel>
+              <FormLabel>{t("businessNameLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="El Rincón del Sabor" {...field} />
+                <Input placeholder={t("businessNamePlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -70,19 +58,17 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
           name="kind"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de tienda</FormLabel>
+              <FormLabel>{t("storeKindLabel")}</FormLabel>
               <FormControl>
                 <select
                   className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   {...field}
                 >
-                  {(Object.entries(STORE_KIND_LABELS) as [StoreKind, string][]).map(
-                    ([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ),
-                  )}
+                  {STORE_KIND_KEYS.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`storeKinds.${value}`)}
+                    </option>
+                  ))}
                 </select>
               </FormControl>
               <FormMessage />
@@ -95,9 +81,9 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
           name="neighborhood"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Barrio operativo</FormLabel>
+              <FormLabel>{t("neighborhoodLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Palermo" {...field} />
+                <Input placeholder={t("neighborhoodPlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,9 +95,13 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
           name="coverageNotes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notas de cobertura (opcional)</FormLabel>
+              <FormLabel>{t("coverageNotesLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Zona SoHo y Hollywood" {...field} value={field.value ?? ""} />
+                <Input
+                  placeholder={t("coverageNotesPlaceholder")}
+                  {...field}
+                  value={field.value ?? ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -123,9 +113,9 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
           name="days"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Días de operación</FormLabel>
+              <FormLabel>{t("daysLabel")}</FormLabel>
               <FormControl>
-                <div role="group" aria-label="Días de operación" className="flex flex-wrap gap-2">
+                <div role="group" aria-label={t("daysLabel")} className="flex flex-wrap gap-2">
                   {PROFILE_DAYS.map((day) => {
                     const checked = (field.value ?? []).includes(day);
                     return (
@@ -133,7 +123,7 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
                         key={day}
                         type="button"
                         aria-pressed={checked}
-                        aria-label={day}
+                        aria-label={t(`days.${day}`)}
                         onClick={() => {
                           const current = field.value ?? [];
                           const next = checked
@@ -147,7 +137,7 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
                             : "border-border bg-surface text-foreground"
                         }`}
                       >
-                        {DAY_LABELS[day]}
+                        {t(`days.${day}`)}
                       </button>
                     );
                   })}
@@ -164,7 +154,7 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
             name="openTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Apertura</FormLabel>
+                <FormLabel>{t("openTimeLabel")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -178,7 +168,7 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
             name="closeTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cierre</FormLabel>
+                <FormLabel>{t("closeTimeLabel")}</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -189,7 +179,7 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
         </div>
 
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Guardando…" : "Guardar cambios"}
+          {isPending ? t("saving") : t("save")}
         </Button>
       </form>
     </Form>

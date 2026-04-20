@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderWithProviders } from "@/shared/test-utils";
 import { AdminShellContainer } from "./AdminShell.container";
 import type { User } from "@/shared/types/user";
 
@@ -36,7 +37,7 @@ describe("AdminShellContainer", () => {
       signOut: mockSignOut,
     } as ReturnType<typeof useSession>);
 
-    render(<AdminShellContainer>content</AdminShellContainer>);
+    renderWithProviders(<AdminShellContainer>content</AdminShellContainer>);
 
     expect(screen.queryByText("content")).not.toBeInTheDocument();
     // spinner is present (animate-spin element)
@@ -52,7 +53,7 @@ describe("AdminShellContainer", () => {
       signOut: mockSignOut,
     } as ReturnType<typeof useSession>);
 
-    render(<AdminShellContainer>content</AdminShellContainer>);
+    renderWithProviders(<AdminShellContainer>content</AdminShellContainer>);
 
     expect(screen.getByText(/error al cargar la sesión/i)).toBeInTheDocument();
     expect(screen.queryByText("content")).not.toBeInTheDocument();
@@ -66,7 +67,7 @@ describe("AdminShellContainer", () => {
       signOut: mockSignOut,
     } as ReturnType<typeof useSession>);
 
-    const { container } = render(<AdminShellContainer>content</AdminShellContainer>);
+    const { container } = renderWithProviders(<AdminShellContainer>content</AdminShellContainer>);
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -80,7 +81,7 @@ describe("AdminShellContainer", () => {
       signOut: mockSignOut,
     } as ReturnType<typeof useSession>);
 
-    render(
+    renderWithProviders(
       <AdminShellContainer>
         <span data-testid="page">page content</span>
       </AdminShellContainer>,

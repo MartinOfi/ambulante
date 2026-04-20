@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -19,6 +20,8 @@ export function ProductForm({
   serverError,
   submitLabel,
 }: ProductFormProps) {
+  const t = useTranslations("Catalog.ProductForm");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
@@ -27,9 +30,9 @@ export function ProductForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del producto</FormLabel>
+              <FormLabel>{t("nameLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Empanada de carne" {...field} />
+                <Input placeholder={t("namePlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -41,10 +44,10 @@ export function ProductForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción (opcional)</FormLabel>
+              <FormLabel>{t("descriptionLabel")}</FormLabel>
               <FormControl>
                 <textarea
-                  placeholder="Breve descripción del producto…"
+                  placeholder={t("descriptionPlaceholder")}
                   maxLength={300}
                   rows={3}
                   className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -61,7 +64,7 @@ export function ProductForm({
           name="priceArs"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Precio (ARS)</FormLabel>
+              <FormLabel>{t("priceLabel")}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -84,7 +87,7 @@ export function ProductForm({
           name="photoUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL de foto (opcional)</FormLabel>
+              <FormLabel>{t("photoUrlLabel")}</FormLabel>
               <FormControl>
                 <Input type="url" placeholder="https://…" {...field} />
               </FormControl>
@@ -106,7 +109,7 @@ export function ProductForm({
                   className="h-4 w-4 rounded border-input accent-primary"
                 />
               </FormControl>
-              <FormLabel className="!mt-0">Disponible</FormLabel>
+              <FormLabel className="!mt-0">{t("availableLabel")}</FormLabel>
               <FormMessage />
             </FormItem>
           )}
@@ -119,7 +122,7 @@ export function ProductForm({
         )}
 
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Guardando…" : submitLabel}
+          {isLoading ? t("saving") : submitLabel}
         </Button>
       </form>
     </Form>

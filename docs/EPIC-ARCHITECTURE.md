@@ -1135,13 +1135,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** MVP Argentina-only → "without i18n routing" mode. LOCALE constant en `shared/constants/i18n.ts`. 6 tests verdes, 107 archivos / 919 tests totales pasan.
 
 ### F10.2 — Migrar copy a messages
-- **Estado:** 🟡 in-progress [owner: chat-f10-2, started: 2026-04-20]
+- **Estado:** ✅ done [owner: chat-f10-2, started: 2026-04-20, completed: 2026-04-20]
 - **Por qué:** Hoy todo está hardcoded.
 - **Entregable:** 100% de los strings de UI en `messages/es.json`. Eslint rule que detecta strings hardcoded en JSX.
-- **Archivos:** `messages/es.json`, features todas.
+- **Archivos:** `messages/es-AR.json`, features todas. `shared/test-utils/render.tsx` ahora incluye `NextIntlClientProvider`.
 - **Depends on:** F10.1
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Todos los `Record<K, string>` de labels eliminados y reemplazados por `t()`. 957 tests verdes. Custom ESLint rule `no-hardcoded-jsx-strings` creada en `eslint-local-rules.js`.
 
 ### F10.3 — ARIA audit
 - **Estado:** ✅ done

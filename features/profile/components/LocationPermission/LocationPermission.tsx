@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Stack, Row } from "@/shared/components/layout";
 import { Text } from "@/shared/components/typography";
 import { Button } from "@/shared/components/ui/button";
@@ -11,23 +14,18 @@ interface LocationPermissionProps {
   onRequest: () => void;
 }
 
-const STATUS_LABELS: Record<LocationPermissionStatus, string> = {
-  [LOCATION_PERMISSION_STATUS.GRANTED]: "Ubicación activa",
-  [LOCATION_PERMISSION_STATUS.DENIED]: "Ubicación denegada — cambiá el permiso en tu navegador",
-  [LOCATION_PERMISSION_STATUS.PROMPT]: "Permiso de ubicación no solicitado",
-  [LOCATION_PERMISSION_STATUS.UNSUPPORTED]: "Geolocalización no disponible en este dispositivo",
-};
-
 export function LocationPermission({ status, onRequest }: LocationPermissionProps) {
+  const t = useTranslations("Profile.LocationPermission");
+
   return (
     <Stack gap={2}>
       <Text variant="body-sm" className="text-muted-foreground">
-        {STATUS_LABELS[status]}
+        {t(`status${status.charAt(0).toUpperCase()}${status.slice(1)}`)}
       </Text>
       {status === LOCATION_PERMISSION_STATUS.PROMPT && (
         <Row>
           <Button size="sm" onClick={onRequest}>
-            Activar ubicación
+            {t("enableButton")}
           </Button>
         </Row>
       )}
