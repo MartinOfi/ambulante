@@ -921,13 +921,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** Dumb + container pattern. iOS: 3 pasos paso a paso (Share2 → PlusSquare → Smartphone). Android: botón native prompt via `BeforeInstallPromptEvent`. Dismiss persistido en localStorage. iPadOS detectado via `navigator.maxTouchPoints > 1`. 7/7 tests GREEN.
 
 ### F6.5 — Background sync
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-20]
 - **Por qué:** Cliente envía pedido offline → se sincroniza cuando hay red.
 - **Entregable:** Service worker con `sync` event; cola de mutations pendientes; integración con React Query mutations.
-- **Archivos:** `app/sw.ts`, `shared/query/offline-queue.ts`.
+- **Archivos:** `app/sw.ts`, `shared/query/offline-queue.ts`, `shared/constants/background-sync.ts`.
 - **Depends on:** F6.1, F4.2
 - **Estimación:** L
-- **Notas:**
+- **Notas:** IDB + Zod validation en boundary. SW usa inline types para evitar conflicto lib.dom/lib.webworker. `registerBackgroundSync()` degrada silenciosamente en iOS Safari. Max 3 intentos (`OFFLINE_QUEUE_MAX_ATTEMPTS`) antes de descartar. 10 tests (fake-indexeddb), todos verdes.
 
 ---
 

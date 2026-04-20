@@ -195,6 +195,20 @@
   ```
 - **Usado en:** cualquier `queryFn` que consuma datos externos (features/*/hooks/).
 
+### offlineQueue (enqueueItem, dequeueAll, registerBackgroundSync)
+
+- **Ruta:** `shared/query/offline-queue.ts`
+- **Descripción:** Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB (`ambulante-offline-queue`). Valida con Zod en el boundary antes de guardar. Limpia la cola de forma atómica en `dequeueAll`. `registerBackgroundSync` registra la Background Sync API degradando silenciosamente en iOS Safari.
+- **API:**
+  - `enqueueItem({ type, payload }): Promise<string>` — encola un pedido, retorna el id generado
+  - `dequeueAll(): Promise<readonly OfflineQueueItem[]>` — lee y limpia la cola; items malformados se omiten con log
+  - `registerBackgroundSync(): Promise<void>` — registra tag `ambulante-sync-orders` (no-op si API no disponible)
+- **Schemas exportados:** `sendOrderPayloadSchema`, `offlineQueueItemSchema`
+- **Tipos exportados:** `SendOrderPayload`, `OfflineQueueItem`, `CreateQueueItemInput`
+- **Constantes:** ver `shared/constants/background-sync.ts`
+- **Tests:** `shared/query/offline-queue.test.ts` (10 casos, usa `fake-indexeddb`)
+- **Usado en:** `app/sw.ts` (sync handler), `features/orders/hooks/useSendOrderMutation` (F6.6+)
+
 ### useRealtimeInvalidation
 
 - **Ruta:** `shared/query/useRealtimeInvalidation.ts`
@@ -631,6 +645,13 @@
 - **Tipo exportado:** `OrderStatus` = unión literal de todos los valores de `ORDER_STATUS`.
 - **Usado en:** máquina de estados (F3.2), transiciones de pedido, guards de inmutabilidad en estados terminales.
 
+### SYNC_TAG, OFFLINE_QUEUE_DB_NAME, OFFLINE_QUEUE_DB_VERSION, OFFLINE_QUEUE_STORE_NAME, OFFLINE_QUEUE_MAX_ATTEMPTS
+
+- **Ruta:** `shared/constants/background-sync.ts`
+- **Descripción:** Constantes de la cola offline e integración con Background Sync API. Context-agnostic: seguro de importar tanto desde código de página como desde el Service Worker.
+- **API:** `SYNC_TAG` (`"ambulante-sync-orders"`), `OFFLINE_QUEUE_DB_NAME`, `OFFLINE_QUEUE_DB_VERSION` (1), `OFFLINE_QUEUE_STORE_NAME` (`"pending-mutations"`), `OFFLINE_QUEUE_MAX_ATTEMPTS` (3)
+- **Usado en:** `shared/query/offline-queue.ts`, `app/sw.ts`.
+
 ### SESSION_COOKIE_NAME, SESSION_COOKIE_MAX_AGE_SECONDS
 
 - **Ruta:** `shared/constants/auth.ts`
@@ -938,6 +959,7 @@
 | 2026-04-20 | F5.4: `useRealtimeStatus` en §3; `reconnect()` + backoff en `realtimeService` §4; `RECONNECT_*` + `ORDER_EVENT_PREFIX` en §8; `TestableRealtimeService` interface extraída de `RealtimeService` | —     |
 | 2026-04-20 | F6.3: agregado `pushService` + `PushService` interface en §4; `NEXT_PUBLIC_VAPID_PUBLIC_KEY` en env.schema | —     |
 | 2026-04-20 | F6.4: `InstallPrompt` (dumb+container) en §2 — detección iOS/Android, pasos iOS, native prompt Android, persist dismiss en localStorage | —     |
+| 2026-04-20 | F6.5: `offlineQueue` (enqueueItem/dequeueAll/registerBackgroundSync) en §2b.Query; constantes background-sync en §8; sync handler en `app/sw.ts` | —     |
 | 2026-04-20 | F7.2: agregadas test factories (`createUser`, `createStore`, `createOrderItem`, `createOrder`) en §14 | —     |
 | 2026-04-20 | F7.2 CR: `STORE_KIND`/`STORE_STATUS` en §8; factories refactorizadas a `crypto.randomUUID()` — elimina estado mutable global `_seq` | —     |
 | 2026-04-20 | F7.5: `MapScreen.test.tsx` + `MapScreen.container.test.tsx` — ejemplo canónico de tests dumb/smart | —     |
