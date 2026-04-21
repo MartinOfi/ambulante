@@ -1,12 +1,28 @@
 import { describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
 import { DEFAULT_RADIUS } from "@/shared/constants/radius";
 import { createStore } from "@/shared/test-utils";
 import { renderWithProviders, screen } from "@/shared/test-utils";
 import type { MapScreenProps } from "./MapScreen";
 import { MapScreen } from "./MapScreen";
 
-vi.mock("./MapCanvas", () => ({
-  MapCanvas: () => <div data-testid="map-canvas" />,
+// dynamic() wraps lazy imports; bypass it so MapCanvasContainer resolves synchronously in tests
+vi.mock("next/dynamic", () => ({
+  default: (loader: () => Promise<{ default: React.ComponentType }>) => {
+    let Component: React.ComponentType | null = null;
+    loader().then((mod) => {
+      Component = mod.default;
+    });
+    const Wrapper = (props: Record<string, unknown>) =>
+      Component ? <Component {...props} /> : null;
+    Wrapper.displayName = "DynamicMock";
+    return Wrapper;
+  },
+}));
+
+vi.mock("./MapCanvas.container", () => ({
+  MapCanvasContainer: () => <div data-testid="map-canvas" />,
+  default: () => <div data-testid="map-canvas" />,
 }));
 
 vi.mock("./TopHeader", () => ({
@@ -102,27 +118,30 @@ describe("MapScreen", () => {
   });
 
   it("calls onRetryGeolocation when retry button is clicked", async () => {
+    const user = userEvent.setup();
     const onRetryGeolocation = vi.fn();
     renderWithProviders(
       <MapScreen {...buildProps({ geo: { status: "denied" }, onRetryGeolocation })} />,
     );
-    await screen.getByTestId("retry-btn").click();
+    await user.click(screen.getByTestId("retry-btn"));
     expect(onRetryGeolocation).toHaveBeenCalledOnce();
   });
 
   it("calls onManualSearch when manual search button is clicked", async () => {
+    const user = userEvent.setup();
     const onManualSearch = vi.fn();
     renderWithProviders(
       <MapScreen {...buildProps({ geo: { status: "denied" }, onManualSearch })} />,
     );
-    await screen.getByTestId("manual-search-btn").click();
+    await user.click(screen.getByTestId("manual-search-btn"));
     expect(onManualSearch).toHaveBeenCalledOnce();
   });
 
   it("calls onRecenter when recenter FAB is clicked", async () => {
+    const user = userEvent.setup();
     const onRecenter = vi.fn();
     renderWithProviders(<MapScreen {...buildProps({ onRecenter })} />);
-    await screen.getByTestId("recenter-fab").click();
+    await user.click(screen.getByTestId("recenter-fab"));
     expect(onRecenter).toHaveBeenCalledOnce();
   });
 
@@ -132,12 +151,13 @@ describe("MapScreen", () => {
   });
 
   it("calls onDismissStoreDetail when dismiss button in sheet is clicked", async () => {
+    const user = userEvent.setup();
     const onDismissStoreDetail = vi.fn();
     const store = createStore();
     renderWithProviders(
       <MapScreen {...buildProps({ selectedStoreId: store.id, onDismissStoreDetail })} />,
     );
-    await screen.getByTestId("dismiss-btn").click();
+    await user.click(screen.getByTestId("dismiss-btn"));
     expect(onDismissStoreDetail).toHaveBeenCalledOnce();
   });
 });

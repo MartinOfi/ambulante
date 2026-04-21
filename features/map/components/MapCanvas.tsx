@@ -1,64 +1,68 @@
 "use client";
 
+import { Map, Marker, NavigationControl } from "react-map-gl/maplibre";
+import type { ViewState } from "react-map-gl/maplibre";
 import type { Store } from "@/shared/types/store";
+import type { Coordinates } from "@/shared/schemas/coordinates";
+import { MAP_DEFAULTS, MAP_STYLE_URL } from "@/features/map/constants";
 import { StorePin } from "./StorePin";
 import { UserLocationPin } from "./UserLocationPin";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-interface MapCanvasProps {
+export interface MapCanvasProps {
   readonly stores: readonly Store[];
   readonly hasUserLocation: boolean;
+  readonly userCoords?: Coordinates;
+  readonly selectedStoreId?: string | null;
+  readonly viewState: ViewState;
+  readonly onMove: (evt: { viewState: ViewState }) => void;
+  readonly onSelectStore?: (id: string) => void;
 }
 
-/**
- * V1 placeholder — stylized static map. Swap for react-map-gl in v2.
- * Pin positions are faked based on store index to convey spatial feel.
- */
-const PIN_POSITIONS = [
-  { top: "32%", left: "38%" },
-  { top: "44%", left: "62%" },
-  { top: "28%", left: "70%" },
-  { top: "52%", left: "30%" },
-];
-
-export function MapCanvas({ stores, hasUserLocation }: MapCanvasProps) {
+export function MapCanvas({
+  stores,
+  hasUserLocation,
+  userCoords,
+  selectedStoreId,
+  viewState,
+  onMove,
+  onSelectStore,
+}: MapCanvasProps) {
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Base map placeholder — warm cream with street grid */}
-      <div className="absolute inset-0 bg-surface">
-        <svg className="h-full w-full opacity-60" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-          <defs>
-            <pattern id="streets" width="80" height="80" patternUnits="userSpaceOnUse">
-              <rect width="80" height="80" fill="hsl(var(--surface))" />
-              <path d="M0 40 H80 M40 0 V80" stroke="hsl(var(--border))" strokeWidth="8" />
-              <path
-                d="M0 0 H80 M0 80 H80 M0 0 V80 M80 0 V80"
-                stroke="hsl(var(--border))"
-                strokeWidth="2"
-              />
-            </pattern>
-            <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
-              <stop offset="0%" stopColor="transparent" />
-              <stop offset="100%" stopColor="hsl(var(--brand-primary))" stopOpacity="0.06" />
-            </radialGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#streets)" />
-          <rect width="100%" height="100%" fill="url(#vignette)" />
-        </svg>
-      </div>
+    <div className="absolute inset-0">
+      <Map
+        {...viewState}
+        onMove={onMove}
+        mapStyle={MAP_STYLE_URL}
+        minZoom={MAP_DEFAULTS.MIN_ZOOM}
+        maxZoom={MAP_DEFAULTS.MAX_ZOOM}
+        style={{ width: "100%", height: "100%" }}
+        attributionControl={false}
+      >
+        <NavigationControl position="top-right" />
 
-      {/* Store pins */}
-      {stores.map((store, i) => (
-        <StorePin
-          key={store.id}
-          kind={store.kind}
-          top={PIN_POSITIONS[i % PIN_POSITIONS.length].top}
-          left={PIN_POSITIONS[i % PIN_POSITIONS.length].left}
-          label={store.name}
-        />
-      ))}
+        {stores.map((store) => (
+          <Marker
+            key={store.id}
+            longitude={store.location.lng}
+            latitude={store.location.lat}
+            anchor="bottom"
+          >
+            <StorePin
+              kind={store.kind}
+              label={store.name}
+              active={selectedStoreId === store.id}
+              onClick={() => onSelectStore?.(store.id)}
+            />
+          </Marker>
+        ))}
 
-      {/* User location */}
-      {hasUserLocation && <UserLocationPin />}
+        {hasUserLocation && userCoords && (
+          <Marker longitude={userCoords.lng} latitude={userCoords.lat} anchor="center">
+            <UserLocationPin />
+          </Marker>
+        )}
+      </Map>
     </div>
   );
 }
