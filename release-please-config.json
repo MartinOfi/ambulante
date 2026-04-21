@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-  "release-type": "node",
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
   "changelog-sections": [
@@ -11,6 +10,12 @@
     { "type": "docs", "section": "Documentation", "hidden": true },
     { "type": "chore", "section": "Miscellaneous", "hidden": true },
     { "type": "test", "section": "Tests", "hidden": true },
-    { "type": "ci", "section": "CI", "hidden": true }
-  ]
+    { "type": "ci", "section": "CI", "hidden": true },
+    { "type": "build", "section": "Build System", "hidden": true }
+  ],
+  "packages": {
+    ".": {
+      "release-type": "node"
+    }
+  }
 }
