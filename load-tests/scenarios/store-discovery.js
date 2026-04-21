@@ -54,9 +54,10 @@ export default function storeDiscovery() {
 
   geoqueryDuration.add(response.timings.duration);
 
+  // Latency belongs in options.thresholds (STORE_DISCOVERY_THRESHOLDS), not here.
+  // Mixing a timing assertion into check() would count slow-but-valid responses as errors.
   const isSuccess = check(response, {
     "nearby stores status 200": (res) => res.status === 200,
-    "nearby stores p95 < 300ms": (res) => res.timings.duration < 300,
     "nearby stores returns array": (res) => {
       if (res.status !== 200) return true; // skip body check on error
       try {

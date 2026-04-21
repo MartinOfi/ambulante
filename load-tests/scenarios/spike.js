@@ -30,12 +30,63 @@ export const options = {
 const raceCondition5xx = new Rate("race_condition_5xx");
 const conflictsResolved = new Counter("conflicts_resolved_correctly");
 
-/** Small pool of "hot" orders that multiple VUs will contest simultaneously */
 const HOT_ORDER_COUNT = 20;
 
-export default function spikeTest() {
-  // Pick a contested order from the hot pool
-  const hotOrderId = `order-${Math.floor(Math.random() * HOT_ORDER_COUNT) + 1}`;
+/**
+ * Pre-seed HOT_ORDER_COUNT orders in RECIBIDO state before VUs start.
+ * PRD §9.3 race: CLIENT→CANCELADO vs STORE→ACEPTADO — both valid from RECIBIDO.
+ * Without known state the server returns 422 (invalid transition), not 409 (race),
+ * so the spike never actually exercises the concurrent-transition conflict path.
+ */
+export function setup() {
+  const hotOrderIds = [];
+
+  for (let i = 0; i < HOT_ORDER_COUNT; i++) {
+    const createResponse = http.post(
+      `${BASE_URL}/api/orders`,
+      JSON.stringify({
+        storeId: `store-${(i % 20) + 1}`,
+        items: [
+          { productId: "product-1", quantity: 1, priceAtOrder: 500, nameAtOrder: "Spike item" },
+        ],
+        notes: "spike-test-seed",
+      }),
+      { headers: { "Content-Type": "application/json" }, timeout: HTTP_TIMEOUT_MS },
+    );
+
+    if (createResponse.status !== 201) continue;
+
+    let orderId;
+    try {
+      const body = JSON.parse(createResponse.body);
+      orderId = body.data?.id ?? body.id;
+    } catch {
+      continue;
+    }
+
+    if (!orderId) continue;
+
+    http.patch(
+      `${BASE_URL}/api/orders/${orderId}/status`,
+      JSON.stringify({ status: "RECIBIDO", actor: "system" }),
+      { headers: { "Content-Type": "application/json" }, timeout: HTTP_TIMEOUT_MS },
+    );
+
+    hotOrderIds.push(orderId);
+  }
+
+  return { hotOrderIds };
+}
+
+export default function spikeTest(data) {
+  const { hotOrderIds = [] } = data ?? {};
+
+  // If setup produced real order IDs use them; otherwise fall back to synthetic IDs
+  // so the script stays runnable against a stub that ignores state (e.g. CI mock).
+  const hotOrderId =
+    hotOrderIds.length > 0
+      ? hotOrderIds[Math.floor(Math.random() * hotOrderIds.length)]
+      : `order-${Math.floor(Math.random() * HOT_ORDER_COUNT) + 1}`;
 
   // Two competing actors try to transition the same order simultaneously
   // Client tries to CANCEL, Store tries to ACCEPT — only one should win

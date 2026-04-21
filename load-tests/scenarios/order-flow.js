@@ -25,7 +25,13 @@ import {
 
 export const options = {
   stages: LOAD_STAGES,
-  thresholds: ORDER_FLOW_THRESHOLDS,
+  thresholds: {
+    ...ORDER_FLOW_THRESHOLDS,
+    // PRD §8: RECIBIDO→ACEPTADO < 3min
+    order_acceptance_ms: ["p(95)<180000"],
+    // PRD §8: finalización ≥70%
+    order_finalization_rate: ["rate>0.70"],
+  },
 };
 
 // ─── Custom metrics ───────────────────────────────────────────────────────────
@@ -40,6 +46,8 @@ const ordersAccepted = new Counter("orders_accepted");
 const ordersExpired = new Counter("orders_expired");
 /** Rate of successful end-to-end flows */
 const flowSuccessRate = new Rate("order_flow_success");
+/** Rate of orders that reached FINALIZADO — PRD §8 target ≥70% */
+const orderFinalizationRate = new Rate("order_finalization_rate");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -109,11 +117,17 @@ export default function orderFlow() {
     { headers: { "Content-Type": "application/json" }, timeout: HTTP_TIMEOUT_MS },
   );
 
-  const receivedAt = Date.now();
-
-  check(receivedResponse, {
+  const receivedOk = check(receivedResponse, {
     "order marked RECIBIDO (200)": (res) => res.status === 200 || res.status === 204,
   });
+
+  if (!receivedOk) {
+    flowSuccessRate.add(false);
+    return;
+  }
+
+  // Capture after check passes so elapsed time measures the business window only
+  const receivedAt = Date.now();
 
   // Step 3: STORE accepts → PATCH /api/orders/:id/status (actor: store)
   // Think time: store responds in 5-30s in this load scenario
@@ -161,6 +175,7 @@ export default function orderFlow() {
     "order FINALIZADO (200)": (res) => res.status === 200 || res.status === 204,
   });
 
+  orderFinalizationRate.add(isFinalized);
   flowSuccessRate.add(isFinalized);
 
   sleep(randomBetween(1, 3));

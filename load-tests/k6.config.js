@@ -3,6 +3,8 @@
  * Thresholds are derived from PRD §8 success metrics.
  */
 
+import { sleep } from "k6";
+
 // ─── Base URL ────────────────────────────────────────────────────────────────
 
 export const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
@@ -46,12 +48,15 @@ export const STORE_DISCOVERY_THRESHOLDS = {
   http_req_failed: ["rate<0.005"],
 };
 
-/** Thresholds for the order-flow scenario */
+/**
+ * Thresholds for the order-flow scenario.
+ * Note: order_acceptance_ms threshold lives in order-flow.js options directly
+ * because it depends on a metric that only that scenario registers.
+ */
 export const ORDER_FLOW_THRESHOLDS = {
   http_req_duration: ["p(95)<500"],
   http_req_failed: ["rate<0.01"],
-  // Custom metric: order acceptance time < 3min (PRD §8)
-  order_acceptance_ms: ["p(95)<180000"],
+  order_flow_success: ["rate>0.60"],
 };
 
 // ─── Stage presets ───────────────────────────────────────────────────────────
@@ -111,6 +116,5 @@ export function randomBuenosAiresCoords() {
 
 /** Pause VU for a random duration between min and max milliseconds */
 export function jitteredSleep(minMs, maxMs) {
-  const { sleep } = require("k6");
   sleep(randomBetween(minMs, maxMs) / 1000);
 }

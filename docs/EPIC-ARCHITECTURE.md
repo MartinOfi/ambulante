@@ -1508,11 +1508,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Creado `docs/db-query-optimization.md`. Documenta: schema de 6 tablas (users, stores, products, orders, order_items, order_transitions), 7 hot queries con su SQL e índices, análisis EXPLAIN prospectivo para Q1 (geoquery crítica con/sin GIST), PostGIS setup (geography vs geometry, funciones usadas), RLS policies para aislamiento de roles, publicaciones Supabase Realtime, y checklist de verificación pre-producción. Sin código TypeScript — documentación pura. F15.6 (load testing) queda desbloqueada.
 
 ### F15.6 — Load testing
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-f15-6, completed: 2026-04-20]
 - **Entregable:** k6 o Artillery con escenarios del §8. Baseline y goals documentados.
 - **Depends on:** F15.5
 - **Estimación:** L
-- **Notas:**
+- **Notas:** 5 escenarios k6: smoke (1 VU/30s), store-discovery (50 VUs geospatial p95<300ms), order-flow (full §7.1 lifecycle), location-update (10→100 stores §7.5 cadencia), spike (500 VUs race-condition §9.3, expects 409 never 500). Config compartido en `load-tests/k6.config.js`. Baselines TBD (requieren backend Supabase — F8). Docs en `docs/load-testing.md`. ESLint ignorePatterns extendido a `load-tests/` (tooling externo, no app Next.js).
 
 ---
 
