@@ -210,8 +210,8 @@ Administrador ────────► app/(admin)/
 
 ```
 [ENVIADO] ──► [RECIBIDO] ──► [ACEPTADO] ──► [EN_CAMINO] ──► [FINALIZADO]
-                  │               │
-                  ├──► [RECHAZADO]└──► [CANCELADO]
+                  │               │               │
+                  ├──► [RECHAZADO]└──► [CANCELADO]└──► [CANCELADO]
                   ├──► [EXPIRADO]
                   └──► [CANCELADO]
 ```
@@ -225,7 +225,7 @@ Administrador ────────► app/(admin)/
 | `EN_CAMINO` | Cliente |
 | `FINALIZADO` | Tienda — terminal |
 | `CANCELADO` (pre-`ACEPTADO`) | Cliente (desde `ENVIADO` o `RECIBIDO`) |
-| `CANCELADO` (post-`ACEPTADO`) | Cliente o Tienda (desde `ACEPTADO` o `EN_CAMINO`) |
+| `CANCELADO` (post-`ACEPTADO`) | Tienda (desde `ACEPTADO` o `EN_CAMINO`) |
 | `EXPIRADO` | Sistema (timeout 10 min desde `RECIBIDO`) — terminal |
 
 La implementación vive en `shared/domain/order-state-machine.ts`.
