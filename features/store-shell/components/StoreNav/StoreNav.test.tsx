@@ -51,13 +51,13 @@ describe("StoreNav", () => {
   });
 
   it("marks active link with aria-current=page", () => {
-    render(<StoreNav currentPath={ROUTES.store.dashboard} />);
+    renderWithProviders(<StoreNav currentPath={ROUTES.store.dashboard} />);
     const activeLink = screen.getByRole("link", { name: /dashboard/i });
     expect(activeLink).toHaveAttribute("aria-current", "page");
   });
 
   it("does not mark inactive links with aria-current", () => {
-    render(<StoreNav currentPath={ROUTES.store.dashboard} />);
+    renderWithProviders(<StoreNav currentPath={ROUTES.store.dashboard} />);
     const inactiveLink = screen.getByRole("link", { name: /pedidos/i });
     expect(inactiveLink).not.toHaveAttribute("aria-current");
   });

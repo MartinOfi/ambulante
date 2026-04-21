@@ -1,14 +1,13 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
-import React from "react";
 
 import { useStatusParam } from "./useStatusParam";
 import { ORDER_STATUS } from "@/shared/constants/order";
 
 function makeWrapper(searchParams: string) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return React.createElement(NuqsTestingAdapter, { searchParams, children });
+    return <NuqsTestingAdapter searchParams={searchParams}>{children}</NuqsTestingAdapter>;
   };
 }
 

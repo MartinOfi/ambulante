@@ -3,7 +3,7 @@ import { BookOpen, User, Inbox, BarChart2 } from "lucide-react";
 
 import { AvailabilityToggle } from "@/features/store-shell";
 import { ORDER_STATUS } from "@/shared/constants/order";
-import { OrderCard } from "@/features/orders";
+import { OrderCard } from "@/features/orders/components/OrderCard";
 import type { StoreDashboardProps } from "./StoreDashboard.types";
 
 const QUICK_LINKS = [

@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+// @ts-expect-error eslint v8 ships no bundled declaration file; @types/eslint not installed
 import { RuleTester } from "eslint";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

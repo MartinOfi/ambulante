@@ -1,22 +1,28 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useUsersQuery } from "@/features/user-management/hooks/useUsersQuery";
 import { useSuspendUserMutation } from "@/features/user-management/hooks/useSuspendUserMutation";
 import { useReinstateUserMutation } from "@/features/user-management/hooks/useReinstateUserMutation";
-import type { UserManagementService } from "@/features/user-management/services/userManagement.service";
+import { createUserManagementService } from "@/features/user-management/services/userManagement.service";
+import { MockUserRepository } from "@/shared/repositories/mock/user.mock";
+import { MockOrderRepository } from "@/shared/repositories/mock/order.mock";
 import { UserManagementPage } from "./UserManagementPage";
-
-interface UserManagementPageContainerProps {
-  readonly service: UserManagementService;
-}
 
 interface PendingSuspension {
   readonly userId: string;
   readonly userEmail: string;
 }
 
-export function UserManagementPageContainer({ service }: UserManagementPageContainerProps) {
+export function UserManagementPageContainer() {
+  const service = useMemo(
+    () =>
+      createUserManagementService({
+        userRepository: new MockUserRepository(),
+        orderRepository: new MockOrderRepository(),
+      }),
+    [],
+  );
   const [pendingSuspension, setPendingSuspension] = useState<PendingSuspension | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 

@@ -34,24 +34,30 @@ describe("AvailabilityToggle", () => {
   });
 
   it("shows 'GPS activo' label when locationStatus is publishing", () => {
-    render(
+    renderWithProviders(
       <AvailabilityToggle isAvailable={true} locationStatus="publishing" onToggle={vi.fn()} />,
     );
     expect(screen.getByText("GPS activo")).toBeInTheDocument();
   });
 
   it("shows 'GPS desactualizado' label when locationStatus is stale", () => {
-    render(<AvailabilityToggle isAvailable={true} locationStatus="stale" onToggle={vi.fn()} />);
+    renderWithProviders(
+      <AvailabilityToggle isAvailable={true} locationStatus="stale" onToggle={vi.fn()} />,
+    );
     expect(screen.getByText("GPS desactualizado")).toBeInTheDocument();
   });
 
   it("shows 'Error de GPS' label when locationStatus is error", () => {
-    render(<AvailabilityToggle isAvailable={true} locationStatus="error" onToggle={vi.fn()} />);
+    renderWithProviders(
+      <AvailabilityToggle isAvailable={true} locationStatus="error" onToggle={vi.fn()} />,
+    );
     expect(screen.getByText("Error de GPS")).toBeInTheDocument();
   });
 
   it("shows no location label when locationStatus is idle", () => {
-    render(<AvailabilityToggle isAvailable={true} locationStatus="idle" onToggle={vi.fn()} />);
+    renderWithProviders(
+      <AvailabilityToggle isAvailable={true} locationStatus="idle" onToggle={vi.fn()} />,
+    );
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.queryByText(/GPS/)).not.toBeInTheDocument();
   });
