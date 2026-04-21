@@ -15,6 +15,9 @@ export const MAP_DEFAULTS = {
   MAX_ZOOM: 20,
 } as const;
 
+export const MAP_STYLE_URL =
+  process.env.NEXT_PUBLIC_MAP_STYLE_URL ?? "https://demotiles.maplibre.org/style.json";
+
 export const BOTTOM_SHEET_SNAP = {
   COLLAPSED: "collapsed",
   HALF: "half",

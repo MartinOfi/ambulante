@@ -20,7 +20,12 @@ interface StorePinProps {
 export function StorePin({ kind, active, label, onClick }: StorePinProps) {
   const Icon = ICON_BY_KIND[kind];
   return (
-    <div className="relative" aria-label={label} role="button" tabIndex={0} onClick={onClick}>
+    <button
+      type="button"
+      className="relative cursor-pointer border-0 bg-transparent p-0"
+      aria-label={label}
+      onClick={onClick}
+    >
       <span className="absolute inset-0 rounded-full bg-brand/40 animate-pulse-pin" />
       <div
         className={cn(
@@ -34,6 +39,6 @@ export function StorePin({ kind, active, label, onClick }: StorePinProps) {
         className="absolute left-1/2 top-full -mt-1 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-white bg-brand"
         aria-hidden
       />
-    </div>
+    </button>
   );
 }
