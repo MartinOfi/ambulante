@@ -50,9 +50,17 @@ export function useServiceWorkerUpdate(): UseServiceWorkerUpdateResult {
       registrationRef.current?.update().catch(() => undefined);
     }, SW_UPDATE_CHECK_INTERVAL_MS);
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        registrationRef.current?.update().catch(() => undefined);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       active = false;
       clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       registrationRef.current?.removeEventListener("updatefound", handleUpdateFound);
     };
   }, []);

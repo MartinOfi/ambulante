@@ -272,6 +272,42 @@ describe("useServiceWorkerUpdate", () => {
     expect(reg.update).toHaveBeenCalledTimes(2);
   });
 
+  it("calls registration.update() when tab becomes visible", async () => {
+    const reg = makeRegistration();
+    setupSwMock(reg);
+    renderHook(() => useServiceWorkerUpdate());
+    await flushMicrotasks();
+
+    Object.defineProperty(document, "visibilityState", {
+      value: "visible",
+      writable: true,
+      configurable: true,
+    });
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(reg.update).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call update() when tab becomes hidden", async () => {
+    const reg = makeRegistration();
+    setupSwMock(reg);
+    renderHook(() => useServiceWorkerUpdate());
+    await flushMicrotasks();
+
+    Object.defineProperty(document, "visibilityState", {
+      value: "hidden",
+      writable: true,
+      configurable: true,
+    });
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(reg.update).not.toHaveBeenCalled();
+  });
+
   it("does not call update() before the interval elapses", async () => {
     vi.useFakeTimers();
 
