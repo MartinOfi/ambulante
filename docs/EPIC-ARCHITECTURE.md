@@ -1191,7 +1191,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** Implementado con react-map-gl/maplibre + Marker + NavigationControl. Props extendidas con `userCoords?: Coordinates` y `onSelectStore`. `MapScreen.tsx` usa `dynamic({ ssr: false })` para evitar carga de browser APIs en server. `StorePin` y `UserLocationPin` adaptados para uso dentro de Marker (sin posicionamiento CSS propio). `MAP_DEFAULTS` agregado a `features/map/constants.ts`. 56 tests verdes. `MapScreen.test.tsx` actualizado con mock de `next/dynamic` para resolución síncrona en tests.
 
 ### F11.4 — Clustering
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-20260420, started: session]
 - **Por qué:** Con 50+ tiendas en pantalla, pins sueltos no escalan.
 - **Entregable:** `supercluster` integrado; clusters al zoom-out, pins individuales al zoom-in.
 - **Archivos:** `features/map/hooks/useClusters.ts`.
