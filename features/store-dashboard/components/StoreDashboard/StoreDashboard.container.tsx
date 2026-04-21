@@ -2,7 +2,7 @@
 
 import { useAvailability, useLocationPublishing } from "@/features/store-shell";
 import { useStoreOrdersQuery } from "@/features/orders/hooks/useStoreOrdersQuery";
-import { useCurrentStoreQuery } from "@/features/store-dashboard/hooks/useCurrentStoreQuery";
+import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { StoreDashboard } from "./StoreDashboard";
 
 export function StoreDashboardContainer() {

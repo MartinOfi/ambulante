@@ -1390,11 +1390,11 @@ Wave B (después de F8.3 ✅):
 - **Notas:** schemas + service mock + hooks (useStoreProfileQuery, useUpdateStoreProfileMutation con optimistic update) + StoreProfileForm + StoreProfilePage Container/Dumb + page route. 7 hook tests GREEN (591 total).
 
 ### F13.7 — Analytics básico
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session-f13-7]
+- **Estado:** ✅ done [owner: claude, completed: 2026-04-20]
 - **Entregable:** `/store/analytics` con los KPIs del PRD §8 filtrados para esa tienda.
 - **Depends on:** F8.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** 6 KPIs con targets visuales (success/warning/danger), selector de período 1/7/30 días, mock service con valores deterministas por storeId. 20 tests (8 service + 6 KpiCard + 6 dashboard).
 
 ---
 
