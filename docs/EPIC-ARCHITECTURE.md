@@ -1598,7 +1598,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Entregable:** `docs/ONBOARDING.md` — setup paso a paso, diagrama de arquitectura, glosario.
 - **Depends on:** F0.*
 - **Estimación:** M
-- **Notas:** Creado `docs/ONBOARDING.md` (300 líneas). Secciones: prerequisitos, setup inicial (5 min), comandos, arquitectura de carpetas con ASCII diagram, tabla del stack, flujo de roles, máquina de estados del pedido, glosario de 18 términos de dominio, checklist del primer PR, links útiles. Sin código nuevo — solo documentación.
+- **Notas:** Creado `docs/ONBOARDING.md` (311 líneas). Secciones: prerequisitos, setup inicial (5 min), tabla de env vars (6 vars + NODE_ENV), comandos pnpm, arquitectura de carpetas con ASCII diagram (incluyendo query/ y test-utils/), nota de discrepancia CLAUDE.md §4 vs nombres reales, tabla del stack, flujo de roles, máquina de estados completa (con ENVIADO→CANCELADO, EN_CAMINO→CANCELADO, actores correctos), glosario de 18+ términos, checklist del primer PR (lint con 0 warnings), links útiles. Code review: 3 rondas, 0 CRITICAL/HIGH al cierre.
 
 ### F17.4 — Changelog automatizado
 - **Estado:** ⚪ pending
