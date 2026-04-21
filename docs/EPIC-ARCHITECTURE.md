@@ -1200,7 +1200,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F11.5 — User location tracking
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 22:00]
 - **Por qué:** Seguir al usuario mientras se mueve.
 - **Entregable:** `navigator.geolocation.watchPosition` detrás de `useGeolocation` extendido; pin del usuario actualiza en vivo.
 - **Archivos:** `shared/hooks/useGeolocation.ts`.
@@ -1580,7 +1580,7 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Un dev nuevo puede levantar el proyecto y hacer su primer PR en <1 día.
 
 ### F17.1 — Contributing guide
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
 - **Entregable:** `CONTRIBUTING.md` con setup, flow, convenciones.
 - **Depends on:** F0.*
 - **Estimación:** S
