@@ -5,7 +5,7 @@ export function HowItWorks() {
   return (
     <section
       id="como-funciona"
-      className="relative overflow-hidden bg-surface px-4 py-20 sm:px-6 sm:py-28"
+      className="relative overflow-hidden bg-surface px-4 py-16 sm:px-6 sm:py-20"
     >
       <div
         aria-hidden
@@ -17,14 +17,18 @@ export function HowItWorks() {
       />
 
       <div className="relative mx-auto max-w-6xl">
-        <SectionHeader eyebrow="Cómo funciona" title="Cinco pasos. Cero fricción." />
-        <Text variant="body-sm" className="mt-4 max-w-xl text-muted">
-          Un sistema de coordinación en tiempo real entre clientes y tiendas ambulantes. Tocá un
-          nodo para explorar cada paso.
-        </Text>
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <SectionHeader eyebrow="Cómo funciona" title="Cinco pasos. Cero fricción." />
+            <Text variant="body-sm" className="mt-4 max-w-md text-muted">
+              Un sistema de coordinación en tiempo real entre clientes y tiendas ambulantes. Tocá un
+              nodo para explorar cada paso.
+            </Text>
+          </div>
 
-        <div className="mt-8">
-          <HowItWorksClient />
+          <div className="flex items-center justify-center">
+            <HowItWorksClient />
+          </div>
         </div>
       </div>
     </section>

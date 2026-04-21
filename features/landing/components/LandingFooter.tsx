@@ -116,7 +116,10 @@ export function LandingFooter() {
           <p>© {new Date().getFullYear()} Ambulante. Todos los derechos reservados.</p>
           <p>
             Hecho para la calle ·{" "}
-            <Link href="/map" className="text-brand transition-colors hover:text-foreground">
+            <Link
+              href="/map"
+              className="text-brand underline transition-colors hover:text-foreground"
+            >
               Abrir la app
             </Link>
           </p>

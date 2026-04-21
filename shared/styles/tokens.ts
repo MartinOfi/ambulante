@@ -18,8 +18,8 @@
 export const COLORS = {
   raw: {
     light: {
-      brandPrimary: "21 90% 48%",
-      brandPrimaryHover: "21 90% 40%",
+      brandPrimary: "21 90% 37%",
+      brandPrimaryHover: "21 90% 30%",
       brandAccent: "221 83% 53%",
       primaryForeground: "0 0% 100%",
       surface: "33 100% 96%",
@@ -32,8 +32,8 @@ export const COLORS = {
       destructive: "0 72% 50%",
     },
     dark: {
-      brandPrimary: "21 90% 48%",
-      brandPrimaryHover: "21 90% 40%",
+      brandPrimary: "21 90% 55%",
+      brandPrimaryHover: "21 90% 48%",
       brandAccent: "221 83% 53%",
       primaryForeground: "0 0% 100%",
       surface: "222 47% 6%",

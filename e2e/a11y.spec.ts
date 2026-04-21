@@ -46,9 +46,12 @@ function formatViolations(
     .join("\n\n");
 }
 
+// /map loads MapLibre tiles continuously — networkidle never fires
+const MAP_ROUTES = new Set(["/map"]);
+
 async function auditRoute(page: Page, route: string): Promise<void> {
   await page.goto(route);
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState(MAP_ROUTES.has(route) ? "domcontentloaded" : "networkidle");
 
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])

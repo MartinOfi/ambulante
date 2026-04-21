@@ -5,8 +5,9 @@
 @layer base {
   :root {
     /* Brand — orange dominates as street food identity */
-    --brand-primary: 21 90% 48%; /* #EA580C */
-    --brand-primary-hover: 21 90% 40%; /* #C2410C */
+    /* Lightness 37% passes WCAG AA 4.5:1 on both white (#fff) and warm cream (#fff7ed) */
+    --brand-primary: 21 90% 37%; /* #B34509 */
+    --brand-primary-hover: 21 90% 30%; /* #8F3707 */
     --brand-accent: 221 83% 53%; /* #2563EB — reserved for user location only */
 
     /* Surfaces — warm cream, not clinical white */
@@ -34,7 +35,10 @@
   }
 
   .dark {
-    /* Dark mode — keep brand orange identical, swap surfaces and text */
+    /* Dark mode — brand needs to be lighter to pass WCAG AA on dark surfaces */
+    /* Lightness 55% gives 6.6:1 on dark surface #070A12 */
+    --brand-primary: 21 90% 55%; /* #F3762A */
+    --brand-primary-hover: 21 90% 48%; /* #EA580C — original vibrant orange */
     --surface: 222 47% 6%; /* #070A12 body */
     --surface-elevated: 222 35% 12%; /* #141B2D cards */
     --foreground: 33 100% 96%; /* warm off-white, mirrors cream */

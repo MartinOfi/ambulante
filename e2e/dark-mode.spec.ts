@@ -98,7 +98,9 @@ test.describe("Dark mode audit", () => {
     const darkContext = await createDarkContext(page);
     try {
       const darkPage = await visitInDark(darkContext, "/");
-      const themeToggle = darkPage.getByRole("button", { name: /tema|theme|dark|light/i });
+      const themeToggle = darkPage.getByRole("button", {
+        name: /cambiar a modo|tema|theme|dark|light/i,
+      });
       await expect(themeToggle.first()).toBeVisible();
     } finally {
       await darkContext.close();
