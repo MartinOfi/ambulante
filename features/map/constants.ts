@@ -16,7 +16,7 @@ export const MAP_DEFAULTS = {
 } as const;
 
 export const MAP_STYLE_URL =
-  process.env.NEXT_PUBLIC_MAP_STYLE_URL ?? "https://demotiles.maplibre.org/style.json";
+  process.env.NEXT_PUBLIC_MAP_STYLE_URL ?? "https://tiles.openfreemap.org/styles/liberty";
 
 export const BOTTOM_SHEET_SNAP = {
   COLLAPSED: "collapsed",
