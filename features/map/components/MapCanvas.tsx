@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type RefObject } from "react";
+import { useCallback, useMemo, type RefObject } from "react";
 import { Map, Marker, NavigationControl, Source, Layer } from "react-map-gl/maplibre";
 import type { MapRef, ViewState, MapMouseEvent } from "react-map-gl/maplibre";
 import type { GeoJSON } from "geojson";
@@ -29,16 +29,21 @@ export interface MapCanvasProps {
   readonly onZoomToCluster?: (clusterId: number, lng: number, lat: number) => void;
 }
 
-const INTERACTIVE_LAYER_IDS = [
+// Spread to mutable string[] — MapLibre Map prop requires string[], not readonly tuple
+const INTERACTIVE_LAYER_IDS: string[] = [
   MAP_LAYER_IDS.CLUSTERS_CIRCLE,
   MAP_LAYER_IDS.STORES_CIRCLE,
   MAP_LAYER_IDS.STORES_ACTIVE,
-] as const;
+];
 
 function toFeatureCollection(clusters: readonly ClusterFeature[]): GeoJSON.FeatureCollection {
   return {
     type: "FeatureCollection",
-    features: [...clusters] as GeoJSON.Feature[],
+    features: clusters.map((f) => ({
+      type: "Feature" as const,
+      geometry: f.geometry,
+      properties: f.properties,
+    })),
   };
 }
 
@@ -56,25 +61,31 @@ export function MapCanvas({
 }: MapCanvasProps) {
   const geojson = useMemo(() => toFeatureCollection(clusters), [clusters]);
 
-  function handleMapClick(e: MapMouseEvent) {
-    const feature = e.features?.[0];
-    if (!feature) return;
-    if (feature.geometry.type !== "Point") return;
+  const handleMapClick = useCallback(
+    (e: MapMouseEvent) => {
+      const feature = e.features?.[0];
+      if (!feature) return;
+      if (feature.geometry.type !== "Point") return;
 
-    const [lng, lat] = feature.geometry.coordinates as [number, number];
-    const layerId = feature.layer.id;
+      const lng = feature.geometry.coordinates[0];
+      const lat = feature.geometry.coordinates[1];
+      if (typeof lng !== "number" || typeof lat !== "number") return;
 
-    if (layerId === MAP_LAYER_IDS.STORES_CIRCLE || layerId === MAP_LAYER_IDS.STORES_ACTIVE) {
-      const storeId = feature.properties?.storeId as string | undefined;
-      if (storeId) onSelectStore?.(storeId);
-      return;
-    }
+      const layerId = feature.layer.id;
 
-    if (layerId === MAP_LAYER_IDS.CLUSTERS_CIRCLE) {
-      const clusterId = feature.properties?.cluster_id as number | undefined;
-      if (clusterId !== undefined) onZoomToCluster?.(clusterId, lng, lat);
-    }
-  }
+      if (layerId === MAP_LAYER_IDS.STORES_CIRCLE || layerId === MAP_LAYER_IDS.STORES_ACTIVE) {
+        const storeId = feature.properties?.storeId;
+        if (typeof storeId === "string") onSelectStore?.(storeId);
+        return;
+      }
+
+      if (layerId === MAP_LAYER_IDS.CLUSTERS_CIRCLE) {
+        const clusterId = feature.properties?.cluster_id;
+        if (typeof clusterId === "number") onZoomToCluster?.(clusterId, lng, lat);
+      }
+    },
+    [onSelectStore, onZoomToCluster],
+  );
 
   return (
     <div className="absolute inset-0">
@@ -84,7 +95,7 @@ export function MapCanvas({
         onMove={onMove}
         onLoad={onLoad}
         onClick={handleMapClick}
-        interactiveLayerIds={INTERACTIVE_LAYER_IDS as unknown as string[]}
+        interactiveLayerIds={INTERACTIVE_LAYER_IDS}
         mapStyle={MAP_STYLE_URL}
         minZoom={MAP_DEFAULTS.MIN_ZOOM}
         maxZoom={MAP_DEFAULTS.MAX_ZOOM}
@@ -93,6 +104,11 @@ export function MapCanvas({
       >
         <NavigationControl position="top-right" />
 
+        {/*
+         * cluster={false}: clustering is already done by useClusters (supercluster).
+         * The "cluster" property in filter expressions below is the app-level boolean
+         * on each feature, NOT a MapLibre-generated cluster property.
+         */}
         <Source id={MAP_SOURCE_ID} type="geojson" data={geojson} cluster={false}>
           <Layer
             id={MAP_LAYER_IDS.CLUSTERS_CIRCLE}
