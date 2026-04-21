@@ -7,6 +7,7 @@ import { createStore } from "@/shared/test-utils";
 import type { ViewState } from "react-map-gl/maplibre";
 import type { MapCanvasProps } from "./MapCanvas";
 import { MapCanvas } from "./MapCanvas";
+import type { ClusterFeature } from "@/features/map/hooks/useClusters";
 
 // react-map-gl uses WebGL APIs not available in jsdom
 vi.mock("react-map-gl/maplibre", () => ({
@@ -40,9 +41,35 @@ const STUB_VIEW_STATE: ViewState = {
   padding: { top: 0, bottom: 0, left: 0, right: 0 },
 };
 
+function makeStoreCluster(store: ReturnType<typeof createStore>): ClusterFeature {
+  return {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [store.location.lng, store.location.lat] },
+    properties: {
+      cluster: false,
+      storeId: store.id,
+      storeKind: store.kind,
+      storeName: store.name,
+    },
+  };
+}
+
+function makeClusterGroup(count: number, lng: number, lat: number): ClusterFeature {
+  return {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [lng, lat] },
+    properties: {
+      cluster: true,
+      cluster_id: 1,
+      point_count: count,
+      point_count_abbreviated: count,
+    },
+  };
+}
+
 function buildProps(overrides: Partial<MapCanvasProps> = {}): MapCanvasProps {
   return {
-    stores: [],
+    clusters: [],
     hasUserLocation: false,
     viewState: STUB_VIEW_STATE,
     onMove: vi.fn(),
@@ -61,18 +88,17 @@ describe("MapCanvas", () => {
     expect(screen.getByTestId("maplibre-map")).toBeInTheDocument();
   });
 
-  it("renders a marker for each store", () => {
+  it("renders a marker for each store cluster feature", () => {
     const stores = [createStore(), createStore()];
-    renderWithProviders(<MapCanvas {...buildProps({ stores })} />);
+    const clusters = stores.map(makeStoreCluster);
+    renderWithProviders(<MapCanvas {...buildProps({ clusters })} />);
     const markers = screen.getAllByTestId("maplibre-marker");
     expect(markers).toHaveLength(2);
   });
 
   it("positions store markers at store coordinates", () => {
-    const store = createStore({
-      location: { lat: -34.6037, lng: -58.3816 },
-    });
-    renderWithProviders(<MapCanvas {...buildProps({ stores: [store] })} />);
+    const store = createStore({ location: { lat: -34.6037, lng: -58.3816 } });
+    renderWithProviders(<MapCanvas {...buildProps({ clusters: [makeStoreCluster(store)] })} />);
     const marker = screen.getByTestId("maplibre-marker");
     expect(marker).toHaveAttribute("data-lat", String(store.location.lat));
     expect(marker).toHaveAttribute("data-lng", String(store.location.lng));
@@ -91,11 +117,13 @@ describe("MapCanvas", () => {
     expect(userMarker).toBeDefined();
   });
 
-  it("calls onSelectStore with store id when store marker is clicked", async () => {
+  it("calls onSelectStore with store id when store pin is clicked", async () => {
     const user = userEvent.setup();
     const onSelectStore = vi.fn();
     const store = createStore();
-    renderWithProviders(<MapCanvas {...buildProps({ stores: [store], onSelectStore })} />);
+    renderWithProviders(
+      <MapCanvas {...buildProps({ clusters: [makeStoreCluster(store)], onSelectStore })} />,
+    );
     await user.click(screen.getByRole("button", { name: store.name }));
     expect(onSelectStore).toHaveBeenCalledWith(store.id);
   });
@@ -103,5 +131,22 @@ describe("MapCanvas", () => {
   it("renders NavigationControl", () => {
     renderWithProviders(<MapCanvas {...buildProps()} />);
     expect(screen.getByTestId("navigation-control")).toBeInTheDocument();
+  });
+
+  it("renders cluster pin for grouped features", () => {
+    const clusterFeature = makeClusterGroup(5, -58.381, -34.603);
+    renderWithProviders(<MapCanvas {...buildProps({ clusters: [clusterFeature] })} />);
+    expect(screen.getByRole("button", { name: /5 tiendas agrupadas/i })).toBeInTheDocument();
+  });
+
+  it("calls onZoomToCluster when cluster pin is clicked", async () => {
+    const user = userEvent.setup();
+    const onZoomToCluster = vi.fn();
+    const clusterFeature = makeClusterGroup(3, -58.381, -34.603);
+    renderWithProviders(
+      <MapCanvas {...buildProps({ clusters: [clusterFeature], onZoomToCluster })} />,
+    );
+    await user.click(screen.getByRole("button", { name: /3 tiendas agrupadas/i }));
+    expect(onZoomToCluster).toHaveBeenCalledWith(1, -58.381, -34.603);
   });
 });

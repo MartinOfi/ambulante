@@ -116,6 +116,9 @@
 | STORE_VALIDATION_STATUS / REJECTION_REASON_MIN_LENGTH / REJECTION_REASON_MAX_LENGTH | constant | `features/store-validation/constants.ts` | features.md §13 |
 | storeValidationService / MockStoreValidationService | service | `features/store-validation/services/` | features.md §13 |
 | StoreDetailPanel / StoreDetailPanelContainer | feature-component | `features/store-validation/components/StoreDetailPanel/` | features.md §13 |
+| ClusterFeature / StorePointProperties / ClusterProperties | type | `features/map/hooks/useClusters.ts` | features.md §13 |
+| ClusterPin | feature-component | `features/map/components/ClusterPin.tsx` | features.md §13 |
+| computeClusters / useClusters | hook | `features/map/hooks/useClusters.ts` | features.md §13 |
 | StoreDetailSheet / StoreDetailSheetContainer | feature-component | `features/map/components/StoreDetailSheet/` | features.md §13 |
 | StoreAnalyticsDashboard / StoreAnalyticsDashboardContainer | feature-component | `features/store-analytics/components/StoreAnalyticsDashboard/` | features.md §13 |
 | StoreDashboard / StoreDashboardContainer | feature-component | `features/store-dashboard/components/StoreDashboard/` | features.md §13 |
