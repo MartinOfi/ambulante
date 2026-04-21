@@ -1601,11 +1601,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Creado `docs/ONBOARDING.md` (311 líneas). Secciones: prerequisitos, setup inicial (5 min), tabla de env vars (6 vars + NODE_ENV), comandos pnpm, arquitectura de carpetas con ASCII diagram (incluyendo query/ y test-utils/), nota de discrepancia CLAUDE.md §4 vs nombres reales, tabla del stack, flujo de roles, máquina de estados completa (con ENVIADO→CANCELADO, EN_CAMINO→CANCELADO, actores correctos), glosario de 18+ términos, checklist del primer PR (lint con 0 warnings), links útiles. Code review: 3 rondas, 0 CRITICAL/HIGH al cierre.
 
 ### F17.4 — Changelog automatizado
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Entregable:** `changesets` o `release-please` con conventional commits.
 - **Depends on:** F0.4
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Implementado con `release-please` (googleapis/release-please-action@v4). Archivos creados: `.github/workflows/release-please.yml`, `release-please-config.json`, `.release-please-manifest.json` (versión inicial 0.1.0 sync con package.json), `CHANGELOG.md` vacío inicial. Workflow se dispara en push a main, crea release PRs automáticos con CHANGELOG generado de conventional commits. Changesets descartado porque el proyecto es single-repo (F17.5/monorepo blocked). No requiere pasos manuales de los desarrolladores.
 
 ### F17.5 — Monorepo evaluation
 - **Estado:** 🔴 blocked (DP-8)
