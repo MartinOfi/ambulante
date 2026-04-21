@@ -869,7 +869,7 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F5.5 — Test E2E de propagación <5s
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: now]
 - **Por qué:** SLA del PRD — hay que medirlo con un test automatizado.
 - **Entregable:** Playwright test que abre 2 contextos (cliente + tienda), dispara una transición desde uno, y verifica actualización en el otro en <5s.
 - **Archivos:** `e2e/realtime.spec.ts`.
