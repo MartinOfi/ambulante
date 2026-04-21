@@ -1183,12 +1183,12 @@ Wave 4 (al final — requiere features):
 - **Notas:** Instalado `react-map-gl@8.1.1` + `maplibre-gl@5.23.0`. Ambos son ESM-only → agregados a `transpilePackages` en `next.config.ts`. `NEXT_PUBLIC_MAP_STYLE_URL` agregado al schema Zod (opcional) y a `.env.example` con demotiles como default. Para F11.3: los componentes que usen `<Map>` deben ser `"use client"` + importados con `dynamic({ ssr: false })` por las APIs de browser de maplibre-gl.
 
 ### F11.3 — Reemplazar MapCanvas placeholder
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
+- **Estado:** ✅ done
 - **Entregable:** Mismo contrato de props, implementación real con `<Map>` de react-map-gl. Pins con coords reales.
 - **Archivos:** `features/map/components/MapCanvas.tsx`.
 - **Depends on:** F11.2
 - **Estimación:** L
-- **Notas:**
+- **Notas:** Implementado con react-map-gl/maplibre + Marker + NavigationControl. Props extendidas con `userCoords?: Coordinates` y `onSelectStore`. `MapScreen.tsx` usa `dynamic({ ssr: false })` para evitar carga de browser APIs en server. `StorePin` y `UserLocationPin` adaptados para uso dentro de Marker (sin posicionamiento CSS propio). `MAP_DEFAULTS` agregado a `features/map/constants.ts`. 56 tests verdes. `MapScreen.test.tsx` actualizado con mock de `next/dynamic` para resolución síncrona en tests.
 
 ### F11.4 — Clustering
 - **Estado:** ⚪ pending

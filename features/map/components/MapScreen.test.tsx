@@ -5,8 +5,23 @@ import { renderWithProviders, screen } from "@/shared/test-utils";
 import type { MapScreenProps } from "./MapScreen";
 import { MapScreen } from "./MapScreen";
 
+// dynamic() wraps lazy imports; bypass it so MapCanvas resolves synchronously in tests
+vi.mock("next/dynamic", () => ({
+  default: (loader: () => Promise<{ default: React.ComponentType }>) => {
+    let Component: React.ComponentType | null = null;
+    loader().then((mod) => {
+      Component = mod.default;
+    });
+    const Wrapper = (props: Record<string, unknown>) =>
+      Component ? <Component {...props} /> : null;
+    Wrapper.displayName = "DynamicMock";
+    return Wrapper;
+  },
+}));
+
 vi.mock("./MapCanvas", () => ({
   MapCanvas: () => <div data-testid="map-canvas" />,
+  default: () => <div data-testid="map-canvas" />,
 }));
 
 vi.mock("./TopHeader", () => ({
