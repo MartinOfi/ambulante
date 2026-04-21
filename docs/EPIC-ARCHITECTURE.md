@@ -562,7 +562,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 - **Depends on:** DP-2
 - **Continues with:** F2.2 (cadena C-F2-core-auth)
 - **Estimación:** S (solo la decisión)
-- **Notas:**
+- **Notas:** ADR creado en F17.2 → `docs/adr/0001-auth-provider.md`.
 
 ### F2.2 — Modelo de User + roles
 - **Estado:** ✅ done
@@ -839,7 +839,7 @@ Wave 4 (al final — requiere features):
 - **Depends on:** DP-1
 - **Continues with:** F5.2 (cadena C-F5-realtime)
 - **Estimación:** S
-- **Notas:**
+- **Notas:** ADR creado en F17.2 → `docs/adr/0002-realtime-transport.md`.
 
 ### F5.2 — Realtime service abstraction
 - **Estado:** ✅ done
@@ -1587,11 +1587,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F17.2 — ADRs (Architecture Decision Records)
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Entregable:** `docs/adr/` con template. Primeros ADRs: estructura features/shared, auth provider, realtime transport.
 - **Depends on:** —
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Creados `docs/adr/README.md`, `docs/adr/0000-template.md`, `docs/adr/0001-auth-provider.md`, `docs/adr/0002-realtime-transport.md`, `docs/adr/0003-features-shared-architecture.md`. Numeración respeta referencias previas de F2.1 (0001) y F5.1 (0002). Template basado en formato Michael Nygard.
 
 ### F17.3 — Onboarding doc
 - **Estado:** ✅ done
