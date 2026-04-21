@@ -25,3 +25,9 @@ export const BOTTOM_SHEET_SNAP = {
 } as const;
 
 export type BottomSheetSnap = (typeof BOTTOM_SHEET_SNAP)[keyof typeof BOTTOM_SHEET_SNAP];
+
+export const CLUSTER_CONFIG = {
+  RADIUS: 60,
+  EXTENT: 512,
+  MAX_ZOOM: 17,
+} as const;

@@ -15,6 +15,10 @@
 | `useStoresNearbyQuery` | `features/map/hooks/useStoresNearbyQuery.ts` | hook | Query de tiendas activas en radio |
 | `useStoreByIdQuery` | `features/map/hooks/useStoreByIdQuery.ts` | hook | Query de tienda por ID |
 | `useStoreProductsQuery` | `features/map/hooks/useStoreProductsQuery.ts` | hook | Query de productos de una tienda |
+| `useClusters` | `features/map/hooks/useClusters.ts` | hook | `useMemo` wrapper sobre `computeClusters`; recibe `stores`, `viewState`, `bounds: BBox \| null` |
+| `computeClusters` | `features/map/hooks/useClusters.ts` | util | Función pura — carga `supercluster`, retorna `ClusterFeature[]` para un `bbox` + `zoom` |
+| `ClusterFeature` | `features/map/hooks/useClusters.ts` | type | Unión discriminada `StorePointProperties \| ClusterProperties` (discriminante: `cluster: boolean`) |
+| `ClusterPin` | `features/map/components/ClusterPin.tsx` | componente | Badge circular con count; `onClick` dispara zoom al cluster |
 | `StoreDetailSheet` | `features/map/components/StoreDetailSheet/` | componente | Bottom sheet overlay del detalle de tienda |
 | `StoreDetailSheetContainer` | `features/map/components/StoreDetailSheet/` | componente | Smart wrapper: carga store + products; renderiza null si no encontrado |
 
