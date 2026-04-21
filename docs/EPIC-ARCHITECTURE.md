@@ -1601,11 +1601,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:**
 
 ### F17.4 — Changelog automatizado
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
+- **Estado:** ✅ done
 - **Entregable:** `changesets` o `release-please` con conventional commits.
 - **Depends on:** F0.4
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Implementado con `release-please` (googleapis/release-please-action@v4). Archivos creados: `.github/workflows/release-please.yml`, `release-please-config.json`, `.release-please-manifest.json` (versión inicial 0.1.0 sync con package.json), `CHANGELOG.md` vacío inicial. Workflow se dispara en push a main, crea release PRs automáticos con CHANGELOG generado de conventional commits. Changesets descartado porque el proyecto es single-repo (F17.5/monorepo blocked). No requiere pasos manuales de los desarrolladores.
 
 ### F17.5 — Monorepo evaluation
 - **Estado:** 🔴 blocked (DP-8)
