@@ -180,12 +180,9 @@ async function processSyncQueue(): Promise<void> {
 // Serwist setup
 // ---------------------------------------------------------------------------
 
-// skipWaiting + clientsClaim: new SW activates immediately and claims all open
-// tabs. Safe for now (no real backend). Revisit at F8.1 — if tabs can be
-// mid-flow during a SW update, message clients to reload instead.
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  skipWaiting: true,
+  skipWaiting: false,
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
