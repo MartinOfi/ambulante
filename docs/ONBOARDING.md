@@ -210,10 +210,10 @@ Administrador ────────► app/(admin)/
 
 ```
 [ENVIADO] ──► [RECIBIDO] ──► [ACEPTADO] ──► [EN_CAMINO] ──► [FINALIZADO]
-                  │               │               │
-                  ├──► [RECHAZADO]└──► [CANCELADO]└──► [CANCELADO]
-                  ├──► [EXPIRADO]
-                  └──► [CANCELADO]
+    │               │               │               │
+    └──► [CANCELADO]├──► [RECHAZADO]└──► [CANCELADO]└──► [CANCELADO]
+                    ├──► [EXPIRADO]
+                    └──► [CANCELADO]
 ```
 
 | Estado | Actor que lo dispara |
