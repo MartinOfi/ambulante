@@ -84,6 +84,7 @@
     "*.config.js",
     "*.config.mjs",
     "*.config.cjs",
-    "*.config.ts"
+    "*.config.ts",
+    "load-tests/"
   ]
 }
