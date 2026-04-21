@@ -1,18 +1,19 @@
 import { Card, CardContent, CardHeader } from "@/shared/components/ui/card";
+import { KPI_STATUS } from "./KpiCard.types";
 import type { KpiCardProps, KpiStatus } from "./KpiCard.types";
 
 const STATUS_CLASSES: Record<KpiStatus, string> = {
-  success: "bg-green-100 text-green-800",
-  warning: "bg-yellow-100 text-yellow-800",
-  danger: "bg-red-100 text-red-800",
-  neutral: "bg-gray-100 text-gray-600",
+  [KPI_STATUS.SUCCESS]: "bg-green-100 text-green-800",
+  [KPI_STATUS.WARNING]: "bg-yellow-100 text-yellow-800",
+  [KPI_STATUS.DANGER]: "bg-red-100 text-red-800",
+  [KPI_STATUS.NEUTRAL]: "bg-gray-100 text-gray-600",
 };
 
 const STATUS_LABELS: Record<KpiStatus, string> = {
-  success: "Bien",
-  warning: "Atención",
-  danger: "Bajo objetivo",
-  neutral: "—",
+  [KPI_STATUS.SUCCESS]: "Bien",
+  [KPI_STATUS.WARNING]: "Atención",
+  [KPI_STATUS.DANGER]: "Bajo objetivo",
+  [KPI_STATUS.NEUTRAL]: "—",
 };
 
 export function KpiCard({ label, value, description, status, target }: KpiCardProps) {

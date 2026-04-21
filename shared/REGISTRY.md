@@ -155,7 +155,7 @@
 | useDeleteProductMutation | hook | `features/catalog/hooks/useDeleteProductMutation.ts` | features.md §13 |
 | useGeolocation | hook | `shared/hooks/useGeolocation.ts` | data.md §3 |
 | useLocationPublishing | hook | `features/store-shell/hooks/useLocationPublishing.ts` | features.md §13 |
-| useCurrentStoreQuery | hook | `features/store-dashboard/hooks/useCurrentStoreQuery.ts` | data.md §3 |
+| useCurrentStoreQuery | hook | `shared/hooks/useCurrentStoreQuery.ts` | data.md §3 |
 | useOrderQuery | hook | `features/orders/hooks/useOrderQuery.ts` | data.md §3 |
 | useStoreOrdersQuery | hook | `features/orders/hooks/useStoreOrdersQuery.ts` | data.md §3 |
 | useOrdersQuery | hook | `features/orders/hooks/useOrdersQuery.ts` | features.md §13 |

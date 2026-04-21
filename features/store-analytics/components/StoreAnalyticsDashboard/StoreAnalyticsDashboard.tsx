@@ -1,5 +1,6 @@
 import type { StoreAnalyticsDashboardProps } from "./StoreAnalyticsDashboard.types";
 import type { AnalyticsPeriod } from "@/features/store-analytics/types/store-analytics.types";
+import { KPI_STATUS } from "@/features/store-analytics/components/KpiCard/KpiCard.types";
 import type { KpiStatus } from "@/features/store-analytics/components/KpiCard/KpiCard.types";
 import { KpiCard } from "@/features/store-analytics/components/KpiCard";
 
@@ -19,10 +20,11 @@ const PERIOD_LABELS: Record<AnalyticsPeriod, string> = {
 const PERIODS: readonly AnalyticsPeriod[] = [1, 7, 30];
 
 function rateStatus(value: number, target: number, higherIsBetter: boolean): KpiStatus {
+  if (value === 0) return KPI_STATUS.NEUTRAL;
   const ratio = higherIsBetter ? value / target : target / value;
-  if (ratio >= 1) return "success";
-  if (ratio >= 0.8) return "warning";
-  return "danger";
+  if (ratio >= 1) return KPI_STATUS.SUCCESS;
+  if (ratio >= 0.8) return KPI_STATUS.WARNING;
+  return KPI_STATUS.DANGER;
 }
 
 function formatRate(value: number): string {
@@ -83,7 +85,7 @@ export function StoreAnalyticsDashboard({
           label="Pedidos / día"
           value={summary.ordersPerDay.toFixed(1)}
           description={`${summary.ordersTotal} pedidos en total`}
-          status="neutral"
+          status={KPI_STATUS.NEUTRAL}
         />
         <KpiCard
           label="Tasa de aceptación"
@@ -117,7 +119,7 @@ export function StoreAnalyticsDashboard({
           label="Días activos"
           value={String(summary.activeDaysCount)}
           description={`de ${summary.periodDays} días del período`}
-          status="neutral"
+          status={KPI_STATUS.NEUTRAL}
         />
       </div>
     </main>
