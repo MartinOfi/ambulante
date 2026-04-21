@@ -6,7 +6,7 @@
 
 # Ambulante — PWA de food trucks y tiendas ambulantes en tiempo real
 
-**Ambulante** es una Progressive Web App (PWA) que conecta clientes con **food trucks**, puestos callejeros y **tiendas ambulantes** mediante **geolocalización en tiempo real**. Construida con **Next.js 14**, **React 18**, **TypeScript strict** y **MapLibre GL JS**, permite a los clientes ver qué tiendas están operando cerca ahora mismo y enviar una intención de compra sin pagar por adelantado. El producto está pensado inicialmente para **Argentina** (Buenos Aires, CABA y GBA), donde el circuito de comida ambulante es difícil de descubrir en tiempo real.
+**Ambulante** es una Progressive Web App (PWA) que conecta clientes con **food trucks**, puestos callejeros y **tiendas ambulantes** mediante **geolocalización en tiempo real**. Construida con **Next.js 15**, **React 19**, **TypeScript strict** y **MapLibre GL JS**, permite a los clientes ver qué tiendas están operando cerca ahora mismo y enviar una intención de compra sin pagar por adelantado. El producto está pensado inicialmente para **Argentina** (Buenos Aires, CABA y GBA), donde el circuito de comida ambulante es difícil de descubrir en tiempo real.
 
 Ambulante **no es un marketplace transaccional**: no procesa pagos, no gestiona stock, no tiene ratings ni chat. Solo coordina la intención de compra para facilitar el encuentro físico entre oferta y demanda. Además, el repo está **diseñado desde cero para colaborar con agentes de IA** (Claude Code como primario) mediante un contrato operativo explícito en [`CLAUDE.md`](./CLAUDE.md).
 
@@ -23,8 +23,8 @@ Ambulante **no es un marketplace transaccional**: no procesa pagos, no gestiona 
 
 **🏷️ Stack técnico**
 
-![Next.js](https://img.shields.io/badge/Next.js_14.2-000?style=flat-square&logo=nextdotjs&logoColor=white)
-![React](https://img.shields.io/badge/React_18-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Next.js](https://img.shields.io/badge/Next.js_15.5-000?style=flat-square&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript_strict-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind_3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000?style=flat-square&logo=shadcnui&logoColor=white)
@@ -81,30 +81,30 @@ _Landing con el claim del producto, CTA dual (**Registrá tu tienda** / **Ver qu
 | 📍    | **Geolocalización**       | Permisos graceful + fallback si se deniega      | ✅     |
 | 🎯    | **Filtros por radio**     | 500m · 1km · 3km · 5km                          | ✅     |
 | 📋    | **Bottom sheet cercanas** | Listado por distancia con tarjetas              | ✅     |
-| 🛒    | **Flujo de pedido**       | Snapshot de producto al enviar                  | 🚧     |
-| 🔔    | **Push notifications**    | Cambios de estado en tiempo real                | 📋     |
+| 🛒    | **Flujo de pedido**       | Arquitectura y UI implementada (mocks)          | ✅     |
+| 🔔    | **Push notifications**    | SW listo; activación real requiere backend      | 🚧     |
 
 ### 🚚 Tienda
 
 | Icono | Feature                    | Descripción                              | Estado |
 | :---: | -------------------------- | ---------------------------------------- | :----: |
-| 📡    | **Broadcasting ubicación** | Cada 30–60s mientras está activa         | 📋     |
-| 📥    | **Inbox de pedidos**       | Con máquina de estados clara             | 📋     |
-| 🔒    | **Privacidad del cliente** | Ubicación exacta solo tras aceptar       | 📋     |
-| 📊    | **Dashboard de actividad** | Métricas del día                         | 📋     |
-| ⏱️    | **Auto-cierre**            | Pedidos inactivos se cierran a las 2h    | 📋     |
+| 📡    | **Broadcasting ubicación** | UI lista; tiempo real requiere backend   | 🚧     |
+| 📥    | **Inbox de pedidos**       | UI con máquina de estados implementada   | ✅     |
+| 🔒    | **Privacidad del cliente** | Ubicación exacta solo tras aceptar       | ✅     |
+| 📊    | **Dashboard de actividad** | Métricas del día + toggle disponibilidad | ✅     |
+| ⏱️    | **Auto-cierre**            | Lógica implementada (mocks)              | ✅     |
 
 ### 🛠️ Admin
 
 | Icono | Feature                      | Descripción                          | Estado |
 | :---: | ---------------------------- | ------------------------------------ | :----: |
-| 🏪    | **Gestión de tiendas**       | Alta, baja, modificación             | 📋     |
+| 🏪    | **Gestión de usuarios**      | Lista, filtro, estado y roles        | ✅     |
+| 📈    | **KPI Dashboard**            | Métricas operativas agregadas        | ✅     |
+| 🔐    | **Control de roles**         | Aislamiento cliente/tienda/admin     | ✅     |
 | 🗂️    | **Catálogo de categorías**   | Taxonomía del producto               | 📋     |
 | 🚨    | **Moderación**               | Reportes y acciones                  | 📋     |
-| 📈    | **Métricas operativas**      | Dashboard agregado                   | 📋     |
-| 🔐    | **Control de roles**         | Aislamiento cliente/tienda/admin     | 📋     |
 
-**Leyenda:** ✅ implementado · 🚧 en progreso · 📋 planeado
+**Leyenda:** ✅ implementado · 🚧 UI lista, requiere backend · 📋 planeado
 
 ---
 
@@ -173,35 +173,35 @@ stateDiagram-v2
 
 ### 🟢 Actual (hoy en el repo)
 
-| Capa             | Tecnología                | Versión    | Estado |
-| ---------------- | ------------------------- | ---------- | :----: |
-| Framework        | Next.js App Router        | `14.2`     | ✅     |
-| UI               | React                     | `18.3`     | ✅     |
-| Lenguaje         | TypeScript strict         | `5.5`      | ✅     |
-| Estilos          | Tailwind CSS              | `3.4`      | ✅     |
-| Componentes      | shadcn/ui + Radix         | —          | ✅     |
-| Iconos           | lucide-react              | `0.441`    | ✅     |
+| Capa             | Tecnología                              | Versión    | Estado |
+| ---------------- | --------------------------------------- | ---------- | :----: |
+| Framework        | Next.js App Router                      | `15.5`     | ✅     |
+| UI               | React                                   | `19`       | ✅     |
+| Lenguaje         | TypeScript strict                       | `5.7`      | ✅     |
+| Package manager  | pnpm                                    | `9`        | ✅     |
+| Estilos          | Tailwind CSS                            | `3.4`      | ✅     |
+| Componentes      | shadcn/ui + Radix                       | —          | ✅     |
+| Iconos           | lucide-react                            | —          | ✅     |
+| Formularios      | react-hook-form + zod                   | —          | ✅     |
+| Data fetching    | @tanstack/react-query                   | `v5`       | ✅     |
+| Estado global    | zustand                                 | —          | ✅     |
+| URL state        | nuqs                                    | —          | ✅     |
+| Mapas            | react-map-gl + MapLibre GL JS           | —          | ✅     |
+| PWA              | serwist + Web Push nativo               | —          | ✅     |
+| Internacionaliz. | next-intl                               | —          | ✅     |
+| Unit testing     | Vitest + Testing Library                | —          | ✅     |
+| E2E testing      | Playwright                              | —          | ✅     |
+| Deploy           | Vercel                                  | —          | ✅     |
 
-### 🎯 Objetivo (se migra por ventanas)
+### 🎯 Pendiente (se migra por ventanas)
 
 | Capa             | Tecnología                                              | Estado |
 | ---------------- | ------------------------------------------------------- | :----: |
-| Framework        | **Next.js 15** App Router                               | 🚧     |
-| Package manager  | **pnpm**                                                | 🚧     |
-| Estilos          | **Tailwind CSS v4**                                     | 🚧     |
+| Estilos          | **Tailwind CSS v4** (hoy en 3.4)                        | 📋     |
 | Animaciones      | **motion** (ex Framer Motion)                           | 📋     |
-| Formularios      | **react-hook-form** + **zod**                           | 📋     |
-| Data fetching    | **@tanstack/react-query** v5                            | 📋     |
-| Estado global    | **zustand**                                             | 📋     |
-| URL state        | **nuqs**                                                | 📋     |
-| Mapas            | **react-map-gl** + **MapLibre GL JS** (sin API key)     | 📋     |
-| PWA              | **serwist** + Web Push nativo                           | 📋     |
-| Unit testing     | **Vitest** + Testing Library                            | 📋     |
-| E2E testing      | **Playwright** (cobertura mínima 80%)                   | 📋     |
-| Deploy           | **Vercel**                                              | 🚧     |
-| Backend (futuro) | **Supabase** (Postgres + Auth + Realtime + PostGIS)     | 📋     |
+| Backend          | **Supabase** (Postgres + Auth + Realtime + PostGIS)     | 📋     |
 
-**Leyenda:** ✅ instalado · 🚧 parcial / en progreso · 📋 planeado
+**Leyenda:** ✅ instalado · 📋 planeado
 
 > [!TIP]
 > Mientras no hay backend, los servicios de datos se mockean en `shared/services/` detrás de interfaces claras para que el swap a Supabase sea trivial.
@@ -382,47 +382,59 @@ flowchart LR
 - <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> · Chrome DevTools → Sensors → mockear Location
 - <kbd>F12</kbd> · Abrir DevTools para inspeccionar el service worker
 
-> [!WARNING]
-> El repo todavía usa `package-lock.json`. La migración a `pnpm` está pendiente.
-
 ---
 
 ## 🗺️ Roadmap
 
-### Fase 1 — Cliente core _(en progreso)_
+### Fase 1 — Fundaciones ✅
+
+- [x] Arquitectura de carpetas (feature islands + shared/)
+- [x] TypeScript strict, ESLint, Prettier, Husky, commitlint
+- [x] pnpm + Tailwind CSS + shadcn/ui + Radix
+- [x] Sistema de autenticación (AuthCard, flujo de login)
+- [x] i18n con next-intl (es-AR)
+
+### Fase 2 — Cliente core ✅
 
 - [x] Landing page con mini-mapa en vivo
 - [x] Mapa de cliente con geolocalización
-- [x] Filtros por radio
+- [x] Filtros por radio (500m · 1km · 3km · 5km)
 - [x] Bottom sheet de tiendas cercanas
-- [ ] Flujo de intención de compra
-- [ ] Snapshot de productos
+- [x] Arquitectura del flujo de pedido (UI + mocks)
+- [x] Máquina de estados del pedido implementada
 
-### Fase 2 — Tienda
+### Fase 3 — Tienda ✅
 
-- [ ] Dashboard de tienda
-- [ ] Broadcasting de ubicación
-- [ ] Inbox de pedidos
-- [ ] Máquina de estados implementada
+- [x] Dashboard de tienda con métricas del día
+- [x] Toggle de disponibilidad (activa/inactiva)
+- [x] Inbox de pedidos con máquina de estados
+- [x] Privacidad de ubicación del cliente
 
-### Fase 3 — Backend
+### Fase 4 — Admin ✅
+
+- [x] Panel de administración
+- [x] Gestión de usuarios (lista, filtro, estado y roles)
+- [x] KPI Dashboard con métricas operativas
+
+### Fase 5 — PWA ✅
+
+- [x] Service worker con serwist
+- [x] Banner de actualización disponible
+- [x] Manejo de ChunkLoadError
+- [x] Manifest + instalación iOS/Android
+- [ ] Push notifications reales (requiere backend)
+
+### Fase 6 — Backend _(próximamente)_
 
 - [ ] Integración Supabase (Auth + Postgres + Realtime)
 - [ ] Migración de mocks a servicios reales
 - [ ] PostGIS para queries geoespaciales
+- [ ] Broadcasting de ubicación en tiempo real
 
-### Fase 4 — PWA production-ready
+### Fase 7 — Moderación y catálogo
 
-- [ ] Service worker con serwist
-- [ ] Push notifications
-- [ ] Instalación iOS/Android
-- [ ] Offline básico
-
-### Fase 5 — Admin
-
-- [ ] Panel de administración
-- [ ] Moderación
-- [ ] Métricas operativas
+- [ ] Catálogo de categorías de tiendas
+- [ ] Módulo de moderación y reportes
 
 ---
 
@@ -464,9 +476,9 @@ Sí, pero las **push notifications requieren que instales la PWA** en tu pantall
 
 **Pre-MVP.** Hoy el repo es solo frontend con datos mockeados. El backend (Supabase + Postgres + PostGIS + Realtime) llega en la Fase 3 del [roadmap](#️-roadmap). Los servicios de datos ya están abstraídos detrás de interfaces en `shared/services/` para que el swap a Supabase sea trivial.
 
-### ¿Por qué Next.js 14 si CLAUDE.md dice Next 15?
+### ¿Por qué Tailwind 3.4 si CLAUDE.md dice v4?
 
-CLAUDE.md define el **stack objetivo**, no el actual. El repo se migra por ventanas: hoy corre en Next 14.2 estable, y la migración a Next 15 + Tailwind v4 + pnpm está planeada como un bloque único para evitar inconsistencias parciales.
+El repo ya migró a Next.js 15, React 19 y pnpm. Tailwind v4 y `motion` (ex Framer Motion) son los únicos pendientes del stack objetivo. La migración a Tailwind v4 implica cambios de sintaxis en todos los archivos CSS y se planea como un bloque dedicado para evitar inconsistencias.
 
 ### ¿Puedo contribuir?
 
@@ -484,7 +496,7 @@ Que las reglas del repo están escritas en formato **ejecutable por máquina**: 
 ![Frontend only](https://img.shields.io/badge/scope-Solo_frontend-06B6D4?style=for-the-badge)
 ![Mocked data](https://img.shields.io/badge/data-Mockeada-8B5CF6?style=for-the-badge)
 
-**Solo frontend, datos mockeados, sin backend todavía.** El foco actual es cerrar los flujos de Cliente (mapa, búsqueda, intención de compra) antes de integrar Supabase.
+**Frontend completo con datos mockeados, sin backend todavía.** Los flujos de Cliente, Tienda y Admin están implementados con interfaces limpias en `shared/services/` para que el swap a Supabase sea trivial. El próximo hito es la integración del backend real.
 
 ---
 
