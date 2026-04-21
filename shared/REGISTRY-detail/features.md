@@ -130,6 +130,30 @@
 
 ---
 
+### `features/admin-kpi-dashboard/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `KpiDashboard` | `features/admin-kpi-dashboard/components/KpiDashboard/KpiDashboard.tsx` | componente dumb | Grid 3-col de 6 KpiCards; maneja loading, error y null snapshot |
+| `KpiDashboardContainer` | `features/admin-kpi-dashboard/components/KpiDashboard/KpiDashboard.container.tsx` | componente smart | Conecta `useKpiDashboardQuery` y pasa props al dumb |
+| `KpiCard` | `features/admin-kpi-dashboard/components/KpiCard/KpiCard.tsx` | componente dumb | Tarjeta de una métrica: label, valor, target opcional, badge de estado |
+| `useKpiDashboardQuery` | `features/admin-kpi-dashboard/hooks/useKpiDashboardQuery.ts` | hook | React Query: obtiene `KpiSnapshot`; staleTime 60s, retry false |
+| `kpiDashboardService` | `features/admin-kpi-dashboard/services/kpi-dashboard.mock.ts` | service | Singleton mock; valida con `kpiSnapshotSchema`; delay `KPI_MOCK_DELAY_MS` |
+| `KpiSnapshot` | `features/admin-kpi-dashboard/types/kpi-dashboard.types.ts` | type | Snapshot de las 6 métricas del PRD §8 con `period` y `computedAt` |
+| `KpiDashboardService` | `features/admin-kpi-dashboard/types/kpi-dashboard.types.ts` | interface | `{ fetchKpiSnapshot(): Promise<KpiSnapshot> }` |
+| `KPI_TARGETS` | `features/admin-kpi-dashboard/constants/kpi-dashboard.constants.ts` | constant | Umbrales PRD §8: `ACCEPTANCE_RATE_MIN=0.6`, `COMPLETION_RATE_MIN=0.7`, `AVG_RESPONSE_TIME_MAX_MS=180_000`, `EXPIRATION_RATE_MAX=0.15` |
+
+#### admin-kpi-dashboard feature completa (F14.1)
+- **Ruta app:** `app/(admin)/admin/dashboard/page.tsx`
+- **API dumb:** `<KpiDashboard snapshot isLoading error />`
+- **API smart:** `<KpiDashboardContainer />` — sin props
+- **6 KPIs:** ordersPerDay, acceptanceRate, completionRate, avgResponseTimeMs, expirationRate, activeStoresConcurrent
+- **Formatters internos:** `formatRate` (→ "72%"), `formatResponseTime` (→ "2m 22s"), `rateStatus`, `invertedRateStatus`, `timeStatus`
+- **Badge de estado:** `on-target` (verde), `below-target` (rojo), `baseline` (gris)
+- **Tests:** 23 tests en 5 archivos
+
+---
+
 ### `features/admin-audit-log/`
 
 | Nombre | Ruta | Tipo | Descripción |

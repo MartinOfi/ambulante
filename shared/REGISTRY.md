@@ -135,6 +135,12 @@
 | Toaster | ui-component | `shared/components/ui/toaster.tsx` | ui.md §1 |
 | transition / ORDER_EVENT / ORDER_ACTOR | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
 | transitionWithAudit / TransitionWithAuditInput | domain | `shared/domain/order-state-machine.ts` | domain.md §12 |
+| KpiDashboard / KpiDashboardContainer | feature-component | `features/admin-kpi-dashboard/components/KpiDashboard/` | features.md §13 |
+| KpiCard | feature-component | `features/admin-kpi-dashboard/components/KpiCard/` | features.md §13 |
+| KpiSnapshot / KpiDashboardService / KpiPeriod | type | `features/admin-kpi-dashboard/types/kpi-dashboard.types.ts` | features.md §13 |
+| kpiDashboardService | service | `features/admin-kpi-dashboard/services/kpi-dashboard.mock.ts` | features.md §13 |
+| useKpiDashboardQuery | hook | `features/admin-kpi-dashboard/hooks/useKpiDashboardQuery.ts` | features.md §13 |
+| KPI_TARGETS / KPI_QUERY_STALE_TIME_MS / KPI_MOCK_DELAY_MS | constant | `features/admin-kpi-dashboard/constants/kpi-dashboard.constants.ts` | features.md §13 |
 | OrderAuditLogContainer | feature-component | `features/admin-audit-log/components/OrderAuditLog/` | features.md §13 |
 | useAuditLogQuery | hook | `features/admin-audit-log/hooks/useAuditLogQuery.ts` | features.md §13 |
 | useAcceptOrderMutation | hook | `features/orders/hooks/useAcceptOrderMutation.ts` | data.md §3 |

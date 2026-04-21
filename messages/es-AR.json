@@ -517,7 +517,7 @@
     },
     "AdminDashboard": {
       "title": "Panel de administración",
-      "comingSoon": "Próximamente."
+      "subtitle": "Métricas clave del producto."
     },
     "StoreDashboard": {
       "title": "Dashboard de tienda",
