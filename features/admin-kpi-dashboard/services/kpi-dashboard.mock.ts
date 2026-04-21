@@ -14,7 +14,7 @@ const SEED_SNAPSHOT = {
   expirationRate: 0.12,
   activeStoresConcurrent: 8,
   period: "day" as const,
-  computedAt: new Date("2026-04-20T10:00:00Z"),
+  computedAt: new Date(),
 };
 
 function simulateDelay(): Promise<void> {
