@@ -24,6 +24,8 @@
 | ANALYTICS_EVENT / analyticsEventSchemas / AnalyticsEventMap | constant | `shared/constants/analytics-events.ts` | data.md §4 |
 | analyticsService / createAnalyticsService / AnalyticsTransport | service | `shared/services/analytics.ts` | data.md §4 |
 | kpiService / createKpiService / KpiService / computeDeltaMs | service | `shared/services/kpi.ts` | data.md §4 |
+| KpiCard | feature-component | `features/store-analytics/components/KpiCard/` | features.md §13 |
+| KpiStatus / KpiCardProps | type | `features/store-analytics/components/KpiCard/KpiCard.types.ts` | features.md §13 |
 | AuditLogEntry / NewAuditLogEntry | type | `shared/domain/audit-log.ts` | domain.md §12 |
 | auditLogEntrySchema / newAuditLogEntrySchema | schema | `shared/domain/audit-log.ts` | domain.md §12 |
 | auditLogService / createMockAuditLogService / AuditLogService | service | `shared/services/audit-log.ts` | data.md §4 |
@@ -43,6 +45,7 @@
 | createLogger | util | `shared/utils/logger.ts` | infra.md §5 |
 | createMockPushService | service | `shared/services/push.ts` | data.md §4 |
 | createMockRealtimeService | service | `shared/services/realtime.ts` | data.md §4 |
+| createMockStoreAnalyticsService | service | `features/store-analytics/services/store-analytics.service.ts` | features.md §13 |
 | createSetTimeoutScheduler | domain | `shared/domain/timeouts.ts` | domain.md §12 |
 | createTestQueryClient | test-util | `shared/test-utils/render.tsx` | testing.md §14 |
 | createOrder / createUser / createStore / createOrderItem | test-util | `shared/test-utils/factories.ts` | testing.md §14 |
@@ -114,6 +117,7 @@
 | storeValidationService / MockStoreValidationService | service | `features/store-validation/services/` | features.md §13 |
 | StoreDetailPanel / StoreDetailPanelContainer | feature-component | `features/store-validation/components/StoreDetailPanel/` | features.md §13 |
 | StoreDetailSheet / StoreDetailSheetContainer | feature-component | `features/map/components/StoreDetailSheet/` | features.md §13 |
+| StoreAnalyticsDashboard / StoreAnalyticsDashboardContainer | feature-component | `features/store-analytics/components/StoreAnalyticsDashboard/` | features.md §13 |
 | StoreDashboard / StoreDashboardContainer | feature-component | `features/store-dashboard/components/StoreDashboard/` | features.md §13 |
 | StoreProfilePage / StoreProfileForm | feature-component | `features/store-profile/components/` | features.md §13 |
 | StoreShell / StoreShellContainer / StoreNav / AvailabilityToggle | feature-component | `features/store-shell/components/` | features.md §13 |
@@ -124,6 +128,8 @@
 | useApproveStoreMutation | hook | `features/store-validation/hooks/useApproveStoreMutation.ts` | features.md §13 |
 | useRejectStoreMutation | hook | `features/store-validation/hooks/useRejectStoreMutation.ts` | features.md §13 |
 | useStoreValidationQueueQuery | hook | `features/store-validation/hooks/useStoreValidationQueueQuery.ts` | features.md §13 |
+| storeAnalyticsService / StoreAnalyticsService | service | `features/store-analytics/services/store-analytics.service.ts` | features.md §13 |
+| StoreKpiSummary / AnalyticsPeriod / StoreAnalyticsFilter | type | `features/store-analytics/types/store-analytics.types.ts` | features.md §13 |
 | storeRepository | repository | `shared/repositories/store.ts` | data.md §11 |
 | Store / StoreKind / StoreStatus | type | `shared/types/store.ts` | domain.md §7 |
 | storeSchema | schema | `shared/schemas/store.ts` | domain.md §7b |
@@ -158,6 +164,7 @@
 | useSendOrderMutation | hook | `features/orders/hooks/useSendOrderMutation.ts` | data.md §3 |
 | useSession | hook | `shared/hooks/useSession.ts` | data.md §3 |
 | useStoreByIdQuery | hook | `features/map/hooks/useStoreByIdQuery.ts` | data.md §3 |
+| useStoreKpiQuery | hook | `features/store-analytics/hooks/useStoreKpiQuery.ts` | features.md §13 |
 | useStoreProductsQuery | hook | `features/map/hooks/useStoreProductsQuery.ts` | data.md §3 |
 | useStoreProfileQuery | hook | `features/store-profile/hooks/useStoreProfileQuery.ts` | data.md §3 |
 | useStoresNearbyQuery | hook | `features/map/hooks/useStoresNearbyQuery.ts` | data.md §3 |

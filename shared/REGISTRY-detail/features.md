@@ -215,6 +215,41 @@
 
 ---
 
+### `features/store-analytics/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `StoreAnalyticsDashboard` | `features/store-analytics/components/StoreAnalyticsDashboard/StoreAnalyticsDashboard.tsx` | componente dumb | Dashboard de KPIs con selector de período (1/7/30 días) y grilla de 6 KpiCards |
+| `StoreAnalyticsDashboardContainer` | `features/store-analytics/components/StoreAnalyticsDashboard/StoreAnalyticsDashboard.container.tsx` | componente smart | Conecta `useCurrentStoreQuery` + `useStoreKpiQuery`; gestiona loading/error en español |
+| `KpiCard` | `features/store-analytics/components/KpiCard/KpiCard.tsx` | componente dumb | Tarjeta de KPI individual: label, valor formateado, descripción, target opcional y badge de status |
+| `KpiStatus` | `features/store-analytics/components/KpiCard/KpiCard.types.ts` | type | Union: `"success" \| "warning" \| "danger" \| "neutral"` |
+| `KpiCardProps` | `features/store-analytics/components/KpiCard/KpiCard.types.ts` | type | Props de `KpiCard`: `label`, `value`, `description`, `status`, `target?` |
+| `useStoreKpiQuery` | `features/store-analytics/hooks/useStoreKpiQuery.ts` | hook | React Query + estado de período; retorna `{ data, isLoading, isError, period, setPeriod }` |
+| `storeAnalyticsService` | `features/store-analytics/services/store-analytics.service.ts` | service | Singleton del mock; interfaz `StoreAnalyticsService { getKpiSummary(filter) }` |
+| `createMockStoreAnalyticsService` | `features/store-analytics/services/store-analytics.service.ts` | service factory | Crea mock con valores deterministas por `storeId` (hash estable, sin `Math.random()`) |
+| `StoreKpiSummary` | `features/store-analytics/types/store-analytics.types.ts` | type | Los 6 KPIs: `ordersTotal`, `ordersPerDay`, `acceptanceRate`, `finalizationRate`, `avgResponseMs`, `expirationRate`, `activeDaysCount` |
+| `AnalyticsPeriod` | `features/store-analytics/types/store-analytics.types.ts` | type | Union: `1 \| 7 \| 30` (días) |
+| `StoreAnalyticsFilter` | `features/store-analytics/types/store-analytics.types.ts` | type | `{ storeId: string; period: AnalyticsPeriod }` |
+| `analyticsPeriodSchema` | `features/store-analytics/schemas/store-analytics.schemas.ts` | schema | Zod: `z.union([z.literal(1), z.literal(7), z.literal(30)])` |
+| `storeKpiSummarySchema` | `features/store-analytics/schemas/store-analytics.schemas.ts` | schema | Zod: objeto con todos los campos de `StoreKpiSummary` con rangos validados |
+
+#### store-analytics feature completa (F13.7)
+
+- **Ruta app:** `app/(store)/store/analytics/page.tsx` — Server Component; renderiza `<StoreAnalyticsDashboardContainer />`
+- **Acceso:** link "Métricas" en `StoreDashboard` quick links (`BarChart2` icon)
+- **KPIs y targets:**
+  - `pedidos/día` → neutral (informativo)
+  - `tasa aceptación` → success ≥60%, warning ≥40%, danger <40%
+  - `tasa finalización` → success ≥70%, warning ≥50%, danger <50%
+  - `tiempo respuesta` → success ≤3min, warning ≤5min, danger >5min (lowerIsBetter)
+  - `tasa expiración` → success ≤15%, warning ≤25%, danger >25% (lowerIsBetter)
+  - `días activos` → neutral (informativo)
+- **Formato:** `formatRate(0.72)` → "72%", `formatResponseTime(120000)` → "2 min"
+- **Helpers internos:** `rateStatus(value, target, higherIsBetter)` → `KpiStatus`; `stableHash(storeId)` → número determinista para mock data
+- **Tests:** 20 tests (service 8, KpiCard 6, StoreAnalyticsDashboard 6)
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:

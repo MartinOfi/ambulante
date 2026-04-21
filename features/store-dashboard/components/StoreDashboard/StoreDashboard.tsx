@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, User, Inbox } from "lucide-react";
+import { BookOpen, User, Inbox, BarChart2 } from "lucide-react";
 
 import { AvailabilityToggle } from "@/features/store-shell";
 import { ORDER_STATUS } from "@/shared/constants/order";
@@ -10,6 +10,7 @@ const QUICK_LINKS = [
   { href: "/store/catalog", label: "Catálogo", icon: BookOpen },
   { href: "/store/inbox", label: "Pedidos", icon: Inbox },
   { href: "/store/profile", label: "Perfil", icon: User },
+  { href: "/store/analytics", label: "Métricas", icon: BarChart2 },
 ] as const;
 
 const ACTIVE_STATUSES: ReadonlySet<string> = new Set([ORDER_STATUS.ENVIADO, ORDER_STATUS.RECIBIDO]);
