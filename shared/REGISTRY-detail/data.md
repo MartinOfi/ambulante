@@ -78,7 +78,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 
 ### `useGeolocation` — `shared/hooks/useGeolocation.ts`
 - **API:** `useGeolocation(): GeoState & { request: () => void }`
-- **Descripción:** Obtiene posición del navegador con filtrado de precisión (PRD §7.1).
+- **Descripción:** Trackea posición del usuario de forma continua via `watchPosition`; actualiza coords en tiempo real mientras el usuario se mueve. Filtra lecturas con `accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR`. Limpieza en unmount via `clearWatch`. `request()` reinicia el watch (útil para recenter o retry tras error). (PRD §7.5)
 - **Estados discriminados:** `idle | loading | granted | denied | error`
 
 ### `useRealtimeStatus` — `shared/hooks/useRealtimeStatus.ts`

@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import type { Coordinates } from "@/shared/types/store";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { coordinatesSchema, type Coordinates } from "@/shared/schemas/coordinates";
 import {
   GEO_MAX_AGE_MS,
   GEO_TIMEOUT_MS,
@@ -20,50 +20,73 @@ export type GeoState =
 
 export type UseGeolocationResult = GeoState & { request: () => void };
 
+const GEO_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: GEO_TIMEOUT_MS,
+  maximumAge: GEO_MAX_AGE_MS,
+};
+
 export function useGeolocation(): UseGeolocationResult {
   const [state, setState] = useState<GeoState>({ status: "idle" });
+  const watchIdRef = useRef<number | null>(null);
 
-  const request = useCallback(() => {
+  const startWatch = useCallback(() => {
     if (typeof window === "undefined" || !("geolocation" in navigator)) {
       setState({ status: "error", message: "Geolocalización no soportada" });
       return;
     }
 
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+    }
+
     setState({ status: "loading" });
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (pos.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        if (position.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
+          navigator.geolocation.clearWatch(watchIdRef.current!);
+          watchIdRef.current = null;
           setState({
             status: "error",
             message: "Señal GPS imprecisa — probá en un espacio abierto",
           });
           return;
         }
+        const parsed = coordinatesSchema.safeParse({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        if (!parsed.success) {
+          setState({ status: "error", message: "Coordenadas inválidas recibidas del GPS" });
+          return;
+        }
         setState({
           status: "granted",
-          coords: { lat: pos.coords.latitude, lng: pos.coords.longitude },
-          accuracy: pos.coords.accuracy,
+          coords: parsed.data,
+          accuracy: position.coords.accuracy,
         });
       },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) {
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
           setState({ status: "denied" });
           return;
         }
-        setState({ status: "error", message: err.message });
+        setState({ status: "error", message: error.message });
       },
-      {
-        enableHighAccuracy: true,
-        timeout: GEO_TIMEOUT_MS,
-        maximumAge: GEO_MAX_AGE_MS,
-      },
+      GEO_OPTIONS,
     );
   }, []);
 
   useEffect(() => {
-    request();
-  }, [request]);
+    startWatch();
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation?.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+    };
+  }, [startWatch]);
 
-  return { ...state, request };
+  return { ...state, request: startWatch };
 }

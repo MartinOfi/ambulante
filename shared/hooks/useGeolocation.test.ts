@@ -40,11 +40,12 @@ function makePositionError(code: number, message: string): GeolocationPositionEr
 const GOOD_ACCURACY = MIN_ACCURACY_METERS;
 const BOUNDARY_ACCURACY = MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR;
 const BAD_ACCURACY = MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR + 1;
+const WATCH_ID = 42;
 
 function setupGeoMock(): MockGeolocation {
   const mock: MockGeolocation = {
     getCurrentPosition: vi.fn(),
-    watchPosition: vi.fn(),
+    watchPosition: vi.fn().mockReturnValue(WATCH_ID),
     clearWatch: vi.fn(),
   };
   vi.stubGlobal("navigator", { geolocation: mock });
@@ -63,12 +64,11 @@ describe("useGeolocation", () => {
   });
 
   it("initializes to idle before effects run", () => {
-    geoMock.getCurrentPosition.mockImplementation(() => {});
+    geoMock.watchPosition.mockImplementation(() => WATCH_ID);
 
     let initialStatus: string | undefined;
     renderHook(() => {
       const geo = useGeolocation();
-      // Capture only on the very first render, before useEffect fires
       if (initialStatus === undefined) initialStatus = geo.status;
       return geo;
     });
@@ -76,15 +76,13 @@ describe("useGeolocation", () => {
     expect(initialStatus).toBe("idle");
   });
 
-  it("fires request() automatically on mount", () => {
+  it("starts watchPosition automatically on mount", () => {
     renderHook(() => useGeolocation());
-    expect(geoMock.getCurrentPosition).toHaveBeenCalledOnce();
+    expect(geoMock.watchPosition).toHaveBeenCalledOnce();
   });
 
-  it("transitions to loading when request() is called", () => {
-    geoMock.getCurrentPosition.mockImplementation(() => {
-      // never resolves — stays loading
-    });
+  it("transitions to loading when the watch starts", () => {
+    geoMock.watchPosition.mockImplementation(() => WATCH_ID);
 
     const { result } = renderHook(() => useGeolocation());
     expect(result.current.status).toBe("loading");
@@ -92,8 +90,9 @@ describe("useGeolocation", () => {
 
   it("transitions to granted with correct coords on success with good accuracy", async () => {
     const position = makePosition(-34.6037, -58.3816, GOOD_ACCURACY);
-    geoMock.getCurrentPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
       onSuccess(position);
+      return WATCH_ID;
     });
 
     const { result } = renderHook(() => useGeolocation());
@@ -109,8 +108,9 @@ describe("useGeolocation", () => {
 
   it("treats accuracy equal to threshold as granted (boundary)", async () => {
     const position = makePosition(-34.6037, -58.3816, BOUNDARY_ACCURACY);
-    geoMock.getCurrentPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
       onSuccess(position);
+      return WATCH_ID;
     });
 
     const { result } = renderHook(() => useGeolocation());
@@ -120,8 +120,9 @@ describe("useGeolocation", () => {
 
   it("transitions to error when accuracy exceeds threshold", async () => {
     const position = makePosition(-34.6037, -58.3816, BAD_ACCURACY);
-    geoMock.getCurrentPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
       onSuccess(position);
+      return WATCH_ID;
     });
 
     const { result } = renderHook(() => useGeolocation());
@@ -136,9 +137,10 @@ describe("useGeolocation", () => {
 
   it("transitions to denied when PERMISSION_DENIED error occurs", async () => {
     const permissionError = makePositionError(1, "User denied Geolocation");
-    geoMock.getCurrentPosition.mockImplementation(
+    geoMock.watchPosition.mockImplementation(
       (_onSuccess: GeolocationSuccessCallback, onError: GeolocationErrorCallback) => {
         onError(permissionError);
+        return WATCH_ID;
       },
     );
 
@@ -149,9 +151,10 @@ describe("useGeolocation", () => {
 
   it("transitions to error on POSITION_UNAVAILABLE geolocation error", async () => {
     const genericError = makePositionError(2, "Position unavailable");
-    geoMock.getCurrentPosition.mockImplementation(
+    geoMock.watchPosition.mockImplementation(
       (_onSuccess: GeolocationSuccessCallback, onError: GeolocationErrorCallback) => {
         onError(genericError);
+        return WATCH_ID;
       },
     );
 
@@ -167,9 +170,10 @@ describe("useGeolocation", () => {
 
   it("transitions to error on TIMEOUT geolocation error", async () => {
     const timeoutError = makePositionError(3, "Timeout expired");
-    geoMock.getCurrentPosition.mockImplementation(
+    geoMock.watchPosition.mockImplementation(
       (_onSuccess: GeolocationSuccessCallback, onError: GeolocationErrorCallback) => {
         onError(timeoutError);
+        return WATCH_ID;
       },
     );
 
@@ -201,24 +205,94 @@ describe("useGeolocation", () => {
     expect(typeof result.current.request).toBe("function");
   });
 
-  it("re-requests position and transitions through loading then granted", async () => {
-    const position = makePosition(-34.6037, -58.3816, GOOD_ACCURACY);
-
-    geoMock.getCurrentPosition
-      .mockImplementationOnce((onSuccess: GeolocationSuccessCallback) => {
-        onSuccess(position);
-      })
-      // second call never resolves so we can assert the loading intermediate state
-      .mockImplementationOnce(() => {});
+  it("updates coords in real-time when the user moves (live tracking)", async () => {
+    let capturedOnSuccess: GeolocationSuccessCallback | null = null;
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+      capturedOnSuccess = onSuccess;
+      return WATCH_ID;
+    });
 
     const { result } = renderHook(() => useGeolocation());
-    await waitFor(() => expect(result.current.status).toBe("granted"));
+
+    act(() => {
+      capturedOnSuccess?.(makePosition(-34.6037, -58.3816, GOOD_ACCURACY));
+    });
+
+    await waitFor(() =>
+      expect(result.current).toMatchObject({
+        status: "granted",
+        coords: { lat: -34.6037, lng: -58.3816 },
+      }),
+    );
+
+    act(() => {
+      capturedOnSuccess?.(makePosition(-34.61, -58.39, GOOD_ACCURACY));
+    });
+
+    await waitFor(() =>
+      expect(result.current).toMatchObject({
+        status: "granted",
+        coords: { lat: -34.61, lng: -58.39 },
+      }),
+    );
+  });
+
+  it("clears the watch on unmount", () => {
+    geoMock.watchPosition.mockReturnValue(WATCH_ID);
+    const { unmount } = renderHook(() => useGeolocation());
+
+    unmount();
+
+    expect(geoMock.clearWatch).toHaveBeenCalledWith(WATCH_ID);
+  });
+
+  it("request() clears the existing watch and starts a new one", async () => {
+    const secondWatchId = 99;
+    geoMock.watchPosition.mockReturnValueOnce(WATCH_ID).mockReturnValueOnce(secondWatchId);
+
+    const { result } = renderHook(() => useGeolocation());
+
+    expect(geoMock.watchPosition).toHaveBeenCalledTimes(1);
 
     act(() => {
       result.current.request();
     });
 
-    await waitFor(() => expect(result.current.status).toBe("loading"));
-    expect(geoMock.getCurrentPosition).toHaveBeenCalledTimes(2);
+    expect(geoMock.clearWatch).toHaveBeenCalledWith(WATCH_ID);
+    expect(geoMock.watchPosition).toHaveBeenCalledTimes(2);
+  });
+
+  it("poor accuracy clears the watch and transitions to error (stable state)", async () => {
+    let capturedOnSuccess: GeolocationSuccessCallback | null = null;
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+      capturedOnSuccess = onSuccess;
+      return WATCH_ID;
+    });
+
+    const { result } = renderHook(() => useGeolocation());
+
+    act(() => {
+      capturedOnSuccess?.(makePosition(-34.6037, -58.3816, BAD_ACCURACY));
+    });
+
+    await waitFor(() => expect(result.current.status).toBe("error"));
+    expect(geoMock.clearWatch).toHaveBeenCalledWith(WATCH_ID);
+  });
+
+  it("transitions to error when coords fail Zod validation", async () => {
+    const invalidPosition = makePosition(999, -58.3816, GOOD_ACCURACY);
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+      onSuccess(invalidPosition);
+      return WATCH_ID;
+    });
+
+    const { result } = renderHook(() => useGeolocation());
+
+    await waitFor(() =>
+      expect(result.current).toMatchObject({
+        status: "error",
+        message: expect.stringContaining("Coordenadas inválidas"),
+      }),
+    );
   });
 });
