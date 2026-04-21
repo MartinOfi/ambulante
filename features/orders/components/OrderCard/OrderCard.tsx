@@ -41,7 +41,10 @@ export function OrderCard({ order }: OrderCardProps) {
   const statusLabel = STATUS_LABELS[order.status];
 
   return (
-    <article className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <article
+      className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+      data-order-status={order.status}
+    >
       <div className="flex items-center justify-between">
         <span className="font-mono text-sm text-gray-500">{formatOrderId(order.id)}</span>
         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colorClass}`}>

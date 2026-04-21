@@ -4,6 +4,9 @@ import { orderRepository } from "@/shared/repositories";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { logger } from "@/shared/utils/logger";
 import type { Order } from "@/shared/schemas/order";
+import { eventBus } from "@/shared/domain/event-bus";
+import { ORDER_DOMAIN_EVENT } from "@/shared/domain/events";
+import type { OrderDomainEvent } from "@/shared/domain/events";
 import type {
   OrdersService,
   FindByUserInput,
@@ -54,6 +57,15 @@ const DEMO_SEEDS = [
     status: ORDER_STATUS.RECIBIDO,
     items: [{ productId: "p5", productName: "Pizza porción", productPriceArs: 900, quantity: 2 }],
   },
+  // Seed for E2E realtime test: newest RECIBIDO for demo-client-1 at store-demo-1
+  {
+    clientId: DEMO_CLIENT_ID,
+    storeId: "store-demo-1",
+    status: ORDER_STATUS.RECIBIDO,
+    items: [
+      { productId: "p6", productName: "Pizza porción E2E", productPriceArs: 900, quantity: 1 },
+    ],
+  },
 ] as const;
 
 async function seedDemoOrders(): Promise<void> {
@@ -73,6 +85,59 @@ seedDemoOrders().catch((err) => {
 
 function delay(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));
+}
+
+function buildOrderDomainEvent(order: Order): OrderDomainEvent | null {
+  const now = new Date();
+  const sentAt = new Date(order.createdAt);
+  const base = {
+    orderId: order.id,
+    clientId: order.clientId,
+    storeId: order.storeId,
+    occurredAt: now,
+    sentAt,
+  };
+  switch (order.status) {
+    case ORDER_STATUS.RECIBIDO:
+      return { ...base, type: ORDER_DOMAIN_EVENT.ORDER_RECEIVED, receivedAt: now };
+    case ORDER_STATUS.ACEPTADO:
+      return {
+        ...base,
+        type: ORDER_DOMAIN_EVENT.ORDER_ACCEPTED,
+        receivedAt: now,
+        acceptedAt: now,
+      };
+    case ORDER_STATUS.RECHAZADO:
+      return {
+        ...base,
+        type: ORDER_DOMAIN_EVENT.ORDER_REJECTED,
+        receivedAt: now,
+        rejectedAt: now,
+      };
+    case ORDER_STATUS.EN_CAMINO:
+      return {
+        ...base,
+        type: ORDER_DOMAIN_EVENT.ORDER_ON_THE_WAY,
+        receivedAt: now,
+        acceptedAt: now,
+        onTheWayAt: now,
+      };
+    case ORDER_STATUS.FINALIZADO:
+      return {
+        ...base,
+        type: ORDER_DOMAIN_EVENT.ORDER_FINISHED,
+        receivedAt: now,
+        acceptedAt: now,
+        onTheWayAt: now,
+        finishedAt: now,
+      };
+    case ORDER_STATUS.CANCELADO:
+      return { ...base, type: ORDER_DOMAIN_EVENT.ORDER_CANCELLED, cancelledAt: now };
+    case ORDER_STATUS.EXPIRADO:
+      return { ...base, type: ORDER_DOMAIN_EVENT.ORDER_EXPIRED, expiredAt: now };
+    default:
+      return null;
+  }
 }
 
 type TransitionActor = (typeof ORDER_ACTOR)[keyof typeof ORDER_ACTOR];
@@ -112,7 +177,12 @@ async function applyTransition({
     throw new Error(`Transition failed: ${result.error.kind}`);
   }
 
-  return orderRepository.update(orderId, { status: result.value.status });
+  const updated = await orderRepository.update(orderId, { status: result.value.status });
+  const domainEvent = buildOrderDomainEvent(updated);
+  if (domainEvent !== null) {
+    eventBus.publish(domainEvent);
+  }
+  return updated;
 }
 
 export const ordersService: OrdersService = {

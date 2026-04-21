@@ -37,18 +37,31 @@ function resolveChannel(eventType: string): RealtimeChannel | null {
   return null;
 }
 
+// ── BroadcastChannel bridge ────────────────────────────────────────────────────
+
+interface BroadcastPayload {
+  readonly tabId: string;
+  readonly channel: string;
+  readonly event: string;
+  readonly payload: unknown;
+}
+
 // ── Factory ────────────────────────────────────────────────────────────────────
 
 interface CreateMockRealtimeServiceOptions {
   readonly eventBus?: EventBus;
+  readonly broadcastChannel?: BroadcastChannel | null;
 }
 
 export function createMockRealtimeService({
   eventBus = defaultEventBus,
+  broadcastChannel = null,
 }: CreateMockRealtimeServiceOptions = {}): TestableRealtimeService {
   const channelHandlers = new Map<string, Set<RealtimeHandler>>();
   let statusListeners: ReadonlyArray<RealtimeStatusHandler> = [];
   let currentStatus: RealtimeStatus = "online";
+
+  const tabId = Math.random().toString(36).slice(2);
 
   // Reconnect state
   let reconnecting = false;
@@ -125,11 +138,28 @@ export function createMockRealtimeService({
     }, RECONNECT_INITIAL_DELAY_MS);
   }
 
+  if (broadcastChannel !== null) {
+    broadcastChannel.onmessage = (ev: MessageEvent<BroadcastPayload>) => {
+      const { tabId: senderId, channel, event, payload } = ev.data;
+      if (senderId === tabId) return;
+      deliverToChannel(channel, event, payload);
+    };
+  }
+
   const unregisterSerializationHook = eventBus.registerSerializationHook(
     (serialized: SerializedDomainEvent) => {
       const channel = resolveChannel(serialized.type);
       if (!channel) return;
       deliverToChannel(channel, serialized.type, serialized);
+      if (broadcastChannel !== null) {
+        const msg: BroadcastPayload = {
+          tabId,
+          channel,
+          event: serialized.type,
+          payload: serialized,
+        };
+        broadcastChannel.postMessage(msg);
+      }
     },
   );
 
@@ -173,6 +203,10 @@ export function createMockRealtimeService({
       channelHandlers.clear();
       statusListeners = [];
       unregisterSerializationHook();
+      if (broadcastChannel !== null) {
+        broadcastChannel.onmessage = null;
+        broadcastChannel.close();
+      }
     },
 
     _testDeliver(channel: string, event: string, payload: unknown): void {
@@ -207,4 +241,9 @@ export function createMockRealtimeService({
 
 // ── Singleton ──────────────────────────────────────────────────────────────────
 
-export const realtimeService: RealtimeService = createMockRealtimeService();
+const _broadcastChannel =
+  typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("ambulante-realtime-mock") : null;
+
+export const realtimeService: RealtimeService = createMockRealtimeService({
+  broadcastChannel: _broadcastChannel,
+});

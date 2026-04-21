@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type { OrderStatus } from "@/shared/constants/order";
+import { REALTIME_CHANNELS } from "@/shared/constants/realtime";
+import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
 import { ordersService } from "@/features/orders/services";
 
 export interface UseOrdersQueryInput {
@@ -12,6 +14,12 @@ export interface UseOrdersQueryInput {
 }
 
 export function useOrdersQuery({ clientId, status }: UseOrdersQueryInput) {
+  const invalidationKey = clientId
+    ? [...queryKeys.orders.byUser(clientId), status ?? "all"]
+    : queryKeys.orders.all();
+
+  useRealtimeInvalidation({ channel: REALTIME_CHANNELS.ORDERS, queryKey: invalidationKey });
+
   const query = useQuery({
     queryKey: clientId
       ? [...queryKeys.orders.byUser(clientId), status ?? "all"]
