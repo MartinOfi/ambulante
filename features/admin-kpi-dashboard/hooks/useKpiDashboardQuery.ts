@@ -9,6 +9,5 @@ export function useKpiDashboardQuery() {
     queryKey: KPI_DASHBOARD_QUERY_KEY,
     queryFn: () => kpiDashboardService.fetchKpiSnapshot(),
     staleTime: KPI_QUERY_STALE_TIME_MS,
-    retry: false,
   });
 }
