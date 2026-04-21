@@ -1,6 +1,4 @@
-"use client";
-
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import Supercluster from "supercluster";
 import type { BBox } from "geojson";
 import type { ViewState } from "react-map-gl/maplibre";
@@ -25,7 +23,8 @@ export type ClusterFeatureProperties = StorePointProperties | ClusterProperties;
 
 export interface ClusterFeature {
   readonly type: "Feature";
-  readonly geometry: { readonly type: "Point"; readonly coordinates: readonly [number, number] };
+  // GeoJSON Position is number[] — we consume only indices 0 and 1 as [lng, lat]
+  readonly geometry: { readonly type: "Point"; readonly coordinates: number[] };
   readonly properties: ClusterFeatureProperties;
 }
 
@@ -60,24 +59,44 @@ function buildIndex(stores: readonly Store[]): Supercluster<StorePointProperties
   return index;
 }
 
+// NOTE: not memoised — callers must wrap in useMemo if called on every render
 export function computeClusters({ stores, bbox, zoom }: ComputeClustersInput): ClusterFeature[] {
   if (stores.length === 0) return [];
 
   const index = buildIndex(stores);
-  const rawClusters = index.getClusters(bbox as [number, number, number, number], Math.round(zoom));
-
-  return rawClusters as unknown as ClusterFeature[];
+  // getClusters returns GeoJSON Features whose coordinates are number[]; shape matches ClusterFeature at runtime
+  return index.getClusters(
+    bbox as [number, number, number, number],
+    Math.round(zoom),
+  ) as ClusterFeature[];
 }
 
 export interface UseClustersInput {
   readonly stores: readonly Store[];
   readonly viewState: ViewState;
-  readonly bounds: BBox | null;
+  readonly bounds: BBox;
 }
 
-export function useClusters({ stores, viewState, bounds }: UseClustersInput): ClusterFeature[] {
-  return useMemo(() => {
-    if (!bounds) return [];
-    return computeClusters({ stores, bbox: bounds, zoom: viewState.zoom });
-  }, [stores, bounds, viewState.zoom]);
+export interface UseClustersOutput {
+  readonly clusters: ClusterFeature[];
+  readonly getExpansionZoom: (clusterId: number) => number;
+}
+
+export function useClusters({ stores, viewState, bounds }: UseClustersInput): UseClustersOutput {
+  const index = useMemo(() => buildIndex(stores), [stores]);
+
+  const clusters = useMemo(() => {
+    if (stores.length === 0) return [];
+    return index.getClusters(
+      bounds as [number, number, number, number],
+      Math.round(viewState.zoom),
+    ) as ClusterFeature[];
+  }, [index, bounds, viewState.zoom, stores.length]);
+
+  const getExpansionZoom = useCallback(
+    (clusterId: number) => index.getClusterExpansionZoom(clusterId),
+    [index],
+  );
+
+  return { clusters, getExpansionZoom };
 }

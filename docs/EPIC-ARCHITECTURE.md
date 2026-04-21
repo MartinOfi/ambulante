@@ -1200,13 +1200,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** `useClusters` hook wraps `computeClusters` (pure fn, separately testable) with `useMemo`. `MapCanvas` props migrated from `stores[]` to `clusters: ClusterFeature[]`. `MapCanvasContainer` manages `bounds: BBox | null` state via `mapRef`, updates on `onLoad` and `onMove`. `ClusterPin` renders count badge; tap zooms +3 levels. `CLUSTER_CONFIG` constant added to `features/map/constants.ts`. 66 map tests green. TypeScript discriminated union narrowed via destructure-before-closure pattern. `GeoJsonProperties` extends removed (union type not extendable). `@types/geojson` installed.
 
 ### F11.5 — User location tracking
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 22:00]
+- **Estado:** ✅ done
 - **Por qué:** Seguir al usuario mientras se mueve.
 - **Entregable:** `navigator.geolocation.watchPosition` detrás de `useGeolocation` extendido; pin del usuario actualiza en vivo.
 - **Archivos:** `shared/hooks/useGeolocation.ts`.
 - **Depends on:** F11.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Migrado de `getCurrentPosition` a `watchPosition`. Watch ID en `useRef` (no useState) para evitar re-renders. Cleanup via `clearWatch` con optional chaining (`?.`) para robustez en teardown de tests bajo React Strict Mode. `request()` reinicia el watch — útil para recenter o retry. API pública idéntica, sin cambios en consumidores (`MapCanvasContainer` ya pasaba `geo.coords`). 14/14 tests verdes. Fallas pre-existentes en `AvailabilityToggle`/`StoreNav` tests (missing `render` import) — no relacionadas a este PR.
 
 ### F11.6 — Performance
 - **Estado:** ⚪ pending

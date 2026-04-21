@@ -47,6 +47,8 @@ describe("computeClusters", () => {
     const cluster = result.find((f) => f.properties.cluster === true);
     if (cluster && cluster.properties.cluster) {
       expect(cluster.properties.point_count).toBeGreaterThanOrEqual(2);
+    } else {
+      throw new Error("Expected a cluster feature with point_count");
     }
   });
 

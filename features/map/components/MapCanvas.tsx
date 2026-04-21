@@ -51,7 +51,7 @@ export function MapCanvas({
       >
         <NavigationControl position="top-right" />
 
-        {clusters.map((feature, index) => {
+        {clusters.map((feature) => {
           const [lng, lat] = feature.geometry.coordinates;
 
           if (feature.properties.cluster) {
@@ -68,12 +68,7 @@ export function MapCanvas({
 
           const { storeId, storeKind, storeName } = feature.properties;
           return (
-            <Marker
-              key={`store-${storeId}-${index}`}
-              longitude={lng}
-              latitude={lat}
-              anchor="bottom"
-            >
+            <Marker key={`store-${storeId}`} longitude={lng} latitude={lat} anchor="bottom">
               <StorePin
                 kind={storeKind}
                 label={storeName}
