@@ -1209,7 +1209,7 @@ Wave 4 (al final — requiere features):
 - **Notas:** Migrado de `getCurrentPosition` a `watchPosition`. Watch ID en `useRef` (no useState) para evitar re-renders. Cleanup via `clearWatch` con optional chaining (`?.`) para robustez en teardown de tests bajo React Strict Mode. `request()` reinicia el watch — útil para recenter o retry. API pública idéntica, sin cambios en consumidores (`MapCanvasContainer` ya pasaba `geo.coords`). 14/14 tests verdes. Fallas pre-existentes en `AvailabilityToggle`/`StoreNav` tests (missing `render` import) — no relacionadas a este PR.
 
 ### F11.6 — Performance
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-20260420, started: 09:00]
 - **Por qué:** Mapa + 100 pins en mobile medio = objetivo 60fps.
 - **Entregable:** Pins como símbolos vectoriales, no React components. Lighthouse mobile: perf >90 en `/map`.
 - **Depends on:** F11.4
