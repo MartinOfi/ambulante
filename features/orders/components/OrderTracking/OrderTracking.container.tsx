@@ -18,7 +18,7 @@ export function OrderTrackingContainer({ orderId }: OrderTrackingContainerProps)
   const { mutate: confirmOnTheWay, isPending: isConfirmingOnTheWay } = useConfirmOnTheWayMutation();
 
   useRealtimeInvalidation({
-    channel: REALTIME_CHANNELS.orders,
+    channel: REALTIME_CHANNELS.ORDERS,
     queryKey: queryKeys.orders.byId(orderId),
   });
 

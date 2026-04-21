@@ -173,7 +173,8 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `reconnect()`, `destroy()`
 - **Reconnect:** exponential backoff — `RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR^attempt`, capped at `RECONNECT_MAX_DELAY_MS`, stops after `RECONNECT_MAX_ATTEMPTS`.
 - **Test escape hatches:** `_testSetStatus(status)` — fuerza el estado; `_testSimulateDisconnect()` — emite `"offline"` y arranca el loop.
-- **Factory exportada:** `createMockRealtimeService(options?)` — recibe `eventBus` opcional para tests aislados.
+- **Factory exportada:** `createMockRealtimeService(options?)` — recibe `eventBus` y `broadcastChannel?: BroadcastChannel | null`. Tests pasan `null` (default) para aislamiento; el singleton pasa `new BroadcastChannel("ambulante-realtime-mock")` para propagación cross-tab.
+- **Cross-tab bridge (F5.5):** el singleton crea un `BroadcastChannel`; cada evento serializado se rebroadcastea con `tabId` para evitar self-echo. Tabs receptoras llaman `deliverToChannel` localmente.
 - **Canales:** `REALTIME_CHANNELS` as const — `{ orders: "orders", stores: "stores" }`
 - **Tipos clave:** `RealtimeStatus`, `RealtimeMessage<T>`, `RealtimeHandler<T>`, `RealtimeStatusHandler`, `RealtimeChannel`
 
