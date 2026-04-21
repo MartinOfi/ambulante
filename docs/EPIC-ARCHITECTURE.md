@@ -1419,11 +1419,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Por qué todo en paralelo:** cada sección del admin es una ruta independiente (`/admin/stores`, `/admin/moderation`, `/admin/orders`, `/admin/users`) sin estado compartido entre ellas. Si hay recursos (equipo o chats), F14 se puede terminar en una fracción del tiempo serial.
 
 ### F14.1 — Dashboard KPIs
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 09:00]
+- **Estado:** ✅ done
 - **Entregable:** `/admin` con los 6 KPIs del §8.
 - **Depends on:** F8.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** feature `admin-kpi-dashboard` — KpiDashboard (dumb) + KpiDashboardContainer (smart, "use client"). KpiDashboardService interface + mock con Zod validation. KPI_TARGETS codifica los umbrales del PRD §8. 23 tests en 5 archivos (100% feature coverage). REGISTRY actualizado.
 
 ### F14.2 — Store validation queue
 - **Estado:** ✅ done [owner: f14-2-chat, completed: 2026-04-20]
