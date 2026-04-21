@@ -31,3 +31,20 @@ export const CLUSTER_CONFIG = {
   EXTENT: 512,
   MAX_ZOOM: 17,
 } as const;
+
+export const MAP_SOURCE_ID = "clusters-source" as const;
+
+export const MAP_LAYER_IDS = {
+  CLUSTERS_CIRCLE: "clusters-circle",
+  CLUSTERS_LABEL: "clusters-label",
+  STORES_CIRCLE: "stores-circle",
+  STORES_ACTIVE: "stores-active",
+} as const;
+
+/** Raw hex values derived from COLORS.raw.light for MapLibre GL paint expressions */
+export const MAP_PIN_COLORS = {
+  STORE: "#EA580C",
+  STORE_ACTIVE: "#1D4ED8",
+  CLUSTER: "#EA580C",
+  CLUSTER_TEXT: "#FFFFFF",
+} as const;
