@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-16
 **Status:** Accepted
-**Deciders:** project architect (DP-2)
+**Deciders:** project architect
 
 ---
 
@@ -48,7 +48,7 @@ The `AuthService` interface (`shared/services/auth.ts`) wraps Supabase Auth clie
 
 ## References
 
-- `docs/EPIC-ARCHITECTURE.md` DP-2
-- `shared/services/auth.ts` — AuthService interface + mock implementation
-- `shared/hooks/useSession.ts` — session hook
-- `shared/types/user.ts` — User model + UserRole
+- `docs/EPIC-ARCHITECTURE.md` DP-2 — decision point that settled this choice
+- `shared/services/auth.ts` — AuthService interface + mock implementation _(created in F2.3, not yet in main)_
+- `shared/hooks/useSession.ts` — session hook _(created in F2.3, not yet in main)_
+- `shared/types/user.ts` — User model + UserRole _(created in F2.2, not yet in main)_

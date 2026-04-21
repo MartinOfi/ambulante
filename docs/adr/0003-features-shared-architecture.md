@@ -33,7 +33,7 @@ Promotion rule: code starts inside a feature. Once a second feature needs it, it
 | Option | Pros | Cons | Reason rejected |
 |---|---|---|---|
 | Type-based organization (`components/`, `hooks/`, `services/`) | Familiar to many developers | Invisible cross-feature coupling; deleting a feature is hard | Scales poorly with multiple product domains |
-| Monorepo with separate packages per feature | Strong isolation via package boundaries | High setup cost; premature for a solo/small team MVP | DP-8 deferred to a later decision point |
+| Monorepo with separate packages per feature | Strong isolation via package boundaries | High setup cost; premature for a solo/small team MVP | Deferred — monorepo tooling overhead not justified at MVP scale; revisit when team grows or parallel apps (marketing site, standalone admin) are needed (tracked as DP-8 in `docs/EPIC-ARCHITECTURE.md`) |
 | Feature flags only, no structural separation | Low friction to start | No structural guarantee of isolation | Coupling is a structural problem; flags don't prevent it |
 
 ## Consequences
@@ -54,6 +54,5 @@ Promotion rule: code starts inside a feature. Once a second feature needs it, it
 
 ## References
 
-- `CLAUDE.md` §4 — Arquitectura de carpetas
-- `CLAUDE.md` §4 — Regla de promoción a `shared/`
+- `CLAUDE.md` §4 — Arquitectura de carpetas (including the promotion rule: feature → shared when used in 2+ places)
 - `shared/REGISTRY.md` — live index of shared infrastructure

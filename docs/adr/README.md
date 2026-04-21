@@ -24,4 +24,5 @@ An ADR documents a significant architectural decision: the context that drove it
 1. Copy `0000-template.md` to `NNNN-short-title.md` (next sequential number).
 2. Fill in all sections — never leave Context or Consequences blank.
 3. Add a row to the index table above.
-4. Submit as part of the PR that implements the decision.
+4. If the decision introduces or changes shared infrastructure, update `shared/REGISTRY.md` in the same commit.
+5. Submit as part of the PR that implements the decision.

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-16
 **Status:** Accepted
-**Deciders:** project architect (DP-1)
+**Deciders:** project architect
 
 ---
 
@@ -31,7 +31,7 @@ All realtime communication is wrapped behind a `RealtimeService` interface (`sha
 | Pusher / Ably | Mature, cross-platform, battle-tested reconnect | Extra vendor + billing; decoupled from Supabase DB events | Additional operational cost and moving part |
 | Self-hosted WebSocket (e.g., Socket.io) | Full control | Requires deployment, scaling, and maintenance beyond MVP scope | Operational overhead not justified at this stage |
 | HTTP polling | Simple, no persistent connection | Latency too high to meet <5s criterion under realistic polling intervals; battery/bandwidth impact on mobile | Does not meet PRD §7.2 latency requirement |
-| Server-Sent Events (SSE) | Simpler than WebSockets; native browser support | Unidirectional; store location updates need bidirectional flow | Not suitable for bidirectional events |
+| Server-Sent Events (SSE) | Simpler than WebSockets; native browser support | Unidirectional; store location updates need bidirectional flow | Store GPS updates require client→server pushes from the store app; SSE is server→client only |
 
 ## Consequences
 
@@ -51,7 +51,7 @@ All realtime communication is wrapped behind a `RealtimeService` interface (`sha
 
 ## References
 
-- `docs/EPIC-ARCHITECTURE.md` DP-1, F5.1, F5.2
-- `shared/services/realtime.ts` — RealtimeService interface + mock
-- `shared/domain/event-bus.ts` — in-memory event bus (mock-phase integration)
-- PRD §7.2 — realtime latency requirement (<5s)
+- `docs/EPIC-ARCHITECTURE.md` DP-1, F5.1, F5.2 — decision points and task chain
+- `shared/services/realtime.ts` — RealtimeService interface + mock _(created in F5.2, not yet in main)_
+- `shared/domain/event-bus.ts` — in-memory event bus (mock-phase integration) _(created in F3.5, not yet in main)_
+- PRD §7.2 — realtime latency requirement (<5s); the mechanism recommendation in that section ("WebSockets or SSE") is superseded by this ADR's decision
