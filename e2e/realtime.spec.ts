@@ -49,6 +49,7 @@ test("store accepting an order reflects in client view within 5 s (PRD §7.2)", 
 
     // Load client orders and filter to RECIBIDO
     await clientPage.goto("/orders");
+    await clientPage.waitForLoadState("networkidle");
     await clientPage.getByRole("button", { name: "Recibido" }).click();
     await expect(clientPage.locator('[data-order-status="RECIBIDO"]')).toHaveCount(1, {
       timeout: REALTIME_SLA_MS,

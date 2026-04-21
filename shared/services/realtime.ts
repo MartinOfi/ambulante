@@ -3,6 +3,7 @@ import { eventBus as defaultEventBus } from "@/shared/domain/event-bus";
 import type { SerializedDomainEvent } from "@/shared/domain/events";
 import {
   ORDER_EVENT_PREFIX,
+  REALTIME_CHANNELS,
   RECONNECT_BACKOFF_FACTOR,
   RECONNECT_INITIAL_DELAY_MS,
   RECONNECT_MAX_ATTEMPTS,
@@ -20,20 +21,13 @@ import type {
 
 export type { RealtimeHandler, RealtimeMessage, RealtimeService, RealtimeStatus };
 export type { RealtimeStatusHandler, TestableRealtimeService };
-
-// ── Channel constants ──────────────────────────────────────────────────────────
-
-export const REALTIME_CHANNELS = Object.freeze({
-  orders: "orders",
-  stores: "stores",
-} as const);
-
+export { REALTIME_CHANNELS };
 export type RealtimeChannel = (typeof REALTIME_CHANNELS)[keyof typeof REALTIME_CHANNELS];
 
 // ── Channel routing ────────────────────────────────────────────────────────────
 
 function resolveChannel(eventType: string): RealtimeChannel | null {
-  if (eventType.startsWith(ORDER_EVENT_PREFIX)) return REALTIME_CHANNELS.orders;
+  if (eventType.startsWith(ORDER_EVENT_PREFIX)) return REALTIME_CHANNELS.ORDERS;
   return null;
 }
 
@@ -62,6 +56,7 @@ export function createMockRealtimeService({
   let currentStatus: RealtimeStatus = "online";
 
   const tabId = Math.random().toString(36).slice(2);
+  let destroyed = false;
 
   // Reconnect state
   let reconnecting = false;
@@ -151,7 +146,7 @@ export function createMockRealtimeService({
       const channel = resolveChannel(serialized.type);
       if (!channel) return;
       deliverToChannel(channel, serialized.type, serialized);
-      if (broadcastChannel !== null) {
+      if (!destroyed && broadcastChannel !== null) {
         const msg: BroadcastPayload = {
           tabId,
           channel,
@@ -198,6 +193,7 @@ export function createMockRealtimeService({
     },
 
     destroy(): void {
+      destroyed = true;
       clearReconnectTimer();
       reconnecting = false;
       channelHandlers.clear();
@@ -242,7 +238,9 @@ export function createMockRealtimeService({
 // ── Singleton ──────────────────────────────────────────────────────────────────
 
 const _broadcastChannel =
-  typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("ambulante-realtime-mock") : null;
+  typeof window !== "undefined" && typeof BroadcastChannel !== "undefined"
+    ? new BroadcastChannel("ambulante-realtime-mock")
+    : null;
 
 export const realtimeService: RealtimeService = createMockRealtimeService({
   broadcastChannel: _broadcastChannel,

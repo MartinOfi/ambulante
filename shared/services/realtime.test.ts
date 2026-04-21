@@ -30,13 +30,13 @@ describe("createMockRealtimeService", () => {
   describe("subscribe / deliver", () => {
     it("delivers a message to a subscriber on the matching channel", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_ACCEPTED", { orderId: "1" });
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_ACCEPTED", { orderId: "1" });
 
       expect(received).toHaveLength(1);
       expect(received[0]).toMatchObject({
-        channel: REALTIME_CHANNELS.orders,
+        channel: REALTIME_CHANNELS.ORDERS,
         event: "ORDER_ACCEPTED",
         payload: { orderId: "1" },
       });
@@ -44,9 +44,9 @@ describe("createMockRealtimeService", () => {
 
     it("does not deliver to subscribers of other channels", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.stores, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.STORES, (msg) => received.push(msg));
 
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_ACCEPTED", {});
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_ACCEPTED", {});
 
       expect(received).toHaveLength(0);
     });
@@ -54,10 +54,10 @@ describe("createMockRealtimeService", () => {
     it("delivers to multiple subscribers on the same channel", () => {
       const first: RealtimeMessage<unknown>[] = [];
       const second: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => first.push(msg));
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => second.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => first.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => second.push(msg));
 
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {});
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {});
 
       expect(first).toHaveLength(1);
       expect(second).toHaveLength(1);
@@ -65,12 +65,12 @@ describe("createMockRealtimeService", () => {
 
     it("isolates a failing handler so others still receive the message", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.orders, () => {
+      service.subscribe(REALTIME_CHANNELS.ORDERS, () => {
         throw new Error("handler crash");
       });
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
-      expect(() => service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {})).not.toThrow();
+      expect(() => service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {})).not.toThrow();
       expect(received).toHaveLength(1);
     });
   });
@@ -78,10 +78,10 @@ describe("createMockRealtimeService", () => {
   describe("subscribe cleanup", () => {
     it("unsubscribes the specific handler returned by subscribe()", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      const unsubscribe = service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      const unsubscribe = service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
       unsubscribe();
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {});
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {});
 
       expect(received).toHaveLength(0);
     });
@@ -89,13 +89,13 @@ describe("createMockRealtimeService", () => {
     it("only removes the specific handler, not others on the same channel", () => {
       const first: RealtimeMessage<unknown>[] = [];
       const second: RealtimeMessage<unknown>[] = [];
-      const unsubscribeFirst = service.subscribe(REALTIME_CHANNELS.orders, (msg) =>
+      const unsubscribeFirst = service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) =>
         first.push(msg),
       );
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => second.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => second.push(msg));
 
       unsubscribeFirst();
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {});
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {});
 
       expect(first).toHaveLength(0);
       expect(second).toHaveLength(1);
@@ -105,21 +105,21 @@ describe("createMockRealtimeService", () => {
   describe("unsubscribe(channel)", () => {
     it("removes all handlers for the given channel", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
-      service.unsubscribe(REALTIME_CHANNELS.orders);
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {});
+      service.unsubscribe(REALTIME_CHANNELS.ORDERS);
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {});
 
       expect(received).toHaveLength(0);
     });
 
     it("does not affect other channels", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.stores, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.STORES, (msg) => received.push(msg));
 
-      service.unsubscribe(REALTIME_CHANNELS.orders);
-      service._testDeliver(REALTIME_CHANNELS.stores, "STORE_UPDATED", {});
+      service.unsubscribe(REALTIME_CHANNELS.ORDERS);
+      service._testDeliver(REALTIME_CHANNELS.STORES, "STORE_UPDATED", {});
 
       expect(received).toHaveLength(1);
     });
@@ -154,7 +154,7 @@ describe("createMockRealtimeService", () => {
       const svc = createMockRealtimeService({ eventBus: testBus });
 
       const received: RealtimeMessage<unknown>[] = [];
-      svc.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      svc.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
       const event: OrderSentDomainEvent = {
         type: ORDER_DOMAIN_EVENT.ORDER_SENT,
@@ -167,7 +167,7 @@ describe("createMockRealtimeService", () => {
       testBus.publish(event);
 
       expect(received).toHaveLength(1);
-      expect(received[0].channel).toBe(REALTIME_CHANNELS.orders);
+      expect(received[0].channel).toBe(REALTIME_CHANNELS.ORDERS);
       expect(received[0].event).toBe(ORDER_DOMAIN_EVENT.ORDER_SENT);
 
       svc.destroy();
@@ -178,7 +178,7 @@ describe("createMockRealtimeService", () => {
       const svc = createMockRealtimeService({ eventBus: testBus });
 
       const received: RealtimeMessage<unknown>[] = [];
-      svc.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      svc.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
       svc.destroy();
 
@@ -199,10 +199,10 @@ describe("createMockRealtimeService", () => {
   describe("destroy", () => {
     it("clears all channel handlers", () => {
       const received: RealtimeMessage<unknown>[] = [];
-      service.subscribe(REALTIME_CHANNELS.orders, (msg) => received.push(msg));
+      service.subscribe(REALTIME_CHANNELS.ORDERS, (msg) => received.push(msg));
 
       service.destroy();
-      service._testDeliver(REALTIME_CHANNELS.orders, "ORDER_SENT", {});
+      service._testDeliver(REALTIME_CHANNELS.ORDERS, "ORDER_SENT", {});
 
       expect(received).toHaveLength(0);
     });
@@ -211,7 +211,7 @@ describe("createMockRealtimeService", () => {
 
 describe("REALTIME_CHANNELS", () => {
   it("exports expected channel names", () => {
-    expect(REALTIME_CHANNELS.orders).toBe("orders");
-    expect(REALTIME_CHANNELS.stores).toBe("stores");
+    expect(REALTIME_CHANNELS.ORDERS).toBe("orders");
+    expect(REALTIME_CHANNELS.STORES).toBe("stores");
   });
 });
