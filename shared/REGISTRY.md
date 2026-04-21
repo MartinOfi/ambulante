@@ -66,6 +66,7 @@
 | Icon | ui-component | `shared/components/Icon/` | ui.md §2 |
 | Input | ui-component | `shared/components/ui/input.tsx` | ui.md §1 |
 | InstallPrompt / InstallPromptContainer | ui-component | `shared/components/InstallPrompt/` | ui.md §2 |
+| ServiceWorkerUpdateBanner / ServiceWorkerUpdateBannerContainer | ui-component | `shared/components/ServiceWorkerUpdateBanner/` | ui.md §2 |
 | isClientError | util | `shared/providers/QueryProvider.tsx` | ui.md §2c |
 | Label | ui-component | `shared/components/ui/label.tsx` | ui.md §1 |
 | LOCALE / SupportedLocale | constant | `shared/constants/i18n.ts` | domain.md §8 |
@@ -160,6 +161,9 @@
 | useCartStore | store | `shared/stores/cart.ts` | infra.md §10 |
 | useCatalogQuery | hook | `features/catalog/hooks/useCatalogQuery.ts` | features.md §13 |
 | useFocusTrap / UseFocusTrapOptions | hook | `shared/hooks/useFocusTrap.ts` | infra.md §11 |
+| useServiceWorkerUpdate / UseServiceWorkerUpdateResult | hook | `shared/hooks/useServiceWorkerUpdate.ts` | infra.md §11 |
+| useServiceWorkerControllerReload | hook | `shared/hooks/useServiceWorkerControllerReload.ts` | infra.md §11 |
+| SW_MESSAGE_TYPE / SW_UPDATE_STATUS / SW_UPDATE_CHECK_INTERVAL_MS / SwUpdateStatus / SwMessageType | constant | `shared/constants/service-worker.ts` | domain.md §8 |
 | useCreateProductMutation | hook | `features/catalog/hooks/useCreateProductMutation.ts` | features.md §13 |
 | useDeleteProductMutation | hook | `features/catalog/hooks/useDeleteProductMutation.ts` | features.md §13 |
 | useGeolocation | hook | `shared/hooks/useGeolocation.ts` | data.md §3 |

@@ -1,4 +1,9 @@
 {
+  "ServiceWorker": {
+    "updateAvailable": "Nueva versión disponible",
+    "later": "Después",
+    "update": "Actualizar"
+  },
   "Landing": {
     "Hero": {
       "badge": "Tiendas ambulantes en vivo",
@@ -513,7 +518,10 @@
     "Error": {
       "title": "Algo salió mal",
       "description": "Ocurrió un error inesperado. Podés intentar de nuevo o volver más tarde.",
-      "retry": "Intentar de nuevo"
+      "retry": "Intentar de nuevo",
+      "chunkTitle": "Hay una versión nueva disponible",
+      "chunkDescription": "La app se actualizó mientras tenías la página abierta. Recargá para continuar.",
+      "chunkReload": "Recargar página"
     },
     "AdminDashboard": {
       "title": "Panel de administración",

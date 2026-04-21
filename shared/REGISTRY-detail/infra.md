@@ -116,7 +116,32 @@ Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en
 
 ---
 
-## §11 — Hooks de accesibilidad
+## §11 — Hooks de accesibilidad y PWA
+
+### useServiceWorkerUpdate — `shared/hooks/useServiceWorkerUpdate.ts`
+
+- **Import:** `import { useServiceWorkerUpdate } from "@/shared/hooks/useServiceWorkerUpdate"`
+- `"use client"`
+- **Firma:** `useServiceWorkerUpdate(): UseServiceWorkerUpdateResult`
+- **Tipo de retorno:**
+  ```ts
+  interface UseServiceWorkerUpdateResult {
+    readonly status: SwUpdateStatus; // "idle" | "available" | "dismissed" | "applying"
+    readonly applyUpdate: () => void; // postMessage SKIP_WAITING al waiting SW
+    readonly dismiss: () => void;     // oculta el banner
+  }
+  ```
+- **Comportamiento:** llama `getRegistration()` en mount, escucha `updatefound` + `statechange` para detectar un SW en waiting. Hace polling con `registration.update()` cada hora. Limpia listeners e interval en unmount.
+- **No activa si:** `typeof window === "undefined"` o `"serviceWorker" not in navigator`.
+- **Usado en:** `ServiceWorkerUpdateBannerContainer`
+
+### useServiceWorkerControllerReload — `shared/hooks/useServiceWorkerControllerReload.ts`
+
+- **Import:** `import { useServiceWorkerControllerReload } from "@/shared/hooks/useServiceWorkerControllerReload"`
+- `"use client"`
+- **Firma:** `useServiceWorkerControllerReload(): void`
+- **Comportamiento:** escucha `controllerchange` en `navigator.serviceWorker` y llama `window.location.reload()` para forzar la recarga de la página cuando el SW activo cambia. Safety net para garantizar que todos los tabs usen la nueva versión. Limpia el listener en unmount.
+- **Usado en:** `ServiceWorkerUpdateBannerContainer`
 
 ### useFocusTrap — `shared/hooks/useFocusTrap.ts`
 

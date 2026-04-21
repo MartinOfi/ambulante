@@ -99,6 +99,16 @@ Todas viven en `shared/components/ui/`. Se añaden con `pnpm dlx shadcn@latest a
 - **Tipos exportados:** `IconName`, `IconSize`, `IconColor`, `IconProps`
 - **Nota:** requiere `"use client"` (React.lazy). El boundary se toma del primer Client Component ancestro.
 
+### ServiceWorkerUpdateBanner — `shared/components/ServiceWorkerUpdateBanner/`
+
+- **Archivos:** `ServiceWorkerUpdateBanner.tsx` (dumb), `ServiceWorkerUpdateBanner.container.tsx` (smart, `"use client"`), `ServiceWorkerUpdateBanner.types.ts`, `ServiceWorkerUpdateBanner.test.tsx`
+- **Descripción:** Banner de notificación de nueva versión disponible. Aparece cuando hay un Service Worker en waiting. Botones "Actualizar" y "Después". Al actualizar, envía `SKIP_WAITING` al SW y espera el `controllerchange` para recargar la página.
+- **API dumb:** `<ServiceWorkerUpdateBanner onApply onDismiss />` — requiere `role="alert"` + `aria-live="polite"` (ya incluido)
+- **API smart:** `<ServiceWorkerUpdateBannerContainer />` — sin props. Conecta `useServiceWorkerUpdate` + `useServiceWorkerControllerReload`. Renderiza `null` si `status !== "available"`.
+- **Tipos exportados:** `ServiceWorkerUpdateBannerProps`
+- **i18n:** claves bajo namespace `"ServiceWorker"` en `messages/es-AR.json`: `updateAvailable`, `later`, `update`
+- **Montado en:** `app/layout.tsx` dentro de `<ThemeProvider>`
+
 ### InstallPrompt — `shared/components/InstallPrompt/`
 
 - **Archivos:** `InstallPrompt.tsx` (dumb), `InstallPrompt.container.tsx` (smart, `"use client"`), `InstallPrompt.types.ts`, `InstallPrompt.test.tsx`

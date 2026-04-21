@@ -172,6 +172,15 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 |---|---|
 | `PUSH_NOTIFICATION_ICON` | Ruta del icono por defecto para notificaciones push |
 
+### `shared/constants/service-worker.ts`
+| Nombre | Descripción |
+|---|---|
+| `SW_MESSAGE_TYPE` | `{ SKIP_WAITING: "SKIP_WAITING" }` frozen as const — tipos de mensajes postMessage al SW |
+| `SwMessageType` | TS type derivado de `SW_MESSAGE_TYPE` |
+| `SW_UPDATE_CHECK_INTERVAL_MS` | `3_600_000` (1h) — intervalo de polling para `registration.update()` |
+| `SW_UPDATE_STATUS` | `{ IDLE, AVAILABLE, DISMISSED, APPLYING }` frozen as const — máquina de estados del update banner |
+| `SwUpdateStatus` | TS type derivado de `SW_UPDATE_STATUS` |
+
 ---
 
 ## §12 — Domain logic

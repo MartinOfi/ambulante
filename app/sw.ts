@@ -9,7 +9,7 @@ import {
   Serwist,
 } from "serwist";
 import { defaultCache } from "@serwist/next/worker";
-import { SYNC_TAG } from "@/shared/constants/background-sync";
+import { SYNC_TAG, OFFLINE_QUEUE_STORE_NAME } from "@/shared/constants/background-sync";
 import { openQueueDb, shouldDiscardQueueItem } from "@/shared/query/idb-queue-helpers";
 
 import {
@@ -18,6 +18,7 @@ import {
   SW_CACHE_TTL_SECONDS,
   SW_ROUTE_MATCHERS,
 } from "./sw-cache-strategies";
+import { SW_MESSAGE_TYPE } from "@/shared/constants/service-worker";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -246,6 +247,12 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+self.addEventListener("message", (event: ExtendableMessageEvent) => {
+  if ((event.data as { type?: string } | null)?.type === SW_MESSAGE_TYPE.SKIP_WAITING) {
+    void self.skipWaiting();
+  }
+});
 
 self.addEventListener("sync", (event) => {
   if (event.tag === SYNC_TAG) {
