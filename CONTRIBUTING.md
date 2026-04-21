@@ -10,7 +10,7 @@ Para las reglas completas del proyecto, la fuente de verdad es [`CLAUDE.md`](./C
 | Herramienta    | Versión mínima | Verificar       |
 |----------------|----------------|-----------------|
 | Node.js        | 20+            | `node -v`       |
-| pnpm           | 9+             | `pnpm -v`       |
+| pnpm           | 10+            | `pnpm -v`       |
 | Git            | 2.38+ (worktrees) | `git --version` |
 
 > **Por qué pnpm:** el repo usa `pnpm-lock.yaml`. Usar npm o yarn rompe el lockfile y puede introducir versiones distintas.

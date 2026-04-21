@@ -1580,11 +1580,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 **Acceptance criteria:** Un dev nuevo puede levantar el proyecto y hacer su primer PR en <1 día.
 
 ### F17.1 — Contributing guide
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: session]
+- **Estado:** ✅ done
 - **Entregable:** `CONTRIBUTING.md` con setup, flow, convenciones.
 - **Depends on:** F0.*
 - **Estimación:** S
-- **Notas:**
+- **Notas:** Creado `CONTRIBUTING.md` (222 líneas). Secciones: prerequisites, setup local, comandos, arquitectura, worktree workflow, primer PR checklist, convenciones de código, testing, gotchas, FAQ. Corrección: pnpm versión actualizada de 9+ a 10+ para alinear con `packageManager` field en `package.json`.
 
 ### F17.2 — ADRs (Architecture Decision Records)
 - **Estado:** ✅ done
