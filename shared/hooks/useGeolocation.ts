@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Coordinates } from "@/shared/types/store";
+import { coordinatesSchema, type Coordinates } from "@/shared/schemas/coordinates";
 import {
   GEO_MAX_AGE_MS,
   GEO_TIMEOUT_MS,
@@ -45,15 +45,25 @@ export function useGeolocation(): UseGeolocationResult {
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
         if (position.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
+          navigator.geolocation.clearWatch(watchIdRef.current!);
+          watchIdRef.current = null;
           setState({
             status: "error",
             message: "Señal GPS imprecisa — probá en un espacio abierto",
           });
           return;
         }
+        const parsed = coordinatesSchema.safeParse({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        if (!parsed.success) {
+          setState({ status: "error", message: "Coordenadas inválidas recibidas del GPS" });
+          return;
+        }
         setState({
           status: "granted",
-          coords: { lat: position.coords.latitude, lng: position.coords.longitude },
+          coords: parsed.data,
           accuracy: position.coords.accuracy,
         });
       },
@@ -73,6 +83,7 @@ export function useGeolocation(): UseGeolocationResult {
     return () => {
       if (watchIdRef.current !== null) {
         navigator.geolocation?.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
       }
     };
   }, [startWatch]);

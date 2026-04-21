@@ -261,4 +261,38 @@ describe("useGeolocation", () => {
     expect(geoMock.clearWatch).toHaveBeenCalledWith(WATCH_ID);
     expect(geoMock.watchPosition).toHaveBeenCalledTimes(2);
   });
+
+  it("poor accuracy clears the watch and transitions to error (stable state)", async () => {
+    let capturedOnSuccess: GeolocationSuccessCallback | null = null;
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+      capturedOnSuccess = onSuccess;
+      return WATCH_ID;
+    });
+
+    const { result } = renderHook(() => useGeolocation());
+
+    act(() => {
+      capturedOnSuccess?.(makePosition(-34.6037, -58.3816, BAD_ACCURACY));
+    });
+
+    await waitFor(() => expect(result.current.status).toBe("error"));
+    expect(geoMock.clearWatch).toHaveBeenCalledWith(WATCH_ID);
+  });
+
+  it("transitions to error when coords fail Zod validation", async () => {
+    const invalidPosition = makePosition(999, -58.3816, GOOD_ACCURACY);
+    geoMock.watchPosition.mockImplementation((onSuccess: GeolocationSuccessCallback) => {
+      onSuccess(invalidPosition);
+      return WATCH_ID;
+    });
+
+    const { result } = renderHook(() => useGeolocation());
+
+    await waitFor(() =>
+      expect(result.current).toMatchObject({
+        status: "error",
+        message: expect.stringContaining("Coordenadas inválidas"),
+      }),
+    );
+  });
 });
