@@ -1191,13 +1191,13 @@ Wave 4 (al final — requiere features):
 - **Notas:** Implementado con react-map-gl/maplibre + Marker + NavigationControl. Props extendidas con `userCoords?: Coordinates` y `onSelectStore`. `MapScreen.tsx` usa `dynamic({ ssr: false })` para evitar carga de browser APIs en server. `StorePin` y `UserLocationPin` adaptados para uso dentro de Marker (sin posicionamiento CSS propio). `MAP_DEFAULTS` agregado a `features/map/constants.ts`. 56 tests verdes. `MapScreen.test.tsx` actualizado con mock de `next/dynamic` para resolución síncrona en tests.
 
 ### F11.4 — Clustering
-- **Estado:** 🟡 in-progress [owner: chat-20260420, started: session]
+- **Estado:** ✅ done [owner: chat-20260420, closed: 2026-04-20]
 - **Por qué:** Con 50+ tiendas en pantalla, pins sueltos no escalan.
 - **Entregable:** `supercluster` integrado; clusters al zoom-out, pins individuales al zoom-in.
-- **Archivos:** `features/map/hooks/useClusters.ts`.
+- **Archivos:** `features/map/hooks/useClusters.ts`, `features/map/components/ClusterPin.tsx`, `features/map/components/MapCanvas.tsx` (refactor), `features/map/components/MapCanvas.container.tsx` (refactor).
 - **Depends on:** F11.3
 - **Estimación:** M
-- **Notas:**
+- **Notas:** `useClusters` hook wraps `computeClusters` (pure fn, separately testable) with `useMemo`. `MapCanvas` props migrated from `stores[]` to `clusters: ClusterFeature[]`. `MapCanvasContainer` manages `bounds: BBox | null` state via `mapRef`, updates on `onLoad` and `onMove`. `ClusterPin` renders count badge; tap zooms +3 levels. `CLUSTER_CONFIG` constant added to `features/map/constants.ts`. 66 map tests green. TypeScript discriminated union narrowed via destructure-before-closure pattern. `GeoJsonProperties` extends removed (union type not extendable). `@types/geojson` installed.
 
 ### F11.5 — User location tracking
 - **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: 22:00]
