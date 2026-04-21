@@ -10,7 +10,7 @@ Para las reglas completas del proyecto, la fuente de verdad es [`CLAUDE.md`](./C
 | Herramienta    | Versión mínima | Verificar       |
 |----------------|----------------|-----------------|
 | Node.js        | 20+            | `node -v`       |
-| pnpm           | 9+             | `pnpm -v`       |
+| pnpm           | 10+            | `pnpm -v`       |
 | Git            | 2.38+ (worktrees) | `git --version` |
 
 > **Por qué pnpm:** el repo usa `pnpm-lock.yaml`. Usar npm o yarn rompe el lockfile y puede introducir versiones distintas.
@@ -42,17 +42,20 @@ pnpm dev
 
 ## Comandos
 
-| Comando          | Qué hace                          |
-|------------------|-----------------------------------|
-| `pnpm dev`       | Dev server con hot reload         |
-| `pnpm build`     | Build de producción               |
-| `pnpm start`     | Servir el build de producción     |
-| `pnpm lint`      | ESLint                            |
-| `pnpm typecheck` | `tsc --noEmit` (0 errores = ok)   |
-| `pnpm test`      | Vitest (unit + componentes, one-shot) |
-| `pnpm test:watch`| Vitest en modo watch              |
-| `pnpm test:coverage` | Vitest con reporte de cobertura |
-| `pnpm test:e2e`  | Playwright (E2E)                  |
+| Comando              | Qué hace                                           |
+|----------------------|----------------------------------------------------|
+| `pnpm dev`           | Dev server con hot reload                          |
+| `pnpm build`         | Build de producción                                |
+| `pnpm start`         | Servir el build de producción                      |
+| `pnpm lint`          | ESLint (solo reporta)                              |
+| `pnpm lint:fix`      | ESLint con auto-fix                                |
+| `pnpm format`        | Prettier sobre todos los archivos                  |
+| `pnpm format:check`  | Prettier en modo check (sin escribir)              |
+| `pnpm typecheck`     | `tsc --noEmit` sobre app + service worker (2 pasadas) |
+| `pnpm test`          | Vitest (unit + componentes, one-shot)              |
+| `pnpm test:watch`    | Vitest en modo watch                               |
+| `pnpm test:coverage` | Vitest con reporte de cobertura                    |
+| `pnpm test:e2e`      | Playwright (E2E)                                   |
 
 > **Service Worker:** solo corre en build de producción. Para testearlo: `pnpm build && pnpm start`.
 
@@ -167,7 +170,7 @@ La referencia completa está en `CLAUDE.md §6`. Los puntos que más sorprenden 
 
 **Commits**
 - Conventional commits: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`.
-- `husky` corre `prettier` en archivos staged via `lint-staged` — los reformatea antes del commit. Instalá la extensión de Prettier en tu editor y activá `formatOnSave` para evitar diffs de formato.
+- `husky` corre `lint-staged` antes de cada commit: sobre archivos `.ts/.tsx/.js` ejecuta `eslint --fix` y `prettier --write`; sobre `.json/.css/.yml` solo `prettier --write`. Los archivos se auto-reformatean antes de commitearse. Instalá la extensión de Prettier en tu editor y activá `formatOnSave` para evitar diffs de formato.
 - `commitlint` rechaza mensajes que no cumplan el formato.
 
 ---
