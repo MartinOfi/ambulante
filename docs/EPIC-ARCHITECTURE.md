@@ -1209,12 +1209,12 @@ Wave 4 (al final — requiere features):
 - **Notas:** Migrado de `getCurrentPosition` a `watchPosition`. Watch ID en `useRef` (no useState) para evitar re-renders. Cleanup via `clearWatch` con optional chaining (`?.`) para robustez en teardown de tests bajo React Strict Mode. `request()` reinicia el watch — útil para recenter o retry. API pública idéntica, sin cambios en consumidores (`MapCanvasContainer` ya pasaba `geo.coords`). 14/14 tests verdes. Fallas pre-existentes en `AvailabilityToggle`/`StoreNav` tests (missing `render` import) — no relacionadas a este PR.
 
 ### F11.6 — Performance
-- **Estado:** 🟡 in-progress [owner: chat-20260420, started: 09:00]
+- **Estado:** ✅ done [owner: chat-20260420, merged: 2026-04-20]
 - **Por qué:** Mapa + 100 pins en mobile medio = objetivo 60fps.
 - **Entregable:** Pins como símbolos vectoriales, no React components. Lighthouse mobile: perf >90 en `/map`.
 - **Depends on:** F11.4
 - **Estimación:** M
-- **Notas:**
+- **Notas:** Reemplazados `<Marker>`+`StorePin`+`ClusterPin` por `<Source>`+`<Layer>` nativos de MapLibre GL. Un solo draw call WebGL para todos los pins vs. N reconciliaciones DOM. `MAP_LAYER_IDS`, `MAP_SOURCE_ID`, `MAP_PIN_COLORS` añadidos a `features/map/constants.ts`. Click handling via `interactiveLayerIds`+`onClick` en `<Map>` con type guard en `geometry.type`. User location mantiene `<Marker>` (1 nodo DOM, sin impacto). `useMemo` para el FeatureCollection. 12/12 tests verdes. `tsc --noEmit` limpio en archivos modificados.
 
 ---
 
