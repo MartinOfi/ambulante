@@ -869,13 +869,13 @@ Wave 4 (al final — requiere features):
 - **Notas:**
 
 ### F5.5 — Test E2E de propagación <5s
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-20, started: now]
+- **Estado:** ✅ done
 - **Por qué:** SLA del PRD — hay que medirlo con un test automatizado.
 - **Entregable:** Playwright test que abre 2 contextos (cliente + tienda), dispara una transición desde uno, y verifica actualización en el otro en <5s.
 - **Archivos:** `e2e/realtime.spec.ts`.
 - **Depends on:** F5.3, F12, F13
 - **Estimación:** L
-- **Notas:**
+- **Notas:** BroadcastChannel bridge en createMockRealtimeService para propagar eventos entre contextos Playwright. REALTIME_CHANNELS consolidado a single source of truth (shared/constants/realtime).
 
 ---
 
