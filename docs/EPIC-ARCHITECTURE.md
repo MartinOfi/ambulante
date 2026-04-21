@@ -53,7 +53,7 @@ Antes de que cualquier fase dependiente se destrabe, estas decisiones deben toma
 - [x] **DP-5 · Tile provider del mapa:** ✅ OSM tiles directos vía MapLibre (ya funcionando, sin proveedor externo). Decidido 2026-04-16.
 - [ ] **DP-6 · Payments out-of-scope:** confirmar que nunca habrá pagos (PRD §2.3) — si cambia, replanificar F12.
 - [x] **DP-7 · Multi-país:** ✅ MVP solo Argentina. Decidido 2026-04-16.
-- [ ] **DP-8 · Monorepo:** ¿quedarse en single repo o mover a Turborepo cuando entren apps paralelas (marketing, admin independiente)? Afecta F17.
+- [x] **DP-8 · Monorepo:** ✅ Single repo con Supabase. No se migra a Turborepo. Decidido 2026-04-20.
 
 ---
 
@@ -1608,11 +1608,11 @@ Wave 1 (paralelo, 5 sub-chats posibles — es la fase más paralelizable interna
 - **Notas:** Implementado con `release-please` (googleapis/release-please-action@v4). Archivos creados: `.github/workflows/release-please.yml`, `release-please-config.json`, `.release-please-manifest.json` (versión inicial 0.1.0 sync con package.json), `CHANGELOG.md` vacío inicial. Workflow se dispara en push a main, crea release PRs automáticos con CHANGELOG generado de conventional commits. Changesets descartado porque el proyecto es single-repo (F17.5/monorepo blocked). No requiere pasos manuales de los desarrolladores.
 
 ### F17.5 — Monorepo evaluation
-- **Estado:** 🔴 blocked (DP-8)
+- **Estado:** ❌ cancelled — DP-8 decidido: single repo, no migración a Turborepo.
 - **Entregable:** Si DP-8 = sí, migrar a Turborepo con `apps/web` + `packages/*`.
 - **Depends on:** DP-8
 - **Estimación:** XL
-- **Notas:**
+- **Notas:** Decisión 2026-04-20: se mantiene single repo con Supabase.
 
 ---
 
