@@ -284,3 +284,60 @@ Al terminar código:
 - **Geolocalización en dev:** Chrome DevTools permite mockear coordenadas (Sensors → Location). Usar esto en lugar de hardcodear.
 - **Service Worker:** solo corre en build de producción. En dev, usar `pnpm build && pnpm start` para testearlo.
 - **Mocks mientras no hay back:** todo lo que va a ser API real vive en `shared/services/` detrás de una interfaz. No importar mocks directamente en componentes.
+
+---
+
+## 10. Backend (Supabase)
+
+El backend corre sobre **Supabase** (Postgres + Auth + Realtime + Storage + PostGIS). La implementación se ejecuta en el epic [`docs/EPIC-BACKEND.md`](./docs/EPIC-BACKEND.md), siguiendo el plan operativo de [`docs/PARALLEL-EXECUTION-BACKEND.md`](./docs/PARALLEL-EXECUTION-BACKEND.md) y el template de agente [`docs/PROMPT-TEMPLATE-BACKEND.md`](./docs/PROMPT-TEMPLATE-BACKEND.md).
+
+### 10.1 Skill obligatoria para tareas de backend
+
+Cualquier tarea que escriba SQL, policies RLS, migraciones o índices **debe leer primero** las reglas aplicables de [`.claude/skills/supabase-postgres-best-practices/`](./.claude/skills/supabase-postgres-best-practices/). Cada bloque de tarea en el epic backend lista en su campo `Skill rules aplicables:` cuáles rules específicas del directorio `references/` aplican.
+
+**No es opcional.** El code review rechaza PRs que violen reglas CRITICAL/HIGH de la skill.
+
+> Nota: `.claude/` está gitignored por diseño (config per-developer). Si el directorio `.claude/skills/supabase-postgres-best-practices/` no existe en tu worktree, instalalo con:
+> ```
+> npx skills add https://github.com/supabase/agent-skills --skill supabase-postgres-best-practices -y
+> ```
+
+### 10.2 Patrón de acceso (híbrido con portabilidad)
+
+- **Reads** del frontend → client-direct contra Supabase con anon key, protegidas por RLS.
+- **Writes críticas** (transiciones del pedido, onboarding tienda, moderación, etc.) → Server Actions / Route Handlers con service role + state machine TS (F3.2) + domain events (F3.5).
+- **Realtime** → `@supabase/ssr` desde el browser via el facade `RealtimeService`.
+- **Cron jobs** → `pg_cron + pg_net` dispara HTTP a `/api/cron/*` que corre state machine TS.
+
+### 10.3 Regla dura de portabilidad
+
+**Imports de `@supabase/*` solo permitidos en 3 directorios:**
+
+1. `shared/repositories/supabase/*.ts` — implementaciones de las interfaces F3.4.
+2. `shared/services/*.supabase.ts` — 4 facades (auth, storage, realtime, push).
+3. `app/api/cron/**/route.ts` — Route Handlers de jobs del sistema.
+
+**Features / componentes / hooks nunca importan el SDK directo.** Consumen los facades y repositories. La regla está enforced por ESLint `no-restricted-imports` y por un check de CI (B3.3 y B3.4 del epic backend).
+
+### 10.4 Convenciones SQL invariantes (del epic y de la skill)
+
+1. `snake_case` lowercase para tablas, columnas, índices, constraints, funciones. Prohibido mixedCase con comillas.
+2. PKs `bigint generated always as identity` por default. UUIDv7 solo para IDs expuestos al cliente (con justificación).
+3. Toda FK con índice explícito en la misma migración que la crea. Test CI (B1.5) audita la DB y falla si encuentra FK sin índice.
+4. RLS policies usan `(select auth.uid())`, nunca `auth.uid()` directo. Lint SQL (B2.5) enforza.
+5. Transacciones cortas, sin I/O externo (fetch, webpush, email) adentro. Efectos secundarios via domain events post-commit.
+6. Jobs que reclaman filas de una queue (expirar pedidos, retry de push) usan `FOR UPDATE SKIP LOCKED` — skill rule `lock-skip-locked`.
+
+### 10.5 REGISTRY y backend
+
+Todo archivo nuevo en `shared/repositories/`, `shared/services/*.supabase.ts`, o utilidades de backend que vayan a `shared/` **debe actualizar `shared/REGISTRY.md` Y el detail file correspondiente de `shared/REGISTRY-detail/` en el mismo commit** (§5 de este doc). El campo `REGISTRY:` de cada bloque del epic backend lista explícitamente cuál detail file actualizar.
+
+### 10.6 Ambientes
+
+- **Dev local:** Supabase CLI + Docker. Cada worktree levanta su propia instancia con `pnpm supabase:start`.
+- **Prod:** Supabase Cloud, región AWS SA-East-1.
+- **Staging:** no hay en MVP. Se activa cuando crezca el equipo (ver NT-06 en NEXT-TASK.md).
+
+### 10.7 Parking lot de backend
+
+Toda mejora, optimización o feature descubierta fuera del scope del epic se registra en [`docs/NEXT-TASK.md`](./docs/NEXT-TASK.md) con formato estructurado `NT-NN`. **Nunca** se agrega al epic si no es MVP.
