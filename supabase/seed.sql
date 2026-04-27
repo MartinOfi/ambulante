@@ -1,0 +1,3 @@
+-- Seed data for local development.
+-- Applied automatically after migrations during `pnpm supabase:reset`.
+-- Keep idempotent: use INSERT ... ON CONFLICT DO NOTHING.

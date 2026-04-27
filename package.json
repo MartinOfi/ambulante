@@ -19,7 +19,15 @@
     "test:e2e:ui": "playwright test --ui",
     "analyze": "ANALYZE=true next build",
     "optimize-images": "node scripts/optimize-images.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:reset": "supabase db reset",
+    "supabase:status": "supabase status",
+    "supabase:db:diff": "supabase db diff",
+    "supabase:db:push": "supabase db push",
+    "supabase:test": "supabase test db",
+    "supabase:test:rls": "supabase test db --db-url $DATABASE_URL_DIRECT"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -88,6 +96,7 @@
     "postcss": "8.4.41",
     "prettier": "^3.8.3",
     "sharp": "^0.34.5",
+    "supabase": "^2.95.5",
     "tailwindcss": "3.4.10",
     "typescript": "5.5.4",
     "vitest": "^4.1.4"

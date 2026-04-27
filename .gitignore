@@ -58,3 +58,7 @@ yarn-error.log*
 
 # git worktrees
 .worktrees/
+
+# supabase local dev — generated / temp files only; config and migrations are committed
+supabase/.branches
+supabase/.temp
