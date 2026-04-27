@@ -234,7 +234,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B0.2 — Env schema: URLs separadas (pooler vs directo) + secretos de backend
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-27, started: 18:50]
 - **Por qué:** Next.js serverless DEBE usar pooler mode transaction para no agotar conexiones; migraciones DEBEN usar conexión directa (el pooler no soporta prepared statements en transaction mode). Mezclarlas rompe producción.
 - **Entregable:** Extensión del schema Zod existente (`shared/config/env.schema.ts`) con `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only), `DATABASE_URL_POOLER`, `DATABASE_URL_DIRECT`, `CRON_SECRET`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`. `.env.example` actualizado con valores de Supabase local. Server-only vars marcadas explícitamente (no `NEXT_PUBLIC_*`).
 - **Archivos:** `shared/config/env.schema.ts`, `shared/config/env.ts`, `shared/config/env.runtime.ts`, `.env.example`.
