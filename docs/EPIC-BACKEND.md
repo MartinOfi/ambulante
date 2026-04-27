@@ -222,7 +222,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** `pnpm supabase:start` levanta Postgres + Auth + Realtime + Storage en Docker; `pnpm supabase:reset` aplica todas las migraciones desde cero; CI corre las mismas migraciones contra una instancia efímera; env vars de Supabase están tipadas con Zod.
 
 ### B0.1 — Supabase CLI + scripts pnpm + Docker baseline
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Sin el CLI instalado y los scripts listos, ningún chat puede empezar a trabajar con backend. Es el bloqueo raíz.
 - **Entregable:** `supabase/` directory creado con `supabase init`; scripts `pnpm supabase:start`, `:stop`, `:reset`, `:status`, `:db:diff`, `:db:push` en `package.json`; doc breve en `docs/workflows/supabase-local.md` que explica el ciclo de dev (start → cambios → migration → reset → test → commit).
 - **Archivos:** `package.json`, `supabase/config.toml`, `supabase/seed.sql` (vacío inicial), `.gitignore` (ignorar `supabase/.branches`, `supabase/.temp`), `docs/workflows/supabase-local.md`.
@@ -231,7 +231,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `conn-pooling` (leer para entender qué URL usa cada comando)
 - **REGISTRY:** —
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** CLI instalado como devDep `supabase@2.95.5`. `supabase init` genera `config.toml` con project_id corregido a `ambulante` y pooler habilitado en transaction mode. Scripts agregados: `supabase:start/stop/reset/status/db:diff/db:push/test/test:rls`. `.gitignore` actualizado con `.branches` y `.temp`. Nota: el npm postinstall del CLI descarga el binario desde GitHub — si falla en CI sin internet, usar `pnpm install --ignore-scripts` y proveer el binario pre-descargado. Pre-existing TypeScript error en `HowItWorksClient.tsx:72` y lint error por `NEXT_PUBLIC_APP_URL` faltante — ambos existían en main antes de esta tarea.
 
 ### B0.2 — Env schema: URLs separadas (pooler vs directo) + secretos de backend
 - **Estado:** ✅ done [owner: chat-2026-04-27, closed: 19:40]
