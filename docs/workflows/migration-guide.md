@@ -217,6 +217,10 @@ update public.orders
  where v2_status is null;
 
 -- add constraint solo después del backfill
+-- ATENCIÓN: sin NOT VALID, Postgres escanea TODA la tabla para validar filas
+-- existentes — toma un lock exclusivo durante ese tiempo.
+-- Solo usar esta forma en tablas pequeñas (<100k filas).
+-- Para tablas grandes, ver el patrón NOT VALID más abajo.
 do $$
 begin
   if not exists (
@@ -232,7 +236,29 @@ end $$;
 commit;
 ```
 
-2. **Tablas grandes (>100k filas):** no usar `ALTER TABLE ... SET NOT NULL` directamente — bloquea la tabla. Usar el patrón de constraint `NOT VALID` + `VALIDATE CONSTRAINT` por separado.
+2. **Tablas grandes (>100k filas):** agregar el constraint como `NOT VALID` (no valida filas existentes, no bloquea la tabla) y validar en un paso separado:
+
+```sql
+-- Paso A — en la misma migración que el backfill, constraint sin validar:
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname  = 'orders_v2_status_notnull'
+      and conrelid = 'public.orders'::regclass
+  ) then
+    alter table public.orders
+      add constraint orders_v2_status_notnull check (v2_status is not null) not valid;
+  end if;
+end $$;
+
+-- Paso B — en una migración separada, validar (toma ShareUpdateExclusiveLock, no bloquea reads):
+alter table public.orders validate constraint orders_v2_status_notnull;
+```
+
+El mismo patrón `NOT VALID` + `VALIDATE CONSTRAINT` aplica a FKs en tablas con millones de filas.
+
+3. **Sin I/O externo dentro de la transacción.** Si la migración necesita disparar emails, webhooks o llamadas HTTP, hacerlo post-commit vía domain events o un job separado.
 
 3. **Sin I/O externo dentro de la transacción.** Si la migración necesita disparar emails, webhooks o llamadas HTTP, hacerlo post-commit vía domain events o un job separado.
 

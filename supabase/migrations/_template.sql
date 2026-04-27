@@ -124,32 +124,51 @@ do $$
 begin
   if not exists (
     select 1 from pg_trigger
-    where tgname   = 'trg_example_updated_at'
-      and tgrelid  = 'public.example'::regclass
+    where tgname      = 'trg_example_updated_at'
+      and tgrelid     = 'public.example'::regclass
+      and tgisinternal = false
   ) then
     create trigger trg_example_updated_at
       before update on public.example
-      for each row execute procedure public.set_updated_at();
+      for each row execute function public.set_updated_at();
   end if;
 end $$;
 
 -- ---------------------------------------------------------------------------
 -- 9. ROW-LEVEL SECURITY
 -- Policies use pg_policy for existence checks.
--- Always enable RLS on new tables before adding policies.
+-- ENABLE ROW LEVEL SECURITY is idempotent (safe to repeat without a guard).
+-- Always enable RLS before adding policies.
 -- ---------------------------------------------------------------------------
 alter table public.example enable row level security;
 
+-- "Authenticated only" policy: any signed-in user can select any row.
 do $$
 begin
   if not exists (
     select 1 from pg_policy
-    where polname   = 'example_select_own'
-      and polrelid  = 'public.example'::regclass
+    where polname  = 'example_select_authenticated'
+      and polrelid = 'public.example'::regclass
   ) then
-    create policy example_select_own
+    create policy example_select_authenticated
       on public.example
       for select
       using ((select auth.uid()) is not null);
   end if;
 end $$;
+
+-- "Own rows only" policy: user can only select rows they own.
+-- Requires a column (e.g. user_id) that references auth.users(id).
+-- do $$
+-- begin
+--   if not exists (
+--     select 1 from pg_policy
+--     where polname  = 'example_select_own'
+--       and polrelid = 'public.example'::regclass
+--   ) then
+--     create policy example_select_own
+--       on public.example
+--       for select
+--       using ((select auth.uid()) = user_id);
+--   end if;
+-- end $$;
