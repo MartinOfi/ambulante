@@ -280,6 +280,50 @@ describe("parseServerEnv", () => {
       });
       expect(parsed.VAPID_SUBJECT).toBe("https://ambulante.app");
     });
+
+    it("VAPID_SUBJECT rejects https:// with no host", () => {
+      expect(() => parseServerEnv({ ...validBase, VAPID_SUBJECT: "https://" })).toThrowError(
+        /VAPID_SUBJECT/,
+      );
+    });
+
+    it("VAPID_SUBJECT rejects mailto: with no address", () => {
+      expect(() => parseServerEnv({ ...validBase, VAPID_SUBJECT: "mailto:" })).toThrowError(
+        /VAPID_SUBJECT/,
+      );
+    });
+
+    it("VAPID_SUBJECT accepts a mailto: address with subdomain and tag", () => {
+      const parsed = parseServerEnv({
+        ...validBase,
+        VAPID_SUBJECT: "mailto:push+tag@mail.ambulante.app",
+      });
+      expect(parsed.VAPID_SUBJECT).toBe("mailto:push+tag@mail.ambulante.app");
+    });
+  });
+
+  describe("production URL enforcement", () => {
+    it("rejects http:// NEXT_PUBLIC_APP_URL in production", () => {
+      expect(() =>
+        parseServerEnv({ NODE_ENV: "production", NEXT_PUBLIC_APP_URL: "http://ambulante.app" }),
+      ).toThrowError(/NEXT_PUBLIC_APP_URL/);
+    });
+
+    it("accepts https:// NEXT_PUBLIC_APP_URL in production", () => {
+      const parsed = parseServerEnv({
+        NODE_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "https://ambulante.app",
+      });
+      expect(parsed.NEXT_PUBLIC_APP_URL).toBe("https://ambulante.app");
+    });
+
+    it("allows http:// NEXT_PUBLIC_APP_URL in development", () => {
+      const parsed = parseServerEnv({
+        NODE_ENV: "development",
+        NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+      });
+      expect(parsed.NEXT_PUBLIC_APP_URL).toBe("http://localhost:3000");
+    });
   });
 
   describe("VAPID key parity", () => {

@@ -40,11 +40,35 @@ const serverOnlyEnvSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().min(1).optional(),
   VAPID_SUBJECT: z
     .string()
-    .regex(/^(mailto:|https:\/\/)/, "debe ser una URL mailto: o https://")
+    .refine(
+      (s) => {
+        if (s.startsWith("mailto:")) {
+          return /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+        }
+        if (s.startsWith("https://")) {
+          try {
+            new URL(s);
+            return true;
+          } catch {
+            return false;
+          }
+        }
+        return false;
+      },
+      { message: "debe ser un email (mailto:user@domain.com) o URL https://" },
+    )
     .optional(),
 });
 
 const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((data, ctx) => {
+  if (data.NODE_ENV === "production" && data.NEXT_PUBLIC_APP_URL.startsWith("http://")) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "NEXT_PUBLIC_APP_URL debe ser https:// en producción",
+      path: ["NEXT_PUBLIC_APP_URL"],
+    });
+  }
+
   const clientKey = data.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const serverKey = data.VAPID_PUBLIC_KEY;
 
