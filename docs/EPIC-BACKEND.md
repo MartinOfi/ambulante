@@ -246,7 +246,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Schema dividido en `clientEnvSchema` (NEXT_PUBLIC_* + NODE_ENV) y `serverOnlyEnvSchema`; merged en `serverEnvSchema`. Exports: `parseClientEnv`, `parseServerEnv`, `parseEnv` (alias). Tipos: `ClientEnv`, `ServerEnv`, `Env` (alias). Vars nuevas todas opcionales para backward compat (B0.1 pendiente). `DATABASE_URL_POOLER` y `DATABASE_URL_DIRECT` validadas con `new URL()` via refine (acepta scheme `postgresql://`). `CRON_SECRET` min 16 chars. `VAPID_SUBJECT` regex `^(mailto:|https://)`. `infra.md §9` actualizado. `.env.example` con defaults de Supabase local (puerto 54321/54322). 36/36 tests green. lint/typecheck failures son pre-existentes (pre-B0.2).
 
 ### B0.3 — Template de migraciones + convention doc
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-27]
 - **Por qué:** Postgres no soporta `ADD CONSTRAINT IF NOT EXISTS`. Migraciones que re-ejecutan (rollback parcial, reset local) fallan si no son idempotentes. Hay que enseñar el patrón desde el primer commit.
 - **Entregable:** `supabase/migrations/_template.sql` con patrón `DO $$ BEGIN IF NOT EXISTS(...) THEN ... END $$;`; doc `docs/workflows/migration-guide.md` que cubre: naming (`YYYYMMDDhhmmss_snake_case.sql`), idempotencia de constraints, cómo rollback-ear, cómo manejar data migrations.
 - **Archivos:** `supabase/migrations/_template.sql`, `docs/workflows/migration-guide.md`.
