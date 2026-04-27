@@ -222,7 +222,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** `pnpm supabase:start` levanta Postgres + Auth + Realtime + Storage en Docker; `pnpm supabase:reset` aplica todas las migraciones desde cero; CI corre las mismas migraciones contra una instancia efímera; env vars de Supabase están tipadas con Zod.
 
 ### B0.1 — Supabase CLI + scripts pnpm + Docker baseline
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-27, started: 19:00]
 - **Por qué:** Sin el CLI instalado y los scripts listos, ningún chat puede empezar a trabajar con backend. Es el bloqueo raíz.
 - **Entregable:** `supabase/` directory creado con `supabase init`; scripts `pnpm supabase:start`, `:stop`, `:reset`, `:status`, `:db:diff`, `:db:push` en `package.json`; doc breve en `docs/workflows/supabase-local.md` que explica el ciclo de dev (start → cambios → migration → reset → test → commit).
 - **Archivos:** `package.json`, `supabase/config.toml`, `supabase/seed.sql` (vacío inicial), `.gitignore` (ignorar `supabase/.branches`, `supabase/.temp`), `docs/workflows/supabase-local.md`.
