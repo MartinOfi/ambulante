@@ -10,6 +10,7 @@ join   pg_attribute   a
          on a.attrelid = c.conrelid
         and a.attnum   = any(c.conkey)
 where  c.contype = 'f'
+  and  array_length(c.conkey, 1) = 1  -- composite FKs need prefix-match logic; extend if ever added
   and  not exists (
          select 1
          from   pg_index i

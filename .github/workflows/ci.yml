@@ -118,30 +118,35 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
-
-      - name: Start local Supabase
-        run: supabase start
-
-      - name: Check for schema drift
-        run: |
-          DIFF=$(supabase db diff 2>/dev/null | tr -d '[:space:]')
-          if [ -n "$DIFF" ]; then
-            echo "::error::Schema drift detected — DB schema does not match migration files."
-            echo "Run 'pnpm supabase:db:diff' locally and create a migration to capture the changes."
-            supabase db diff
-            exit 1
-          fi
-          echo "No schema drift."
+          version: 2.95.5
 
       - name: Install psql
         run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Start local Supabase
+        run: |
+          supabase start
+          until pg_isready -h localhost -p 54322 -U postgres; do sleep 1; done
+
+      - name: Check for schema drift
+        run: |
+          DIFF=$(supabase db diff 2>&1 | tr -d '[:space:]')
+          if [ -n "$DIFF" ]; then
+            echo "::error::Schema drift detected — DB schema does not match migration files."
+            echo "Run 'pnpm supabase:db:diff' locally and create a migration to capture the changes."
+            supabase db diff 2>&1 || true
+            exit 1
+          fi
+          echo "No schema drift."
 
       - name: Audit FK indexes
         run: |
           MISSING=$(psql "$SUPABASE_DB_URL" \
             --tuples-only --no-align \
-            -f scripts/db-audit-fk-indexes.sql)
+            -f scripts/db-audit-fk-indexes.sql) || {
+            echo "::error::psql failed to connect or execute audit query."
+            exit 1
+          }
           if [ -n "$MISSING" ]; then
             echo "::error::FK columns without indexes (schema-foreign-key-indexes rule — HIGH):"
             printf "table_name\tfk_column\n%s\n" "$MISSING"
