@@ -258,7 +258,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Template cubre 9 patrones idempotentes: TABLE (IF NOT EXISTS), COLUMN (IF NOT EXISTS), CONSTRAINT UNIQUE/CHECK/FK (DO block + pg_constraint check), DROP CONSTRAINT (IF EXISTS nativo), INDEX (IF NOT EXISTS), ENUM/TYPE (EXCEPTION duplicate_object), FUNCTION (OR REPLACE), TRIGGER (pg_trigger check), POLICY (pg_policy check). Template nombrado `_template.sql` para que supabase db push lo ignore (sin timestamp prefix). Migration guide cubre: naming convention, tabla de DDL con soporte nativo vs. DO block, FK+índice en la misma migración, rollback strategy (nueva migración forward), data migrations (transacciones, NOT VALID pattern para tablas grandes), naming conventions de constraints/índices/triggers/policies, checklist pre-commit. Skill rule `schema-constraints` aplicada: todos los ADD CONSTRAINT usan DO block con pg_constraint.
 
 ### B0.4 — CI de migraciones + drift check + audit de FK sin índice
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
 - **Por qué:** Sin CI, una migración rota se descubre en prod. Drift check previene "alguien tocó la DB manualmente". Audit de FK sin índice previene el bug perf más común (skill rule HIGH).
 - **Entregable:** Job nuevo en `.github/workflows/ci.yml` que: (a) levanta Supabase en el runner, (b) corre `supabase db push`, (c) corre `supabase db diff` y falla si hay drift, (d) corre una query contra `pg_constraint` / `pg_index` y falla si hay FK sin índice. El script de audit es un archivo SQL reusable.
 - **Archivos:** `.github/workflows/ci.yml` (patch), `scripts/db-audit-fk-indexes.sql`.
@@ -267,7 +267,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `schema-foreign-key-indexes`
 - **REGISTRY:** —
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** Job `db-migrations` agregado al workflow. Pasos: `supabase start` (levanta containers + aplica migraciones), `supabase db diff` (falla si hay drift — stdout vacío = OK), psql con `--tuples-only --no-align` contra `scripts/db-audit-fk-indexes.sql` (falla si devuelve filas). SQL script usa la query exacta de skill rule `schema-foreign-key-indexes`: JOIN `pg_constraint` + `pg_attribute` + NOT EXISTS en `pg_index`. Env var `SUPABASE_DB_URL` a nivel de job para evitar repetición. `postgresql-client` instalado en el step previo al audit. Skill rule `schema-foreign-key-indexes` (HIGH) aplicada.
 
 ---
 
