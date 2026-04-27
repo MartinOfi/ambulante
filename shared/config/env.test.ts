@@ -180,10 +180,22 @@ describe("parseServerEnv", () => {
       expect(parsed.DATABASE_URL_POOLER).toBe(url);
     });
 
+    it("accepts a postgres:// alias URL", () => {
+      const url = "postgres://postgres:secret@localhost:6543/postgres";
+      const parsed = parseServerEnv({ ...validBase, DATABASE_URL_POOLER: url });
+      expect(parsed.DATABASE_URL_POOLER).toBe(url);
+    });
+
     it("rejects an invalid URL when present", () => {
       expect(() => parseServerEnv({ ...validBase, DATABASE_URL_POOLER: "not-a-url" })).toThrowError(
         /DATABASE_URL_POOLER/,
       );
+    });
+
+    it("rejects a non-postgresql URL scheme", () => {
+      expect(() =>
+        parseServerEnv({ ...validBase, DATABASE_URL_POOLER: "http://localhost:6543/postgres" }),
+      ).toThrowError(/DATABASE_URL_POOLER/);
     });
   });
 
@@ -199,10 +211,22 @@ describe("parseServerEnv", () => {
       expect(parsed.DATABASE_URL_DIRECT).toBe(url);
     });
 
+    it("accepts a postgres:// alias URL", () => {
+      const url = "postgres://postgres:secret@localhost:5432/postgres";
+      const parsed = parseServerEnv({ ...validBase, DATABASE_URL_DIRECT: url });
+      expect(parsed.DATABASE_URL_DIRECT).toBe(url);
+    });
+
     it("rejects an invalid URL when present", () => {
       expect(() => parseServerEnv({ ...validBase, DATABASE_URL_DIRECT: "not-a-url" })).toThrowError(
         /DATABASE_URL_DIRECT/,
       );
+    });
+
+    it("rejects a non-postgresql URL scheme", () => {
+      expect(() =>
+        parseServerEnv({ ...validBase, DATABASE_URL_DIRECT: "http://localhost:5432/postgres" }),
+      ).toThrowError(/DATABASE_URL_DIRECT/);
     });
   });
 
@@ -255,6 +279,60 @@ describe("parseServerEnv", () => {
         VAPID_SUBJECT: "https://ambulante.app",
       });
       expect(parsed.VAPID_SUBJECT).toBe("https://ambulante.app");
+    });
+  });
+
+  describe("VAPID key parity", () => {
+    const publicKey = "BPublicKeyBase64Placeholder==";
+
+    it("passes when no VAPID keys are set (feature disabled)", () => {
+      const parsed = parseServerEnv(validBase);
+      expect(parsed.NEXT_PUBLIC_VAPID_PUBLIC_KEY).toBeUndefined();
+      expect(parsed.VAPID_PUBLIC_KEY).toBeUndefined();
+    });
+
+    it("passes when both public keys match and VAPID_PRIVATE_KEY is present", () => {
+      const parsed = parseServerEnv({
+        ...validBase,
+        NEXT_PUBLIC_VAPID_PUBLIC_KEY: publicKey,
+        VAPID_PUBLIC_KEY: publicKey,
+        VAPID_PRIVATE_KEY: "private-key",
+      });
+      expect(parsed.NEXT_PUBLIC_VAPID_PUBLIC_KEY).toBe(publicKey);
+      expect(parsed.VAPID_PUBLIC_KEY).toBe(publicKey);
+    });
+
+    it("throws when NEXT_PUBLIC_VAPID_PUBLIC_KEY is set but VAPID_PUBLIC_KEY is not", () => {
+      expect(() =>
+        parseServerEnv({ ...validBase, NEXT_PUBLIC_VAPID_PUBLIC_KEY: publicKey }),
+      ).toThrowError(/VAPID/);
+    });
+
+    it("throws when VAPID_PUBLIC_KEY is set but NEXT_PUBLIC_VAPID_PUBLIC_KEY is not", () => {
+      expect(() => parseServerEnv({ ...validBase, VAPID_PUBLIC_KEY: publicKey })).toThrowError(
+        /VAPID/,
+      );
+    });
+
+    it("throws when both public keys are set but not equal", () => {
+      expect(() =>
+        parseServerEnv({
+          ...validBase,
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: "key-A",
+          VAPID_PUBLIC_KEY: "key-B",
+          VAPID_PRIVATE_KEY: "private-key",
+        }),
+      ).toThrowError(/VAPID_PUBLIC_KEY/);
+    });
+
+    it("throws when both public keys match but VAPID_PRIVATE_KEY is missing", () => {
+      expect(() =>
+        parseServerEnv({
+          ...validBase,
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: publicKey,
+          VAPID_PUBLIC_KEY: publicKey,
+        }),
+      ).toThrowError(/VAPID_PRIVATE_KEY/);
     });
   });
 });

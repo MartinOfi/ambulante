@@ -1,3 +1,5 @@
+import "server-only";
+
 import { env } from "./env.runtime";
 
 export { parseClientEnv, parseEnv, parseServerEnv } from "./env.schema";

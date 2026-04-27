@@ -1,15 +1,17 @@
 import { z } from "zod";
 
-function isAnyUrl(s: string): boolean {
+function isDatabaseUrl(s: string): boolean {
   try {
-    new URL(s);
-    return true;
+    const url = new URL(s);
+    return url.protocol === "postgresql:" || url.protocol === "postgres:";
   } catch {
     return false;
   }
 }
 
-const anyUrl = z.string().refine(isAnyUrl, { message: "Invalid URL" });
+const databaseUrl = z
+  .string()
+  .refine(isDatabaseUrl, { message: "debe ser una URL postgresql:// o postgres://" });
 
 const clientEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -31,8 +33,8 @@ const serverOnlyEnvSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   EDGE_CONFIG: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-  DATABASE_URL_POOLER: anyUrl.optional(),
-  DATABASE_URL_DIRECT: anyUrl.optional(),
+  DATABASE_URL_POOLER: databaseUrl.optional(),
+  DATABASE_URL_DIRECT: databaseUrl.optional(),
   CRON_SECRET: z.string().min(16).optional(),
   VAPID_PUBLIC_KEY: z.string().min(1).optional(),
   VAPID_PRIVATE_KEY: z.string().min(1).optional(),
@@ -42,14 +44,34 @@ const serverOnlyEnvSchema = z.object({
     .optional(),
 });
 
-const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema);
+const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((data, ctx) => {
+  const clientKey = data.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const serverKey = data.VAPID_PUBLIC_KEY;
+
+  if (clientKey !== undefined || serverKey !== undefined) {
+    if (clientKey !== serverKey) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "NEXT_PUBLIC_VAPID_PUBLIC_KEY y VAPID_PUBLIC_KEY deben ser iguales",
+        path: ["VAPID_PUBLIC_KEY"],
+      });
+    }
+    if (data.VAPID_PRIVATE_KEY === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "VAPID_PRIVATE_KEY es requerida cuando se configuran las claves VAPID",
+        path: ["VAPID_PRIVATE_KEY"],
+      });
+    }
+  }
+});
 
 export type ClientEnv = z.infer<typeof clientEnvSchema>;
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 export type Env = ServerEnv;
 
 function makeParser<TSchema extends z.ZodTypeAny>(schema: TSchema) {
-  return function parse(rawEnv: Record<string, string | undefined>): z.infer<TSchema> {
+  return function parse(rawEnv: Record<string, string | undefined>): Readonly<z.infer<TSchema>> {
     const result = schema.safeParse(rawEnv);
 
     if (!result.success) {
