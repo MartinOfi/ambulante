@@ -26,8 +26,8 @@
     "supabase:status": "supabase status",
     "supabase:db:diff": "supabase db diff",
     "supabase:db:push": "supabase db push",
-    "supabase:test": "supabase test db",
-    "supabase:test:rls": "supabase test db --db-url $DATABASE_URL_DIRECT"
+    "supabase:test": "supabase test db --db-url postgresql://postgres:postgres@localhost:54322/postgres",
+    "supabase:test:rls": "supabase test db --db-url postgresql://postgres:postgres@localhost:54322/postgres"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

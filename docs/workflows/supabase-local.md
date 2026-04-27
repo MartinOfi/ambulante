@@ -55,13 +55,13 @@ Ejecutar `pnpm supabase:status` para ver los valores exactos. Los defaults son:
 
 ### Cuál URL usar para qué
 
-| Contexto | URL a usar | Por qué |
+| Contexto | URL local | Por qué |
 |---|---|---|
-| App Next.js en runtime | `DATABASE_URL_POOLER` (pooler port 54329) | Transaction mode reutiliza conexiones — esencial bajo carga |
-| Migraciones (`supabase db push/reset`) | `DATABASE_URL_DIRECT` (direct port 54322) | El pooler no soporta prepared statements en transaction mode |
-| Tests pgTAP (`supabase:test:rls`) | `DATABASE_URL_DIRECT` | Misma razón |
+| App Next.js en runtime | `postgresql://postgres:postgres@localhost:54329/postgres` (pooler) | Transaction mode reutiliza conexiones — esencial bajo carga |
+| Migraciones (`supabase db push/reset`) | `postgresql://postgres:postgres@localhost:54322/postgres` (directo) | El pooler no soporta prepared statements en transaction mode |
+| Tests pgTAP (`supabase:test` y `supabase:test:rls`) | `postgresql://postgres:postgres@localhost:54322/postgres` (directo) | Misma razón — pgTAP usa estado de sesión |
 
-> Esta separación se define en `shared/config/env.schema.ts` (tarea B0.2).
+> En producción, estas URLs se leen de variables de entorno tipadas con Zod (`DATABASE_URL_POOLER` y `DATABASE_URL_DIRECT`). Esas variables se definen en `shared/config/env.schema.ts` — creado en la tarea **B0.2** (todavía no existe, no buscar el archivo).
 
 ---
 
@@ -76,7 +76,7 @@ Los worktrees de cadenas que no necesiten DB propia (ej: B0.2, B0.3) pueden comp
 ## Agregar una migración nueva
 
 1. Crear el archivo en `supabase/migrations/` con el formato: `YYYYMMDDhhmmss_descripcion_en_snake_case.sql`
-2. Seguir el template en `supabase/migrations/_template.sql` (disponible desde B0.3).
+2. Seguir el template de idempotencia en `supabase/migrations/_template.sql` — creado en la tarea **B0.3** (todavía no existe; hasta que se complete B0.3, aplicar manualmente el patrón `DO $$ BEGIN IF NOT EXISTS(...) THEN ... END $$;`).
 3. Correr `pnpm supabase:reset` para verificar que aplica desde cero.
 4. Commitear la migración junto con los cambios de código que la requieren.
 
