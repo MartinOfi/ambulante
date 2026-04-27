@@ -169,24 +169,44 @@ Sistema de feature flags basado en Vercel Edge Config con fallback a defaults en
 
 | Nombre | Ruta | Descripción |
 |---|---|---|
-| `env` | `shared/config/env.runtime.ts` | Objeto con todas las variables de entorno validadas y tipadas (resultado congelado de parsear `process.env` al import) |
-| `parseEnv` | `shared/config/env.schema.ts` | `(raw: Record<string, string \| undefined>) => Env` — valida con Zod; lanza si faltan vars requeridas |
-| `Env` | `shared/config/env.schema.ts` | Tipo inferido del schema |
+| `env` | `shared/config/env.runtime.ts` | Objeto server-env congelado — resultado de `parseServerEnv(process.env)` al import |
+| `parseClientEnv` | `shared/config/env.schema.ts` | `(raw) => ClientEnv` — solo vars `NEXT_PUBLIC_*` + `NODE_ENV`; seguro de llamar en el browser |
+| `parseServerEnv` | `shared/config/env.schema.ts` | `(raw) => ServerEnv` — todas las vars incluye server-only; nunca en el browser |
+| `parseEnv` | `shared/config/env.schema.ts` | Alias de `parseServerEnv` (backward compat) |
+| `ClientEnv` | `shared/config/env.schema.ts` | Tipo inferido de `clientEnvSchema` |
+| `ServerEnv` | `shared/config/env.schema.ts` | Tipo inferido de `serverEnvSchema` (client ∪ server-only) |
+| `Env` | `shared/config/env.schema.ts` | Alias de `ServerEnv` (backward compat) |
 
-**Schema actual (todos los campos):**
+**Schema — vars cliente (`clientEnvSchema` — embebidas en el bundle del browser):**
 
 | Variable | Tipo Zod | Requerida |
 |---|---|---|
 | `NODE_ENV` | `enum("development","test","production")` default `"development"` | no |
-| `NEXT_PUBLIC_APP_URL` | `string().url()` | sí |
+| `NEXT_PUBLIC_APP_URL` | `string().url()` | **sí** |
 | `NEXT_PUBLIC_SENTRY_DSN` | `string().url().optional()` | no |
-| `SENTRY_DSN` | `string().url().optional()` | no |
-| `SENTRY_AUTH_TOKEN` | `string().optional()` | no |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | `string().optional()` | no |
-| `NEXT_PUBLIC_MAP_STYLE_URL` | `string().url().optional()` | no — URL del estilo MapLibre; default en `.env.example`: `https://demotiles.maplibre.org/style.json` |
-| `EDGE_CONFIG` | `string().url().optional()` | no — inyectado automáticamente por Vercel al conectar un Edge Config store; ausente en local dev |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | `string().optional()` | no — clave pública para `pushManager.subscribe()` en el browser |
+| `NEXT_PUBLIC_MAP_STYLE_URL` | `string().url().optional()` | no — estilo MapLibre; local default: `https://demotiles.maplibre.org/style.json` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `string().url().optional()` | no — URL del proyecto Supabase; local: `http://localhost:54321` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `string().min(1).optional()` | no — anon key protegida por RLS; safe en el browser |
 
-**Consumers TS:** importar `env` desde `@/shared/config/env.runtime`. `next.config.ts` importa el side-effect `shared/config/env.runtime` para validar al build.
+**Schema — vars server-only (`serverOnlyEnvSchema` — NUNCA NEXT_PUBLIC_):**
+
+| Variable | Tipo Zod | Notas |
+|---|---|---|
+| `SENTRY_DSN` | `string().url().optional()` | server-side Sentry |
+| `SENTRY_AUTH_TOKEN` | `string().optional()` | subir source maps en CI |
+| `UPSTASH_REDIS_REST_URL` | `string().url().optional()` | rate limiting distribuido |
+| `UPSTASH_REDIS_REST_TOKEN` | `string().optional()` | |
+| `EDGE_CONFIG` | `string().url().optional()` | Vercel Edge Config para feature flags |
+| `SUPABASE_SERVICE_ROLE_KEY` | `string().min(1).optional()` | bypasses RLS — solo en Server Actions / Route Handlers |
+| `DATABASE_URL_POOLER` | `anyUrl.optional()` | PgBouncer transaction-mode puerto 6543 — solo serverless Next.js |
+| `DATABASE_URL_DIRECT` | `anyUrl.optional()` | directo puerto 5432 — solo migraciones CLI, nunca serverless |
+| `CRON_SECRET` | `string().min(16).optional()` | compartido entre pg_cron y `/api/cron/*` handlers |
+| `VAPID_PUBLIC_KEY` | `string().min(1).optional()` | firma push server-side (distinto del NEXT_PUBLIC_) |
+| `VAPID_PRIVATE_KEY` | `string().min(1).optional()` | firma push server-side |
+| `VAPID_SUBJECT` | `string().regex(/^(mailto:\|https:\/\/)/).optional()` | ej. `"mailto:push@ambulante.app"` |
+
+**Consumers TS:** importar `env` desde `@/shared/config/env.runtime`. `next.config.ts` importa el side-effect para validar al build. Las facades de Supabase (B4+) harán `assertDefined` de sus vars al inicializarse.
 
 ---
 

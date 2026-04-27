@@ -1,5 +1,5 @@
 import { env } from "./env.runtime";
 
-export { parseEnv } from "./env.schema";
+export { parseClientEnv, parseEnv, parseServerEnv } from "./env.schema";
 export { env };
-export type { Env } from "./env.schema";
+export type { ClientEnv, Env, ServerEnv } from "./env.schema";
