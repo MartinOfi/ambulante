@@ -30,6 +30,14 @@
 | auditLogEntrySchema / newAuditLogEntrySchema | schema | `shared/domain/audit-log.ts` | domain.md §12 |
 | auditLogService / createMockAuditLogService / AuditLogService | service | `shared/services/audit-log.ts` | data.md §4 |
 | authService | service | `shared/services/auth.ts` | data.md §4 |
+| authService / realtimeService / pushService / storageService (env factory) | factory | `shared/services/index.ts` | data.md §5 |
+| supabaseAuthService / createAuthClient | service-stub | `shared/services/auth.supabase.ts` | data.md §5 |
+| supabaseRealtimeService / createRealtimeClient | service-stub | `shared/services/realtime.supabase.ts` | data.md §5 |
+| supabasePushService / createPushClient | service-stub | `shared/services/push.supabase.ts` | data.md §5 |
+| supabaseStorageService / createStorageClient | service-stub | `shared/services/storage.supabase.ts` | data.md §5 |
+| storageService | service | `shared/services/storage.ts` | data.md §4 |
+| StorageService / UploadParams / RemoveParams / GetPublicUrlParams / StorageResult / UploadResult | type | `shared/services/storage.types.ts` | data.md §4 |
+| STORAGE_BUCKETS / StorageBucket / MOCK_STORAGE_BASE_URL | constant | `shared/constants/storage.ts` | domain.md §8 |
 | Badge | ui-component | `shared/components/ui/badge.tsx` | ui.md §1 |
 | Button | ui-component | `shared/components/ui/button.tsx` | ui.md §1 |
 | Card | ui-component | `shared/components/ui/card.tsx` | ui.md §1 |
