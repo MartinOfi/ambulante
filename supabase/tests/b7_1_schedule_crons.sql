@@ -2,7 +2,15 @@
 -- Run with: supabase test db
 
 begin;
-select plan(8);
+
+-- Inject settings scoped to this transaction so future in-test function calls
+-- (e.g. direct invocations of call_cron_endpoint) see a valid secret.
+-- ALTER DATABASE SET only applies to new connections; set_config(..., true) is
+-- the correct mechanism for transaction-scoped settings in pgTAP tests.
+select set_config('app.settings.cron_secret', 'dev-cron-secret-min-16-chars!!', true);
+select set_config('app.settings.site_url',    'http://127.0.0.1:3000',          true);
+
+select plan(9);
 
 -- 1. internal schema exists
 select has_schema('internal', 'internal schema should exist');
@@ -63,11 +71,18 @@ select is(
   'auto-close-orders cron job should be registered'
 );
 
--- 8. cron schedules match PRD §7.6 intervals
+-- 8. expire-orders schedule matches PRD §7.6 (every 1 min → catches 10min expiry window)
 select is(
   (select schedule from cron.job where jobname = 'expire-orders'),
   '* * * * *',
   'expire-orders should run every minute'
+);
+
+-- 9. auto-close-orders schedule matches PRD §7.6 (every 10 min → 2h auto-close window)
+select is(
+  (select schedule from cron.job where jobname = 'auto-close-orders'),
+  '*/10 * * * *',
+  'auto-close-orders should run every 10 minutes'
 );
 
 select finish();

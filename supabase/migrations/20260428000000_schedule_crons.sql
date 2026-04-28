@@ -7,7 +7,10 @@
 
 create schema if not exists internal;
 
--- postgres superuser owns the schema; PostgREST cannot see it (not in config.toml schemas[]).
+-- Revoke public browsability: anon/authenticated must not enumerate internal objects.
+-- PostgREST cannot expose internal (absent from config.toml schemas[]), but schema
+-- USAGE privilege is still inherited by public by default — remove it explicitly.
+revoke all on schema internal from public;
 grant usage on schema internal to postgres;
 
 -- ---------------------------------------------------------------------------
