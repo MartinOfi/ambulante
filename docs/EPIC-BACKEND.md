@@ -576,7 +576,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** `RealtimeService` apunta a Supabase Realtime; suscripciones por canal funcionan; React Query invalida cache correctamente al recibir eventos; reconnect + backoff en caso de desconexión; test E2E verifica propagación <5s.
 
 ### B6.1 — Habilitar Realtime + publicar tablas necesarias
-- **Estado:** 🟡 WIP
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
 - **Inicio:** 2026-04-28
 - **Por qué:** Realtime en Supabase no escucha todas las tablas por default — hay que publicarlas explícitamente vía `alter publication supabase_realtime add table ...`. Sin esto, las subscriptions no disparan.
 - **Entregable:** migración `YYYYMMDDhhmmss_realtime_publication.sql` que agrega a la publication: `orders`, `store_locations`, `stores` (columna `available`). Supabase aplica esto globalmente.
@@ -586,7 +586,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** (se llena al cerrar)
+- **Notas:** Migración `20260428000002_realtime_publication.sql` creada. REPLICA IDENTITY FULL configurado en las 3 tablas. pgTAP 7/7 passing. Se descubrieron y documentaron 2 issues previos: (1) supabase/config.toml paths para CLI v2.95.5 (corregido); (2) seed.sql ALTER DATABASE SET falla sin superuser (comentado, registrado como NT-27).
 
 ### B6.2 — Implementación del facade `RealtimeService`
 - **Estado:** ⚪ pending
