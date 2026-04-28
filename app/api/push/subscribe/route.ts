@@ -1,11 +1,9 @@
 import "server-only";
 
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { env } from "@/shared/config/env.runtime";
+import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
 
 const subscribeSchema = z.object({
   endpoint: z.string().url(),
@@ -26,24 +24,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { endpoint, keys, userAgent } = parsed.data;
 
-  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: "Error de configuración del servidor." }, { status: 500 });
-  }
-
-  const cookieStore = await cookies();
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: (cookiesToSet) => {
-        for (const { name, value, options } of cookiesToSet) {
-          cookieStore.set(name, value, options);
-        }
-      },
-    },
-  });
-
+  const supabase = await createRouteHandlerClient();
   const {
     data: { user },
     error: authError,

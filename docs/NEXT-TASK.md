@@ -420,6 +420,19 @@
 
 ---
 
+### NT-28 — Refactorizar rutas push para usar SupabasePushSubscriptionRepository
+- **Categoría:** backend / arquitectura
+- **Contexto:** `app/api/push/subscribe/route.ts` y `app/api/push/unsubscribe/route.ts` llaman a `supabase.rpc("current_user_id")` y `supabase.from("push_subscriptions")` directamente, en lugar de usar `SupabasePushSubscriptionRepository`. Esto duplica la lógica de resolución de usuario y crea drift entre el `select` de la ruta (`id, endpoint, created_at, updated_at`) y el `PUSH_SELECT` del repositorio. Descubierto en revisión de B3.3.
+- **Aceptación:** ambas rutas instancian `SupabasePushSubscriptionRepository`, llaman `upsertByEndpoint` (subscribe) y buscan por endpoint para luego llamar `delete(id)` (unsubscribe). Tests actualizados para reflejar la interfaz del repositorio.
+- **Archivos afectados:** `app/api/push/subscribe/route.ts`, `app/api/push/subscribe/route.test.ts`, `app/api/push/unsubscribe/route.ts`, `app/api/push/unsubscribe/route.test.ts`, `shared/repositories/supabase/push-subscriptions.supabase.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** cuando se toque la capa de push en cualquier otra tarea (B8.x, NT-16).
+- **Dependencias:** B3.3 ✅.
+- **Ticket:** —
+- **Notas:** El repositorio usa `resolveUserInternalId(publicId)` mientras las rutas actuales usan `rpc("current_user_id")` — hay que alinear el mecanismo de resolución. El issue de `onConflict: "endpoint"` que no valida ownership (endpoint puede ser reasignado entre usuarios) también debe resolverse aquí.
+
+---
+
 ## Cómo se alimenta este doc durante la ejecución del epic
 
 Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
