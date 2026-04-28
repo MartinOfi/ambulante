@@ -58,6 +58,16 @@ export async function createRouteHandlerClient() {
   });
 }
 
+// Server-only. Bypasses RLS — use only for trusted server-side operations.
+export function createServiceRoleClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return createSupabaseServerClient(url, key, {
+    cookies: { getAll: () => [], setAll: () => undefined },
+    auth: { persistSession: false },
+  });
+}
+
 // Used in middleware.ts — both request and response are needed to read and
 // write refreshed session cookies across the request/response cycle.
 export function createMiddlewareClient(request: NextRequest, response: NextResponse) {

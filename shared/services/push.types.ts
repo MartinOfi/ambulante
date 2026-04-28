@@ -15,3 +15,15 @@ export interface PushService {
   unsubscribe(): Promise<boolean>;
   sendTestNotification(title: string, body: string): Promise<void>;
 }
+
+// ── Server-side push (B8.2) ────────────────────────────────────────────────────
+
+export interface PushNotificationPayload {
+  readonly title: string;
+  readonly body: string;
+  readonly icon?: string;
+}
+
+export interface ServerPushSender {
+  sendToUser(userId: string, payload: PushNotificationPayload): Promise<void>;
+}

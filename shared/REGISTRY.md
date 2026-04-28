@@ -33,7 +33,9 @@
 | authService / realtimeService / pushService / storageService (env factory) | factory | `shared/services/index.ts` | data.md §5 |
 | supabaseAuthService / createAuthClient | service-stub | `shared/services/auth.supabase.ts` | data.md §5 |
 | supabaseRealtimeService / createRealtimeClient | service-stub | `shared/services/realtime.supabase.ts` | data.md §5 |
-| supabasePushService / createPushClient | service-stub | `shared/services/push.supabase.ts` | data.md §5 |
+| supabasePushService / createPushClient / createServerPushSender / getServerPushSender | service-stub + server-sender | `shared/services/push.supabase.ts` | data.md §5 |
+| ServerPushSender / PushNotificationPayload | type | `shared/services/push.types.ts` | data.md §5 |
+| createPushOnStatusChangeListener / PushListener | domain-listener | `shared/domain/events/listeners/push-on-status-change.ts` | domain.md §12 |
 | supabaseStorageService / createStorageClient | service-stub | `shared/services/storage.supabase.ts` | data.md §5 |
 | storageService | service | `shared/services/storage.ts` | data.md §4 |
 | StorageService / UploadParams / RemoveParams / GetPublicUrlParams / StorageResult / UploadResult | type | `shared/services/storage.types.ts` | data.md §4 |
