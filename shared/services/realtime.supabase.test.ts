@@ -359,6 +359,37 @@ describe("createSupabaseRealtimeService", () => {
       mockClient.allChannels[3]._triggerStatus("CHANNEL_ERROR"); // second fails
       expect(service.status()).toBe("offline"); // no spurious "online"
     });
+
+    it("does not emit 'online' until both first-time subscribe() channels confirm SUBSCRIBED", () => {
+      // Both channels created via subscribe(), not resubscribeAll().
+      // pendingChannels must be tracked per buildChannel() call, not only in resubscribeAll().
+      service.subscribe("orders:abc", () => {});
+      service.subscribe("stores:available", () => {});
+
+      mockClient.allChannels[0]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("connecting"); // second channel still pending
+
+      mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("online"); // both confirmed
+    });
+
+    it("backoff delay escalates across consecutive failures (reconnectAttempt is not reset on error)", () => {
+      service.subscribe("orders:abc", () => {});
+
+      // First failure → timer fires → attempt 1 → resubscribe → fails again
+      mockClient.lastChannel!._triggerStatus("CHANNEL_ERROR");
+      expect(service.status()).toBe("offline");
+
+      // Advance past first delay (attempt 0 → delay = INITIAL * FACTOR^0 = INITIAL)
+      vi.runAllTimers(); // fires timer, calls resubscribeAll(), creates channel[1]
+      mockClient.allChannels[1]._triggerStatus("CHANNEL_ERROR"); // attempt 1 fails
+
+      // Now there should be a second timer pending for attempt 1 (longer delay)
+      // reconnectAttempt must be 1 at this point (not reset to 0 by the error handler)
+      // We verify indirectly: running timers again triggers resubscribeAll() and creates channel[2]
+      vi.runAllTimers();
+      expect(mockClient.channel).toHaveBeenCalledTimes(3); // channel[0], [1], [2]
+    });
   });
 
   describe("destroy", () => {

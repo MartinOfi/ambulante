@@ -102,6 +102,7 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
   }
 
   function buildChannel(channelName: string): SupabaseChannel {
+    pendingChannels++;
     return getClient()
       .channel(channelName)
       .on(
@@ -129,7 +130,6 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
           // one timer because the first one sets reconnectTimer != null.
           if (reconnectTimer === null) {
             notifyStatus("offline");
-            reconnectAttempt = 0;
             pendingChannels = 0;
             scheduleNextAttempt();
           }
@@ -140,7 +140,7 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
   function resubscribeAll(): void {
     if (destroyed) return;
     notifyStatus("connecting");
-    pendingChannels = channelHandlers.size;
+    pendingChannels = 0;
     for (const channelName of channelHandlers.keys()) {
       const old = activeChannels.get(channelName);
       if (old) {
