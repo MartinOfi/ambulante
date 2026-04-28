@@ -382,7 +382,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B2.4 — Benchmark de performance RLS
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** RLS mal optimizado puede volver queries 10-100x más lentas. Necesitamos un número duro que falle el CI si alguien regresa la performance.
 - **Entregable:** Script `scripts/rls-benchmark.sql` que: (a) genera data sintética (10k stores, 100k orders, 1k users); (b) corre las 5 queries más críticas del dominio con `EXPLAIN ANALYZE`; (c) asserta que `mean_exec_time < 20ms` por query. Integrado al CI como job paralelo (no bloqueante inicialmente, bloqueante después de primera baseline).
 - **Archivos:** `scripts/rls-benchmark.sql`, `.github/workflows/ci.yml` (patch).

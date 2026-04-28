@@ -198,6 +198,32 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  rls-benchmark:
+    name: RLS Performance Benchmark
+    runs-on: ubuntu-latest
+    # Non-blocking initially: collects baseline data without failing the pipeline.
+    # Change to false once all 5 queries consistently pass the 20 ms threshold in CI.
+    continue-on-error: true
+    env:
+      SUPABASE_DB_URL: postgresql://postgres:postgres@localhost:54322/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.95.5
+
+      - name: Install psql
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Start local Supabase
+        run: |
+          supabase start
+          until pg_isready -h localhost -p 54322 -U postgres; do sleep 1; done
+
+      - name: Run RLS benchmark
+        run: psql "$SUPABASE_DB_URL" -f scripts/rls-benchmark.sql
+
   bundle-analysis:
     name: Bundle Analysis
     runs-on: ubuntu-latest
