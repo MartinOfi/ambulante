@@ -89,6 +89,8 @@ describe("SupabaseStoreRepository", () => {
       photoUrl: "https://example.com/photo.jpg",
       tagline: "Los mejores",
       priceFromArs: 1500,
+      location: { lat: -34.6, lng: -58.4 },
+      distanceMeters: 0,
     };
 
     it("resolves owner id, inserts store, and re-fetches from view", async () => {
