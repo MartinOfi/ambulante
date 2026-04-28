@@ -203,6 +203,15 @@ describe("createSupabaseRealtimeService", () => {
     it("does not throw when broadcast is called on an inactive channel", () => {
       expect(() => service.broadcast("orders:ghost", "EVENT", {})).not.toThrow();
     });
+
+    it("catches and does not re-throw when channel.send() rejects", async () => {
+      service.subscribe("orders:abc", () => {});
+      mockClient.lastChannel!.send.mockRejectedValueOnce(new Error("network failure"));
+
+      await expect(async () => service.broadcast("orders:abc", "ORDER_UPDATED", {})).not.toThrow();
+      // Give the rejected promise microtask a chance to run
+      await Promise.resolve();
+    });
   });
 
   describe("status and onStatusChange", () => {
@@ -277,6 +286,78 @@ describe("createSupabaseRealtimeService", () => {
 
       expect(statuses[0]).toBe("connecting");
       expect(mockClient.channel).toHaveBeenCalledTimes(2); // original + resubscribe
+    });
+
+    it("force-restarts even when backoff timer is already pending", () => {
+      service.subscribe("orders:abc", () => {});
+      mockClient.lastChannel!._triggerStatus("CHANNEL_ERROR"); // starts backoff
+
+      const channelCountBefore = (mockClient.channel as ReturnType<typeof vi.fn>).mock.calls.length;
+
+      // reconnect() while backoff timer is pending — should cancel timer and resubscribe now
+      service.reconnect();
+
+      expect(mockClient.channel).toHaveBeenCalledTimes(channelCountBefore + 1);
+    });
+
+    it("is a no-op after destroy", () => {
+      service.subscribe("orders:abc", () => {});
+      mockClient.lastChannel!._triggerStatus("CHANNEL_ERROR");
+
+      service.destroy();
+      const channelCountAfterDestroy = (mockClient.channel as ReturnType<typeof vi.fn>).mock.calls
+        .length;
+
+      service.reconnect();
+
+      expect(mockClient.channel).toHaveBeenCalledTimes(channelCountAfterDestroy);
+    });
+  });
+
+  describe("multi-channel status coordination (resubscribe cycle)", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("only emits 'online' when all resubscribed channels confirm SUBSCRIBED", () => {
+      // Set up two channels and get them online
+      service.subscribe("orders:abc", () => {});
+      service.subscribe("stores:available", () => {});
+      mockClient.allChannels[0]._triggerStatus("SUBSCRIBED");
+      mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
+
+      // Trigger a full resubscribe (pendingChannels = 2 → channels[2] + channels[3])
+      mockClient.allChannels[0]._triggerStatus("CHANNEL_ERROR");
+      service.reconnect();
+
+      expect(service.status()).toBe("connecting");
+
+      mockClient.allChannels[2]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("connecting"); // still waiting for channel[3]
+
+      mockClient.allChannels[3]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("online"); // all confirmed
+    });
+
+    it("stays offline and schedules backoff when one resubscribed channel errors after another subscribes", () => {
+      service.subscribe("orders:abc", () => {});
+      service.subscribe("stores:available", () => {});
+      mockClient.allChannels[0]._triggerStatus("SUBSCRIBED");
+      mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
+
+      // Trigger resubscribe → channels[2] + channels[3]
+      mockClient.allChannels[0]._triggerStatus("CHANNEL_ERROR");
+      service.reconnect();
+
+      mockClient.allChannels[2]._triggerStatus("SUBSCRIBED"); // first succeeds
+      expect(service.status()).toBe("connecting");
+
+      mockClient.allChannels[3]._triggerStatus("CHANNEL_ERROR"); // second fails
+      expect(service.status()).toBe("offline"); // no spurious "online"
     });
   });
 
