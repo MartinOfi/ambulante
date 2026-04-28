@@ -631,7 +631,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** pg_cron tiene 2 schedules activos; los Route Handlers usan `SKIP LOCKED` para soportar workers concurrentes; tests de integración verifican correctness bajo concurrencia.
 
 ### B7.1 — Migración schedule_crons + helper pg_net
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 10:50]
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 10:55]
 - **Por qué:** Sin el schedule registrado en `cron.schedule(...)`, nada corre. El helper pg_net envuelve `net.http_post(...)` con el header de autorización.
 - **Entregable:** migración `YYYYMMDDhhmmss_schedule_crons.sql` que: (a) crea función `call_cron_endpoint(path text)` que lee `CRON_SECRET` de `app_settings` y hace POST firmado; (b) registra 2 schedules: `expire-orders` cada 1 min, `auto-close-orders` cada 10 min. Secret se inyecta a Supabase desde env en B14 (prod) o desde `supabase/config.toml [edge_runtime.secrets]` (local).
 - **Archivos:** `supabase/migrations/<ts>_schedule_crons.sql`.
@@ -640,7 +640,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** `domain.md` (sección: Scheduled jobs).
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** Migración `20260428000000_schedule_crons.sql`. Función SECURITY DEFINER con restricted search_path. Settings locales en seed.sql via ALTER DATABASE. pgTAP: `supabase/tests/b7_1_schedule_crons.sql` (8 assertions).
 
 ### B7.2 — Route Handler `/api/cron/expire-orders` con SKIP LOCKED
 - **Estado:** ⚪ pending

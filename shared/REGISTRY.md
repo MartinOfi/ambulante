@@ -79,6 +79,7 @@
 | ORDER_DOMAIN_EVENT / serializeEvent | domain | `shared/domain/events.ts` | domain.md §12 |
 | ORDER_STATUS / TERMINAL_ORDER_STATUSES | constant | `shared/constants/order.ts` | domain.md §8 |
 | ORDER_TIMEOUT_POLICIES | domain | `shared/domain/timeouts.ts` | domain.md §12 |
+| internal.call_cron_endpoint / expire-orders / auto-close-orders | sql-scheduled-job | `supabase/migrations/20260428000000_schedule_crons.sql` | domain.md §14 |
 | orderRepository | repository | `shared/repositories/order.ts` | data.md §11 |
 | orderSchema | schema | `shared/schemas/order.ts` | domain.md §7b |
 | parseResponse / ParseError | query | `shared/query/parseResponse.ts` | data.md §2b |

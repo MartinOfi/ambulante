@@ -280,3 +280,28 @@ Definidas en `supabase/migrations/20260427000001_core_tables.sql`. Convenciones:
 ### FK cubiertos por índice (regla B1.5)
 
 Todas las columnas FK tienen índice explícito en la misma migración: `stores(owner_id)`, `products(store_id)`, `orders(store_id)`, `orders(customer_id)`, `order_items(order_id)`, `order_items(product_id)`, `store_locations(store_id)`, `push_subscriptions(user_id)`.
+
+---
+
+## §14 — Scheduled jobs (B7.1)
+
+Definidos en `supabase/migrations/20260428000000_schedule_crons.sql`. Usan `pg_cron` + `pg_net`. Los Route Handlers que ejecutan la lógica viven en `app/api/cron/` (B7.2, B7.3).
+
+### Helper PL/pgSQL
+
+| Función | Schema | Descripción |
+|---|---|---|
+| `internal.call_cron_endpoint(path text)` | `internal` | Lanza HTTP POST autenticado a `${app.settings.site_url}${path}` con header `Authorization: Bearer <cron_secret>`. SECURITY DEFINER. Fire-and-forget via `net.http_post()`. |
+
+**Inyección de settings:**
+- `app.settings.cron_secret` — mínimo 16 chars. Local: `ALTER DATABASE postgres SET ...` en `supabase/seed.sql`. Prod: Supabase secrets dashboard (B14).
+- `app.settings.site_url` — URL base del Next.js server. Local: `http://127.0.0.1:3000`. Prod: URL de producción.
+
+### Cron schedules
+
+| Nombre | Expresión | Ruta | PRD ref |
+|---|---|---|---|
+| `expire-orders` | `* * * * *` (cada 1 min) | `/api/cron/expire-orders` | §7.6: EXPIRADO tras 10min sin respuesta |
+| `auto-close-orders` | `*/10 * * * *` (cada 10 min) | `/api/cron/auto-close-orders` | §7.6: auto-cierre ACEPTADO tras 2h |
+
+**Tests:** `supabase/tests/b7_1_schedule_crons.sql` (pgTAP — verifica schema, función, privilegios y schedules).
