@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
+import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
 
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
@@ -79,27 +80,29 @@ test("store toggles availability → client map reflects change within 2 s (B6.3
   const storeContext = await browser.newContext();
 
   try {
-    await setSessionCookie(clientContext, "client", DEMO_CLIENT_ID);
-    await setSessionCookie(storeContext, "store", DEMO_STORE_ID);
+    // Use seed IDs that map to real mock data (store = Doña Rosa, ownerId = SEED_USER_IDS.store)
+    await setSessionCookie(clientContext, "client", SEED_USER_IDS.client);
+    await setSessionCookie(storeContext, "store", SEED_USER_IDS.store);
 
     const clientPage = await clientContext.newPage();
     const storePage = await storeContext.newPage();
 
-    // Client opens the map — store marker should be visible (store starts available)
+    // Client opens the map — NearbyBottomSheet renders store cards with "Abierto ahora" badges
     await clientPage.goto("/map");
     await clientPage.waitForLoadState("networkidle");
-    const storeMarker = clientPage.locator(`[data-store-id="${DEMO_STORE_ID}"]`);
-    await expect(storeMarker).toBeVisible({ timeout: REALTIME_SLA_MS });
+    const openBadges = clientPage.getByText("Abierto ahora");
+    await expect(openBadges.first()).toBeVisible({ timeout: REALTIME_SLA_MS });
+    const initialOpenCount = await openBadges.count();
 
-    // Store toggles availability to unavailable
+    // Store toggles availability to unavailable via the role="switch" toggle
     await storePage.goto("/store/dashboard");
     await storePage.waitForLoadState("networkidle");
-    const toggleButton = storePage.getByRole("button", { name: /disponibilidad|availability/i });
-    await expect(toggleButton).toBeVisible({ timeout: REALTIME_SLA_MS });
-    await toggleButton.click();
+    const availabilityToggle = storePage.getByRole("switch");
+    await expect(availabilityToggle).toBeVisible({ timeout: REALTIME_SLA_MS });
+    await availabilityToggle.click();
 
-    // Client map must hide the marker within 2 s (useStoresAvailabilityRealtime SLA)
-    await expect(storeMarker).toBeHidden({ timeout: AVAILABILITY_SLA_MS });
+    // useStoresAvailabilityRealtime must propagate the update — one fewer open badge within 2 s
+    await expect(openBadges).toHaveCount(initialOpenCount - 1, { timeout: AVAILABILITY_SLA_MS });
   } finally {
     await clientContext.close();
     await storeContext.close();
