@@ -319,7 +319,9 @@ Definidos en `supabase/migrations/20260428000000_schedule_crons.sql`. Usan `pg_c
 
 Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Todas las tablas tienen `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`. Patrón de rendimiento: `(select auth.uid())` evaluado una vez por query, no por fila.
 
-### Helper functions (SECURITY DEFINER, search_path = '')
+### Helper functions — contexto de sesión (SECURITY DEFINER, search_path = '')
+
+Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Devuelven el identidad del usuario autenticado actual.
 
 | Función | Retorno | Descripción |
 |---|---|---|
@@ -327,7 +329,34 @@ Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Todas las ta
 | `public.current_store_id()` | `bigint` | `id` de la tienda cuyo `owner_id` coincide con el usuario autenticado. Retorna NULL si el caller no es dueño de ninguna tienda. |
 | `public.is_admin()` | `boolean` | `true` si el usuario autenticado tiene `role = 'admin'` en `public.users`. |
 
-### Resumen de policies por tabla
+---
+
+## §16 — RLS helper functions para cross-tenant checks (B2.2)
+
+Definidas en `supabase/migrations/20260428000002_rls_helpers.sql`. Todas: `language sql stable security definer set search_path = ''`. Respaldadas por índices existentes.
+
+### Helper functions — verificación de pertenencia (SECURITY DEFINER, search_path = '')
+
+| Función | Retorno | Descripción |
+|---|---|---|
+| `public.is_store_owner(p_store_id bigint)` | `boolean` | `true` si el usuario autenticado es el dueño (`owner_id`) de la tienda dada. Índices: `stores_owner_id_idx`, `users_auth_user_id_idx`. |
+| `public.owns_order(p_order_id bigint)` | `boolean` | `true` si el usuario autenticado es el cliente o el dueño de la tienda del pedido. Retorna `false` para usuarios no autenticados (NULL no iguala ningún bigint). Índices: `orders_customer_id_idx`, `orders_store_id_idx`, `stores_owner_id_idx`, `users_auth_user_id_idx`. |
+| `public.has_role(p_role public.user_role)` | `boolean` | `true` si el usuario autenticado tiene exactamente el rol dado en `public.users`. Índice: `users_auth_user_id_idx`. |
+| `public.is_admin()` | `boolean` | Redeclaración idempotente de B2.1. `true` si `role = 'admin'`. |
+
+### View — orders_for_tienda
+
+`public.orders_for_tienda` — definida en la misma migración B2.2.
+
+- `WITH (security_barrier = true, security_invoker = true)` — previene predicate pushdown y preserva RLS del caller (PostgreSQL 15+).
+- Expone todas las columnas de `public.orders` excepto `customer_location`, que se reemplaza por `NULL` cuando `status` ∉ `{'aceptado', 'en_camino', 'finalizado'}` (PRD §7.2).
+- El filtrado de filas por tienda lo gestiona la policy RLS existente en `public.orders`; la view solo agrega la máscara de columna.
+
+---
+
+## §15 (continuación) — Resumen de policies por tabla
+
+Definidas en `supabase/migrations/20260428000000_rls_policies.sql`.
 
 | Tabla | SELECT | INSERT | UPDATE | DELETE | Notas |
 |---|---|---|---|---|---|
@@ -340,4 +369,4 @@ Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Todas las ta
 | `push_subscriptions` | propio | propio | propio | propio | |
 | `audit_log` | admin | — (service) | — | — | Solo service role escribe |
 
-**PRD §7.2 (privacidad customer_location):** la visibilidad de fila es concedida por RLS; la privacidad de la columna `customer_location` para el rol tienda se implementa en B2.2 via security-barrier view `orders_for_tienda`.
+**PRD §7.2 (privacidad customer_location):** la visibilidad de fila es concedida por RLS; la privacidad de la columna `customer_location` para el rol tienda se implementa via la view `orders_for_tienda` (§16).

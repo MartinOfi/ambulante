@@ -93,7 +93,7 @@ select is(
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'internal' and p.proname = 'call_cron_endpoint'
   ),
-  array['search_path='],
+  array['search_path=""'],
   'call_cron_endpoint should have search_path set to empty string'
 );
 
