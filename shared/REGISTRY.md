@@ -92,7 +92,8 @@
 | orderRepository | repository | `shared/repositories/order.ts` | data.md §11 |
 | orderSchema | schema | `shared/schemas/order.ts` | domain.md §7b |
 | parseResponse / ParseError | query | `shared/query/parseResponse.ts` | data.md §2b |
-| parseSessionCookie / serializeSessionCookie / writeSessionCookie / clearSessionCookie | util | `shared/utils/session-cookie.ts` | infra.md §5 |
+| parseSessionCookie / serializeSessionCookie / writeSessionCookie / clearSessionCookie | util ⚠️ superseded B4.2 | `shared/utils/session-cookie.ts` | infra.md §5 |
+| createBrowserClient / createServerClient / createRouteHandlerClient / createMiddlewareClient | supabase-client | `shared/repositories/supabase/client.ts` | data.md §6 |
 | Popover | ui-component | `shared/components/ui/popover.tsx` | ui.md §1 |
 | productRepository | repository | `shared/repositories/product.ts` | data.md §11 |
 | Product | type | `shared/types/product.ts` | domain.md §7 |

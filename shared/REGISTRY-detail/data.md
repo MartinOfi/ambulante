@@ -247,6 +247,23 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 
 ---
 
+## §6 — Clientes Supabase (`shared/repositories/supabase/client.ts`)
+
+> **Portabilidad (CLAUDE.md §10.3):** estos son los únicos archivos autorizados a importar `@supabase/ssr`. Features, hooks y componentes **nunca** instancian el cliente directo — usan los facades de §5 o los repositories de §11.
+
+Cuatro factories que wrappean `@supabase/ssr` con la configuración de cookies correcta para cada contexto de Next.js App Router:
+
+| Factory | Contexto | Descripción |
+|---|---|---|
+| `createBrowserClient()` | Client Component | Singleton por pestaña. Lee `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`. |
+| `createServerClient()` | Server Component / Server Action | Async — awaita `cookies()` del paquete `next/headers`. Lee y escribe cookies de sesión en el contexto del request. |
+| `createRouteHandlerClient()` | Route Handler | Igual que `createServerClient` — separado para claridad semántica (Route Handlers no son Server Components). |
+| `createMiddlewareClient(request, response)` | `middleware.ts` | Síncrono — recibe `NextRequest` + `NextResponse`. Lee cookies del request y escribe las refrescadas en el response. **Crear el response ANTES de llamar a `getUser()`** para que Supabase pueda escribir las cookies refrescadas. |
+
+**Nota crítica sobre `middleware.ts`:** usar siempre `supabase.auth.getUser()` (valida el JWT server-side), **nunca** `getSession()` (lee de cookie, puede ser forjada).
+
+---
+
 ## §11 — Repositories
 
 > Capa de acceso a datos detrás de interfaces genéricas. Hoy: mocks en memoria. Mañana: Supabase. **Nunca importar los mocks directamente — usar el singleton exportado desde `shared/repositories/index.ts`.**

@@ -20,11 +20,11 @@ Viven en `shared/utils/`. Funciones puras sin efectos secundarios.
 | `formatDistance` | `shared/utils/format.ts` | `(meters: number) => string` — ej. `"1.2 km"` o `"300 m"` |
 | `formatPrice` | `shared/utils/format.ts` | `(amount: number, currency?: string) => string` — formatea a moneda `es-AR` (default ARS) |
 | `getRequiredRole` | `shared/utils/route-access.ts` | `(path: string) => UserRole \| null` — mapea pathname al rol requerido; `null` para rutas públicas. Mapeo: `/map*→client`, `/store*→store`, `/admin*→admin` |
-| `parseSessionCookie` | `shared/utils/session-cookie.ts` | `(cookieValue: string) => Session \| null` — retorna `null` si vacío, base64 inválido, JSON inválido, expirado, o no satisface `sessionSchema` |
-| `serializeSessionCookie` | `shared/utils/session-cookie.ts` | `(session: Session) => string` — serializa la sesión a base64 |
-| `writeSessionCookie` | `shared/utils/session-cookie.ts` | `(session: Session) => void` — escribe en `document.cookie` (MOCK PHASE ONLY, sin `httpOnly`) |
-| `clearSessionCookie` | `shared/utils/session-cookie.ts` | `() => void` — elimina la cookie de sesión |
-| `SESSION_COOKIE_OPTIONS` | `shared/utils/session-cookie.ts` | Flags de seguridad de la cookie |
+| `parseSessionCookie` ⚠️ | `shared/utils/session-cookie.ts` | **SUPERSEDED B4.2** — reemplazado por Supabase SSR (`createMiddlewareClient`). No usar en código nuevo. |
+| `serializeSessionCookie` ⚠️ | `shared/utils/session-cookie.ts` | **SUPERSEDED B4.2** — mock phase only. |
+| `writeSessionCookie` ⚠️ | `shared/utils/session-cookie.ts` | **SUPERSEDED B4.2** — mock phase only. |
+| `clearSessionCookie` ⚠️ | `shared/utils/session-cookie.ts` | **SUPERSEDED B4.2** — mock phase only. |
+| `SESSION_COOKIE_OPTIONS` ⚠️ | `shared/utils/session-cookie.ts` | **SUPERSEDED B4.2** — mock phase only. |
 
 ---
 

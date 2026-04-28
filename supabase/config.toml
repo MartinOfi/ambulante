@@ -241,10 +241,12 @@ otp_expiry = 3600
 
 [auth.email.template.magic_link]
 subject = "Tu enlace de acceso a Ambulante"
+# Path is relative to project root (supabase CLI 2.95+).
 content_path = "./supabase/templates/magic-link.html"
 
 [auth.email.template.confirmation]
 subject = "Confirmá tu cuenta en Ambulante"
+# Path is relative to project root (supabase CLI 2.95+).
 content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize notification email template
