@@ -705,6 +705,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 ### B8.1 — VAPID keys + tabla + endpoint de subscribe
 - **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
 - **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** VAPID es el estándar para identificar al servidor ante el push service del browser. Sin VAPID, el browser rechaza.
 - **Entregable:** (a) Generar VAPID keys con `npx web-push generate-vapid-keys` y guardarlas en env vars (ya agregadas en B0.2); (b) Endpoint `app/api/push/subscribe/route.ts` (POST) que recibe subscription JSON del browser y la guarda en `push_subscriptions` con el `user_id` del JWT; (c) Endpoint `app/api/push/unsubscribe/route.ts` (DELETE).
 - **Archivos:** `app/api/push/subscribe/route.ts`, `app/api/push/unsubscribe/route.ts`.
