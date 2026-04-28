@@ -102,7 +102,7 @@
     {
       "files": [
         "shared/repositories/supabase/**/*.{ts,tsx}",
-        "shared/services/*.supabase.{ts,tsx}",
+        "shared/services/**/*.supabase.{ts,tsx}",
         "app/api/cron/**/*.{ts,tsx}"
       ],
       "rules": {

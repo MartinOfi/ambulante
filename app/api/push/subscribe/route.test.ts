@@ -29,6 +29,7 @@ vi.mock("@/shared/repositories/supabase/client", () => ({
 describe("POST /api/push/subscribe", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules();
   });
 
   function makeRequest(body: unknown): NextRequest {
