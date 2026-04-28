@@ -86,14 +86,17 @@ select is(
 );
 
 -- 10. function search_path is hardened to empty string (prevents search_path hijacking)
-select is(
-  (
-    select proconfig
+-- Postgres 15+ stores empty search_path as 'search_path=""'; older versions as 'search_path='.
+select ok(
+  exists(
+    select 1
     from pg_proc p
-    join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'internal' and p.proname = 'call_cron_endpoint'
+    join pg_namespace n on n.oid = p.pronamespace,
+    unnest(proconfig) as cfg
+    where n.nspname = 'internal'
+      and p.proname = 'call_cron_endpoint'
+      and cfg in ('search_path=', 'search_path=""')
   ),
-  array['search_path='],
   'call_cron_endpoint should have search_path set to empty string'
 );
 
