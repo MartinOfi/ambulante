@@ -156,8 +156,9 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 ### `shared/constants/storage.ts`
 | Nombre | Descripción |
 |---|---|
-| `STORAGE_BUCKETS` | `{ STORE_IMAGES: "store-images", PRODUCT_IMAGES: "product-images" }` frozen as const — nombres canónicos de buckets Supabase Storage |
-| `StorageBucket` | Unión literal de los valores de `STORAGE_BUCKETS` — `"store-images" \| "product-images"` |
+| `STORAGE_BUCKETS` | `{ PRODUCTS: "products", STORE_LOGOS: "store-logos", VALIDATION_DOCS: "validation-docs" }` frozen as const — nombres canónicos de los 3 buckets Supabase Storage |
+| `StorageBucket` | Unión literal: `"products" \| "store-logos" \| "validation-docs"` |
+| `STORAGE_SIZE_LIMITS` | `{ PRODUCTS: 5MB, STORE_LOGOS: 5MB, VALIDATION_DOCS: 10MB }` as const — tamaños máximos por bucket (satisfies Record<keyof STORAGE_BUCKETS, number>) |
 | `MOCK_STORAGE_BASE_URL` | `"https://mock-storage.ambulante.local"` — base URL del mock local para tests y dev sin Supabase |
 
 ### `shared/constants/user-management.ts`
@@ -370,3 +371,34 @@ Definidas en `supabase/migrations/20260428000000_rls_policies.sql`.
 | `audit_log` | admin | — (service) | — | — | Solo service role escribe |
 
 **PRD §7.2 (privacidad customer_location):** la visibilidad de fila es concedida por RLS; la privacidad de la columna `customer_location` para el rol tienda se implementa via la view `orders_for_tienda` (§16).
+
+---
+
+## §17 — Storage buckets y RLS (B5.1)
+
+Definidos en `supabase/migrations/20260428000006_storage_buckets.sql`.
+
+### Buckets
+
+| Bucket | Público | Límite | MIME types |
+|---|---|---|---|
+| `products` | sí | 5 MB | jpeg, png, webp, gif |
+| `store-logos` | sí | 5 MB | jpeg, png, webp |
+| `validation-docs` | no | 10 MB | jpeg, png, pdf |
+
+### Convención de paths
+
+`<bucket>/store-<store_id>/<filename>` — cada tienda escribe solo bajo su propio prefijo, verificado en `with check` vía `(select public.current_store_id())`.
+
+### Policies (sobre `storage.objects`)
+
+| Bucket | Operación | Actor permitido |
+|---|---|---|
+| `products` | SELECT | `anon`, `authenticated` (público) |
+| `products` | INSERT/UPDATE/DELETE | tienda autenticada en su path `store-<id>/` |
+| `store-logos` | SELECT | `anon`, `authenticated` (público) |
+| `store-logos` | INSERT/UPDATE/DELETE | tienda autenticada en su path `store-<id>/` |
+| `validation-docs` | SELECT | admin **o** tienda en su propio path |
+| `validation-docs` | INSERT/UPDATE/DELETE | tienda autenticada en su path `store-<id>/` |
+
+**Patrón de rendimiento:** todas las policies usan `(select public.current_store_id())` — evaluado una vez por query, no por fila, consistente con §15.
