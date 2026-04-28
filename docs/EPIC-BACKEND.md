@@ -533,7 +533,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Buckets `products`, `store-logos`, `validation-docs` existen con policies; el facade `StorageService` apunta a Supabase; upload helper valida tamaño, mime type, y orienta al user si algo falla; tests de integración cubren los 3 buckets.
 
 ### B5.1 — Crear buckets + RLS de Storage
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** Cada bucket tiene reglas de acceso distintas (productos es público de lectura; validation-docs es admin-only). Policies mal puestas = leak de documentos de identidad.
 - **Entregable:** migración `YYYYMMDDhhmmss_storage_buckets.sql` que crea los 3 buckets con `storage.buckets` + policies via `storage.objects`. Bucket `products` (público read, tienda puede escribir solo en su path `store-<id>/`); `store-logos` (público read, tienda escribe solo en su path); `validation-docs` (private, tienda escribe, admin lee). Límites de tamaño: 5MB productos/logos, 10MB docs.
 - **Archivos:** `supabase/migrations/<ts>_storage_buckets.sql`.
@@ -1273,5 +1274,4 @@ Este epic **va a crecer la superficie de `shared/`** considerablemente:
 | Fecha | Cambio |
 |---|---|
 | 2026-04-21 | Creación del epic backend (EPIC-BACKEND.md) a partir del brainstorming documentado en la conversación: shape 3 validado contra skill supabase-postgres-best-practices, 9 incorporaciones de la skill, 15 fases, ~75 tareas. |
-
-B2.3, B2.4, B3.3, B4.4, B5.1, B6.3, B7.2, B8.2             
+| 2026-04-28 | B5.1 iniciada: crear buckets + RLS de Storage. |

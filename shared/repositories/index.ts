@@ -31,7 +31,7 @@ export { productRepository } from "./mock/product.mock";
 // ── Supabase factory ───────────────────────────────────────────────────────────
 // Instantiate only when needed (browser client creation is side-effect-free but
 // we avoid module-level construction to stay compatible with SSR and test envs).
-export { createSupabaseBrowserClient } from "./supabase/client";
+export { createBrowserClient } from "./supabase/client";
 export { SupabaseUserRepository } from "./supabase/users.supabase";
 export { SupabaseStoreRepository } from "./supabase/stores.supabase";
 export { SupabaseProductRepository } from "./supabase/products.supabase";

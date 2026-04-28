@@ -16,7 +16,7 @@ create or replace function public.handle_new_auth_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = ''
 as $$
 begin
   insert into public.users (auth_user_id, display_name, role, email)
@@ -48,7 +48,9 @@ alter table public.stores
 -- stores_view: exposes lat/lng as plain columns, avoids WKB parsing in TS
 -- ─────────────────────────────────────────────────────────────────────────────
 
-create or replace view public.stores_view as
+create or replace view public.stores_view
+  with (security_invoker = true, security_barrier = true)
+as
 select
   s.id,
   s.public_id,
@@ -62,8 +64,8 @@ select
   s.tagline,
   s.price_from_ars,
   s.hours,
-  st_y(s.current_location::geometry) as lat,
-  st_x(s.current_location::geometry) as lng,
+  extensions.st_y(s.current_location::extensions.geometry) as lat,
+  extensions.st_x(s.current_location::extensions.geometry) as lng,
   s.created_at,
   s.updated_at
 from public.stores s
@@ -101,7 +103,7 @@ set search_path = ''
 as $$
   select
     s.public_id,
-    u.public_id                                     as owner_public_id,
+    u.public_id                                               as owner_public_id,
     s.name,
     s.description,
     s.category,
@@ -110,18 +112,18 @@ as $$
     s.tagline,
     s.price_from_ars,
     s.hours,
-    st_y(s.current_location::geometry)              as lat,
-    st_x(s.current_location::geometry)              as lng,
-    st_distance(
-      s.current_location::geometry::geography,
-      st_point(p_lng, p_lat)::geography
-    )                                               as distance_meters
+    extensions.st_y(s.current_location::extensions.geometry) as lat,
+    extensions.st_x(s.current_location::extensions.geometry) as lng,
+    extensions.st_distance(
+      s.current_location::extensions.geometry::extensions.geography,
+      extensions.st_point(p_lng, p_lat)::extensions.geography
+    )                                                         as distance_meters
   from public.stores s
   join public.users u on u.id = s.owner_id
   where s.current_location is not null
-    and st_dwithin(
-      s.current_location::geometry::geography,
-      st_point(p_lng, p_lat)::geography,
+    and extensions.st_dwithin(
+      s.current_location::extensions.geometry::extensions.geography,
+      extensions.st_point(p_lng, p_lat)::extensions.geography,
       p_radius_meters
     )
   order by distance_meters

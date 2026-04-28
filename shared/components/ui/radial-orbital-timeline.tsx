@@ -18,7 +18,7 @@ export interface TimelineItem {
 }
 
 interface RadialOrbitalTimelineProps {
-  timelineData: TimelineItem[];
+  timelineData: readonly TimelineItem[];
 }
 
 export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTimelineProps) {

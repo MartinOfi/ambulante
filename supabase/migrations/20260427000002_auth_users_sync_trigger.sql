@@ -7,7 +7,7 @@ create or replace function public.handle_new_auth_user()
 returns trigger
 language plpgsql
 security definer
-set search_path = public
+set search_path = public  -- superseded by 20260428000004 which corrects this to ''
 as $$
 begin
   insert into public.users (auth_user_id, display_name, role)
