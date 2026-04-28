@@ -466,7 +466,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Usuario puede registrarse, confirmar email, loguear con password o magic link o Google; middleware redirige según rol; el facade `AuthService` apunta a la implementación real y los features no notan el cambio.
 
 ### B4.1 — Configurar providers en supabase/config.toml
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 11:30]
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 11:45]
 - **Por qué:** Los providers (email, magic link, Google OAuth) se configuran declarativamente en Supabase. Commit en el repo = reproducible en cualquier instancia.
 - **Entregable:** `supabase/config.toml` con `[auth]` + `[auth.email]` (confirm_email = true, template_magic_link customizado ES) + `[auth.external.google]` (client_id + secret via env). Doc breve en `docs/workflows/auth-setup.md` con los pasos para crear la Google OAuth app y pegar los secrets en prod.
 - **Archivos:** `supabase/config.toml`, `docs/workflows/auth-setup.md`.
@@ -475,7 +475,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** —
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** Archivos creados/modificados: `supabase/config.toml` (enable_confirmations=true, secure_password_change=true, min_password_length=8, Google OAuth habilitado con env vars, templates en español), `supabase/templates/magic-link.html`, `supabase/templates/confirmation.html`, `docs/workflows/auth-setup.md` (guía paso a paso para Google Cloud Console + secrets en prod + notas sobre skip_nonce_check local vs cloud), `.env.example` (vars SUPABASE_AUTH_EXTERNAL_GOOGLE_*). Decisión: `skip_nonce_check=true` solo en config local (CLI dev), no aplica en Cloud — documentado en auth-setup.md.
 
 ### B4.2 — `@supabase/ssr` wiring + middleware.ts swap
 - **Estado:** ⚪ pending
