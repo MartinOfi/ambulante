@@ -441,7 +441,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (1) `storage.ts` y `storage.types.ts` no existían como mocks — se crearon en esta tarea junto con `shared/constants/storage.ts` (`STORAGE_BUCKETS`, `MOCK_STORAGE_BASE_URL`). (2) El env driver del factory usa `NEXT_PUBLIC_SUPABASE_URL` (ya en env.schema.ts como opcional) en lugar de una nueva var `MOCK_BACKEND`, manteniendo los cambios mínimos y semánticos. (3) `@supabase/ssr 0.10.2` y `@supabase/supabase-js 2.105.1` instalados en este paso. Tests: 12/12 ✓, suite completa 1422/1422 ✓. Code review (2 passes): 3 HIGH + 5 MEDIUM resueltos antes de merge — callsites migrados al barrel, co-validación URL+ANON_KEY, URL del mock de upload alineada con getPublicUrl, StorageBucket type en params, readonly paths, test de onAuthStateChange sync throw. Suite final: 1426/1426 ✓.
 
 ### B3.3 — ESLint `no-restricted-imports` para `@supabase/*`
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** Sin esta regla, cualquier dev apurado importa el SDK desde un feature y rompe la portabilidad silenciosamente.
 - **Entregable:** Regla en `.eslintrc.json` que prohíbe `@supabase/ssr` y `@supabase/supabase-js` excepto en los 3 directorios permitidos (via `overrides`). Error, no warning.
 - **Archivos:** `.eslintrc.json`.

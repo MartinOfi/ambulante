@@ -4,21 +4,6 @@ import { NextRequest } from "next/server";
 
 vi.mock("server-only", () => ({}));
 
-vi.mock("@/shared/config/env.runtime", () => ({
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321",
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
-  },
-}));
-
-const mockCookieStore = {
-  getAll: vi.fn(() => []),
-  set: vi.fn(),
-};
-vi.mock("next/headers", () => ({
-  cookies: vi.fn(() => Promise.resolve(mockCookieStore)),
-}));
-
 function makeQueryBuilder(result: { data?: unknown; error?: unknown }) {
   const builder: Record<string, unknown> = {};
   builder.upsert = vi.fn().mockReturnValue(builder);
@@ -31,12 +16,14 @@ const mockRpc = vi.fn();
 const mockFrom = vi.fn();
 const mockGetUser = vi.fn();
 
-vi.mock("@supabase/ssr", () => ({
-  createServerClient: vi.fn(() => ({
-    auth: { getUser: mockGetUser },
-    rpc: mockRpc,
-    from: mockFrom,
-  })),
+vi.mock("@/shared/repositories/supabase/client", () => ({
+  createRouteHandlerClient: vi.fn(() =>
+    Promise.resolve({
+      auth: { getUser: mockGetUser },
+      rpc: mockRpc,
+      from: mockFrom,
+    }),
+  ),
 }));
 
 describe("POST /api/push/subscribe", () => {
