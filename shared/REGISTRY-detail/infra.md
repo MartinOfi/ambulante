@@ -276,3 +276,28 @@ Para estado global del cliente. Usar solo cuando React state local no alcance.
 | `createRateLimitService` | factory | Retorna `InMemoryRateLimiter`; swap a Upstash cuando las env vars estén presentes (futuro backend task) |
 
 **Notas de producción:** `InMemoryRateLimiter` usa un `Map` por isolate de Edge Runtime — no comparte estado entre instancias de Vercel. Swappear a `@upstash/ratelimit` cuando se configure Supabase/backend.
+
+---
+
+## §13 — Push API Route Handlers
+
+Route Handlers server-only para gestión de suscripciones Web Push. Usan `createServerClient` de `@supabase/ssr` con cookies para autenticación server-side. El rate limiting ya aplica vía middleware (`RATE_LIMIT_RULES.api` — 60 req/60s) para todas las rutas `/api/*`.
+
+### POST /api/push/subscribe — `app/api/push/subscribe/route.ts`
+
+Registra o actualiza una suscripción Web Push del browser en la tabla `push_subscriptions`.
+
+- **Auth:** `supabase.auth.getSession()` → 401 si no hay sesión
+- **User resolution:** `supabase.rpc("current_user_id")` → 404 si no hay fila en `public.users`
+- **Persistencia:** upsert con `onConflict: "endpoint"` — idempotente para re-suscripciones
+- **Body esperado:** `{ endpoint: string (URL), keys: { p256dh: string, auth: string }, userAgent?: string }`
+- **Respuestas:** 201 con `{ id, endpoint, created_at, updated_at }` | 400 (validación) | 401 | 404 | 500
+
+### DELETE /api/push/unsubscribe — `app/api/push/unsubscribe/route.ts`
+
+Elimina una suscripción Web Push por endpoint. RLS restringe a las filas del usuario autenticado.
+
+- **Auth:** `supabase.auth.getSession()` → 401 si no hay sesión
+- **Delete:** `.delete().eq("endpoint", endpoint).select("id")` — 404 si `data.length === 0`
+- **Body esperado:** `{ endpoint: string (URL) }`
+- **Respuestas:** 204 (éxito) | 400 (validación) | 401 | 404 | 500
