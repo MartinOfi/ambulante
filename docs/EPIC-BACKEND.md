@@ -415,7 +415,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Toda interface de F3.4 tiene su implementación Supabase; los 4 facades (Auth, Storage, Realtime, Push) tienen firma documentada y stub apuntando a Supabase; ESLint bloquea imports de `@supabase/*` fuera de los 3 directorios permitidos; CI corre el check de imports y falla si hay violaciones.
 
 ### B3.1 — Repositories Supabase (implementaciones de F3.4)
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 13:05]
+- **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** Sin repositories, los hooks de React Query van a consumir Supabase directo y pierde portabilidad. Este es el cuello de botella del patrón (c').
 - **Entregable:** `shared/repositories/supabase/` con archivos: `users.supabase.ts`, `stores.supabase.ts`, `products.supabase.ts`, `orders.supabase.ts`, `audit-log.supabase.ts`, `push-subscriptions.supabase.ts`. Cada uno implementa la interface correspondiente de F3.4 y usa `@supabase/ssr` con el cliente correcto (browser client para reads públicos, service role en Server Actions). Cada repository expone embeddings para evitar N+1 (ej: `storesNearby.findAll` retorna stores + sus productos en una query).
 - **Archivos:** `shared/repositories/index.ts` (factory), `shared/repositories/supabase/*.ts` (6 archivos).
@@ -424,7 +426,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `data-n-plus-one`, `data-pagination`, `data-batch-inserts`
 - **REGISTRY:** `data.md` (nueva sección: Repositories).
 - **Estimación:** L
-- **Notas:** (se llena al cerrar)
+- **Notas:** Implementados 6 repositories Supabase: stores, products, orders, audit-log, push-subscriptions, users. Patrón de acceso híbrido (joined selects con aliases para evitar N+1, RPCs para inserts atómicos). `mappers.ts` centraliza todas las conversiones DB→dominio. Suite: 1514/1514 ✓. Code review (2 passes): HIGH-1 (`Number(id)` sin guard en push-subscriptions findById/update/delete), HIGH-2 (RPC publicId sin type-check en orders.create) — ambos resueltos. Zod safeParse en audit-log mapRow filtra rows con enums inválidos en lugar de lanzar. `stale` stub en stores lanza por diseño (no es una transición de DB sino un estado derivado del frontend).
 
 ### B3.2 — Facades Auth + Storage + Realtime + Push (stubs Supabase)
 - **Estado:** ✅ done [owner: chat-2026-04-28, closed: 11:05]

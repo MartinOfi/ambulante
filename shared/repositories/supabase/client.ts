@@ -20,6 +20,9 @@ export function createBrowserClient() {
   return createSupabaseBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
+// Repositories accept any Supabase client variant (browser, server, route handler).
+export type SupabaseClient = ReturnType<typeof createBrowserClient>;
+
 // Server Components: cookies() is read-only — setAll wraps in try/catch so
 // getUser() doesn't throw. Middleware handles session refresh on the next request.
 export async function createServerClient() {

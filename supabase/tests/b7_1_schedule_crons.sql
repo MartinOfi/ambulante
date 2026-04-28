@@ -92,9 +92,8 @@ select ok(
     select 1
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace,
-    unnest(proconfig) as cfg
-    where n.nspname = 'internal'
-      and p.proname = 'call_cron_endpoint'
+    unnest(p.proconfig) as cfg
+    where n.nspname = 'internal' and p.proname = 'call_cron_endpoint'
       and cfg in ('search_path=', 'search_path=""')
   ),
   'call_cron_endpoint should have search_path set to empty string'
