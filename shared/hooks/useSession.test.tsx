@@ -36,6 +36,12 @@ function makeMockService(initial: Session | null = null): AuthService {
       listeners.forEach((cb) => cb(null));
       return { success: true as const, data: undefined };
     }),
+    signInWithMagicLink: vi.fn(async () => ({ success: true as const, data: undefined })),
+    signInWithGoogle: vi.fn(async () => ({
+      success: false as const,
+      error: "Google sign-in no disponible en modo mock",
+    })),
+    getUser: vi.fn(async () => session?.user ?? null),
     onAuthStateChange: vi.fn((cb) => {
       listeners.add(cb);
       return () => listeners.delete(cb);

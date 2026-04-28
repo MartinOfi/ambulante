@@ -164,7 +164,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 ### `authService` — `shared/services/auth.ts`
 - **Tipos:** `shared/services/auth.types.ts`
 - **Descripción:** Implementación mock de `AuthService`. Gestiona sesión en memoria, pre-seed 3 usuarios (`client/store/admin @test.com`, password `"password"`).
-- **Interface:** `AuthService` — `signIn(input)`, `signUp(input)`, `signOut()`, `getSession()`, `onAuthStateChange(cb)`
+- **Interface:** `AuthService` — `signIn(input)`, `signUp(input)`, `signInWithMagicLink(input)`, `signInWithGoogle(input?)`, `signOut()`, `getSession()`, `getUser()`, `onAuthStateChange(cb)`
 - **Tipos clave:** `SignInInput`, `SignUpInput`, `AuthResult<T>`, `AuthStateChangeCallback`
 
 ### `realtimeService` — `shared/services/realtime.ts`
@@ -222,10 +222,10 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 ```
 
 ### `supabaseAuthService` — `shared/services/auth.supabase.ts`
-- Implementa `AuthService` (misma interface que `auth.ts`).
-- Importa `createBrowserClient` de `@supabase/ssr`.
-- **Helper:** `createAuthClient()` — instancia el cliente; disponible para B4.
-- Todos los métodos lanzan `Error("TODO — implementar en B4")`.
+- Implementa `AuthService` con llamadas reales a Supabase (B4.3).
+- Importa `createBrowserClient` de `@supabase/ssr`; instancia el cliente con env vars dentro de cada método (lazy, no module-level).
+- **Interface completa:** `signIn`, `signUp`, `signInWithMagicLink` (OTP), `signInWithGoogle` (OAuth — `skipBrowserRedirect: true`, devuelve `{ url }`), `signOut`, `getSession`, `getUser`, `onAuthStateChange`.
+- **Mapeo de roles:** `user_metadata.role` → fallback `app_metadata.role` → default `"client"`. Solo acepta `"store"` y `"admin"` como valores explícitos.
 
 ### `supabaseRealtimeService` — `shared/services/realtime.supabase.ts`
 - Implementa `RealtimeService` (misma interface que `realtime.ts`).

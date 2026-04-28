@@ -82,29 +82,18 @@ describe("services/index factory", () => {
   });
 
   describe("when NEXT_PUBLIC_SUPABASE_URL is set (supabase stub mode)", () => {
-    it("authService.signIn throws a TODO error", async () => {
+    it("authService has the expected interface", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
       const { authService } = await import("./index");
-      await expect(
-        authService.signIn({ email: "test@test.com", password: "password" }),
-      ).rejects.toThrow("TODO");
-    });
-
-    it("authService.signUp throws a TODO error", async () => {
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
-      const { authService } = await import("./index");
-      await expect(
-        authService.signUp({ email: "new@test.com", password: "password123" }),
-      ).rejects.toThrow("TODO");
-    });
-
-    it("authService.getSession throws a TODO error", async () => {
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
-      const { authService } = await import("./index");
-      await expect(authService.getSession()).rejects.toThrow("TODO");
+      expect(authService).toHaveProperty("signIn");
+      expect(authService).toHaveProperty("signUp");
+      expect(authService).toHaveProperty("signInWithMagicLink");
+      expect(authService).toHaveProperty("signInWithGoogle");
+      expect(authService).toHaveProperty("signOut");
+      expect(authService).toHaveProperty("getSession");
+      expect(authService).toHaveProperty("getUser");
+      expect(authService).toHaveProperty("onAuthStateChange");
     });
 
     it("realtimeService.subscribe throws a TODO error", async () => {
@@ -128,13 +117,6 @@ describe("services/index factory", () => {
       await expect(
         storageService.upload({ bucket: "store-images", path: "test.jpg", file: new Blob() }),
       ).rejects.toThrow("TODO");
-    });
-
-    it("authService.onAuthStateChange throws a TODO error synchronously", async () => {
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
-      vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
-      const { authService } = await import("./index");
-      expect(() => authService.onAuthStateChange(() => {})).toThrow("TODO");
     });
 
     it("throws at module load when URL is set but ANON_KEY is missing", async () => {

@@ -25,6 +25,13 @@ function buildMockService(overrides: Partial<AuthService> = {}): AuthService {
     signUp: vi.fn<AuthService["signUp"]>().mockResolvedValue({ success: true, data: mockSession }),
     signOut: vi.fn<AuthService["signOut"]>().mockResolvedValue({ success: true, data: undefined }),
     getSession: vi.fn<AuthService["getSession"]>().mockResolvedValue(null),
+    getUser: vi.fn<AuthService["getUser"]>().mockResolvedValue(null),
+    signInWithMagicLink: vi
+      .fn<AuthService["signInWithMagicLink"]>()
+      .mockResolvedValue({ success: true, data: undefined }),
+    signInWithGoogle: vi
+      .fn<AuthService["signInWithGoogle"]>()
+      .mockResolvedValue({ success: false, error: "Google sign-in no disponible en modo mock" }),
     onAuthStateChange: vi.fn<AuthService["onAuthStateChange"]>().mockReturnValue(() => {}),
     ...overrides,
   };
