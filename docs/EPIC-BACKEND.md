@@ -631,7 +631,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** pg_cron tiene 2 schedules activos; los Route Handlers usan `SKIP LOCKED` para soportar workers concurrentes; tests de integración verifican correctness bajo concurrencia.
 
 ### B7.1 — Migración schedule_crons + helper pg_net
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 10:50]
 - **Por qué:** Sin el schedule registrado en `cron.schedule(...)`, nada corre. El helper pg_net envuelve `net.http_post(...)` con el header de autorización.
 - **Entregable:** migración `YYYYMMDDhhmmss_schedule_crons.sql` que: (a) crea función `call_cron_endpoint(path text)` que lee `CRON_SECRET` de `app_settings` y hace POST firmado; (b) registra 2 schedules: `expire-orders` cada 1 min, `auto-close-orders` cada 10 min. Secret se inyecta a Supabase desde env en B14 (prod) o desde `supabase/config.toml [edge_runtime.secrets]` (local).
 - **Archivos:** `supabase/migrations/<ts>_schedule_crons.sql`.
