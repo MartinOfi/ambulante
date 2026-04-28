@@ -478,7 +478,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Archivos creados/modificados: `supabase/config.toml` (enable_confirmations=true, secure_password_change=true, min_password_length=8, Google OAuth habilitado con env vars, templates en español), `supabase/templates/magic-link.html`, `supabase/templates/confirmation.html`, `docs/workflows/auth-setup.md` (guía paso a paso para Google Cloud Console + secrets en prod + notas sobre skip_nonce_check local vs cloud), `.env.example` (vars SUPABASE_AUTH_EXTERNAL_GOOGLE_*). Decisión: `skip_nonce_check=true` solo en config local (CLI dev), no aplica en Cloud — documentado en auth-setup.md.
 
 ### B4.2 — `@supabase/ssr` wiring + middleware.ts swap
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** El `middleware.ts` actual está stubbeado. Supabase Auth necesita cookie-based session handling server-side para funcionar en App Router.
 - **Entregable:** `shared/repositories/supabase/client.ts` con `createBrowserClient`, `createServerClient`, `createRouteHandlerClient`; `middleware.ts` actualizado que refresca sesión + extrae user + determina rol desde `users` + redirige según route group `(client)/(store)/(admin)`.
 - **Archivos:** `shared/repositories/supabase/client.ts`, `middleware.ts`, `middleware.test.ts`.

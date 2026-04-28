@@ -1,10 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 import { RATE_LIMIT_RULES } from "@/shared/constants/rate-limit";
-import { parseSessionCookie } from "@/shared/utils/session-cookie";
 import { getRequiredRole } from "@/shared/utils/route-access";
 import { ROUTES } from "@/shared/constants/routes";
 import { createRateLimitService } from "@/shared/services/rate-limit";
+import { createMiddlewareClient } from "@/shared/repositories/supabase/client";
 
 const rateLimiter = createRateLimitService();
 
@@ -24,7 +23,6 @@ function extractIp(request: NextRequest): string | null {
 }
 
 // Rate limiting applies only to /api/* routes.
-// Non-API routes (map, orders, profile, store, admin) pass through to auth middleware below.
 async function applyRateLimit(request: NextRequest): Promise<NextResponse | null> {
   const { pathname } = request.nextUrl;
 
@@ -65,21 +63,33 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const rateLimitResponse = await applyRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
+  // Create response first so Supabase can write refreshed session cookies into it.
+  const response = NextResponse.next({ request });
+  const supabase = createMiddlewareClient(request, response);
+
+  // getUser() validates the JWT server-side on every request — cannot be forged.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { pathname } = request.nextUrl;
   const requiredRole = getRequiredRole(pathname);
 
   if (!requiredRole) {
-    return NextResponse.next();
+    return response;
   }
 
-  const cookieValue = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = cookieValue ? parseSessionCookie(cookieValue) : null;
+  if (!user) {
+    return NextResponse.redirect(new URL(ROUTES.auth.login, request.url));
+  }
 
-  if (!session || session.user.role !== requiredRole) {
+  const { data: appUser } = await supabase.from("users").select("role").eq("id", user.id).single();
+
+  if (!appUser || (appUser as { role: string }).role !== requiredRole) {
     return NextResponse.redirect(new URL(ROUTES.public.home, request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 // Next.js static analysis requires literal values in config.matcher — no identifier references.
