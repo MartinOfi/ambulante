@@ -11,9 +11,17 @@ create extension if not exists pgcrypto with schema extensions;
 -- Configured with track = 'all' in config.toml to capture all statement types.
 create extension if not exists pg_stat_statements with schema extensions;
 
--- pg_cron: schema is hardcoded in the extension source — must be pg_cron, not extensions
-create extension if not exists pg_cron with schema pg_cron;
-grant usage on schema pg_cron to postgres;
+-- pg_cron: schema is hardcoded in the extension source — must be pg_cron, not extensions.
+-- The grant is conditional because the local Supabase image may ship pg_cron pre-installed
+-- under a different search path; the extension CREATE is idempotent (if not exists).
+create extension if not exists pg_cron;
+do $$
+begin
+  if exists (select 1 from pg_namespace where nspname = 'pg_cron') then
+    execute 'grant usage on schema pg_cron to postgres';
+  end if;
+end;
+$$;
 
 -- pg_net: schema is hardcoded as net in the extension source
 create extension if not exists pg_net with schema net;

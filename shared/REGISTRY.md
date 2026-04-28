@@ -42,6 +42,7 @@
 | Coordinates | type | `shared/types/coordinates.ts` | domain.md §7 |
 | coordinatesSchema | schema | `shared/schemas/coordinates.ts` | domain.md §7b |
 | createEventBus / eventBus | domain | `shared/domain/event-bus.ts` | domain.md §12 |
+| current_user_id / current_store_id / is_admin | sql-fn | `supabase/migrations/20260428000000_rls_policies.sql` | domain.md §14 |
 | createLogger | util | `shared/utils/logger.ts` | infra.md §5 |
 | createMockPushService | service | `shared/services/push.ts` | data.md §4 |
 | createMockRealtimeService | service | `shared/services/realtime.ts` | data.md §4 |

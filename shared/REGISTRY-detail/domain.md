@@ -305,3 +305,32 @@ Definidos en `supabase/migrations/20260428000000_schedule_crons.sql`. Usan `pg_c
 | `auto-close-orders` | `*/10 * * * *` (cada 10 min) | `/api/cron/auto-close-orders` | §7.6: auto-cierre ACEPTADO tras 2h |
 
 **Tests:** `supabase/tests/b7_1_schedule_crons.sql` (pgTAP — verifica schema, función, privilegios y schedules).
+
+---
+
+## §15 — RLS policies (B2.1)
+
+Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Todas las tablas tienen `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`. Patrón de rendimiento: `(select auth.uid())` evaluado una vez por query, no por fila.
+
+### Helper functions (SECURITY DEFINER, search_path = public)
+
+| Función | Retorno | Descripción |
+|---|---|---|
+| `public.current_user_id()` | `bigint` | `id` del usuario autenticado en `public.users` vía `auth_user_id`. Retorna NULL si el usuario no tiene fila en public.users. |
+| `public.current_store_id()` | `bigint` | `id` de la tienda cuyo `owner_id` coincide con el usuario autenticado. Retorna NULL si el caller no es dueño de ninguna tienda. |
+| `public.is_admin()` | `boolean` | `true` si el usuario autenticado tiene `role = 'admin'` en `public.users`. |
+
+### Resumen de policies por tabla
+
+| Tabla | SELECT | INSERT | UPDATE | DELETE | Notas |
+|---|---|---|---|---|---|
+| `users` | propio o admin | — (server) | propio | — (server) | INSERT via auth trigger (service role) |
+| `stores` | disponibles, propio o admin | — (server) | dueño | — (server) | |
+| `products` | disponibles, propios o admin | dueño | dueño | dueño | Owners ven también los no-disponibles |
+| `orders` | cliente propio, tienda propia o admin | cliente | — (server) | — | Transiciones solo via server actions |
+| `order_items` | órdenes del cliente, tienda o admin | cliente | — | — | Append-only |
+| `store_locations` | todos (autenticados) | dueño | — | — | Append-only |
+| `push_subscriptions` | propio | propio | propio | propio | |
+| `audit_log` | admin | — (service) | — | — | Solo service role escribe |
+
+**PRD §7.2 (privacidad customer_location):** la visibilidad de fila es concedida por RLS; la privacidad de la columna `customer_location` para el rol tienda se implementa en B2.2 via security-barrier view `orders_for_tienda`.
