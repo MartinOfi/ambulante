@@ -277,7 +277,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Todas las tablas del dominio existen con PKs bigint identity, FKs indexadas, snake_case lowercase, índices compuestos para queries conocidas e índices parciales para filtros estables; `pg_stat_statements`, `pg_cron`, `pg_net`, `postgis`, `pgcrypto`, `pgtap` habilitadas.
 
 ### B1.1 — Extensiones habilitadas
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-27]
 - **Por qué:** Todas las fases posteriores dependen de estas extensiones. Habilitarlas en la primera migración garantiza orden y elimina re-trabajos.
 - **Entregable:** migración `YYYYMMDDhhmmss_enable_extensions.sql` con `create extension if not exists` para: `postgis`, `pgcrypto`, `pg_stat_statements`, `pg_cron`, `pg_net`, `pgtap`. Configurar `pg_stat_statements.track = 'all'` en `supabase/config.toml`.
 - **Archivos:** `supabase/migrations/<ts>_enable_extensions.sql`, `supabase/config.toml`.
@@ -286,10 +286,10 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `monitor-pg-stat-statements`
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** (se llena al cerrar)
+- **Notas:** `supabase/migrations/20260427000000_enable_extensions.sql` — 6 extensiones con `with schema extensions`. `config.toml` actualizado con `[db.settings] pg_stat_statements.track = "all"` antes de `[db.pooler]`.
 
 ### B1.2 — Tablas core del dominio
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-27]
 - **Por qué:** Schema mínimo para que el resto de fases pueda construir. Lo pensamos integral para no refactorizar por agregados triviales.
 - **Entregable:** migración `YYYYMMDDhhmmss_core_tables.sql` con tablas: `users` (extiende `auth.users` de Supabase via trigger), `stores`, `products`, `orders`, `order_items` (snapshot de producto), `store_locations` (append-only para tracking), `push_subscriptions`, `audit_log` (append-only inmutable). Convenciones: snake_case lowercase; PKs `bigint generated always as identity`; timestamps `created_at timestamptz not null default now()`; enum-ish via `check` constraints + tipos de dominio (`order_status`, `user_role`); `order_items.product_snapshot` como JSONB tipado. `id` externo para clientes via columna `public_id uuid` con `default gen_random_uuid()` en las tablas expuestas (orders, stores, products).
 - **Archivos:** `supabase/migrations/<ts>_core_tables.sql`, `supabase/migrations/<ts>_auth_users_sync_trigger.sql`.
@@ -298,10 +298,10 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `schema-primary-keys`, `schema-data-types`, `schema-lowercase-identifiers`, `schema-constraints`, `schema-foreign-key-indexes`
 - **REGISTRY:** `domain.md` (nueva sección: Tablas SQL del dominio, con snippet de cada tabla).
 - **Estimación:** L
-- **Notas:** (se llena al cerrar)
+- **Notas:** `20260427000001_core_tables.sql` — 8 tablas, 2 enum types (user_role, order_status), 9 FK constraints via DO/pg_constraint blocks + covering indexes, `set_updated_at()` trigger on 5 mutable tables, `sync_store_current_location()` AFTER INSERT trigger on store_locations that denormalizes `stores.current_location`. `20260427000002_auth_users_sync_trigger.sql` — `handle_new_auth_user()` SECURITY DEFINER + trigger on `auth.users`. Notable design: `audit_log.actor_id` is a soft reference (no FK) so audit rows survive user deletion; `order_items.product_id` is nullable FK with ON DELETE SET NULL (product_snapshot is source of truth).
 
 ### B1.3 — Índices compuestos para queries conocidas
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-27]
 - **Por qué:** Las queries críticas (mapa de tiendas activas, inbox de pedidos, historial de cliente) son predecibles desde el PRD. Agregar índices compuestos ahora es barato; agregarlos cuando hay data es doloroso.
 - **Entregable:** migración `YYYYMMDDhhmmss_composite_indexes.sql` con índices compuestos: `(status, created_at)` en orders (para inbox tienda); `(store_id, status, created_at)` en orders (para historial por tienda); `(customer_id, created_at desc)` en orders (para historial cliente); `(store_id, available)` en products; GIST en `store_locations(location)` para queries PostGIS de radio. Cada índice justificado en comentario SQL con la query que lo usa.
 - **Archivos:** `supabase/migrations/<ts>_composite_indexes.sql`.
@@ -310,10 +310,10 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `query-composite-indexes`, `query-index-types`, `query-missing-indexes`
 - **REGISTRY:** —
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** `20260427000003_composite_indexes.sql` — 4 indexes: `orders(store_id, status, created_at desc)`, `orders(customer_id, created_at desc)`, `products(store_id, available)`, `store_locations(location) USING gist`.
 
 ### B1.4 — Índices parciales para filtros estables
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-27]
 - **Por qué:** Queries que filtran siempre por el mismo predicado (ej: `stores where available = true`, `orders where status in ('ENVIADO','RECIBIDO')`) se benefician de índices parciales — 5-20x más chicos, updates más baratos.
 - **Entregable:** migración `YYYYMMDDhhmmss_partial_indexes.sql` con: índice parcial de `stores.location` donde `available = true`; índice parcial de `orders.created_at` donde `status in ('ENVIADO','RECIBIDO')`; índice parcial de `products.sku` donde `sku is not null`. Cada uno comentado.
 - **Archivos:** `supabase/migrations/<ts>_partial_indexes.sql`.
@@ -322,10 +322,10 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `query-partial-indexes`
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** (se llena al cerrar)
+- **Notas:** `20260427000004_partial_indexes.sql` — 3 partial indexes: `stores(current_location) USING gist WHERE available = true`, `orders(created_at desc) WHERE status IN ('enviado','recibido')`, `products(sku) WHERE sku IS NOT NULL`.
 
 ### B1.5 — Audit de FK sin índice + test CI
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-27]
 - **Por qué:** Cerrar la cadena con un test que garantice que ninguna FK futura queda sin índice. Si la regla se escribe solo en docs, se rompe.
 - **Entregable:** SQL script `scripts/db-audit-fk-indexes.sql` integrado al job de CI de B0.4 — si la query devuelve filas, el CI falla. Reporta tabla + columna sin índice.
 - **Archivos:** `scripts/db-audit-fk-indexes.sql`, `.github/workflows/ci.yml` (patch).
@@ -334,7 +334,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `schema-foreign-key-indexes`
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** (se llena al cerrar)
+- **Notas:** Pre-implementado en B0.4 — `scripts/db-audit-fk-indexes.sql` y el job CI ya existían al comienzo de la cadena B1. El audit corre automáticamente en cada push y falla si cualquier FK carece de índice. Todos los índices de FK de B1.2 satisfacen el check.
 
 ---
 
