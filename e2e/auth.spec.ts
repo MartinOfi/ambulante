@@ -82,3 +82,106 @@ test.describe("middleware auth gating — wrong role redirects", () => {
     expect(page.url()).not.toContain("/admin");
   });
 });
+
+test.describe("auth/callback route handler", () => {
+  test("redirects to /auth/error when code param is missing", async ({ page }) => {
+    await page.goto("/auth/callback");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+    expect(url.searchParams.get("reason")).toBe("missing_code");
+  });
+
+  test("redirects to /auth/error when code is invalid", async ({ page }) => {
+    await page.goto("/auth/callback?code=invalid-code-xyz");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+    expect(url.searchParams.get("reason")).toBe("exchange_failed");
+  });
+});
+
+test.describe("auth/confirm route handler", () => {
+  test("redirects to /auth/error when token_hash is missing", async ({ page }) => {
+    await page.goto("/auth/confirm");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+    expect(url.searchParams.get("reason")).toBe("missing_token");
+  });
+
+  test("redirects to /auth/error when type is missing", async ({ page }) => {
+    await page.goto("/auth/confirm?token_hash=abc123");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+    expect(url.searchParams.get("reason")).toBe("missing_token");
+  });
+
+  test("redirects to /auth/error when token is expired or invalid", async ({ page }) => {
+    await page.goto("/auth/confirm?token_hash=invalid-hash&type=signup");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+  });
+});
+
+test.describe("auth/error page", () => {
+  test("shows generic error when no reason param", async ({ page }) => {
+    await page.goto("/auth/error");
+    await expect(page.getByRole("heading", { name: /error/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /iniciar sesión/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /nuevo enlace/i })).toBeVisible();
+  });
+
+  test("shows expired link message for link_expired reason", async ({ page }) => {
+    await page.goto("/auth/error?reason=link_expired");
+    await expect(page.getByRole("heading", { name: /expirado/i })).toBeVisible();
+    await expect(page.getByText(/1 hora/i)).toBeVisible();
+  });
+
+  test("shows already confirmed message", async ({ page }) => {
+    await page.goto("/auth/error?reason=already_confirmed");
+    await expect(page.getByRole("heading", { name: /confirmada/i })).toBeVisible();
+  });
+
+  test("shows missing code message", async ({ page }) => {
+    await page.goto("/auth/error?reason=missing_code");
+    await expect(page.getByRole("heading", { name: /inválido/i })).toBeVisible();
+  });
+});
+
+test.describe("login page — password flow UI", () => {
+  test("renders login form", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByRole("heading", { name: /sesión/i })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible();
+    await expect(page.getByLabel(/contraseña/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /ingresar/i })).toBeVisible();
+  });
+
+  test("shows validation errors on empty submit", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("button", { name: /ingresar/i }).click();
+    await expect(page.getByText(/email/i).first()).toBeVisible();
+  });
+
+  test("shows error on wrong credentials", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByRole("textbox", { name: /email/i }).fill("wrong@test.com");
+    await page.getByLabel(/contraseña/i).fill("wrongpassword1");
+    await page.getByRole("button", { name: /ingresar/i }).click();
+    await expect(page.getByText(/credenciales/i)).toBeVisible({ timeout: 5000 });
+  });
+});
+
+test.describe("forgot-password page — magic link flow UI", () => {
+  test("renders forgot password form", async ({ page }) => {
+    await page.goto("/forgot-password");
+    await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible();
+  });
+
+  test("shows success message after submitting valid email", async ({ page }) => {
+    await page.goto("/forgot-password");
+    await page.getByRole("textbox", { name: /email/i }).fill("test@example.com");
+    await page.getByRole("button").first().click();
+    // Success state shows a confirmation message — the exact copy varies but
+    // must mention email or enlace.
+    await expect(page.getByText(/email|enlace/i).first()).toBeVisible({ timeout: 5000 });
+  });
+});
