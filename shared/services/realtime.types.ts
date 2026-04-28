@@ -13,6 +13,7 @@ export type RealtimeStatusHandler = (status: RealtimeStatus) => void;
 export interface RealtimeService {
   subscribe<T = unknown>(channel: string, handler: RealtimeHandler<T>): () => void;
   unsubscribe(channel: string): void;
+  broadcast(channel: string, event: string, payload: unknown): void;
   status(): RealtimeStatus;
   onStatusChange(handler: RealtimeStatusHandler): () => void;
   reconnect(): void;

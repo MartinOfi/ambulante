@@ -170,7 +170,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 ### `realtimeService` — `shared/services/realtime.ts`
 - **Tipos:** `shared/services/realtime.types.ts`
 - **Descripción:** Abstracción de transporte realtime swapeable (mock in-memory → Supabase Realtime). Se integra con el `eventBus` via `registerSerializationHook`. Arranca en estado `"online"`.
-- **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `reconnect()`, `destroy()`
+- **Interface:** `RealtimeService` — `subscribe(channel, handler)` → `() => void`, `unsubscribe(channel)`, `broadcast(channel, event, payload)`, `status()` → `RealtimeStatus`, `onStatusChange(handler)` → `() => void`, `reconnect()`, `destroy()`
 - **Reconnect:** exponential backoff — `RECONNECT_INITIAL_DELAY_MS * RECONNECT_BACKOFF_FACTOR^attempt`, capped at `RECONNECT_MAX_DELAY_MS`, stops after `RECONNECT_MAX_ATTEMPTS`.
 - **Test escape hatches:** `_testSetStatus(status)` — fuerza el estado; `_testSimulateDisconnect()` — emite `"offline"` y arranca el loop.
 - **Factory exportada:** `createMockRealtimeService(options?)` — recibe `eventBus` y `broadcastChannel?: BroadcastChannel | null`. Tests pasan `null` (default) para aislamiento; el singleton pasa `new BroadcastChannel("ambulante-realtime-mock")` para propagación cross-tab.
@@ -227,11 +227,15 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - **Helper:** `createAuthClient()` — instancia el cliente; disponible para B4.
 - Todos los métodos lanzan `Error("TODO — implementar en B4")`.
 
-### `supabaseRealtimeService` — `shared/services/realtime.supabase.ts`
-- Implementa `RealtimeService` (misma interface que `realtime.ts`).
-- Importa `createBrowserClient` de `@supabase/ssr`.
-- **Helper:** `createRealtimeClient()` — disponible para B5.
-- Todos los métodos lanzan `Error("TODO — implementar en B5")`.
+### `supabaseRealtimeService` — `shared/services/realtime.supabase.ts` ✅ B6.2
+- Implementa `RealtimeService` (misma interface que `realtime.ts`) usando Supabase Realtime broadcast.
+- Importa `createBrowserClient` de `@supabase/ssr` con inicialización lazy (primer uso) para seguridad en SSR y tests.
+- **DI seam:** `SupabaseRealtimeClient` — interfaz mínima (`channel`, `removeChannel`) para testabilidad sin env vars.
+- **Factory:** `createSupabaseRealtimeService(client?: SupabaseRealtimeClient)` — acepta cliente inyectado; crea `createBrowserClient` on demand si no se provee.
+- **Channels:** Supabase broadcast mode. `buildChannel` se suscribe a `{ event: "*" }` y despacha a handlers por `channelName`.
+- **Reconnect:** exponential backoff idéntico al mock. `reconnect()` fuerza restart inmediato aunque ya haya un loop en progreso (semántica: "intentar ahora, resetear backoff").
+- **Singleton:** `supabaseRealtimeService` exportado desde el módulo.
+- **Tests:** `shared/services/realtime.supabase.test.ts` — 22 casos con `MockChannel`/`MockClient` inyectados.
 
 ### `supabasePushService` — `shared/services/push.supabase.ts`
 - Implementa `PushService` (misma interface que `push.ts`).

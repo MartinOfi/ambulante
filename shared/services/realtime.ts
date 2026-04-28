@@ -173,6 +173,10 @@ export function createMockRealtimeService({
       channelHandlers.delete(channel);
     },
 
+    broadcast(channel: string, event: string, payload: unknown): void {
+      deliverToChannel(channel, event, payload);
+    },
+
     status(): RealtimeStatus {
       return currentStatus;
     },
