@@ -1,1 +1,19 @@
 pnpm exec lint-staged
+
+# Ambulante backend guard: block backend commits on main
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+if [[ "$BRANCH" == "main" ]]; then
+  STAGED=$(git diff --cached --name-only)
+  BACKEND_PATTERN='supabase/|shared/repositories/|app/api/cron/|\.supabase\.ts$'
+  if echo "$STAGED" | grep -qE "$BACKEND_PATTERN"; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  PRE-COMMIT GUARD — BLOCKED                                  ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  Backend files staged on main branch.                        ║"
+    echo "║  Backend commits must happen on a feature branch worktree.   ║"
+    echo "║  Use /b-start to create an isolated worktree + branch.       ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    exit 1
+  fi
+fi
