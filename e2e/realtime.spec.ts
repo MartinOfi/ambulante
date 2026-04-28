@@ -93,6 +93,7 @@ test("store toggles availability → client map reflects change within 2 s (B6.3
     const openBadges = clientPage.getByText("Abierto ahora");
     await expect(openBadges.first()).toBeVisible({ timeout: REALTIME_SLA_MS });
     const initialOpenCount = await openBadges.count();
+    expect(initialOpenCount).toBeGreaterThan(0);
 
     // Store toggles availability to unavailable via the role="switch" toggle
     await storePage.goto("/store/dashboard");
