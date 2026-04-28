@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 
 vi.mock("server-only", () => ({}));
 
-vi.mock("@/shared/config/env", () => ({
+vi.mock("@/shared/config/env.runtime", () => ({
   env: {
     NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321",
     NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
@@ -29,11 +29,11 @@ function makeQueryBuilder(result: { data?: unknown; error?: unknown }) {
 
 const mockRpc = vi.fn();
 const mockFrom = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetUser = vi.fn();
 
 vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(() => ({
-    auth: { getSession: mockGetSession },
+    auth: { getUser: mockGetUser },
     rpc: mockRpc,
     from: mockFrom,
   })),
@@ -82,8 +82,8 @@ describe("POST /api/push/subscribe", () => {
     expect(response.status).toBe(400);
   });
 
-  it("returns 401 when session is missing", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: null } });
+  it("returns 401 when user is not authenticated", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
     const { POST } = await import("./route");
     const response = await POST(
       makeRequest({
@@ -95,7 +95,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("returns 404 when user has no public.users row", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "auth-uuid" } } } });
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
     mockRpc.mockResolvedValue({ data: null, error: null });
     const { POST } = await import("./route");
     const response = await POST(
@@ -108,7 +108,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("returns 201 with subscription data on success", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "auth-uuid" } } } });
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
     mockRpc.mockResolvedValue({ data: 42, error: null });
     const subscriptionRow = {
       id: 1,
@@ -131,7 +131,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("returns 500 when database upsert fails", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "auth-uuid" } } } });
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
     mockRpc.mockResolvedValue({ data: 42, error: null });
     mockFrom.mockReturnValue(
       makeQueryBuilder({ data: null, error: { code: "23505", message: "duplicate" } }),
@@ -147,7 +147,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("passes userAgent as null when not provided", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "auth-uuid" } } } });
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
     mockRpc.mockResolvedValue({ data: 42, error: null });
     const builder = makeQueryBuilder({
       data: { id: 1, endpoint: "https://push.example.com/sub/abc", created_at: "", updated_at: "" },

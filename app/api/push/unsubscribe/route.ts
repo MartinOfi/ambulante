@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { env } from "@/shared/config/env";
+import { env } from "@/shared/config/env.runtime";
 
 const unsubscribeSchema = z.object({
   endpoint: z.string().url(),
@@ -21,34 +21,44 @@ export async function DELETE(request: Request): Promise<NextResponse> {
 
   const { endpoint } = parsed.data;
 
+  const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.json({ error: "Error de configuración del servidor." }, { status: 500 });
+  }
+
   const cookieStore = await cookies();
-  const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL!,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
-          }
-        },
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll: () => cookieStore.getAll(),
+      setAll: (cookiesToSet) => {
+        for (const { name, value, options } of cookiesToSet) {
+          cookieStore.set(name, value, options);
+        }
       },
     },
-  );
+  });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (authError || !user) {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+
+  const { data: userId, error: userError } = await supabase.rpc("current_user_id");
+
+  if (userError || userId === null || userId === undefined) {
+    return NextResponse.json({ error: "Usuario no encontrado." }, { status: 404 });
   }
 
   const { data, error } = await supabase
     .from("push_subscriptions")
     .delete()
     .eq("endpoint", endpoint)
+    .eq("user_id", userId)
     .select("id");
 
   if (error) {
