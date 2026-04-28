@@ -423,7 +423,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B3.2 — Facades Auth + Storage + Realtime + Push (stubs Supabase)
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 11:00]
 - **Por qué:** Los 4 facades ya existen como mocks (F4, F5, F6, F8 del frontend epic). Esta tarea instala la implementación Supabase con el mismo contrato, sin wirear todavía a Supabase real (eso se hace en B4-B8). El objetivo: las firmas están estables y los features pueden seguir importando el facade.
 - **Entregable:** `shared/services/auth.supabase.ts`, `storage.supabase.ts`, `realtime.supabase.ts`, `push.supabase.ts` con stubs que: (a) importan el SDK; (b) implementan la firma; (c) marcan cuerpo como `TODO — implementar en B4/B5/B6/B8`. Factory en `shared/services/index.ts` que exporta el facade correcto según env (`MOCK_BACKEND=true` → mock, false → supabase).
 - **Archivos:** `shared/services/auth.supabase.ts`, `storage.supabase.ts`, `realtime.supabase.ts`, `push.supabase.ts`, `shared/services/index.ts` (factory).
