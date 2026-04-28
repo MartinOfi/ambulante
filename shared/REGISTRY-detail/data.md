@@ -235,7 +235,7 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - **Channels:** Supabase broadcast mode. `buildChannel` se suscribe a `{ event: "*" }` y despacha a handlers por `channelName`.
 - **Reconnect:** exponential backoff idéntico al mock. `reconnect()` fuerza restart inmediato aunque ya haya un loop en progreso (semántica: "intentar ahora, resetear backoff").
 - **Singleton:** `supabaseRealtimeService` exportado desde el módulo.
-- **Tests:** `shared/services/realtime.supabase.test.ts` — 22 casos con `MockChannel`/`MockClient` inyectados.
+- **Tests:** `shared/services/realtime.supabase.test.ts` — 32 casos con `MockChannel`/`MockClient` inyectados.
 
 ### `supabasePushService` — `shared/services/push.supabase.ts`
 - Implementa `PushService` (misma interface que `push.ts`).

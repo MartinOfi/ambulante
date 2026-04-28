@@ -230,6 +230,14 @@ describe("createSupabaseRealtimeService", () => {
       expect(service.status()).toBe("offline");
     });
 
+    it("transitions to 'offline' when channel reports TIMED_OUT (same as CHANNEL_ERROR)", () => {
+      service.subscribe("orders:abc", () => {});
+      mockClient.lastChannel!._triggerStatus("SUBSCRIBED");
+      mockClient.lastChannel!._triggerStatus("TIMED_OUT");
+
+      expect(service.status()).toBe("offline");
+    });
+
     it("notifies status listeners on transitions", () => {
       const statuses: string[] = [];
       service.onStatusChange((s) => statuses.push(s));
@@ -371,6 +379,34 @@ describe("createSupabaseRealtimeService", () => {
 
       mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
       expect(service.status()).toBe("online"); // both confirmed
+    });
+
+    it("does not block 'online' when a pending channel is unsubscribed before SUBSCRIBED fires", () => {
+      // subscribe two channels; unsub the first before SUBSCRIBED arrives.
+      // The second channel's SUBSCRIBED should still resolve to "online".
+      const unsub = service.subscribe("orders:abc", () => {});
+      service.subscribe("stores:available", () => {});
+
+      unsub(); // remove before SUBSCRIBED fires — pendingChannels must be corrected
+
+      mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("online");
+    });
+
+    it("stale callbacks from replaced channels do not emit 'online' prematurely", () => {
+      service.subscribe("orders:abc", () => {});
+      mockClient.allChannels[0]._triggerStatus("SUBSCRIBED");
+
+      // Error triggers reconnect → resubscribeAll builds channel[1]
+      mockClient.allChannels[0]._triggerStatus("CHANNEL_ERROR");
+      service.reconnect(); // creates channel[1], epoch bumped
+
+      // Old channel[0] fires SUBSCRIBED again (stale async callback) — must be ignored
+      mockClient.allChannels[0]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("connecting"); // still waiting for channel[1]
+
+      mockClient.allChannels[1]._triggerStatus("SUBSCRIBED");
+      expect(service.status()).toBe("online");
     });
 
     it("backoff delay escalates across consecutive failures (reconnectAttempt is not reset on error)", () => {

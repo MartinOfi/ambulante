@@ -52,6 +52,13 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingChannels = 0;
 
+  // epoch increments on each resubscribeAll() to invalidate stale callbacks from
+  // replaced channels that may still fire after removeChannel() is called (async).
+  let epoch = 0;
+  // tracks which channel names are still awaiting their SUBSCRIBED confirmation,
+  // enabling correct pendingChannels adjustment when a channel is removed mid-flight.
+  const pendingChannelNames = new Set<string>();
+
   function notifyStatus(status: RealtimeStatus): void {
     currentStatus = status;
     for (const listener of statusListeners) {
@@ -101,7 +108,16 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
     }, delay);
   }
 
+  function removePendingChannel(channelName: string): void {
+    if (pendingChannelNames.has(channelName)) {
+      pendingChannelNames.delete(channelName);
+      pendingChannels = Math.max(0, pendingChannels - 1);
+    }
+  }
+
   function buildChannel(channelName: string): SupabaseChannel {
+    const capturedEpoch = epoch;
+    pendingChannelNames.add(channelName);
     pendingChannels++;
     return getClient()
       .channel(channelName)
@@ -114,8 +130,14 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
       )
       .subscribe((status: string) => {
         if (destroyed) return;
+        // Stale callback from a channel replaced by resubscribeAll()
+        if (capturedEpoch !== epoch) return;
 
         if (status === "SUBSCRIBED") {
+          // Skip if the channel was unsubscribed before SUBSCRIBED arrived — its
+          // pending slot was already released by removePendingChannel().
+          if (!pendingChannelNames.has(channelName)) return;
+          pendingChannelNames.delete(channelName);
           pendingChannels = Math.max(0, pendingChannels - 1);
           // Only emit "online" when all pending channels confirm AND no error
           // has already scheduled a backoff (a concurrent sibling channel error
@@ -131,6 +153,7 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
           if (reconnectTimer === null) {
             notifyStatus("offline");
             pendingChannels = 0;
+            pendingChannelNames.clear();
             scheduleNextAttempt();
           }
         }
@@ -139,8 +162,12 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
 
   function resubscribeAll(): void {
     if (destroyed) return;
+    // Bump epoch before building new channels so any SUBSCRIBED/ERROR callbacks
+    // still in flight from the old channels are silently discarded.
+    epoch++;
     notifyStatus("connecting");
     pendingChannels = 0;
+    pendingChannelNames.clear();
     for (const channelName of channelHandlers.keys()) {
       const old = activeChannels.get(channelName);
       if (old) {
@@ -171,6 +198,7 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
       return () => {
         handlers.delete(handler as RealtimeHandler);
         if (handlers.size === 0) {
+          removePendingChannel(channelName);
           const ch = activeChannels.get(channelName);
           if (ch) {
             getClient()
@@ -189,6 +217,7 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
     },
 
     unsubscribe(channelName: string): void {
+      removePendingChannel(channelName);
       const ch = activeChannels.get(channelName);
       if (ch) {
         getClient()
@@ -236,6 +265,8 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
     destroy(): void {
       destroyed = true;
       clearReconnectTimer();
+      pendingChannels = 0;
+      pendingChannelNames.clear();
       for (const ch of activeChannels.values()) {
         getClient()
           .removeChannel(ch)
