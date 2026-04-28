@@ -65,6 +65,20 @@ describe("services/index factory", () => {
       expect(typeof url).toBe("string");
       expect(url.length).toBeGreaterThan(0);
     });
+
+    it("storageService.upload URL matches getPublicUrl for the same bucket+path", async () => {
+      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+      const { storageService } = await import("./index");
+      const bucket = "store-images" as const;
+      const path = "logos/store.png";
+      const result = await storageService.upload({ bucket, path, file: new Blob(["x"]) });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const publicUrl = storageService.getPublicUrl({ bucket, path });
+        expect(result.data.url).toBe(publicUrl);
+        expect(result.data.url).toContain("mock-storage.ambulante.local");
+      }
+    });
   });
 
   describe("when NEXT_PUBLIC_SUPABASE_URL is set (supabase stub mode)", () => {
@@ -114,6 +128,19 @@ describe("services/index factory", () => {
       await expect(
         storageService.upload({ bucket: "store-images", path: "test.jpg", file: new Blob() }),
       ).rejects.toThrow("TODO");
+    });
+
+    it("authService.onAuthStateChange throws a TODO error synchronously", async () => {
+      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
+      vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
+      const { authService } = await import("./index");
+      expect(() => authService.onAuthStateChange(() => {})).toThrow("TODO");
+    });
+
+    it("throws at module load when URL is set but ANON_KEY is missing", async () => {
+      vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
+      vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+      await expect(import("./index")).rejects.toThrow("NEXT_PUBLIC_SUPABASE_ANON_KEY");
     });
   });
 });

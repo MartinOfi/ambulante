@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@/shared/types/user";
-import { authService as defaultAuthService } from "@/shared/services/auth";
+import { authService as defaultAuthService } from "@/shared/services";
 import type { AuthService, SignInInput, SignUpInput } from "@/shared/services/auth.types";
 
 export type SessionStatus = "loading" | "authenticated" | "unauthenticated" | "error";

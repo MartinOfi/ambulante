@@ -1,16 +1,18 @@
+import type { StorageBucket } from "@/shared/constants/storage";
+
 export interface UploadParams {
-  readonly bucket: string;
+  readonly bucket: StorageBucket;
   readonly path: string;
   readonly file: Blob | File;
 }
 
 export interface RemoveParams {
-  readonly bucket: string;
-  readonly paths: string[];
+  readonly bucket: StorageBucket;
+  readonly paths: readonly string[];
 }
 
 export interface GetPublicUrlParams {
-  readonly bucket: string;
+  readonly bucket: StorageBucket;
   readonly path: string;
 }
 

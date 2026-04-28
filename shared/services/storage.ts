@@ -9,22 +9,13 @@ import type {
   UploadResult,
 } from "./storage.types";
 
-export type {
-  GetPublicUrlParams,
-  RemoveParams,
-  StorageResult,
-  StorageService,
-  UploadParams,
-  UploadResult,
-};
-
 export const storageService: StorageService = {
-  async upload({ path }: UploadParams): Promise<StorageResult<UploadResult>> {
+  async upload({ bucket, path }: UploadParams): Promise<StorageResult<UploadResult>> {
     return {
       success: true,
       data: {
         path,
-        url: `${MOCK_STORAGE_BASE_URL}/${path}`,
+        url: `${MOCK_STORAGE_BASE_URL}/${bucket}/${path}`,
       },
     };
   },

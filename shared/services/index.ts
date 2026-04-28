@@ -11,7 +11,14 @@ import { supabaseRealtimeService } from "./realtime.supabase";
 import { storageService as mockStorageService } from "./storage";
 import { supabaseStorageService } from "./storage.supabase";
 
-const isMock = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (supabaseUrl && !supabaseAnonKey) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is required when NEXT_PUBLIC_SUPABASE_URL is set");
+}
+
+const isMock = !supabaseUrl;
 
 export const authService: AuthService = isMock ? mockAuthService : supabaseAuthService;
 export const realtimeService: RealtimeService = isMock
