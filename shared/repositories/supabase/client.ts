@@ -2,6 +2,7 @@ import {
   createBrowserClient as createSupabaseBrowserClient,
   createServerClient as createSupabaseServerClient,
 } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
@@ -55,6 +56,17 @@ export async function createRouteHandlerClient() {
         cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
       },
     },
+  });
+}
+
+// Cron route handlers use service role to bypass RLS. Never pass this client to
+// user-facing code — it has full DB access with no row-level restrictions.
+export function createServiceRoleClient(url: string, key: string): SupabaseClient {
+  if (!url.startsWith("https://") || key.trim().length === 0) {
+    throw new Error("createServiceRoleClient: invalid url or key");
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 

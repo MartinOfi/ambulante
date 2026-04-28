@@ -656,7 +656,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Migración `20260428000000_schedule_crons.sql`. Función SECURITY DEFINER con restricted search_path. Settings locales en seed.sql via ALTER DATABASE. pgTAP: `supabase/tests/b7_1_schedule_crons.sql` (8 assertions).
 
 ### B7.2 — Route Handler `/api/cron/expire-orders` con SKIP LOCKED
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
+- **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** PRD §7.6: pedidos sin respuesta → `EXPIRADO` a los 10min. Debe ser idempotente (puede dispararse 2x por lag) y seguro bajo concurrencia.
 - **Entregable:** `app/api/cron/expire-orders/route.ts` que: (a) valida `Authorization: Bearer ${CRON_SECRET}`; (b) hace UPDATE atómico con `SKIP LOCKED` para claim y transition en un solo statement; (c) usa la state machine TS (F3.2) para validar cada transición; (d) emite domain events post-commit (F3.5); (e) retorna JSON con count de orders transitioned. Tests unitarios + tests de integración con 100 orders concurrent.
 - **Archivos:** `app/api/cron/expire-orders/route.ts`, `app/api/cron/expire-orders/route.test.ts`.
@@ -665,7 +667,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `lock-skip-locked`, `lock-short-transactions`
 - **REGISTRY:** —
 - **Estimación:** L
-- **Notas:** (se llena al cerrar)
+- **Notas:** Migración SQL en `supabase/migrations/20260428000004_claim_expirable_orders_rpc.sql`. RPC encapsula `FOR UPDATE SKIP LOCKED` (no soportado directo por PostgREST). `createServiceRoleClient` añadido a `shared/repositories/supabase/client.ts`. DB→domain status via `dbStatusToDomain()`. Eventos publicados post-loop (garantía post-commit). 10 tests (2 auth + 8 lógica incluyendo 100 orders). Pre-existing typecheck fixes: `createBrowserClient` rename en `repositories/index.ts`, `readonly` en `HowItWorksClient`.
 
 ### B7.3 — Route Handler `/api/cron/auto-close-orders`
 - **Estado:** ⚪ pending
