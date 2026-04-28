@@ -110,5 +110,7 @@ function makeParser<TSchema extends z.ZodTypeAny>(schema: TSchema) {
 }
 
 export const parseClientEnv = makeParser(clientEnvSchema);
+// Import parseServerEnv/parseEnv through shared/config/env.ts, not this file directly.
+// env.ts carries `import "server-only"` which blocks Next.js from bundling it into the client.
 export const parseServerEnv = makeParser(serverEnvSchema);
 export const parseEnv = parseServerEnv;

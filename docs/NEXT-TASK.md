@@ -394,6 +394,17 @@
 - **Ticket:** —
 - **Notas:** OpenTelemetry en Vercel serverless es estable desde 2024; el cliente de OTel SDK ya está maduro. Costo del backend es la variable principal.
 
+### NT-26 — Mejorar mensajes de error de paridad VAPID cuando una sola clave está configurada
+- **Categoría:** backend / DX
+- **Contexto:** Cuando solo `NEXT_PUBLIC_VAPID_PUBLIC_KEY` o solo `VAPID_PUBLIC_KEY` está presente, el `superRefine` en `serverEnvSchema` emite dos errores (mismatch + private key faltante) en lugar de uno solo y claro. No es un bug de seguridad pero degrada la DX al arrancar con config incompleta.
+- **Aceptación:** superRefine reformulado con 3 ramas explícitas: (a) solo client key → error "falta VAPID_PUBLIC_KEY", (b) solo server key → error "falta NEXT_PUBLIC_VAPID_PUBLIC_KEY", (c) ambas presentes y distintas → error de mismatch + VAPID_PRIVATE_KEY si falta.
+- **Archivos afectados:** `shared/config/env.schema.ts`, `shared/config/env.test.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** cuando se active VAPID en producción y se reporten errores de startup confusos.
+- **Dependencias:** B0.2 ✅ (descubierto en code review de B0.2).
+- **Ticket:** —
+- **Notas:** Descubierto por B0.2 code review pass #3; ver `shared/config/env.schema.ts` línea 79.
+
 ---
 
 ## Cómo se alimenta este doc durante la ejecución del epic

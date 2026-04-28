@@ -103,6 +103,14 @@ describe("parseClientEnv", () => {
       parseClientEnv({ ...validBase, NEXT_PUBLIC_SUPABASE_URL: "not-a-url" }),
     ).toThrowError(/NEXT_PUBLIC_SUPABASE_URL/);
   });
+
+  it("does not enforce https:// in production — that check is server-only", () => {
+    const parsed = parseClientEnv({
+      NODE_ENV: "production",
+      NEXT_PUBLIC_APP_URL: "http://ambulante.app",
+    });
+    expect(parsed.NEXT_PUBLIC_APP_URL).toBe("http://ambulante.app");
+  });
 });
 
 describe("parseServerEnv", () => {
