@@ -576,7 +576,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** `RealtimeService` apunta a Supabase Realtime; suscripciones por canal funcionan; React Query invalida cache correctamente al recibir eventos; reconnect + backoff en caso de desconexión; test E2E verifica propagación <5s.
 
 ### B6.1 — Habilitar Realtime + publicar tablas necesarias
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** Realtime en Supabase no escucha todas las tablas por default — hay que publicarlas explícitamente vía `alter publication supabase_realtime add table ...`. Sin esto, las subscriptions no disparan.
 - **Entregable:** migración `YYYYMMDDhhmmss_realtime_publication.sql` que agrega a la publication: `orders`, `store_locations`, `stores` (columna `available`). Supabase aplica esto globalmente.
 - **Archivos:** `supabase/migrations/<ts>_realtime_publication.sql`.

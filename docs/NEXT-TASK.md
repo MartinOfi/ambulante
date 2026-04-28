@@ -55,6 +55,8 @@
 | [NT-23](#nt-23--modo-offline-completo-con-sincronización-diferida) | Modo offline completo con sincronización diferida | PWA / perf | XL | >30% de usuarios en zonas de conectividad mala |
 | [NT-24](#nt-24--app-nativa-ios-si-la-pwa-topa-límites) | App nativa iOS si la PWA topa límites | plataforma | XL | push en iOS sin PWA-install sigue sin estar disponible |
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
+| [NT-26](#nt-26--mejorar-mensajes-de-error-de-paridad-vapid-cuando-una-sola-clave-está-configurada) | Mejorar mensajes de error de paridad VAPID | backend / DX | S | activar VAPID en prod |
+| [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 
 ---
 
@@ -404,6 +406,17 @@
 - **Dependencias:** B0.2 ✅ (descubierto en code review de B0.2).
 - **Ticket:** —
 - **Notas:** Descubierto por B0.2 code review pass #3; ver `shared/config/env.schema.ts` línea 79.
+
+### NT-27 — Mover `ALTER DATABASE SET` de seed.sql a una migración
+- **Categoría:** infra / DX
+- **Contexto:** `supabase/seed.sql` contiene dos `ALTER DATABASE postgres SET "app.settings.*"` agregados en B7.1. En Supabase CLI v2.95.5, el seed se aplica como el usuario `postgres` que carece del privilegio `ALTER DATABASE` (requiere superuser o `pg_alter_system`). Esto causa que `pnpm supabase:start` falle durante el seeding y deje los contenedores detenidos. Como workaround temporal en B6.1, las líneas están comentadas. Los ajustes deben vivir en una migración donde el CLI los aplica con el usuario `supabase_admin` (superuser).
+- **Aceptación:** `ALTER DATABASE postgres SET "app.settings.cron_secret"` y `"app.settings.site_url"` movidos a una migración (ej: `20260428000001_schedule_crons.sql` o una nueva). `pnpm supabase:start` completa sin errores de seeding.
+- **Archivos afectados:** `supabase/seed.sql`, `supabase/migrations/20260428000001_schedule_crons.sql`.
+- **Estimación:** S
+- **Cuándo retomarlo:** al reabrir el epic de cron jobs (B7.x) o cuando se necesite que la cron secret esté disponible en dev.
+- **Dependencias:** B7.1 ✅ (bug introducido ahí).
+- **Ticket:** —
+- **Notas:** Descubierto en B6.1. El pgTAP test de B7.1 ya usa `set_config()` transaction-scoped como workaround correcto para tests; la migración debería hacer lo mismo para el arranque.
 
 ---
 
