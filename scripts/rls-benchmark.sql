@@ -182,6 +182,13 @@ BEGIN
 
   EXECUTE 'RESET ROLE';
 
+  IF v_test_order_id IS NULL THEN
+    RAISE EXCEPTION 'No bench orders found for bench customer — Step 1 data generation may have failed.';
+  END IF;
+
+  -- Wrap all query blocks so RESET ROLE always runs on error.
+  BEGIN
+
   -- ── Q1: Available stores for the map (customer auth) ──────────────────────
   v_q_name := 'Q1  available stores (map query, customer view)';
   PERFORM set_config('request.jwt.claims',
@@ -276,6 +283,12 @@ BEGIN
   IF v_exec_time > v_threshold THEN v_any_fail := true; END IF;
 
   EXECUTE 'RESET ROLE';
+
+  EXCEPTION WHEN OTHERS THEN
+    -- Guarantee role is reset even if an EXPLAIN or set_config call fails.
+    EXECUTE 'RESET ROLE';
+    RAISE;
+  END;
 
   -- ── Final result ──────────────────────────────────────────────────────────
   IF v_any_fail THEN
