@@ -22,7 +22,7 @@ returns bigint
 language sql
 stable
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select id from public.users where auth_user_id = (select auth.uid());
 $$;
@@ -30,6 +30,7 @@ $$;
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Helper: get the store_id owned by the current auth user (tienda role).
 -- Returns NULL when the caller is not a tienda owner.
+-- security definer + fixed search_path prevents search_path hijacking.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 create or replace function public.current_store_id()
@@ -37,7 +38,7 @@ returns bigint
 language sql
 stable
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select s.id
   from public.stores s
@@ -56,7 +57,7 @@ returns boolean
 language sql
 stable
 security definer
-set search_path = public
+set search_path = ''
 as $$
   select exists (
     select 1 from public.users
