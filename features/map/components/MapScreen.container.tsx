@@ -5,6 +5,7 @@ import { useGeolocation } from "@/shared/hooks/useGeolocation";
 import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
 import { useRadiusParam } from "@/features/map/hooks/useRadiusParam";
 import { useStoresNearbyQuery } from "@/features/map/hooks/useStoresNearbyQuery";
+import { useStoresAvailabilityRealtime } from "@/features/map/hooks/useStoresAvailabilityRealtime";
 import { MapScreen } from "./MapScreen";
 
 export function MapScreenContainer() {
@@ -14,6 +15,7 @@ export function MapScreenContainer() {
 
   const coords = geo.status === "granted" ? geo.coords : null;
   const { data: stores = [] } = useStoresNearbyQuery({ coords, radius });
+  useStoresAvailabilityRealtime();
 
   const handleExpandRadius = useCallback(() => {
     setRadius(MAX_EXPAND_RADIUS);

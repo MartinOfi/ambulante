@@ -93,6 +93,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 | `useOrderQuery` | `features/orders/hooks/useOrderQuery.ts` | `useOrderQuery(orderId: string)` — fetches single order, retorna `Order \| null`. Key: `queryKeys.orders.byId(orderId)` |
 | `useAcceptOrderMutation` | `features/orders/hooks/useAcceptOrderMutation.ts` | Tienda acepta pedido; optimistic update: snapshot + write `ACEPTADO`; rollback en `onError`; invalida `orders.byId` + `orders.all` en `onSettled` |
 | `useSendOrderMutation` | `features/orders/hooks/useSendOrderMutation.ts` | `mutate({ storeId, items, notes? })` — crea pedido en `ENVIADO`; snapshot inmutable de productos (PRD §7.4); invalida `orders.all()` |
+| `useOrderRealtime` | `features/orders/hooks/useOrderRealtime.ts` | `useOrderRealtime(orderId: string): void` — suscribe al canal `REALTIME_CHANNELS.ORDERS` e invalida `queryKeys.orders.byId(orderId)` en cada evento. Wrapper de `useRealtimeInvalidation`. |
 
 ### Hooks feature-local — map
 
@@ -101,6 +102,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 | `useStoresNearbyQuery` | `features/map/hooks/useStoresNearbyQuery.ts` | `useStoresNearbyQuery({ coords: Coordinates \| null, radius: RadiusValue })` — disabled si `coords === null`; key: `queryKeys.stores.nearby(coords, radius)` |
 | `useStoreByIdQuery` | `features/map/hooks/useStoreByIdQuery.ts` | `useStoreByIdQuery(storeId: string \| null)` — disabled cuando `storeId` es null |
 | `useStoreProductsQuery` | `features/map/hooks/useStoreProductsQuery.ts` | `useStoreProductsQuery(storeId: string \| null)` — key: `queryKeys.products.byStore(storeId)` |
+| `useStoresAvailabilityRealtime` | `features/map/hooks/useStoresAvailabilityRealtime.ts` | `useStoresAvailabilityRealtime(): void` — suscribe al canal `REALTIME_CHANNELS.STORES` e invalida `queryKeys.stores.all()` en cada evento (prefix invalidation — cubre `nearby`, `byId`, etc.). Wrapper de `useRealtimeInvalidation`. |
 
 ### Hooks feature-local — store-dashboard
 
