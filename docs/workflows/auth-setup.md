@@ -61,8 +61,11 @@ para capturar emails en `http://localhost:54324`.
 
 **Opción B — Variables de entorno del proyecto (recomendado para CI/CD):**
 ```bash
-supabase secrets set SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<client-id>
-supabase secrets set SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<client-secret>
+# Usar --env-file evita que los secrets queden en el historial del shell.
+supabase secrets set --env-file ./.env.production.local
+# Donde .env.production.local (no commiteado) contiene:
+# SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<client-id>
+# SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<client-secret>
 ```
 
 ### 2.4 Para desarrollo local
@@ -75,6 +78,9 @@ Crear un OAuth client ID separado para `localhost`:
    SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<client-id-local>
    SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<client-secret-local>
    ```
+   > **Importante:** estas variables NO llevan el prefijo `NEXT_PUBLIC_`. Son leídas
+   > exclusivamente por el Supabase CLI / proceso servidor. Nunca exponerlas al bundle
+   > del cliente.
 4. Reiniciar Supabase local: `pnpm supabase:stop && pnpm supabase:start`
 
 > **Nota:** `skip_nonce_check = true` está habilitado en `config.toml` para desarrollo local.

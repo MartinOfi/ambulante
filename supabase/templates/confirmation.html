@@ -60,8 +60,14 @@
     <p>
       Gracias por registrarte en Ambulante. Hacé clic en el botón de abajo para confirmar tu dirección de email y activar tu cuenta.
     </p>
+    <p>
+      Este enlace es válido por 1 hora y solo puede usarse una vez.
+    </p>
     <a href="{{ .ConfirmationURL }}" class="btn">Confirmar mi cuenta</a>
     <div class="footer">
+      <p>Si el botón no funciona, copiá este enlace en tu navegador:<br>
+        <span style="word-break:break-all;">{{ .ConfirmationURL }}</span>
+      </p>
       <p>Si no creaste una cuenta en Ambulante, podés ignorar este email con seguridad.</p>
       <p>Ambulante &mdash; Encontrá tu tienda ambulante favorita.</p>
     </div>
