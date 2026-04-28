@@ -392,7 +392,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B2.5 — Lint SQL check de patrones RLS prohibidos
-- **Estado:** ⚪ pending
+- **Estado:** ✅ Done
+- **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** La regla "usar `(select auth.uid())` nunca `auth.uid()`" es fácil de olvidar. Un grep en CI la vuelve estructural.
 - **Entregable:** Script `scripts/rls-lint.sh` que: (a) busca `auth.uid()` no envuelto en subquery; (b) busca policies sin `to authenticated`/`to anon` explícito; (c) falla el CI si encuentra. Documentado en `docs/workflows/rls-patterns.md`.
 - **Archivos:** `scripts/rls-lint.sh`, `docs/workflows/rls-patterns.md`, `.github/workflows/ci.yml` (patch).
@@ -401,7 +403,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `security-rls-performance`
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** (se llena al cerrar)
+- **Notas:** Implementado con grep+awk (sin conexión a DB). Dos checks: (1) bare auth.uid() detectado por grep con exclusión de líneas comentadas y del patrón correcto; (2) CREATE POLICY sin TO acumulado por awk en bloques multi-línea hasta `;`. Testeado contra fixtures pass/fail. CI job `rls-lint` corre independiente (sin Supabase). Commit 5c86f17.
 
 ---
 
