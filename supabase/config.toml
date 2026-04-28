@@ -35,9 +35,6 @@ health_timeout = "2m"
 # server_version;` on the remote database to check.
 major_version = 17
 
-[db.settings]
-# Track all statement types so pg_stat_statements captures utility commands too (monitor-pg-stat-statements rule)
-pg_stat_statements.track = "all"
 
 [db.pooler]
 enabled = true
