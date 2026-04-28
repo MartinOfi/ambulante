@@ -356,8 +356,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Entregado en `supabase/migrations/20260428000000_rls_policies.sql`. 8 tablas con ENABLE + FORCE RLS. 19 policies consolidadas (1 SELECT por tabla/rol para evitar advisory 0006). 3 helpers security definer: `current_user_id()`, `current_store_id()`, `is_admin()`. PRD §7.2 customer_location privacidad delegada a B2.2 view (la RLS da visibilidad de fila; la view controla la columna). Dos bugs pre-existentes corregidos en B0 migrations para desbloquear supabase start: `[db.settings]` inválido en config.toml y grant de pg_cron schema condicional.
 
 ### B2.2 — Helper functions security definer para cross-tenant checks
-- **Estado:** 🟡 WIP
+- **Estado:** ✅ done
 - **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** Policies que validan pertenencia a equipos/roles (ej: "admin puede ver todo") deben usar funciones `security definer` para evitar recursión RLS y mantener performance (skill rule HIGH).
 - **Entregable:** migración con funciones: `is_admin()`, `is_store_owner(store_id bigint)`, `owns_order(order_id bigint)`, `has_role(role user_role)`. Todas `language sql security definer set search_path = ''`. Cada una con index-backed lookup.
 - **Archivos:** `supabase/migrations/<ts>_rls_helpers.sql`.
