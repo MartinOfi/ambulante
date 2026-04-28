@@ -4,6 +4,7 @@ import { getRequiredRole } from "@/shared/utils/route-access";
 import { ROUTES } from "@/shared/constants/routes";
 import { createRateLimitService } from "@/shared/services/rate-limit";
 import { createMiddlewareClient } from "@/shared/repositories/supabase/client";
+import { userRoleSchema } from "@/shared/schemas/user";
 
 const rateLimiter = createRateLimitService();
 
@@ -85,7 +86,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   const { data: appUser } = await supabase.from("users").select("role").eq("id", user.id).single();
 
-  if (!appUser || (appUser as { role: string }).role !== requiredRole) {
+  const roleResult = userRoleSchema.safeParse(appUser?.role);
+  if (!roleResult.success || roleResult.data !== requiredRole) {
     return NextResponse.redirect(new URL(ROUTES.public.home, request.url));
   }
 
