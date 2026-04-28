@@ -113,6 +113,28 @@ select throws_ok($$ ... $$, '42501', null, 'descripción del test');
 
 ---
 
+### RLS Benchmark — `scripts/rls-benchmark.sql`
+
+SQL script that generates production-scale synthetic data and asserts the 5 most critical domain queries complete within a 20 ms threshold with RLS fully enforced.
+
+| Query | Index used | Actor |
+|---|---|---|
+| Q1 — available stores (map) | `stores_current_location_active_gist_idx` | customer |
+| Q2 — customer order history | `orders_customer_created_idx` | customer |
+| Q3 — store active inbox | `orders_store_status_created_idx` | tienda |
+| Q4 — store product catalog | `products_store_available_idx` | tienda |
+| Q5 — order items for one order | `order_items_order_id_idx` + EXISTS RLS | customer |
+
+**Synthetic data:** 1k users · 10k stores · 50k products · 100k orders · 100k order_items. Data is tagged with `__bench_user_*` / `__bench_store_*` / `__bench_product_*` prefixes and cleaned up automatically on success and failure.
+
+**Auth simulation:** uses `set_config('request.jwt.claims', ...)` + `SET LOCAL ROLE authenticated` — no real auth.users entries needed.
+
+**Run:** `psql "$DATABASE_URL" -f scripts/rls-benchmark.sql`
+
+**CI:** `rls-benchmark` job in `.github/workflows/ci.yml` (`continue-on-error: true` until baseline is established).
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`

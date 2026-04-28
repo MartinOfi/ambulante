@@ -384,7 +384,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** 85 tests pasan (8 archivos). Fixes aplicados: (a) `has_policy` reemplazado por `ok(exists(select 1 from pg_policies...))` — pgTAP 1.3 no tiene `has_policy`; (b) `throws_ok` 4-arg con `null` errmsg — 3-arg verificaba el mensaje literal; (c) `localhost` → `127.0.0.1` en scripts y CI (macOS resuelve localhost a IPv6). Patrón cross-user ID stash documentado en `testing.md §15`.
 
 ### B2.4 — Benchmark de performance RLS
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
+- **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** RLS mal optimizado puede volver queries 10-100x más lentas. Necesitamos un número duro que falle el CI si alguien regresa la performance.
 - **Entregable:** Script `scripts/rls-benchmark.sql` que: (a) genera data sintética (10k stores, 100k orders, 1k users); (b) corre las 5 queries más críticas del dominio con `EXPLAIN ANALYZE`; (c) asserta que `mean_exec_time < 20ms` por query. Integrado al CI como job paralelo (no bloqueante inicialmente, bloqueante después de primera baseline).
 - **Archivos:** `scripts/rls-benchmark.sql`, `.github/workflows/ci.yml` (patch).
@@ -393,7 +395,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `security-rls-performance`, `monitor-explain-analyze`
 - **REGISTRY:** `testing.md`.
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** Benchmark verificado localmente — Q1 0.53 ms, Q2 11.43 ms, Q3 1.18 ms, Q4 12.14 ms, Q5 1.18 ms. Todas bajo el umbral de 20 ms. Auth simulada via set_config JWT claims. Nested PROCEDURE en DO block no es válido en PG — se inlineó el timing pattern.
 
 ### B2.5 — Lint SQL check de patrones RLS prohibidos
 - **Estado:** ✅ Done
