@@ -1271,3 +1271,5 @@ Este epic **va a crecer la superficie de `shared/`** considerablemente:
 | Fecha | Cambio |
 |---|---|
 | 2026-04-21 | Creación del epic backend (EPIC-BACKEND.md) a partir del brainstorming documentado en la conversación: shape 3 validado contra skill supabase-postgres-best-practices, 9 incorporaciones de la skill, 15 fases, ~75 tareas. |
+
+B2.3, B2.4, B3.3, B4.4, B5.1, B6.3, B7.2, B8.2             
