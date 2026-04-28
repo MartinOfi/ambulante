@@ -15,6 +15,7 @@ const VALID_OTP_TYPES = new Set<EmailOtpType>([
 ]);
 
 function isValidOtpType(value: string): value is EmailOtpType {
+  // Cast required: Set<T>.has() only accepts T; this function is the runtime validation.
   return VALID_OTP_TYPES.has(value as EmailOtpType);
 }
 

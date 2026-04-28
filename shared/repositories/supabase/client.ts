@@ -78,9 +78,16 @@ export function createMiddlewareClient(request: NextRequest, response: NextRespo
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
+        const secure = process.env.NODE_ENV === "production";
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
+          response.cookies.set(name, value, {
+            httpOnly: true,
+            secure,
+            sameSite: "lax",
+            path: "/",
+            ...options,
+          }),
         );
       },
     },
