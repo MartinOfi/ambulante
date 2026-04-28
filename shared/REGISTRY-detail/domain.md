@@ -242,3 +242,41 @@ Implementa el invariante PRD §9.4: la ubicación del cliente **nunca** se expon
   - `TimeoutScheduler.schedule({ orderId, status, onFire }): () => void` — devuelve cleanup
 - **Tipos exportados:** `TimeoutPolicy`, `ScheduleInput`, `TimeoutScheduler`
 - **Nota:** estados sin política (terminales, EN_CAMINO) devuelven no-op cleanup — el caller no necesita verificar.
+
+---
+
+## §13 — Tablas SQL del dominio (B1.2)
+
+Definidas en `supabase/migrations/20260427000001_core_tables.sql`. Convenciones: `snake_case` lowercase; PKs `bigint generated always as identity`; `public_id uuid default gen_random_uuid()` en tablas expuestas al cliente; `timestamptz` para todos los timestamps.
+
+### Enum types
+
+| Nombre | Valores |
+|---|---|
+| `public.user_role` | `'cliente'`, `'tienda'`, `'admin'` |
+| `public.order_status` | `'enviado'`, `'recibido'`, `'aceptado'`, `'en_camino'`, `'finalizado'`, `'rechazado'`, `'cancelado'`, `'expirado'` |
+
+### Tablas
+
+| Tabla | PK | Notas clave |
+|---|---|---|
+| `public.users` | `id bigint` | `public_id uuid`, `auth_user_id uuid` unique; sincronizada desde `auth.users` via trigger `handle_new_auth_user()` (SECURITY DEFINER) |
+| `public.stores` | `id bigint` | `public_id uuid`; `current_location geometry(Point,4326)` denormalizado — actualizado por trigger `sync_store_current_location` en INSERT de `store_locations` |
+| `public.products` | `id bigint` | `public_id uuid`; `price numeric(10,2)` check ≥ 0; `currency text` default `'ARS'` |
+| `public.orders` | `id bigint` | `public_id uuid`; `status order_status` default `'enviado'`; `customer_location geometry(Point,4326)` — expuesta a tienda solo post-ACEPTADO (RLS B2.1) |
+| `public.order_items` | `id bigint` | Append-only (sin `updated_at`); `product_id` FK nullable (ON DELETE SET NULL); `product_snapshot jsonb not null` — fuente de verdad del snapshot |
+| `public.store_locations` | `id bigint` | Append-only (sin `updated_at`); `location geometry(Point,4326) not null`; INSERT actualiza `stores.current_location` via trigger |
+| `public.push_subscriptions` | `id bigint` | `endpoint text` unique; `p256dh`, `auth_key`, `user_agent` text |
+| `public.audit_log` | `id bigint` | Append-only (sin `updated_at`); `actor_id bigint` — soft reference (no FK, para sobrevivir DELETE de usuario) |
+
+### Trigger functions
+
+| Función | Tipo | Propósito |
+|---|---|---|
+| `public.set_updated_at()` | BEFORE UPDATE | Actualiza `updated_at = now()` en las 5 tablas mutables |
+| `public.sync_store_current_location()` | AFTER INSERT on store_locations | Denormaliza `location` → `stores.current_location` |
+| `public.handle_new_auth_user()` | AFTER INSERT on auth.users | Crea fila en `public.users` (SECURITY DEFINER) |
+
+### FK cubiertos por índice (regla B1.5)
+
+Todas las columnas FK tienen índice explícito en la misma migración: `stores(owner_id)`, `products(store_id)`, `orders(store_id)`, `orders(customer_id)`, `order_items(order_id)`, `order_items(product_id)`, `store_locations(store_id)`, `push_subscriptions(user_id)`.
