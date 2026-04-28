@@ -1,8 +1,9 @@
 pnpm exec lint-staged
 
 # Ambulante backend guard: block backend commits on main
+# Skip during merges — MERGE_HEAD exists only when git merge --continue is running.
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-if [[ "$BRANCH" == "main" ]]; then
+if [[ "$BRANCH" == "main" ]] && [[ ! -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]]; then
   STAGED=$(git diff --cached --name-only)
   BACKEND_PATTERN='supabase/|shared/repositories/|app/api/cron/|\.supabase\.ts$'
   if echo "$STAGED" | grep -qE "$BACKEND_PATTERN"; then
