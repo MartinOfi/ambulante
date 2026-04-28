@@ -85,7 +85,7 @@ describe("authService.signUp", () => {
       role: "client",
     });
     expect(result.success).toBe(true);
-    if (result.success) {
+    if (result.success && result.data) {
       expect(result.data.user.email).toBe("new@test.com");
       expect(result.data.user.role).toBe("client");
     }
@@ -97,7 +97,7 @@ describe("authService.signUp", () => {
       password: "password",
     });
     expect(result.success).toBe(true);
-    if (result.success) {
+    if (result.success && result.data) {
       expect(result.data.user.role).toBe("client");
     }
   });

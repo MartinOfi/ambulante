@@ -10,7 +10,14 @@ import {
   parseSessionCookie,
 } from "@/shared/utils/session-cookie";
 import { SESSION_COOKIE_MAX_AGE_SECONDS, SESSION_COOKIE_NAME } from "@/shared/constants/auth";
-import type { AuthService, AuthStateChangeCallback, SignInInput, SignUpInput } from "./auth.types";
+import type {
+  AuthService,
+  AuthStateChangeCallback,
+  MagicLinkInput,
+  OAuthInput,
+  SignInInput,
+  SignUpInput,
+} from "./auth.types";
 import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
 
 export type { AuthService, SignInInput, SignUpInput };
@@ -163,6 +170,19 @@ export const authService: AuthService = {
     writeSessionCookie(currentSession);
     notify(currentSession);
     return { success: true, data: currentSession };
+  },
+
+  async signInWithMagicLink(_input: MagicLinkInput) {
+    return { success: true as const, data: undefined };
+  },
+
+  async signInWithGoogle(_input?: OAuthInput) {
+    return { success: false as const, error: "Google sign-in no disponible en modo mock" };
+  },
+
+  async getUser() {
+    if (currentSession) return currentSession.user;
+    return null;
   },
 
   async signOut() {

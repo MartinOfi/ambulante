@@ -496,7 +496,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** 13/13 tests. Usa `getUser()` (JWT server-side) en lugar de `getSession()`. Fix de `config.toml` template paths para Supabase CLI 2.95.4+. Session-cookie utils marcados como superseded.
 
 ### B4.3 — Implementación completa del facade `AuthService`
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
+- **Inicio:** 2026-04-28
 - **Por qué:** Con el SSR wiring listo, hay que llenar los stubs de B3.2 con implementaciones reales que llamen a `supabase.auth.signInWith*`.
 - **Entregable:** `shared/services/auth.supabase.ts` con firmas completas: `signIn`, `signInWithMagicLink`, `signInWithGoogle`, `signOut`, `getSession`, `getUser`, `onAuthStateChange`. Tests unitarios para cada método (mockeando el cliente). Actualizar `shared/services/index.ts` factory para usar auth.supabase.ts por default cuando `MOCK_BACKEND=false`.
 - **Archivos:** `shared/services/auth.supabase.ts`, `shared/services/auth.supabase.test.ts`, `shared/services/index.ts`.
@@ -505,7 +506,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** `data.md`.
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** Importa `createBrowserClient` de `@supabase/ssr` directamente (permitido por §10.3 de CLAUDE.md). Lazy client — instanciado dentro de cada método para evitar module-level side effects. Mapeo de roles: `user_metadata.role` → `app_metadata.role` → `"client"`. 26 tests unitarios (vi.hoisted + vi.mock("@supabase/ssr")). Suite completa 1456/1456 verde. `HowItWorksClient.tsx` TS error es pre-existente, no introducido por esta tarea.
 
 ### B4.4 — Callbacks OAuth + confirm email + error pages
 - **Estado:** ⚪ pending
