@@ -8,5 +8,6 @@
 -- The cron_secret value must be ≥16 chars (matches env.schema.ts min length).
 -- site_url points to the local Next.js dev server; pg_net fires against it.
 -- ---------------------------------------------------------------------------
-alter database postgres set "app.settings.cron_secret" = 'dev-cron-secret-min-16-chars!!';
-alter database postgres set "app.settings.site_url"    = 'http://127.0.0.1:3000';
+-- These require pg_alter_system (superuser) — moved to migration B7.1 equivalent.
+-- alter database postgres set "app.settings.cron_secret" = 'dev-cron-secret-min-16-chars!!';
+-- alter database postgres set "app.settings.site_url"    = 'http://127.0.0.1:3000';
