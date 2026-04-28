@@ -319,7 +319,7 @@ Definidos en `supabase/migrations/20260428000000_schedule_crons.sql`. Usan `pg_c
 
 Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Todas las tablas tienen `ENABLE ROW LEVEL SECURITY` + `FORCE ROW LEVEL SECURITY`. Patrón de rendimiento: `(select auth.uid())` evaluado una vez por query, no por fila.
 
-### Helper functions (SECURITY DEFINER, search_path = public)
+### Helper functions (SECURITY DEFINER, search_path = '')
 
 | Función | Retorno | Descripción |
 |---|---|---|
