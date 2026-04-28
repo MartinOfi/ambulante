@@ -13,7 +13,7 @@
 | Domain: tipos TS, schemas Zod, state machine, domain events, constantes, routes | [`REGISTRY-detail/domain.md`](./REGISTRY-detail/domain.md) |
 | Infraestructura: utils puros, design tokens, config de entorno, stores Zustand | [`REGISTRY-detail/infra.md`](./REGISTRY-detail/infra.md) |
 | Componentes/hooks de features existentes (OrderTracking, StoreDetailSheet, store-shell) | [`REGISTRY-detail/features.md`](./REGISTRY-detail/features.md) |
-| Test utilities (renderWithProviders, factories de entidades) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
+| Test utilities (renderWithProviders, factories de entidades) o pgTAP RLS tests (`supabase/tests/`) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
 
 ---
 
@@ -115,6 +115,11 @@
 | registerBackgroundSync | query | `shared/query/offline-queue.ts` | data.md §2b |
 | renderWithProviders | test-util | `shared/test-utils/render.tsx` | testing.md §14 |
 | no-raw-img (invariant test) | fitness-fn | `shared/test-utils/no-raw-img.test.ts` | testing.md §14 |
+| rls_users (pgTAP) | pgtap-test | `supabase/tests/rls_users.sql` | testing.md §15 |
+| rls_stores (pgTAP) | pgtap-test | `supabase/tests/rls_stores.sql` | testing.md §15 |
+| rls_products (pgTAP) | pgtap-test | `supabase/tests/rls_products.sql` | testing.md §15 |
+| rls_orders (pgTAP) | pgtap-test | `supabase/tests/rls_orders.sql` | testing.md §15 |
+| rls_audit_log (pgTAP) | pgtap-test | `supabase/tests/rls_audit_log.sql` | testing.md §15 |
 | ROUTES / Route / buildHref | constant | `shared/constants/routes.ts` | domain.md §8 |
 | Row | ui-component | `shared/components/layout/` | ui.md §2 |
 | Screen | ui-component | `shared/components/layout/` | ui.md §2 |

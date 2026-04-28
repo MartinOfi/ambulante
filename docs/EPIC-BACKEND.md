@@ -370,7 +370,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B2.3 — pgTAP test suite para policies
-- **Estado:** ⚪ pending
+- **Estado:** 🟢 Done
+- **Inicio:** 2026-04-28
+- **Cierre:** 2026-04-28
 - **Por qué:** Una policy mal escrita no falla: simplemente expone data. Sin tests, el bug es invisible hasta que alguien lo explota. pgTAP corre SQL tests con asserts.
 - **Entregable:** `supabase/tests/rls_users.sql`, `rls_stores.sql`, `rls_products.sql`, `rls_orders.sql`, `rls_audit_log.sql` con mínimo: (a) positivos (el rol autorizado ve/escribe lo suyo); (b) negativos (otro rol no ve / no escribe); (c) edge case de privacy de ubicación (cliente antes de ACEPTADO no expone su location a la tienda). Script `pnpm supabase:test:rls` que corre todos. Integrado al CI.
 - **Archivos:** `supabase/tests/*.sql`, `package.json` (script), `.github/workflows/ci.yml` (patch).
@@ -379,7 +381,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `security-rls-basics`
 - **REGISTRY:** `testing.md` (sección: pgTAP RLS tests).
 - **Estimación:** L
-- **Notas:** (se llena al cerrar)
+- **Notas:** 85 tests pasan (8 archivos). Fixes aplicados: (a) `has_policy` reemplazado por `ok(exists(select 1 from pg_policies...))` — pgTAP 1.3 no tiene `has_policy`; (b) `throws_ok` 4-arg con `null` errmsg — 3-arg verificaba el mensaje literal; (c) `localhost` → `127.0.0.1` en scripts y CI (macOS resuelve localhost a IPv6). Patrón cross-user ID stash documentado en `testing.md §15`.
 
 ### B2.4 — Benchmark de performance RLS
 - **Estado:** ⚪ pending

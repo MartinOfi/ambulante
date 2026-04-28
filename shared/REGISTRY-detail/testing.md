@@ -68,6 +68,51 @@ No importar ni reutilizar — es un test standalone que corre con el suite norma
 
 ---
 
+## §15 — pgTAP RLS tests
+
+Viven en `supabase/tests/`. Corren dentro de una transacción `BEGIN/ROLLBACK` — no dejan datos en la DB. Correr con `pnpm supabase:test:rls`.
+
+| Archivo | Tabla | Tests | Qué cubre |
+|---|---|---|---|
+| `rls_users.sql` | `public.users` | 8 | SELECT/UPDATE propio, isolation entre usuarios, INSERT denegado |
+| `rls_stores.sql` | `public.stores` | 8 | Visibilidad por `available`, UPDATE propio, cross-store isolation |
+| `rls_products.sql` | `public.products` | 8 | Visibilidad por `available`, INSERT solo owner, cross-store isolation |
+| `rls_orders.sql` | `public.orders` + `orders_for_tienda` | 11 | Customer/tienda SELECT isolation, INSERT propio, PRD §7.2 location privacy |
+| `rls_audit_log.sql` | `public.audit_log` | 5 | Solo admin lee, INSERT denegado para authenticated |
+
+### Patrón de simulación de usuario autenticado
+
+```sql
+set local role authenticated;
+select set_config('request.jwt.claims',
+  json_build_object('sub', '<auth_user_id_uuid>')::text, true);
+-- ... assertions ...
+reset role;
+```
+
+`SET LOCAL ROLE authenticated` activa la evaluación de RLS policies. `set_config('request.jwt.claims', ...)` hace que `auth.uid()` devuelva el UUID indicado. `RESET ROLE` vuelve al superusuario `postgres` para setup/verificación post-UPDATE.
+
+### Patrón cross-user ID (para throws_ok con IDs ocultos por RLS)
+
+Cuando el test necesita el bigint ID de otro usuario (oculto por RLS desde el rol que se va a simular), stashear como superusuario antes del `set local role`:
+
+```sql
+select set_config('test.other_user_id',
+  (select id::text from public.users where auth_user_id = '<uuid>'), true);
+-- luego en el SQL de throws_ok:
+-- current_setting('test.other_user_id')::bigint
+```
+
+### throws_ok — forma correcta con solo SQLSTATE
+
+```sql
+-- 4-arg form: throws_ok(sql, errcode, errmsg, description)
+-- Pasar null como errmsg para no verificar el mensaje, solo el code
+select throws_ok($$ ... $$, '42501', null, 'descripción del test');
+```
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`
