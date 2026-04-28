@@ -29,7 +29,7 @@ export type AuthStateChangeCallback = (session: Session | null) => void;
 
 export interface AuthService {
   signIn(input: SignInInput): Promise<AuthResult<Session>>;
-  signUp(input: SignUpInput): Promise<AuthResult<Session>>;
+  signUp(input: SignUpInput): Promise<AuthResult<Session | null>>;
   signInWithMagicLink(input: MagicLinkInput): Promise<AuthResult<void>>;
   signInWithGoogle(input?: OAuthInput): Promise<AuthResult<{ url: string | null }>>;
   signOut(): Promise<AuthResult<void>>;

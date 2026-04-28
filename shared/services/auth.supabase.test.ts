@@ -108,12 +108,12 @@ describe("supabaseAuthService.signUp", () => {
     });
 
     expect(result.success).toBe(true);
-    if (result.success) {
+    if (result.success && result.data) {
       expect(result.data.user.email).toBe("test@example.com");
     }
   });
 
-  it("returns error when session is null (email confirmation required)", async () => {
+  it("returns success with null data when session is null (email confirmation required)", async () => {
     mockAuth.signUp.mockResolvedValue({
       data: { session: null, user: mockSupabaseUser },
       error: null,
@@ -124,9 +124,9 @@ describe("supabaseAuthService.signUp", () => {
       password: "password123",
     });
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.toLowerCase()).toContain("email");
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toBeNull();
     }
   });
 
@@ -246,6 +246,17 @@ describe("supabaseAuthService.signInWithGoogle", () => {
     mockAuth.signInWithOAuth.mockResolvedValue({
       data: { provider: "google", url: null },
       error: { message: "OAuth error", status: 500 },
+    });
+
+    const result = await supabaseAuthService.signInWithGoogle();
+
+    expect(result.success).toBe(false);
+  });
+
+  it("returns error when url is null even without an error (provider misconfiguration)", async () => {
+    mockAuth.signInWithOAuth.mockResolvedValue({
+      data: { provider: "google", url: null },
+      error: null,
     });
 
     const result = await supabaseAuthService.signInWithGoogle();

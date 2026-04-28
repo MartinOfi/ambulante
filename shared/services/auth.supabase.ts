@@ -1,14 +1,6 @@
 import { createBrowserClient as _createBrowserClient } from "@supabase/ssr";
 import { logger } from "@/shared/utils/logger";
 import type { Session, User, UserRole } from "@/shared/types/user";
-
-function createBrowserClient() {
-  return _createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
-
 import type {
   AuthResult,
   AuthService,
@@ -18,6 +10,13 @@ import type {
   SignInInput,
   SignUpInput,
 } from "./auth.types";
+
+function createBrowserClient() {
+  return _createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
+}
 
 type SupabaseUser = {
   id: string;
@@ -38,7 +37,9 @@ function extractRole(
   userMetadata?: Record<string, unknown>,
   appMetadata?: Record<string, unknown>,
 ): UserRole {
-  const raw = userMetadata?.["role"] ?? appMetadata?.["role"];
+  // app_metadata is server-controlled; user_metadata is writable by the user.
+  // Always prefer app_metadata to prevent role self-escalation via updateUser().
+  const raw = appMetadata?.["role"] ?? userMetadata?.["role"];
   if (raw === "store" || raw === "admin") return raw;
   return "client";
 }
@@ -77,7 +78,7 @@ export const supabaseAuthService: AuthService = {
     return { success: true, data: toSession(data.session) };
   },
 
-  async signUp(input: SignUpInput): Promise<AuthResult<Session>> {
+  async signUp(input: SignUpInput): Promise<AuthResult<Session | null>> {
     const client = createBrowserClient();
     const { data, error } = await client.auth.signUp({
       email: input.email,
@@ -88,8 +89,10 @@ export const supabaseAuthService: AuthService = {
       logger.error("signUp failed", { error });
       return { success: false, error: "No se pudo registrar la cuenta. Intentá de nuevo." };
     }
+    // session is null when Supabase email confirmation is enabled — registration succeeded
+    // but the user must confirm before a session is issued.
     if (!data.session) {
-      return { success: false, error: "Revisá tu email para confirmar tu cuenta." };
+      return { success: true, data: null };
     }
     return { success: true, data: toSession(data.session) };
   },
@@ -113,7 +116,7 @@ export const supabaseAuthService: AuthService = {
       provider: "google",
       options: { redirectTo: input?.redirectTo, skipBrowserRedirect: true },
     });
-    if (error) {
+    if (error || !data.url) {
       logger.error("signInWithGoogle failed", { error });
       return { success: false, error: "No se pudo iniciar sesión con Google. Intentá de nuevo." };
     }
@@ -130,6 +133,9 @@ export const supabaseAuthService: AuthService = {
     return { success: true, data: undefined };
   },
 
+  // NOTE: getSession() returns the locally-cached token WITHOUT server verification.
+  // For security-sensitive checks (e.g. authorization gates) call getUser() instead,
+  // which validates the JWT against the Supabase Auth server.
   async getSession(): Promise<Session | null> {
     const client = createBrowserClient();
     const { data, error } = await client.auth.getSession();
