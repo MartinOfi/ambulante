@@ -4,11 +4,15 @@
 # Static analysis for prohibited RLS patterns in SQL migration files.
 # Exits 1 if any violation is found.
 #
-# Usage:
+# Usage (run from repo root):
 #   scripts/rls-lint.sh [sql-dir]
 #
 # Defaults sql-dir to "supabase/migrations".
 # Excludes _template.sql (examples, not real migrations).
+#
+# Known limitation (check 1): an auth.uid() call that is split across
+# lines where the (select …) wrapper opens on a prior line will produce
+# a false positive. This formatting is not used in practice.
 
 set -euo pipefail
 
@@ -33,11 +37,13 @@ echo ""
 
 echo "==> [1/2] Bare auth.uid() — must use (select auth.uid())"
 
-BARE=$(grep -rEn "auth\.uid\(\)" "$SQL_DIR" \
-  --include="*.sql" \
-  --exclude="_template.sql" \
-  | grep -Ev "[[:space:]]*--"            `# skip comment lines` \
-  | grep -Ev "\(select auth\.uid\(\)\)"  `# exclude correct pattern` \
+# grep output format is "filename:linenum:content".
+# The comment filter anchors to that prefix so only pure comment lines
+# (content begins with --) are excluded; inline comments are kept.
+BARE=$(grep -rEn --include="*.sql" --exclude="_template.sql" \
+  "auth\.uid\(\)" -- "$SQL_DIR" \
+  | grep -Ev "^[^:]+:[[:digit:]]+:[[:space:]]*--"  `# skip pure comment lines` \
+  | grep -Ev "\(select auth\.uid\(\)\)"              `# exclude correct pattern` \
   || true)
 
 if [[ -n "$BARE" ]]; then
@@ -62,18 +68,39 @@ echo "==> [2/2] CREATE POLICY without explicit TO authenticated/anon"
 MISSING_TO=""
 while IFS= read -r sql_file; do
   RESULT=$(awk '
-    # start accumulating a policy block (skip comment lines)
+    # Accumulate a CREATE POLICY block; skip pure comment lines.
     /[Cc][Rr][Ee][Aa][Tt][Ee][[:space:]]+[Pp][Oo][Ll][Ii][Cc][Yy]/ &&
     !/^[[:space:]]*--/ {
       block = $0
       first_line = NR
+      # Single-line policy: CREATE POLICY … ; on the same line.
+      if (/;/) {
+        # Trim to header (before USING / WITH CHECK) so string literals
+        # in the body expression cannot produce false negatives.
+        header = $0
+        sub(/[[:space:]][Uu][Ss][Ii][Nn][Gg][[:space:]]*\(.*/, "", header)
+        sub(/[Ww][Ii][Tt][Hh][[:space:]]+[Cc][Hh][Ee][Cc][Kk][[:space:]]*\(.*/, "", header)
+        if (header !~ /[[:space:]][Tt][Oo][[:space:]]+(authenticated|anon)([[:space:]\n;(]|$)/) {
+          print FILENAME ":" NR ": " $0
+        }
+        next
+      }
       in_block = 1
       next
     }
     in_block {
       block = block "\n" $0
       if (/;/) {
-        if (block !~ /[[:space:]]to[[:space:]]+(authenticated|anon)/) {
+        # Scan only the policy header (lines before USING / WITH CHECK) to
+        # avoid matching the keyword inside body string literals.
+        n = split(block, blines, "\n")
+        header = ""
+        for (i = 1; i <= n; i++) {
+          if (tolower(blines[i]) ~ /[[:space:]]using[[:space:]]*\(/ || \
+              tolower(blines[i]) ~ /with[[:space:]]+check[[:space:]]*\(/) break
+          header = header blines[i] "\n"
+        }
+        if (header !~ /[[:space:]][Tt][Oo][[:space:]]+(authenticated|anon)([[:space:]\n;(]|$)/) {
           split(block, lines, "\n")
           print FILENAME ":" first_line ": " lines[1]
         }
@@ -83,7 +110,7 @@ while IFS= read -r sql_file; do
     }
   ' "$sql_file" || true)
   [[ -n "$RESULT" ]] && MISSING_TO="${MISSING_TO}${RESULT}"$'\n'
-done < <(grep -rl --include="*.sql" --exclude="_template.sql" -i "create policy" "$SQL_DIR" 2>/dev/null || true)
+done < <(grep -rl --include="*.sql" --exclude="_template.sql" -i "create policy" -- "$SQL_DIR" 2>/dev/null || true)
 
 if [[ -n "$MISSING_TO" ]]; then
   echo "FAIL — add 'to authenticated' or 'to anon' to each policy:"
