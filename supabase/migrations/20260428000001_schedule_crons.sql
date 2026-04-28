@@ -13,6 +13,9 @@ create schema if not exists internal;
 revoke all on schema internal from public;
 grant usage on schema internal to postgres;
 
+-- Ensure future functions in this schema are not callable by public by default.
+alter default privileges in schema internal revoke execute on functions from public;
+
 -- ---------------------------------------------------------------------------
 -- Helper: fires an authenticated HTTP POST to the Next.js cron route handler.
 -- Reads secret + base URL from PostgreSQL custom settings so no sensitive data
@@ -24,7 +27,7 @@ create or replace function internal.call_cron_endpoint(path text)
   returns void
   language plpgsql
   security definer
-  set search_path = pg_catalog, pg_temp
+  set search_path = ''
 as $$
 declare
   v_secret   text;
