@@ -48,7 +48,6 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
   let currentStatus: RealtimeStatus = "connecting";
   let destroyed = false;
 
-  let reconnecting = false;
   let reconnectAttempt = 0;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingChannels = 0;
@@ -95,7 +94,6 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
 
       if (reconnectAttempt >= RECONNECT_MAX_ATTEMPTS) {
         logger.error("Realtime: max reconnect attempts reached");
-        reconnecting = false;
         return;
       }
 
@@ -123,17 +121,14 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
           // sets reconnectTimer != null and pendingChannels = 0).
           if (pendingChannels === 0 && reconnectTimer === null) {
             notifyStatus("online");
-            reconnecting = false;
             reconnectAttempt = 0;
           }
         } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-          // Guard on timer rather than `reconnecting` so that channel errors
-          // during a resubscribe cycle (reconnecting=true, no timer scheduled)
-          // can still queue the next attempt. Multiple simultaneous errors only
-          // schedule one timer because the first one sets reconnectTimer != null.
+          // Guard on timer so that errors during a resubscribe cycle can still
+          // schedule the next attempt. Multiple simultaneous errors only schedule
+          // one timer because the first one sets reconnectTimer != null.
           if (reconnectTimer === null) {
             notifyStatus("offline");
-            reconnecting = true;
             reconnectAttempt = 0;
             pendingChannels = 0;
             scheduleNextAttempt();
@@ -234,7 +229,6 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
       // Force-restart even if backoff loop is already in progress; calling
       // reconnect() explicitly means "try immediately, reset the backoff".
       clearReconnectTimer();
-      reconnecting = true;
       reconnectAttempt = 0;
       resubscribeAll();
     },
@@ -242,7 +236,6 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
     destroy(): void {
       destroyed = true;
       clearReconnectTimer();
-      reconnecting = false;
       for (const ch of activeChannels.values()) {
         getClient()
           .removeChannel(ch)
