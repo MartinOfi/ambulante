@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
 import { getRoleRedirect } from "@/features/auth/utils/role-redirect";
-import { extractRole } from "@/shared/utils/auth-helpers";
+import { extractRole, safeRedirectPath } from "@/shared/utils/auth-helpers";
 import { ROUTES } from "@/shared/constants/routes";
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -22,6 +22,6 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   const role = extractRole(data.session.user.user_metadata, data.session.user.app_metadata);
 
-  const redirectTo = next ?? getRoleRedirect(role);
+  const redirectTo = safeRedirectPath(next, getRoleRedirect(role));
   return NextResponse.redirect(new URL(redirectTo, origin));
 }

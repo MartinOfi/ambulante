@@ -10,3 +10,12 @@ export function extractRole(
   if (raw === "store" || raw === "admin") return raw;
   return "client";
 }
+
+// Prevents open-redirect: only allow same-origin relative paths as redirect targets.
+// new URL(absolute, origin) ignores origin, so /^(https?:)?\/\// rejects absolute URLs.
+export function safeRedirectPath(next: string | null | undefined, fallback: string): string {
+  if (!next) return fallback;
+  if (/^(https?:)?\/\//i.test(next)) return fallback;
+  if (!next.startsWith("/")) return fallback;
+  return next;
+}

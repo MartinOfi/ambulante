@@ -52,7 +52,18 @@ export async function createRouteHandlerClient() {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        // Merge hardened defaults so any future cookie written here is secure by default.
+        // SDK-supplied options take precedence (spread last) to preserve expiry and path.
+        const secure = process.env.NODE_ENV === "production";
+        cookiesToSet.forEach(({ name, value, options }) =>
+          cookieStore.set(name, value, {
+            httpOnly: true,
+            secure,
+            sameSite: "lax",
+            path: "/",
+            ...options,
+          }),
+        );
       },
     },
   });

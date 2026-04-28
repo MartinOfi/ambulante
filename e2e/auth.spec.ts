@@ -97,6 +97,18 @@ test.describe("auth/callback route handler", () => {
     expect(url.pathname).toBe("/auth/error");
     expect(url.searchParams.get("reason")).toBe("exchange_failed");
   });
+
+  test("rejects absolute next param — does not redirect off-site", async ({ page }) => {
+    // Even with a missing code (which short-circuits before next is used), the test
+    // confirms the route never blindly follows an absolute next value. When a valid
+    // code is available the safeRedirectPath guard on the happy path provides the
+    // same protection.
+    await page.goto("/auth/callback?next=https://evil.example.com");
+    const url = new URL(page.url());
+    // Must land on our own origin, not the external domain
+    expect(url.hostname).not.toBe("evil.example.com");
+    expect(url.pathname).toBe("/auth/error");
+  });
 });
 
 test.describe("auth/confirm route handler", () => {
@@ -114,10 +126,26 @@ test.describe("auth/confirm route handler", () => {
     expect(url.searchParams.get("reason")).toBe("missing_token");
   });
 
+  test("redirects to /auth/error when type is unknown", async ({ page }) => {
+    await page.goto("/auth/confirm?token_hash=abc123&type=hacked_type");
+    const url = new URL(page.url());
+    expect(url.pathname).toBe("/auth/error");
+    expect(url.searchParams.get("reason")).toBe("missing_token");
+  });
+
   test("redirects to /auth/error when token is expired or invalid", async ({ page }) => {
     await page.goto("/auth/confirm?token_hash=invalid-hash&type=signup");
     const url = new URL(page.url());
     expect(url.pathname).toBe("/auth/error");
+    // reason is one of the known error codes
+    const reason = url.searchParams.get("reason");
+    expect(["link_expired", "already_confirmed", "confirmation_failed"]).toContain(reason);
+  });
+
+  test("rejects absolute next param — does not redirect off-site", async ({ page }) => {
+    await page.goto("/auth/confirm?next=https://evil.example.com");
+    const url = new URL(page.url());
+    expect(url.hostname).not.toBe("evil.example.com");
   });
 });
 

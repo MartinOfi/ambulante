@@ -39,10 +39,14 @@ interface AuthErrorPageProps {
   readonly searchParams: Promise<{ reason?: string }>;
 }
 
+type ErrorReason = keyof typeof ERROR_MESSAGES;
+const KNOWN_REASONS = new Set(Object.keys(ERROR_MESSAGES));
+
 export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps) {
   const { reason } = await searchParams;
-  const resolved = reason != null ? ERROR_MESSAGES[reason] : undefined;
-  const { title, body } = resolved ?? DEFAULT_ERROR;
+  const safeReason: ErrorReason | undefined =
+    reason != null && KNOWN_REASONS.has(reason) ? (reason as ErrorReason) : undefined;
+  const { title, body } = safeReason != null ? ERROR_MESSAGES[safeReason] : DEFAULT_ERROR;
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-zinc-50 dark:bg-surface px-6 py-12">
