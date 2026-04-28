@@ -423,7 +423,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B3.2 — Facades Auth + Storage + Realtime + Push (stubs Supabase)
-- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 11:00]
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 11:05]
 - **Por qué:** Los 4 facades ya existen como mocks (F4, F5, F6, F8 del frontend epic). Esta tarea instala la implementación Supabase con el mismo contrato, sin wirear todavía a Supabase real (eso se hace en B4-B8). El objetivo: las firmas están estables y los features pueden seguir importando el facade.
 - **Entregable:** `shared/services/auth.supabase.ts`, `storage.supabase.ts`, `realtime.supabase.ts`, `push.supabase.ts` con stubs que: (a) importan el SDK; (b) implementan la firma; (c) marcan cuerpo como `TODO — implementar en B4/B5/B6/B8`. Factory en `shared/services/index.ts` que exporta el facade correcto según env (`MOCK_BACKEND=true` → mock, false → supabase).
 - **Archivos:** `shared/services/auth.supabase.ts`, `storage.supabase.ts`, `realtime.supabase.ts`, `push.supabase.ts`, `shared/services/index.ts` (factory).
@@ -432,7 +432,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** `data.md` (sección: Facades y factory).
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** (1) `storage.ts` y `storage.types.ts` no existían como mocks — se crearon en esta tarea junto con `shared/constants/storage.ts` (`STORAGE_BUCKETS`, `MOCK_STORAGE_BASE_URL`). (2) El env driver del factory usa `NEXT_PUBLIC_SUPABASE_URL` (ya en env.schema.ts como opcional) en lugar de una nueva var `MOCK_BACKEND`, manteniendo los cambios mínimos y semánticos. (3) `@supabase/ssr 0.10.2` y `@supabase/supabase-js 2.105.1` instalados en este paso. Tests: 12/12 ✓, suite completa 1422/1422 ✓.
 
 ### B3.3 — ESLint `no-restricted-imports` para `@supabase/*`
 - **Estado:** ⚪ pending
