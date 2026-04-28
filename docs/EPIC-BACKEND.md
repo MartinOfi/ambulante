@@ -344,7 +344,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Cada tabla tiene `enable row level security` + `force row level security` + policies por rol (anon, authenticated, service_role); suite pgTAP cubre casos positivos/negativos por rol; benchmark RLS valida <20ms para queries críticas con 10k stores / 100k orders.
 
 ### B2.1 — Policies RLS de todas las tablas del dominio
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-28, started: 09:00]
 - **Por qué:** El invariante PRD §7.2 (privacidad de ubicación) y §7.3 (roles aislados) es trabajo de RLS, no de código de aplicación. Es el activo de seguridad más crítico del sistema.
 - **Entregable:** migración `YYYYMMDDhhmmss_rls_policies.sql` con policies completas para: `users`, `stores`, `products`, `orders`, `order_items`, `store_locations`, `push_subscriptions`, `audit_log`. **Todas usan `(select auth.uid())`** — nunca `auth.uid()` directo. Cobertura: cliente puede leer tiendas disponibles y sus propios pedidos; tienda puede CRUD solo su catálogo y leer/transicionar sus pedidos; admin lee todo via security definer functions; audit_log es append-only para todos (no UPDATE, no DELETE).
 - **Archivos:** `supabase/migrations/<ts>_rls_policies.sql`.
