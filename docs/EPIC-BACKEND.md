@@ -403,7 +403,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** `security-rls-performance`
 - **REGISTRY:** —
 - **Estimación:** S
-- **Notas:** Implementado con grep+awk (sin conexión a DB). Dos checks: (1) bare auth.uid() detectado por grep con exclusión de líneas comentadas y del patrón correcto; (2) CREATE POLICY sin TO acumulado por awk en bloques multi-línea hasta `;`. Testeado contra fixtures pass/fail. CI job `rls-lint` corre independiente (sin Supabase). Commit 5c86f17.
+- **Notas:** Implementado con grep+awk (sin conexión a DB). Dos checks: (1) bare auth.uid() detectado por grep con exclusión de líneas comentadas y del patrón correcto; (2) CREATE POLICY sin TO acumulado por awk en bloques multi-línea hasta `;`. Testeado contra fixtures pass/fail. CI job `rls-lint` corre independiente (sin Supabase). Code review (2 pasadas): fixes aplicados — filtro de comentarios format-aware (`^file:line:content`), `--include`/`--exclude` antes de `--`, manejo de policy de una sola línea, check TO limitado al header (antes de USING/WITH CHECK). Commits 5c86f17 + 61f5271.
 
 ---
 
