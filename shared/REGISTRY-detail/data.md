@@ -278,3 +278,56 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - **Ruta mock:** `shared/repositories/mock/product.mock.ts`
 - **Descripción:** Filtros: `storeId`, `isAvailable`.
 - **Singleton:** `import { productRepository } from '@/shared/repositories'`
+
+### PushSubscriptionRepository / pushSubscriptionRepository
+- **Ruta interface:** `shared/repositories/push-subscriptions.ts` → `PushSubscriptionRepository`, `PushSubscription`, `PushSubscriptionFilters`, `CreatePushSubscriptionInput`, `UpdatePushSubscriptionInput`
+- **Descripción:** CRUD de suscripciones Web Push. Extiende `Repository<PushSubscription,...>` con `findByEndpoint(endpoint)` y `upsertByEndpoint(input)`.
+- **Singleton:** `import { pushSubscriptionRepository } from '@/shared/repositories'`
+
+---
+
+## §11b — Supabase implementations (B3.1)
+
+> Implementaciones reales de las interfaces de §11. Constructor-injected `SupabaseClient` — funciona con browser client (anon+RLS), service-role, o mock de tests. **Importar vía `shared/repositories/index.ts`**, no directamente.
+
+### `createSupabaseBrowserClient` / `SupabaseClient` — `shared/repositories/supabase/client.ts`
+- Factory que envuelve `createBrowserClient` de `@supabase/ssr`.
+- `SupabaseClient` es el tipo alias usado como parámetro de constructor en todos los repos.
+
+### Mappers — `shared/repositories/supabase/mappers.ts`
+Funciones puras de conversión DB ↔ dominio:
+- `dbRoleToDomain` / `domainRoleToDb` — `"cliente" ↔ "client"`, `"tienda" ↔ "store"`
+- `dbStatusToDomain` / `domainStatusToDb` — `"aceptado" ↔ "ACEPTADO"` (uppercase en dominio)
+- `dbCategoryToKind` — category string → `StoreKind` (fallback `"food-truck"`)
+- `dbAvailableToStatus` — `boolean → "open" | "closed"`
+- `mapUserRow`, `mapStoreRow`, `mapProductRow`, `mapOrderItemRow`, `mapOrderRow`, `mapPushSubscriptionRow`
+- `mapOrderItemRow` soporta tanto nombres domain (`productId/productName/productPriceArs`) como legacy (`id/name/price`)
+
+### `SupabaseUserRepository` — `shared/repositories/supabase/users.supabase.ts`
+- Implementa `UserRepository`. Filtra por `role` y `suspended`.
+- Métodos: `findAll(filters?)`, `findById`, `findByEmail`, `create`, `update`, `delete` (todos por `public_id`).
+
+### `SupabaseStoreRepository` — `shared/repositories/supabase/stores.supabase.ts`
+- Implementa `StoreRepository`. Lee desde `stores_view` (tiene `lat`/`lng` via ST_Y/ST_X).
+- `findNearby` llama RPC `find_stores_nearby(p_lat, p_lng, p_radius_meters)`.
+- `create` resuelve `ownerId` UUID → bigint antes de insertar. Re-fetches from view post-insert/update.
+- Nota: el estado `stale` no es filtrable server-side (sin timestamp de ubicación en la view).
+
+### `SupabaseProductRepository` — `shared/repositories/supabase/products.supabase.ts`
+- Implementa `ProductRepository`. SELECT incluye `store:stores!store_id(public_id)` para UUID del store en una sola query.
+- `findAll({ storeId })` resuelve UUID → bigint via `resolveStoreInternalId` antes de filtrar.
+- `create` resuelve store UUID → bigint antes de insertar.
+
+### `SupabaseOrderRepository` — `shared/repositories/supabase/orders.supabase.ts`
+- Implementa `OrderRepository`. SELECT anidado: `customer:users!customer_id(public_id)` + `store:stores!store_id(public_id)` + `items:order_items(product_snapshot, quantity)` — una sola query.
+- `create` resuelve `clientId` + `storeId` en `Promise.all`, inserta la orden, inserta `order_items` con snapshot JSONB, re-fetches via `findById`.
+
+### `SupabaseAuditLogService` — `shared/repositories/supabase/audit-log.supabase.ts`
+- Implementa `AuditLogService`. Usa la tabla genérica `audit_log` con `table_name='orders'`, `row_id=bigint`, campos domain en `new_values` JSONB.
+- `append` resuelve orden UUID → bigint, inserta. `findByOrderId` filtra por `table_name + row_id`, ordena por `created_at ASC`.
+- `mapAuditRow` retorna `null` si faltan campos domain en `new_values` (filas incompletas se filtran silenciosamente).
+
+### `SupabasePushSubscriptionRepository` — `shared/repositories/supabase/push-subscriptions.supabase.ts`
+- Implementa `PushSubscriptionRepository`. `findById` usa `id` numérico (PK bigint).
+- `upsertByEndpoint` usa `.upsert({ onConflict: 'endpoint' })`. `create` delega a `upsertByEndpoint`.
+- SELECT incluye `user:users!user_id(public_id)` para UUID del user.

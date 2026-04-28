@@ -198,6 +198,15 @@
 | USER_SUSPENSION_STATUS / UserSuspensionStatus | constant | `shared/constants/user-management.ts` | domain.md §8 |
 | User / UserRole / Session | type | `shared/types/user.ts` | domain.md §7 |
 | userRepository | repository | `shared/repositories/user.ts` | data.md §11 |
+| SupabaseUserRepository | repository-impl | `shared/repositories/supabase/users.supabase.ts` | data.md §11b |
+| SupabaseStoreRepository | repository-impl | `shared/repositories/supabase/stores.supabase.ts` | data.md §11b |
+| SupabaseProductRepository | repository-impl | `shared/repositories/supabase/products.supabase.ts` | data.md §11b |
+| SupabaseOrderRepository | repository-impl | `shared/repositories/supabase/orders.supabase.ts` | data.md §11b |
+| SupabaseAuditLogService | service-impl | `shared/repositories/supabase/audit-log.supabase.ts` | data.md §11b |
+| SupabasePushSubscriptionRepository | repository-impl | `shared/repositories/supabase/push-subscriptions.supabase.ts` | data.md §11b |
+| PushSubscriptionRepository / PushSubscription / CreatePushSubscriptionInput | repository + type | `shared/repositories/push-subscriptions.ts` | data.md §11 |
+| createSupabaseBrowserClient / SupabaseClient | factory + type | `shared/repositories/supabase/client.ts` | data.md §11b |
+| mapUserRow / mapStoreRow / mapProductRow / mapOrderRow / mapPushSubscriptionRow | mapper | `shared/repositories/supabase/mappers.ts` | data.md §11b |
 | userSchema / sessionSchema | schema | `shared/schemas/user.ts` | domain.md §7b |
 | suspendUserSchema / reinstateUserSchema / SuspendUserInput / ReinstateUserInput | schema | `shared/schemas/user-management.ts` | domain.md §7b |
 | createUserManagementService / UserManagementService | service | `features/user-management/services/userManagement.service.ts` | data.md §4 |
