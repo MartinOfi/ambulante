@@ -239,11 +239,14 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - **Singleton:** `supabaseRealtimeService` exportado desde el módulo.
 - **Tests:** `shared/services/realtime.supabase.test.ts` — 32 casos con `MockChannel`/`MockClient` inyectados.
 
-### `supabasePushService` — `shared/services/push.supabase.ts`
-- Implementa `PushService` (misma interface que `push.ts`).
-- Importa `createClient` de `@supabase/supabase-js` (para persistir subscriptions).
+### `supabasePushService` / `createServerPushSender` / `getServerPushSender` — `shared/services/push.supabase.ts`
+- `supabasePushService` — implementa `PushService` (misma interface que `push.ts`). Todos los métodos lanzan `Error("TODO — implementar en B6")`.
+- **`createServerPushSender({ pushRepo }): ServerPushSender`** — factory server-side (B8.2). Inicializa VAPID con `VAPID_SUBJECT / VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY`. `sendToUser(userId, payload)` consulta `pushRepo.findAll({ userId })`, envía vía `webpush.sendNotification` usando `Promise.allSettled` (resiliencia — un 410 no bloquea los demás), loguea fallos individuales.
+- **`getServerPushSender(): ServerPushSender`** — singleton lazy (`??=`). La inicialización diferida evita que la validación de URL de Supabase falle al importar en entornos de test.
+- **Interface `ServerPushSender`:** `sendToUser(userId: string, payload: PushNotificationPayload): Promise<void>` — en `shared/services/push.types.ts`.
+- **Interface `PushNotificationPayload`:** `{ title: string; body: string; icon?: string }` — en `shared/services/push.types.ts`.
 - **Helper:** `createPushClient()` — disponible para B6.
-- Todos los métodos lanzan `Error("TODO — implementar en B6")`.
+- **Tests:** `shared/services/push.supabase.test.ts` (7 casos — envío múltiple, shape correcto, JSON serializado, sin subscripciones, userId correcto, resiliencia a rechazo parcial).
 
 ### `supabaseStorageService` — `shared/services/storage.supabase.ts`
 - Implementa `StorageService` (misma interface que `storage.ts`).

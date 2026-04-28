@@ -230,6 +230,22 @@ Schemas Zod y tipos TS para las entradas del log de auditoría inmutable (PRD §
   - `EventBus.publish(event)` · `EventBus.subscribe(type, handler): () => void` · `EventBus.registerSerializationHook(hook): () => void`
 - **Tipo exportado:** `EventBus`
 
+### Domain event listeners — `shared/domain/events/`
+
+#### Registration entry point — `shared/domain/events/index.ts`
+Módulo de inicialización: crea un `PushOnStatusChangeListener` con el `getServerPushSender()` singleton y un `SupabaseStoreRepository` con service-role client, y lo registra contra el `eventBus` singleton. **Importar una sola vez al arrancar el servidor** (e.g. en un Route Handler de cron o al inicializar la app). No exporta nada — su efecto es el side-effect de registro.
+
+#### `createPushOnStatusChangeListener` — `shared/domain/events/listeners/push-on-status-change.ts`
+- **API:** `createPushOnStatusChangeListener({ pushSender, storeRepo }): PushListener`
+  - `PushListener.register(bus: EventBus): () => void` — suscribe a los 8 tipos de `ORDER_DOMAIN_EVENT`; retorna función de limpieza.
+- **Routing de notificaciones:**
+  - Store-actor events (`ACCEPTED`, `REJECTED`, `FINISHED`) → `pushSender.sendToUser(event.clientId, payload)`
+  - System-actor events (`RECEIVED`, `EXPIRED`) → `pushSender.sendToUser(event.clientId, payload)`
+  - Client-actor events (`SENT`, `ON_THE_WAY`, `CANCELLED`) → resuelve `storeRepo.findById(event.storeId)` → `pushSender.sendToUser(store.ownerId, payload)`
+- **Resiliencia:** handlers async lanzados con `void handleEvent(event).catch(logger.error)` — un fallo de push nunca rechaza el handler del bus ni produce un unhandled rejection.
+- **Textos UI (español):** 8 payloads hardcodeados en `PAYLOADS` const (conforme CLAUDE.md §6.2).
+- **Tests:** `shared/domain/events/listeners/push-on-status-change.test.ts` (11 casos — routing correcto por tipo de actor, tienda no encontrada, evento desconocido ignorado, resiliencia a rechazo de sender).
+
 ### Client location privacy — `shared/domain/client-location-access.ts`
 
 Implementa el invariante PRD §9.4: la ubicación del cliente **nunca** se expone al actor TIENDA antes de que el pedido esté en estado `ACEPTADO`.

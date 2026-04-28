@@ -737,7 +737,9 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** VAPID keys generadas fresh con `web-push`. Subscribe: upsert idempotente por endpoint + rpc `current_user_id` para resolver auth→public.users. Unsubscribe: delete+select para distinguir 404 vs 204. Rate limiting delegado al middleware. 1443/1443 tests green.
 
 ### B8.2 — Domain event listener: OrderStatusChanged → webpush
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done
+- **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** La decisión arquitectónica fue "efectos secundarios post-commit via domain events" (regla transversal 5). Un listener suscrito al event `OrderStatusChanged` dispara `webpush.sendNotification()` a las subscriptions del user target.
 - **Entregable:** `shared/services/push.supabase.ts` implementado completo con `sendToUser(userId, payload)` usando la lib `web-push`. Listener registrado en `shared/domain/events/index.ts` que al recibir `OrderStatusChanged` lee las subscriptions del destinatario (cliente si es transición tienda→cliente, tienda si es transición cliente→tienda) y manda push.
 - **Archivos:** `shared/services/push.supabase.ts`, `shared/domain/events/listeners/push-on-status-change.ts`.
