@@ -21,6 +21,9 @@ export const ROUTES = {
     registerStore: "/register/store",
     forgotPassword: "/forgot-password",
     resetPassword: "/reset-password",
+    callback: "/auth/callback",
+    confirm: "/auth/confirm",
+    error: "/auth/error",
   },
   client: {
     map: "/map",

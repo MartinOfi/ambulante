@@ -1,6 +1,7 @@
 import { createBrowserClient as _createBrowserClient } from "@supabase/ssr";
 import { logger } from "@/shared/utils/logger";
-import type { Session, User, UserRole } from "@/shared/types/user";
+import { extractRole } from "@/shared/utils/auth-helpers";
+import type { Session, User } from "@/shared/types/user";
 import type {
   AuthResult,
   AuthService,
@@ -32,17 +33,6 @@ type SupabaseSession = {
   expires_in: number;
   user: SupabaseUser;
 };
-
-function extractRole(
-  userMetadata?: Record<string, unknown>,
-  appMetadata?: Record<string, unknown>,
-): UserRole {
-  // app_metadata is server-controlled; user_metadata is writable by the user.
-  // Always prefer app_metadata to prevent role self-escalation via updateUser().
-  const raw = appMetadata?.["role"] ?? userMetadata?.["role"];
-  if (raw === "store" || raw === "admin") return raw;
-  return "client";
-}
 
 function toUser(sbUser: SupabaseUser): User {
   return {

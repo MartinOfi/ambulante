@@ -516,7 +516,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Importa `createBrowserClient` de `@supabase/ssr` directamente (permitido por §10.3 de CLAUDE.md). Lazy client — instanciado dentro de cada método para evitar module-level side effects. Mapeo de roles: `user_metadata.role` → `app_metadata.role` → `"client"`. 26 tests unitarios (vi.hoisted + vi.mock("@supabase/ssr")). Suite completa 1456/1456 verde. `HowItWorksClient.tsx` TS error es pre-existente, no introducido por esta tarea.
 
 ### B4.4 — Callbacks OAuth + confirm email + error pages
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
+- **Inicio:** 2026-04-28
 - **Por qué:** Los flows de OAuth terminan en `/auth/callback`; el confirm email en `/auth/confirm`. Sin estos endpoints, la UI rompe al volver de Google / click en magic link.
 - **Entregable:** Route Handlers `app/auth/callback/route.ts` (intercambia code por session) y `app/auth/confirm/route.ts` (confirma email via token_hash). Páginas de error `app/auth/error/page.tsx` con UX en español para los casos "link expirado", "email ya confirmado", "login fallido". Tests E2E en `e2e/auth.spec.ts` del flow completo magic link + password.
 - **Archivos:** `app/auth/callback/route.ts`, `app/auth/confirm/route.ts`, `app/auth/error/page.tsx`, `e2e/auth.spec.ts`.
@@ -525,7 +526,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Skill rules aplicables:** —
 - **REGISTRY:** —
 - **Estimación:** L
-- **Notas:** (se llena al cerrar)
+- **Notas:** `extractRole` extraída a `shared/utils/auth-helpers.ts` para reusar en callback sin acoplarse al servicio. ROUTES.auth ampliado con `callback`, `confirm`, `error`. Error page con 6 mensajes de error tipados. E2E cubre callback/confirm inválidos, error page, login UI y magic link UI.
 
 ---
 
