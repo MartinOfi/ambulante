@@ -498,6 +498,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 ### B4.3 — Implementación completa del facade `AuthService`
 - **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
 - **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** Con el SSR wiring listo, hay que llenar los stubs de B3.2 con implementaciones reales que llamen a `supabase.auth.signInWith*`.
 - **Entregable:** `shared/services/auth.supabase.ts` con firmas completas: `signIn`, `signInWithMagicLink`, `signInWithGoogle`, `signOut`, `getSession`, `getUser`, `onAuthStateChange`. Tests unitarios para cada método (mockeando el cliente). Actualizar `shared/services/index.ts` factory para usar auth.supabase.ts por default cuando `MOCK_BACKEND=false`.
 - **Archivos:** `shared/services/auth.supabase.ts`, `shared/services/auth.supabase.test.ts`, `shared/services/index.ts`.
