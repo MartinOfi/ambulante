@@ -518,6 +518,7 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 ### B4.4 — Callbacks OAuth + confirm email + error pages
 - **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
 - **Inicio:** 2026-04-28
+- **Fin:** 2026-04-28
 - **Por qué:** Los flows de OAuth terminan en `/auth/callback`; el confirm email en `/auth/confirm`. Sin estos endpoints, la UI rompe al volver de Google / click en magic link.
 - **Entregable:** Route Handlers `app/auth/callback/route.ts` (intercambia code por session) y `app/auth/confirm/route.ts` (confirma email via token_hash). Páginas de error `app/auth/error/page.tsx` con UX en español para los casos "link expirado", "email ya confirmado", "login fallido". Tests E2E en `e2e/auth.spec.ts` del flow completo magic link + password.
 - **Archivos:** `app/auth/callback/route.ts`, `app/auth/confirm/route.ts`, `app/auth/error/page.tsx`, `e2e/auth.spec.ts`.
