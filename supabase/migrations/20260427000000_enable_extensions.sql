@@ -27,4 +27,11 @@ $$;
 create extension if not exists pg_net with schema net;
 
 -- pgtap: installed in public so test runner can call ok()/plan()/etc. unqualified
-create extension if not exists pgtap with schema public;
+-- Wrapped in DO block because pgtap binary may not be present in all local images.
+do $$
+begin
+  create extension if not exists pgtap with schema public;
+exception when others then
+  raise notice 'pgtap not available in this image — skipping (tests will be skipped too)';
+end;
+$$;

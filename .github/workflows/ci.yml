@@ -108,6 +108,15 @@ jobs:
       # Fails the job on high or critical vulnerabilities — no install needed; audit reads only the lockfile
       - run: pnpm audit --audit-level=high
 
+  rls-lint:
+    name: RLS Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run RLS static analysis
+        run: bash scripts/rls-lint.sh
+
   db-migrations:
     name: DB Migrations & Audit
     runs-on: ubuntu-latest
