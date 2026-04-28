@@ -698,16 +698,17 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 **Acceptance criteria:** Tabla `push_subscriptions` con RLS correcta; endpoint de suscripción funciona end-to-end; domain event `OrderStatusChanged` dispara push; retry + cleanup de subscriptions muertas (410 Gone).
 
 ### B8.1 — VAPID keys + tabla + endpoint de subscribe
-- **Estado:** ⚪ pending
+- **Estado:** ✅ done [owner: chat-2026-04-28, closed: 2026-04-28]
+- **Inicio:** 2026-04-28
 - **Por qué:** VAPID es el estándar para identificar al servidor ante el push service del browser. Sin VAPID, el browser rechaza.
 - **Entregable:** (a) Generar VAPID keys con `npx web-push generate-vapid-keys` y guardarlas en env vars (ya agregadas en B0.2); (b) Endpoint `app/api/push/subscribe/route.ts` (POST) que recibe subscription JSON del browser y la guarda en `push_subscriptions` con el `user_id` del JWT; (c) Endpoint `app/api/push/unsubscribe/route.ts` (DELETE).
 - **Archivos:** `app/api/push/subscribe/route.ts`, `app/api/push/unsubscribe/route.ts`.
 - **Depends on:** B1.2 (tabla push_subscriptions existe), B2.1 (RLS de push_subscriptions: cada user ve solo las suyas)
 - **Continues with:** B8.2 (cadena C-B8-push)
 - **Skill rules aplicables:** —
-- **REGISTRY:** —
+- **REGISTRY:** `infra.md §13`
 - **Estimación:** M
-- **Notas:** (se llena al cerrar)
+- **Notas:** VAPID keys generadas fresh con `web-push`. Subscribe: upsert idempotente por endpoint + rpc `current_user_id` para resolver auth→public.users. Unsubscribe: delete+select para distinguir 404 vs 204. Rate limiting delegado al middleware. 1443/1443 tests green.
 
 ### B8.2 — Domain event listener: OrderStatusChanged → webpush
 - **Estado:** ⚪ pending

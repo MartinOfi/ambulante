@@ -99,6 +99,8 @@
 | productSchema | schema | `shared/schemas/product.ts` | domain.md §7b |
 | ProductSnapshot / snapshot | domain | `shared/domain/product-snapshot.ts` | domain.md §7c |
 | productsService | service | `shared/services/products.ts` | data.md §4 |
+| POST /api/push/subscribe | route-handler | `app/api/push/subscribe/route.ts` | infra.md §13 |
+| DELETE /api/push/unsubscribe | route-handler | `app/api/push/unsubscribe/route.ts` | infra.md §13 |
 | pushService | service | `shared/services/push.ts` | data.md §4 |
 | QueryProvider | provider | `shared/providers/QueryProvider.tsx` | ui.md §2c |
 | queryKeys | query | `shared/query/keys.ts` | data.md §2b |
