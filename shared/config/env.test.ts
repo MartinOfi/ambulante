@@ -127,12 +127,19 @@ describe("parseServerEnv", () => {
       expect(parsed.NEXT_PUBLIC_SUPABASE_URL).toBeUndefined();
     });
 
-    it("accepts a valid URL", () => {
+    it("accepts a valid URL when ANON_KEY is also present", () => {
       const parsed = parseServerEnv({
         ...validBase,
         NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321",
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
       });
       expect(parsed.NEXT_PUBLIC_SUPABASE_URL).toBe("http://localhost:54321");
+    });
+
+    it("rejects URL without ANON_KEY (pair required together)", () => {
+      expect(() =>
+        parseServerEnv({ ...validBase, NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321" }),
+      ).toThrowError(/NEXT_PUBLIC_SUPABASE_ANON_KEY/);
     });
 
     it("rejects an invalid URL when present", () => {

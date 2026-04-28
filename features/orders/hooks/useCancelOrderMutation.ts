@@ -8,7 +8,7 @@ import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
 import type { Order } from "@/shared/schemas/order";
 import { ordersService } from "@/features/orders/services";
-import { authService } from "@/shared/services/auth";
+import { authService } from "@/shared/services";
 
 interface MutateContext {
   readonly previous: Order | undefined;

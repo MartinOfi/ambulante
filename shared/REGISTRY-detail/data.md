@@ -189,6 +189,14 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **API:** `findByStore(storeId: string): Promise<readonly Product[]>`
 - **Tipo:** `ProductsService`
 
+### `storageService` — `shared/services/storage.ts`
+- **Tipos:** `shared/services/storage.types.ts`
+- **Descripción:** Abstracción de almacenamiento de archivos swapeable (mock → Supabase Storage). Retorna resultados con discriminant `success` para manejo de errores uniforme.
+- **Interface:** `StorageService` — `upload(params)` → `Promise<StorageResult<UploadResult>>`, `remove(params)` → `Promise<StorageResult<void>>`, `getPublicUrl(params)` → `string`
+- **Tipos clave:** `UploadParams` (`bucket`, `path`, `file: Blob | File`), `RemoveParams` (`bucket`, `paths: string[]`), `GetPublicUrlParams` (`bucket`, `path`), `StorageResult<T>`, `UploadResult` (`path`, `url`)
+- **Constantes:** `STORAGE_BUCKETS` (`STORE_IMAGES`, `PRODUCT_IMAGES`), `MOCK_STORAGE_BASE_URL` — en `shared/constants/storage.ts`
+- **Singleton:** `storageService`
+
 ### `pushService` — `shared/services/push.ts`
 - **Tipos:** `shared/services/push.types.ts`
 - **Descripción:** Abstracción de notificaciones push swapeable (mock → Web Push API real + VAPID). SSR-safe: todas las rutas verifican `typeof window / typeof Notification`.
@@ -196,6 +204,46 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Factory exportada:** `createMockPushService()` — instancia aislada por test
 - **Singleton:** `pushService` — usado en runtime
 - **Tipos clave:** `PushPermissionStatus` (`"default" | "granted" | "denied" | "unavailable"`), `PushSubscriptionData` (endpoint + keys p256dh/auth)
+
+---
+
+## §5 — Supabase facades (stubs B3.2) + factory
+
+> **Portabilidad (CLAUDE.md §10.3):** `@supabase/*` solo se importa en estos archivos. Features y componentes **nunca** importan el SDK directo — consumen los facades via `shared/services/index.ts`.
+
+### Factory — `shared/services/index.ts`
+
+Lee `process.env.NEXT_PUBLIC_SUPABASE_URL` al momento de la evaluación del módulo:
+- **Sin URL** (`""` / `undefined`) → exporta los singletons mock (los mismos de §4).
+- **Con URL** → exporta los stubs Supabase de abajo.
+
+```ts
+import { authService, realtimeService, pushService, storageService } from "@/shared/services";
+```
+
+### `supabaseAuthService` — `shared/services/auth.supabase.ts`
+- Implementa `AuthService` (misma interface que `auth.ts`).
+- Importa `createBrowserClient` de `@supabase/ssr`.
+- **Helper:** `createAuthClient()` — instancia el cliente; disponible para B4.
+- Todos los métodos lanzan `Error("TODO — implementar en B4")`.
+
+### `supabaseRealtimeService` — `shared/services/realtime.supabase.ts`
+- Implementa `RealtimeService` (misma interface que `realtime.ts`).
+- Importa `createBrowserClient` de `@supabase/ssr`.
+- **Helper:** `createRealtimeClient()` — disponible para B5.
+- Todos los métodos lanzan `Error("TODO — implementar en B5")`.
+
+### `supabasePushService` — `shared/services/push.supabase.ts`
+- Implementa `PushService` (misma interface que `push.ts`).
+- Importa `createClient` de `@supabase/supabase-js` (para persistir subscriptions).
+- **Helper:** `createPushClient()` — disponible para B6.
+- Todos los métodos lanzan `Error("TODO — implementar en B6")`.
+
+### `supabaseStorageService` — `shared/services/storage.supabase.ts`
+- Implementa `StorageService` (misma interface que `storage.ts`).
+- Importa `createClient` de `@supabase/supabase-js`.
+- **Helper:** `createStorageClient()` — disponible para B8.
+- Todos los métodos lanzan `Error("TODO — implementar en B8")`.
 
 ---
 

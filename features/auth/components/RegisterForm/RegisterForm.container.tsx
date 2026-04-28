@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/shared/hooks/useSession";
-import { authService as defaultAuthService } from "@/shared/services/auth";
+import { authService as defaultAuthService } from "@/shared/services";
 import type { AuthService, SignUpInput } from "@/shared/services/auth.types";
 import { getRoleRedirect } from "@/features/auth/utils/role-redirect";
 import { registerSchema, type RegisterValues } from "@/features/auth/schemas/auth.schemas";

@@ -69,6 +69,15 @@ const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((
     });
   }
 
+  if (data.NEXT_PUBLIC_SUPABASE_URL && !data.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY es requerida cuando se configura NEXT_PUBLIC_SUPABASE_URL",
+      path: ["NEXT_PUBLIC_SUPABASE_ANON_KEY"],
+    });
+  }
+
   const clientKey = data.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const serverKey = data.VAPID_PUBLIC_KEY;
 

@@ -153,6 +153,13 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 |---|---|
 | `USER_ROLES` | `{ client: "client", store: "store", admin: "admin" }` frozen as const |
 
+### `shared/constants/storage.ts`
+| Nombre | Descripción |
+|---|---|
+| `STORAGE_BUCKETS` | `{ STORE_IMAGES: "store-images", PRODUCT_IMAGES: "product-images" }` frozen as const — nombres canónicos de buckets Supabase Storage |
+| `StorageBucket` | Unión literal de los valores de `STORAGE_BUCKETS` — `"store-images" \| "product-images"` |
+| `MOCK_STORAGE_BASE_URL` | `"https://mock-storage.ambulante.local"` — base URL del mock local para tests y dev sin Supabase |
+
 ### `shared/constants/user-management.ts`
 | Nombre | Descripción |
 |---|---|
