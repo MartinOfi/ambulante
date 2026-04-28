@@ -334,7 +334,7 @@ Definidas en `supabase/migrations/20260428000000_rls_policies.sql`. Devuelven el
 
 ## §16 — RLS helper functions para cross-tenant checks (B2.2)
 
-Definidas en `supabase/migrations/20260428000002_rls_helpers.sql`. Todas: `language sql stable security definer set search_path = ''`. Respaldadas por índices existentes.
+Definidas en `supabase/migrations/20260428000003_rls_helpers.sql`. Todas: `language sql stable security definer set search_path = ''`. Respaldadas por índices existentes.
 
 ### Helper functions — verificación de pertenencia (SECURITY DEFINER, search_path = '')
 

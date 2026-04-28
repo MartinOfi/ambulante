@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { STORAGE_BUCKETS } from "@/shared/constants/storage";
 
 describe("services/index factory", () => {
   afterEach(() => {
@@ -47,7 +48,7 @@ describe("services/index factory", () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
       const { storageService } = await import("./index");
       const result = await storageService.upload({
-        bucket: "store-logos",
+        bucket: STORAGE_BUCKETS.STORE_LOGOS,
         path: "test/image.jpg",
         file: new Blob(["test"]),
       });
@@ -61,7 +62,10 @@ describe("services/index factory", () => {
     it("storageService.getPublicUrl returns a string URL", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
       const { storageService } = await import("./index");
-      const url = storageService.getPublicUrl({ bucket: "store-logos", path: "test.jpg" });
+      const url = storageService.getPublicUrl({
+        bucket: STORAGE_BUCKETS.STORE_LOGOS,
+        path: "test.jpg",
+      });
       expect(typeof url).toBe("string");
       expect(url.length).toBeGreaterThan(0);
     });
@@ -69,7 +73,7 @@ describe("services/index factory", () => {
     it("storageService.upload URL matches getPublicUrl for the same bucket+path", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
       const { storageService } = await import("./index");
-      const bucket = "store-logos" as const;
+      const bucket = STORAGE_BUCKETS.STORE_LOGOS;
       const path = "logos/store.png";
       const result = await storageService.upload({ bucket, path, file: new Blob(["x"]) });
       expect(result.success).toBe(true);
@@ -115,7 +119,11 @@ describe("services/index factory", () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
       const { storageService } = await import("./index");
       await expect(
-        storageService.upload({ bucket: "store-logos", path: "test.jpg", file: new Blob() }),
+        storageService.upload({
+          bucket: STORAGE_BUCKETS.STORE_LOGOS,
+          path: "test.jpg",
+          file: new Blob(),
+        }),
       ).rejects.toThrow("TODO");
     });
 

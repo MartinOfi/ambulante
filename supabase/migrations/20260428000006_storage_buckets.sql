@@ -69,6 +69,11 @@ create policy "products: store owner update"
     bucket_id = 'products'
     and (select public.current_store_id()) is not null
     and name like 'store-' || (select public.current_store_id()) || '/%'
+  )
+  with check (
+    bucket_id = 'products'
+    and (select public.current_store_id()) is not null
+    and name like 'store-' || (select public.current_store_id()) || '/%'
   );
 
 -- Authenticated tienda can delete objects under their own prefix.
@@ -103,6 +108,11 @@ create policy "store-logos: store owner update"
   on storage.objects for update
   to authenticated
   using (
+    bucket_id = 'store-logos'
+    and (select public.current_store_id()) is not null
+    and name like 'store-' || (select public.current_store_id()) || '/%'
+  )
+  with check (
     bucket_id = 'store-logos'
     and (select public.current_store_id()) is not null
     and name like 'store-' || (select public.current_store_id()) || '/%'
@@ -155,6 +165,11 @@ create policy "validation-docs: store owner update"
   on storage.objects for update
   to authenticated
   using (
+    bucket_id = 'validation-docs'
+    and (select public.current_store_id()) is not null
+    and name like 'store-' || (select public.current_store_id()) || '/%'
+  )
+  with check (
     bucket_id = 'validation-docs'
     and (select public.current_store_id()) is not null
     and name like 'store-' || (select public.current_store_id()) || '/%'
