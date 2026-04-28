@@ -1,8 +1,6 @@
 "use client";
 
-import { queryKeys } from "@/shared/query/keys";
-import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
-import { REALTIME_CHANNELS } from "@/shared/services/realtime";
+import { useOrderRealtime } from "@/features/orders/hooks/useOrderRealtime";
 import { useOrderQuery } from "@/features/orders/hooks/useOrderQuery";
 import { useCancelOrderMutation } from "@/features/orders/hooks/useCancelOrderMutation";
 import { useConfirmOnTheWayMutation } from "@/features/orders/hooks/useConfirmOnTheWayMutation";
@@ -17,10 +15,7 @@ export function OrderTrackingContainer({ orderId }: OrderTrackingContainerProps)
   const { mutate: cancel, isPending: isCancelling } = useCancelOrderMutation();
   const { mutate: confirmOnTheWay, isPending: isConfirmingOnTheWay } = useConfirmOnTheWayMutation();
 
-  useRealtimeInvalidation({
-    channel: REALTIME_CHANNELS.ORDERS,
-    queryKey: queryKeys.orders.byId(orderId),
-  });
+  useOrderRealtime(orderId);
 
   if (isLoading) return <p>Cargando pedido…</p>;
   if (isError || order === undefined || order === null) return <p>No se encontró el pedido.</p>;

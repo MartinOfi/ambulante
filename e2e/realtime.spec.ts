@@ -1,6 +1,6 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
-import { SEED_USER_IDS } from "@/shared/repositories/mock/seeds";
+import { E2E_USER_IDS } from "./constants";
 
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
@@ -80,9 +80,9 @@ test("store toggles availability → client map reflects change within 2 s (B6.3
   const storeContext = await browser.newContext();
 
   try {
-    // Use seed IDs that map to real mock data (store = Doña Rosa, ownerId = SEED_USER_IDS.store)
-    await setSessionCookie(clientContext, "client", SEED_USER_IDS.client);
-    await setSessionCookie(storeContext, "store", SEED_USER_IDS.store);
+    // Use seed IDs that map to real mock data (store = Doña Rosa, ownerId = E2E_USER_IDS.store)
+    await setSessionCookie(clientContext, "client", E2E_USER_IDS.client);
+    await setSessionCookie(storeContext, "store", E2E_USER_IDS.store);
 
     const clientPage = await clientContext.newPage();
     const storePage = await storeContext.newPage();
