@@ -120,6 +120,12 @@ export type TransitionError =
 
 export type TransitionResult = Result<Order, TransitionError>;
 
+// Extends TransitionResult with optional audit-failure signal used by batch callers
+// (e.g. cron handlers) that need to distinguish "transition ok + audit degraded".
+export type TransitionWithAuditResult =
+  | { ok: false; error: TransitionError }
+  | { ok: true; value: Order; auditFailed?: true };
+
 // ── Transition input ──────────────────────────────────────────────────────────
 
 export interface TransitionInput {
@@ -340,7 +346,7 @@ export async function transitionWithAudit({
   event,
   actor,
   auditLog,
-}: TransitionWithAuditInput): Promise<TransitionResult> {
+}: TransitionWithAuditInput): Promise<TransitionWithAuditResult> {
   const result = transition({ order, event, actor });
 
   if (!result.ok) {
@@ -359,9 +365,9 @@ export async function transitionWithAudit({
   try {
     await auditLog.append(entry);
   } catch (error: unknown) {
-    // Audit log failure must not block the state transition
     logger.error("transitionWithAudit: failed to append audit entry", { orderId: order.id, error });
+    return { ok: true, value: result.value, auditFailed: true };
   }
 
-  return result;
+  return { ok: true, value: result.value };
 }

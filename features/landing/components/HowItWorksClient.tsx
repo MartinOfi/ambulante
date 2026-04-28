@@ -6,7 +6,7 @@ import RadialOrbitalTimeline, {
   type TimelineItem,
 } from "@/shared/components/ui/radial-orbital-timeline";
 
-const TIMELINE: readonly TimelineItem[] = [
+const TIMELINE: TimelineItem[] = [
   {
     id: 1,
     title: "Activá ubicación",

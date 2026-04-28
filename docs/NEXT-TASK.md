@@ -57,6 +57,7 @@
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
 | [NT-26](#nt-26--mejorar-mensajes-de-error-de-paridad-vapid-cuando-una-sola-clave-está-configurada) | Mejorar mensajes de error de paridad VAPID | backend / DX | S | activar VAPID en prod |
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
+| [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 
 ---
 
@@ -417,6 +418,17 @@
 - **Dependencias:** B7.1 ✅ (bug introducido ahí).
 - **Ticket:** —
 - **Notas:** Descubierto en B6.1. El pgTAP test de B7.1 ya usa `set_config()` transaction-scoped como workaround correcto para tests; la migración debería hacer lo mismo para el arranque.
+
+### NT-28 — Agregar `received_at` a la tabla `orders`
+- **Categoría:** schema / backend
+- **Contexto:** En B7.2, `buildOrderForTransition` usa `sent_at` como placeholder para `receivedAt` en un `OrderRecibido` porque la tabla `orders` no tiene columna `received_at`. El state machine `SISTEMA_EXPIRA` no lee `receivedAt` por ahora, pero si en el futuro `OrderExpirado` incluye `receivedAt` en el audit trail o en los domain events, la ausencia de este campo produce timestamps incorrectos silenciosamente.
+- **Aceptación:** Columna `received_at timestamptz` en `orders`; migración que la rellena retrospectivamente con `updated_at` para filas en estado `recibido`/superiores; `buildOrderForTransition` en `route.ts` lee `received_at` del RPC result en vez de usar `sent_at`.
+- **Archivos afectados:** `supabase/migrations/`, `app/api/cron/expire-orders/route.ts`, `supabase/migrations/20260428000004_claim_expirable_orders_rpc.sql`.
+- **Estimación:** S
+- **Cuándo retomarlo:** cuando `received_at` sea necesario en el audit trail del evento `ORDER_EXPIRED` o al agregar el campo a `OrderExpirado`.
+- **Dependencias:** B7.2 ✅.
+- **Ticket:** —
+- **Notas:** Descubierto en B7.2. El comment en `route.ts:40` documenta la limitación.
 
 ---
 
