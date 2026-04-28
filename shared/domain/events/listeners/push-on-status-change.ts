@@ -1,12 +1,16 @@
 import { logger } from "@/shared/utils/logger";
 import type { EventBus } from "@/shared/domain/event-bus";
-import { ORDER_DOMAIN_EVENT, type OrderDomainEvent } from "@/shared/domain/events";
+import {
+  ORDER_DOMAIN_EVENT,
+  type OrderDomainEvent,
+  type OrderDomainEventType,
+} from "@/shared/domain/events";
 import type { StoreRepository } from "@/shared/repositories/store";
 import type { ServerPushSender, PushNotificationPayload } from "@/shared/services/push.types";
 
 // ── Notification copy (UI copy in Spanish per CLAUDE.md) ──────────────────────
 
-const PAYLOADS: Record<string, PushNotificationPayload> = {
+const PAYLOADS: Record<OrderDomainEventType, PushNotificationPayload> = {
   [ORDER_DOMAIN_EVENT.ORDER_SENT]: {
     title: "Nuevo pedido",
     body: "Tienes un nuevo pedido de un cliente",
@@ -41,13 +45,19 @@ const PAYLOADS: Record<string, PushNotificationPayload> = {
   },
 };
 
-// ── Routing helpers ────────────────────────────────────────────────────────────
+// ── Routing sets ───────────────────────────────────────────────────────────────
 
 // Events dispatched by the store actor — the client should be notified.
 const STORE_ACTOR_EVENTS: ReadonlySet<string> = new Set([
   ORDER_DOMAIN_EVENT.ORDER_ACCEPTED,
   ORDER_DOMAIN_EVENT.ORDER_REJECTED,
   ORDER_DOMAIN_EVENT.ORDER_FINISHED,
+]);
+
+// Events dispatched by the system — the client should be notified.
+const SYSTEM_ACTOR_EVENTS: ReadonlySet<string> = new Set([
+  ORDER_DOMAIN_EVENT.ORDER_RECEIVED,
+  ORDER_DOMAIN_EVENT.ORDER_EXPIRED,
 ]);
 
 // Events dispatched by the client actor — the store owner should be notified.
@@ -74,24 +84,23 @@ export function createPushOnStatusChangeListener({
 }: PushListenerDeps): PushListener {
   async function handleEvent(event: OrderDomainEvent): Promise<void> {
     const payload = PAYLOADS[event.type];
-    if (payload === undefined) return;
 
-    if (STORE_ACTOR_EVENTS.has(event.type) || !CLIENT_ACTOR_EVENTS.has(event.type)) {
-      // Covers store-actor events AND system-actor events (RECEIVED, EXPIRED)
+    if (STORE_ACTOR_EVENTS.has(event.type) || SYSTEM_ACTOR_EVENTS.has(event.type)) {
       await pushSender.sendToUser(event.clientId, payload);
       return;
     }
 
-    // Client-actor events: resolve storeId → ownerId
-    const store = await storeRepo.findById(event.storeId);
-    if (store === null) {
-      logger.warn("push-on-status-change: store not found, skipping push", {
-        storeId: event.storeId,
-        eventType: event.type,
-      });
-      return;
+    if (CLIENT_ACTOR_EVENTS.has(event.type)) {
+      const store = await storeRepo.findById(event.storeId);
+      if (store === null) {
+        logger.warn("push-on-status-change: store not found, skipping push", {
+          storeId: event.storeId,
+          eventType: event.type,
+        });
+        return;
+      }
+      await pushSender.sendToUser(store.ownerId, payload);
     }
-    await pushSender.sendToUser(store.ownerId, payload);
   }
 
   function register(bus: EventBus): () => void {

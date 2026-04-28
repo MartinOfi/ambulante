@@ -1,21 +1,16 @@
+import "server-only";
+
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 
 import { SupabasePushSubscriptionRepository } from "@/shared/repositories/supabase/push-subscriptions.supabase";
 import { logger } from "@/shared/utils/logger";
 
-import type { PushPermissionStatus, PushService, PushSubscriptionData } from "./push.types";
 import type { PushNotificationPayload, ServerPushSender } from "./push.types";
+import type { PushService, PushPermissionStatus, PushSubscriptionData } from "./push.types";
 import type { PushSubscriptionRepository } from "@/shared/repositories/push-subscriptions";
 
 // ── Browser-facing PushService stub (implemented in B6) ───────────────────────
-
-export function createPushClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
 
 export const supabasePushService: PushService = {
   getPermissionStatus(): PushPermissionStatus {
@@ -42,13 +37,17 @@ interface ServerPushSenderDeps {
 }
 
 export function createServerPushSender({ pushRepo }: ServerPushSenderDeps): ServerPushSender {
-  const subject = process.env.VAPID_SUBJECT ?? "";
-  const publicKey = process.env.VAPID_PUBLIC_KEY ?? "";
-  const privateKey = process.env.VAPID_PRIVATE_KEY ?? "";
+  const subject = process.env.VAPID_SUBJECT;
+  const publicKey = process.env.VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
 
-  if (subject && publicKey && privateKey) {
-    webpush.setVapidDetails(subject, publicKey, privateKey);
+  if (!subject || !publicKey || !privateKey) {
+    throw new Error(
+      "createServerPushSender: VAPID_SUBJECT, VAPID_PUBLIC_KEY, and VAPID_PRIVATE_KEY must all be set",
+    );
   }
+
+  webpush.setVapidDetails(subject, publicKey, privateKey);
 
   async function sendToUser(userId: string, payload: PushNotificationPayload): Promise<void> {
     const subscriptions = await pushRepo.findAll({ userId });
@@ -78,8 +77,8 @@ export function createServerPushSender({ pushRepo }: ServerPushSenderDeps): Serv
 }
 
 // ── Singleton (server-only) ───────────────────────────────────────────────────
-// Lazy getter avoids Supabase URL validation at module load time, which would
-// throw in test environments where NEXT_PUBLIC_SUPABASE_URL is not set.
+// Lazy getter avoids VAPID + Supabase validation at module load time in test
+// environments where env vars may not be set.
 
 function createServiceRoleClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";

@@ -47,6 +47,9 @@ describe("createServerPushSender", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("VAPID_SUBJECT", "mailto:test@example.com");
+    vi.stubEnv("VAPID_PUBLIC_KEY", "BNcRdreALRFXTkOOUHK1EtK2wtd5uL7KYGFN0tmH4G89GF0");
+    vi.stubEnv("VAPID_PRIVATE_KEY", "tBHIth2jVLrQl4k2e1K3Kg");
     vi.mocked(webpush.sendNotification).mockResolvedValue({} as never);
   });
 

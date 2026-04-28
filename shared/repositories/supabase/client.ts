@@ -60,8 +60,16 @@ export async function createRouteHandlerClient() {
 
 // Server-only. Bypasses RLS — use only for trusted server-side operations.
 export function createServiceRoleClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ??
+    (() => {
+      throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
+    })();
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    (() => {
+      throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
+    })();
   return createSupabaseServerClient(url, key, {
     cookies: { getAll: () => [], setAll: () => undefined },
     auth: { persistSession: false },
