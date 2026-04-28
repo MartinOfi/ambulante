@@ -613,7 +613,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** (se llena al cerrar)
 
 ### B6.3 — Integración Realtime ↔ React Query
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** Cuando llega un evento realtime, hay que actualizar el cache de React Query (o invalidarlo). Sin esto, la UI no refleja el cambio aunque el evento haya llegado.
 - **Entregable:** Hook `useRealtimeInvalidation(channel, queryKeys)` en `shared/hooks/`. Usos concretos: `useOrderRealtime(orderId)`, `useStoresAvailabilityRealtime()`. Tests unitarios del hook + test E2E de un flow (tienda cambia disponibilidad → cliente ve el cambio <2s).
 - **Archivos:** `shared/hooks/useRealtimeInvalidation.ts`, `features/orders/hooks/useOrderRealtime.ts`, `features/map/hooks/useStoresAvailabilityRealtime.ts`.
