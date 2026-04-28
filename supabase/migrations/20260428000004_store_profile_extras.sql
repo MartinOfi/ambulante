@@ -48,7 +48,9 @@ alter table public.stores
 -- stores_view: exposes lat/lng as plain columns, avoids WKB parsing in TS
 -- ─────────────────────────────────────────────────────────────────────────────
 
-create or replace view public.stores_view as
+create or replace view public.stores_view
+  with (security_invoker = true, security_barrier = true)
+as
 select
   s.id,
   s.public_id,
@@ -62,8 +64,8 @@ select
   s.tagline,
   s.price_from_ars,
   s.hours,
-  st_y(s.current_location::geometry) as lat,
-  st_x(s.current_location::geometry) as lng,
+  extensions.st_y(s.current_location::extensions.geometry) as lat,
+  extensions.st_x(s.current_location::extensions.geometry) as lng,
   s.created_at,
   s.updated_at
 from public.stores s
