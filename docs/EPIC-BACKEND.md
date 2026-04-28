@@ -596,7 +596,8 @@ B0 ──► B1 ──► B2 ──► B3 ──┬──► B4 ──► B9 (cl
 - **Notas:** Migración `20260428000002_realtime_publication.sql` creada. REPLICA IDENTITY FULL configurado en las 3 tablas. pgTAP 7/7 passing. Se descubrieron y documentaron 2 issues previos: (1) supabase/config.toml paths para CLI v2.95.5 (corregido); (2) seed.sql ALTER DATABASE SET falla sin superuser (comentado, registrado como NT-27).
 
 ### B6.2 — Implementación del facade `RealtimeService`
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 WIP
+- **Inicio:** 2026-04-28
 - **Por qué:** La firma de F5.2 (ya existente como mock) define `subscribe(channel, handler)`. Hay que llenarla con Supabase Realtime respetando el contrato.
 - **Entregable:** `shared/services/realtime.supabase.ts` con `subscribe`, `unsubscribe`, `broadcast`. Manejo de canales `orders:id`, `stores:available`, `store-locations:store_id`. Tests con mock del cliente Supabase.
 - **Archivos:** `shared/services/realtime.supabase.ts`, `shared/services/realtime.supabase.test.ts`.
