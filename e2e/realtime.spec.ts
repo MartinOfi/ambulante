@@ -1,40 +1,11 @@
-import { expect, test, type BrowserContext } from "@playwright/test";
-import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
+import { expect, test } from "@playwright/test";
 import { E2E_USER_IDS } from "./constants";
+import { setSessionCookie } from "./helpers";
 
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
 const REALTIME_SLA_MS = 5_000;
 const AVAILABILITY_SLA_MS = 2_000;
-
-function makeSessionCookie(role: "client" | "store", userId: string): string {
-  const session = {
-    accessToken: `mock-access-${role}`,
-    refreshToken: `mock-refresh-${role}`,
-    expiresAt: Math.floor(Date.now() / 1000) + 3600,
-    user: {
-      id: userId,
-      email: `${role}@test.com`,
-      role,
-    },
-  };
-  return btoa(JSON.stringify(session));
-}
-
-async function setSessionCookie(
-  context: BrowserContext,
-  role: "client" | "store",
-  userId: string,
-): Promise<void> {
-  await context.addCookies([
-    {
-      name: SESSION_COOKIE_NAME,
-      value: makeSessionCookie(role, userId),
-      domain: "localhost",
-      path: "/",
-    },
-  ]);
-}
 
 test("store accepting an order reflects in client view within 5 s (PRD §7.2)", async ({
   browser,
