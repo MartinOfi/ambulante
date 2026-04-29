@@ -1,5 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { RATE_LIMIT_RULES } from "@/shared/constants/rate-limit";
+import {
+  RATE_LIMIT_HEADERS,
+  RATE_LIMIT_PATH_PREFIXES,
+  RATE_LIMIT_RULES,
+} from "@/shared/constants/rate-limit";
 import { getRequiredRole } from "@/shared/utils/route-access";
 import { ROUTES } from "@/shared/constants/routes";
 import { createRateLimiterFromEnv } from "@/shared/services/rate-limit.factory";
@@ -11,10 +15,10 @@ const rateLimiter = createRateLimiterFromEnv();
 // x-real-ip is set by Vercel's reverse proxy and cannot be forged by the client.
 // x-forwarded-for rightmost entry is the one appended by the trusted proxy.
 function extractIp(request: NextRequest): string | null {
-  const realIp = request.headers.get("x-real-ip")?.trim();
+  const realIp = request.headers.get(RATE_LIMIT_HEADERS.realIp)?.trim();
   if (realIp) return realIp;
 
-  const forwarded = request.headers.get("x-forwarded-for");
+  const forwarded = request.headers.get(RATE_LIMIT_HEADERS.forwardedFor);
   if (forwarded) {
     const entries = forwarded.split(",");
     return entries[entries.length - 1]?.trim() ?? null;
@@ -27,7 +31,7 @@ function extractIp(request: NextRequest): string | null {
 async function applyRateLimit(request: NextRequest): Promise<NextResponse | null> {
   const { pathname } = request.nextUrl;
 
-  if (!pathname.startsWith("/api/")) {
+  if (!pathname.startsWith(RATE_LIMIT_PATH_PREFIXES.api)) {
     return null;
   }
 
@@ -39,7 +43,9 @@ async function applyRateLimit(request: NextRequest): Promise<NextResponse | null
     );
   }
 
-  const rule = pathname.startsWith("/api/orders") ? RATE_LIMIT_RULES.orders : RATE_LIMIT_RULES.api;
+  const rule = pathname.startsWith(RATE_LIMIT_PATH_PREFIXES.orders)
+    ? RATE_LIMIT_RULES.orders
+    : RATE_LIMIT_RULES.api;
   const result = await rateLimiter.check({ identifier: ip, rule });
 
   if (!result.allowed) {
@@ -48,10 +54,12 @@ async function applyRateLimit(request: NextRequest): Promise<NextResponse | null
       {
         status: 429,
         headers: {
-          "Retry-After": String(Math.ceil((result.resetAtMs - Date.now()) / 1000)),
-          "X-RateLimit-Limit": String(rule.maxRequests),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(result.resetAtMs),
+          [RATE_LIMIT_HEADERS.retryAfter]: String(
+            Math.ceil((result.resetAtMs - Date.now()) / 1000),
+          ),
+          [RATE_LIMIT_HEADERS.limit]: String(rule.maxRequests),
+          [RATE_LIMIT_HEADERS.remaining]: "0",
+          [RATE_LIMIT_HEADERS.reset]: String(result.resetAtMs),
         },
       },
     );

@@ -292,6 +292,9 @@ jobs:
             echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
             echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
             echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            # Dummy CRON_SECRET so unauthorized-caller fuzz tests exercise
+            # the 401 path instead of the 503 "service unavailable" path.
+            echo "CRON_SECRET=ci-dummy-cron-secret-not-used-for-real"
           } >> "$GITHUB_ENV"
 
       - name: Run security smoke tests

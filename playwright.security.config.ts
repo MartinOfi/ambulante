@@ -48,6 +48,7 @@ export default defineConfig({
       ...(process.env.SUPABASE_SERVICE_ROLE_KEY
         ? { SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY }
         : {}),
+      ...(process.env.CRON_SECRET ? { CRON_SECRET: process.env.CRON_SECRET } : {}),
     },
   },
 });

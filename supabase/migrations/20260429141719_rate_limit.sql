@@ -67,15 +67,15 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_now                 timestamptz      := clock_timestamp();
-  v_refill_per_sec      double precision := p_max_requests::double precision
-                                            / nullif(p_window_seconds, 0)::double precision;
-  v_bucket              public.rate_limit_buckets%rowtype;
-  v_elapsed_seconds     double precision;
-  v_refilled_tokens     double precision;
-  v_resulting_tokens    double precision;
-  v_allowed             boolean;
-  v_full_refill_seconds double precision;
+  v_now                     timestamptz      := clock_timestamp();
+  v_refill_per_sec          double precision := p_max_requests::double precision
+                                                / nullif(p_window_seconds, 0)::double precision;
+  v_bucket                  public.rate_limit_buckets%rowtype;
+  v_elapsed_seconds         double precision;
+  v_refilled_tokens         double precision;
+  v_resulting_tokens        double precision;
+  v_allowed                 boolean;
+  v_seconds_until_next      double precision;
 begin
   if p_max_requests <= 0 or p_window_seconds <= 0 then
     raise exception 'check_rate_limit: invalid params (max_requests=%, window_seconds=%)',
@@ -91,14 +91,21 @@ begin
    where key = p_key;
 
   if not found then
-    -- First request: start with max tokens, consume one.
+    -- First request: start with max tokens, consume one. Next token is
+    -- available immediately if max >= 2; otherwise refill takes 1/rate seconds.
     insert into public.rate_limit_buckets (key, tokens, last_refill_at, updated_at)
     values (p_key, p_max_requests::double precision - 1, v_now, v_now);
+
+    v_seconds_until_next := case
+      when p_max_requests >= 2 then 0
+      when v_refill_per_sec > 0 then 1.0 / v_refill_per_sec
+      else p_window_seconds::double precision
+    end;
 
     return query select
       true,
       (p_max_requests::double precision - 1),
-      (extract(epoch from v_now) * 1000 + p_window_seconds::double precision * 1000);
+      (extract(epoch from v_now) * 1000 + v_seconds_until_next * 1000);
     return;
   end if;
 
@@ -122,17 +129,20 @@ begin
          updated_at     = v_now
    where key = p_key;
 
-  -- reset_at_ms: when the bucket would be back at full capacity.
-  v_full_refill_seconds := case
-    when v_refill_per_sec > 0
-      then (p_max_requests::double precision - v_resulting_tokens) / v_refill_per_sec
+  -- reset_at_ms: wall-clock ms when the bucket holds >=1 token (i.e. when a
+  -- subsequent request would succeed). Maps directly to RFC 6585 Retry-After
+  -- semantics. NOT "time until full" — that would 5x-overstate Retry-After
+  -- for low-capacity rules and trigger over-aggressive client backoff.
+  v_seconds_until_next := case
+    when v_resulting_tokens >= 1 then 0
+    when v_refill_per_sec > 0 then (1.0 - v_resulting_tokens) / v_refill_per_sec
     else p_window_seconds::double precision
   end;
 
   return query select
     v_allowed,
     v_resulting_tokens,
-    (extract(epoch from v_now) * 1000 + v_full_refill_seconds * 1000);
+    (extract(epoch from v_now) * 1000 + v_seconds_until_next * 1000);
 end;
 $$;
 
@@ -147,16 +157,28 @@ create or replace function public.cleanup_rate_limit_buckets(
   p_ttl_seconds integer default 86400
 )
 returns integer
-language sql
+language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_deleted integer;
+begin
+  -- Guard against accidental purge-all if cron passes 0 or negative.
+  if p_ttl_seconds <= 0 then
+    raise exception 'cleanup_rate_limit_buckets: p_ttl_seconds must be > 0, got %',
+      p_ttl_seconds;
+  end if;
+
   with deleted as (
     delete from public.rate_limit_buckets
      where updated_at < now() - make_interval(secs => p_ttl_seconds)
     returning 1
   )
-  select coalesce(count(*)::integer, 0) from deleted;
+  select coalesce(count(*)::integer, 0) into v_deleted from deleted;
+
+  return v_deleted;
+end;
 $$;
 
 revoke execute on function public.cleanup_rate_limit_buckets(integer) from public;

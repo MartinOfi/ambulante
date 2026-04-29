@@ -56,6 +56,11 @@ test.describe("security smoke — server action fuzz", () => {
   });
 
   test("cron endpoint rejects unauthorized callers without leaking", async ({ request }) => {
+    test.skip(
+      !process.env.CRON_SECRET,
+      "CRON_SECRET not set — cron handler returns 503 instead of 401",
+    );
+
     const probes: ReadonlyArray<{ readonly headers: Record<string, string> }> = [
       { headers: { "x-real-ip": "198.51.100.21" } },
       { headers: { "x-real-ip": "198.51.100.22", Authorization: "Bearer wrong-secret" } },
@@ -64,7 +69,7 @@ test.describe("security smoke — server action fuzz", () => {
 
     for (const probe of probes) {
       const response = await request.post(CRON_PATH, probe);
-      expect([401, 503]).toContain(response.status());
+      expect(response.status()).toBe(401);
 
       const body = await response.text();
       expect(body).not.toContain("CRON_SECRET");
