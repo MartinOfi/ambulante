@@ -25,7 +25,7 @@
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
 | B5 | Storage (buckets + RLS + upload helpers) | 4 | 2/4 | 🟡 |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
-| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 5 | 2/5 | 🟡 |
+| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 5 | 3/5 | 🟡 |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
 | B9 | Swap cliente (features Cliente consumen backend real) | 8 | 0/8 | ⚪ |
 | B10 | Swap tienda (features Tienda consumen backend real) | 8 | 0/8 | ⚪ |
@@ -41,7 +41,6 @@
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
 | B5.3 | Upload helper con optimización de imagen | ⚪ | B5.2 | M | — | `infra.md` (sección Utils). |
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
-| B7.3 | Route Handler `/api/cron/auto-close-orders` | ✅ | B7.2 | M | `lock-skip-locked`, `lock-short-transactions` | — |
 | B7.4 | Runbook: cómo desactivar / reactivar / auditar un cron | ⚪ | B7.3 | S | — | — |
 | B7.5 | Tests de integración concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B8.3 | Retry + dead subscription cleanup | ✅ | B8.2 | M | — | — |
