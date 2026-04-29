@@ -9,7 +9,7 @@ import type { NextRequest, NextResponse } from "next/server";
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (!value?.trim()) throw new Error(`${name} is not set`);
-  return value;
+  return value.trim();
 }
 
 export function createBrowserClient() {
