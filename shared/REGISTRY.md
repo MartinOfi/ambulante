@@ -117,6 +117,7 @@
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |
 | registerBackgroundSync | query | `shared/query/offline-queue.ts` | data.md §2b |
 | renderWithProviders | test-util | `shared/test-utils/render.tsx` | testing.md §14 |
+| resizeImageForUpload / RESIZABLE_IMAGE_TYPES / ResizeImageOptions / ResizeImageResult / CanvasLike / DEFAULT_MAX_DIMENSION / DEFAULT_OUTPUT_MIME / DEFAULT_QUALITY | util | `shared/utils/image-upload.ts` | infra.md §5 |
 | no-raw-img (invariant test) | fitness-fn | `shared/test-utils/no-raw-img.test.ts` | testing.md §14 |
 | rls_users (pgTAP) | pgtap-test | `supabase/tests/rls_users.sql` | testing.md §15 |
 | rls_stores (pgTAP) | pgtap-test | `supabase/tests/rls_stores.sql` | testing.md §15 |

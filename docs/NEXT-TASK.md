@@ -58,6 +58,7 @@
 | [NT-26](#nt-26--mejorar-mensajes-de-error-de-paridad-vapid-cuando-una-sola-clave-está-configurada) | Mejorar mensajes de error de paridad VAPID | backend / DX | S | activar VAPID en prod |
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
+| [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
 
 ---
 
@@ -442,6 +443,20 @@
 - **Dependencias:** B3.3 ✅.
 - **Ticket:** —
 - **Notas:** El repositorio usa `resolveUserInternalId(publicId)` mientras las rutas actuales usan `rpc("current_user_id")` — hay que alinear el mecanismo de resolución. El issue de `onConflict: "endpoint"` que no valida ownership (endpoint puede ser reasignado entre usuarios) también debe resolverse aquí.
+
+---
+
+### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
+
+- **Categoría:** DX / types
+- **Contexto:** En el path donde el MIME del archivo no es redimensionable (ej. PDF), el helper retorna `originalDimensions: { width: 0, height: 0 }` y `outputDimensions: { width: 0, height: 0 }`. Eso es ambiguo — un caller no puede distinguir "imagen de tamaño 0" (imposible en la práctica) de "nunca decodificamos el archivo". El code reviewer (B5.3, MEDIUM 2) sugirió tipar `originalDimensions` y `outputDimensions` como `ImageDimensions | null` para hacer la distinción explícita en el tipo.
+- **Aceptación:** la interfaz `ResizeImageResult` expone `originalDimensions: ImageDimensions | null` y `outputDimensions: ImageDimensions | null`; los callers se actualizan; tests cubren ambos paths (`null` para MIME no redimensionable, valores reales para imágenes).
+- **Archivos afectados:** `shared/utils/image-upload.ts`, `shared/utils/image-upload.test.ts`, callers en `features/catalog/components/ProductImageUpload` (creado por B10.3).
+- **Estimación:** S
+- **Cuándo retomarlo:** al ejecutar **B10.3** (Swap catálogo CRUD + image upload) — si el componente consumidor termina necesitando esa distinción, se hace en el mismo PR. Si no, se puede dejar como-está y descartar este item.
+- **Dependencias:** B10.3 (consumer real del helper).
+- **Ticket:** —
+- **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
 
 ---
 
