@@ -2,10 +2,10 @@
 # scripts/check-supabase-imports.sh
 #
 # Enforces the Supabase portability boundary (docs/epic-backend/portabilidad.md).
-# @supabase/* imports are only allowed in three directories:
+# @supabase/* imports are only allowed in three locations:
 #   - shared/repositories/supabase/*.ts
 #   - shared/services/*.supabase.ts
-#   - app/api/cron/**/route.ts
+#   - app/api/cron/**/route.ts        ← only route.ts, not test files
 #
 # This is a second line of defence against eslint-disable bypasses (see B3.3).
 # ESLint catches violations at dev time; this script blocks them in CI regardless.
@@ -17,12 +17,16 @@
 
 set -euo pipefail
 
+# Always run from the repo root regardless of where the caller invoked us.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+
 ERRORS=0
 
 echo "Supabase import boundary check"
 echo ""
 
-# Scan a directory for @supabase imports, skipping paths that match exclude_re.
+# Scan a directory for @supabase imports, skipping paths matching exclude_re.
 # Prints matching lines in grep -Hn format (file:line:content).
 scan_dir() {
   local dir="$1"
@@ -47,6 +51,7 @@ if [[ -d features ]]; then
   FEAT=$(scan_dir "features")
   if [[ -n "$FEAT" ]]; then
     echo "FAIL:"
+    echo "──────────────────────────────────────────────"
     printf "%s" "$FEAT"
     ERRORS=$((ERRORS + 1))
   else
@@ -58,14 +63,17 @@ fi
 
 echo ""
 
-# ─── check 2: app/ — @supabase allowed only in app/api/cron/ ─────────────────
+# ─── check 2: app/ — @supabase allowed ONLY in app/api/cron/**/route.ts ───────
+# The allowlist is route.ts files only. Test files under app/api/cron/ are
+# not in the architectural allowlist and must use mocks instead.
 
-echo "==> [2/2] app/ (excluding app/api/cron/) — @supabase not allowed"
+echo "==> [2/2] app/ (excluding app/api/cron/**/route.ts) — @supabase not allowed"
 
 if [[ -d app ]]; then
-  APP=$(scan_dir "app" "^app/api/cron/")
+  APP=$(scan_dir "app" "^app/api/cron/.+/route\.ts$")
   if [[ -n "$APP" ]]; then
     echo "FAIL:"
+    echo "──────────────────────────────────────────────"
     printf "%s" "$APP"
     ERRORS=$((ERRORS + 1))
   else
