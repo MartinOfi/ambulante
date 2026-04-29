@@ -446,6 +446,23 @@
 
 ---
 
+### NT-30 — Resolver pares de migraciones con timestamp prefijo duplicado
+
+- **Categoría:** infra / migraciones
+- **Contexto:** En `supabase/migrations/` hay dos pares con el mismo prefijo numérico:
+  - `20260428000004_claim_expirable_orders_rpc.sql` y `20260428000004_store_profile_extras.sql`
+  - `20260428000007_claim_auto_closeable_orders_rpc.sql` y `20260428000007_get_top_slow_queries_fn.sql`
+  Resultado: `pnpm supabase db reset` aborta al insertar en `supabase_migrations.schema_migrations` (PK `(version)` viola unique). El estado local de la DB se mantiene aplicando migraciones individualmente. Producción todavía no fue afectada porque B14.1 aún no corrió.
+- **Aceptación:** `pnpm supabase db reset` corre limpio end-to-end; cada migración tiene un prefijo único; `supabase_migrations.schema_migrations` puede repoblar sin conflictos.
+- **Archivos afectados:** las cuatro migraciones listadas — renombrar las dos "segundas" a un timestamp posterior (p.ej. `20260428000008_*.sql` y `20260428000009_*.sql`) preservando el orden lógico.
+- **Estimación:** S
+- **Cuándo retomarlo:** **antes de B14.1** (crear proyecto Supabase Cloud) — si producción se inicializa con estos prefijos duplicados, el primer push falla con el mismo error.
+- **Dependencias:** ninguna; cambio puramente de archivos.
+- **Ticket:** —
+- **Notas:** descubierto por **B12-A** al intentar `db reset` para validar la migración `20260429000000_observability_alerts.sql`. Se usó psql directo como workaround.
+
+---
+
 ### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
 
 - **Categoría:** DX / types

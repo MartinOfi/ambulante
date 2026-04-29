@@ -144,3 +144,37 @@ describe("serverLogger — singleton", () => {
     expect(mockPinoInstance.info).toHaveBeenCalledWith({ phase: "boot" }, "startup event");
   });
 });
+
+describe("getOrCreateRequestLogger", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.resetModules();
+  });
+
+  it("uses the incoming x-request-id when present and valid", async () => {
+    const { getOrCreateRequestLogger } = await import("./server-logger");
+    const headers = new Headers({ "x-request-id": "req-from-edge-1" });
+    const { logger, requestId } = getOrCreateRequestLogger(headers);
+    expect(requestId).toBe("req-from-edge-1");
+    expect(mockPinoInstance.child).toHaveBeenCalledWith({ requestId: "req-from-edge-1" });
+    expect(typeof logger.info).toBe("function");
+  });
+
+  it("generates a UUID when the header is absent", async () => {
+    const { getOrCreateRequestLogger } = await import("./server-logger");
+    const { requestId } = getOrCreateRequestLogger(new Headers());
+    expect(requestId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    );
+  });
+
+  it("accepts a Request and reads its headers", async () => {
+    const { getOrCreateRequestLogger } = await import("./server-logger");
+    const req = new Request("http://localhost/x", { headers: { "x-request-id": "from-req" } });
+    const { requestId } = getOrCreateRequestLogger(req);
+    expect(requestId).toBe("from-req");
+  });
+});

@@ -132,6 +132,10 @@
 | serverLogger | util | `shared/utils/server-logger.ts` | infra.md §5 |
 | createRequestLogger | util | `shared/utils/server-logger.ts` | infra.md §5 |
 | generateRequestId | util | `shared/utils/server-logger.ts` | infra.md §5 |
+| getOrCreateRequestLogger | util | `shared/utils/server-logger.ts` | infra.md §5 |
+| getRequestId / readOrCreateRequestId / isValidRequestId | util | `shared/utils/request-id.ts` | infra.md §5 |
+| reportSlowQuery | util | `shared/utils/sentry.ts` | infra.md §5 |
+| REQUEST_ID_HEADER / SLOW_QUERY_THRESHOLD_MS / SLOW_QUERY_BASELINE_FACTOR / SLOW_QUERY_MAX_RESULTS / QUERY_TEXT_MAX_LENGTH / BASELINE_MIN_AGE_DAYS | constant | `shared/constants/observability.ts` | infra.md §5 |
 | shouldRetry | util | `shared/providers/QueryProvider.tsx` | ui.md §2c |
 | Spacer | ui-component | `shared/components/layout/` | ui.md §2 |
 | Stack | ui-component | `shared/components/layout/` | ui.md §2 |

@@ -161,3 +161,36 @@ describe("middleware — auth protection", () => {
     expect(response.status).toBe(200);
   });
 });
+
+describe("middleware — request id propagation", () => {
+  beforeEach(() => {
+    rateLimitStore.clear();
+    mockUnauthenticated();
+  });
+
+  it("sets x-request-id on the response when no header arrives", async () => {
+    const response = await middleware(makeRequest("/map/nearby"));
+    const id = response.headers.get("x-request-id");
+    expect(id).not.toBeNull();
+    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  });
+
+  it("preserves an incoming x-request-id on the response", async () => {
+    const incoming = "550e8400-e29b-41d4-a716-446655440000";
+    const response = await middleware(makeRequest("/map/nearby", { "x-request-id": incoming }));
+    expect(response.headers.get("x-request-id")).toBe(incoming);
+  });
+
+  it("tags rate-limit rejections with a request id", async () => {
+    const response = await middleware(makeRequest("/api/test"));
+    expect(response.status).toBe(400);
+    expect(response.headers.get("x-request-id")).not.toBeNull();
+  });
+
+  it("tags redirects with a request id", async () => {
+    mockUnauthenticated();
+    const response = await middleware(makeRequest("/admin/dashboard"));
+    expect(response.status).toBe(307);
+    expect(response.headers.get("x-request-id")).not.toBeNull();
+  });
+});
