@@ -24,7 +24,7 @@ export function OrderTrackingContainer({ orderId }: OrderTrackingContainerProps)
     <OrderTracking
       order={order}
       onConfirmOnTheWay={() => confirmOnTheWay(orderId)}
-      onCancel={() => cancel(orderId)}
+      onCancel={() => cancel({ publicId: orderId })}
       isCancelling={isCancelling}
       isConfirmingOnTheWay={isConfirmingOnTheWay}
     />

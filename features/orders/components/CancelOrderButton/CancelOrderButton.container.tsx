@@ -37,9 +37,12 @@ export function CancelOrderButtonContainer({
   const handleCancelClick = () => setIsConfirming(true);
   const handleDismissConfirm = () => setIsConfirming(false);
   const handleConfirmCancel = () => {
-    cancelOrder(orderId, {
-      onSettled: () => setIsConfirming(false),
-    });
+    cancelOrder(
+      { publicId: orderId },
+      {
+        onSettled: () => setIsConfirming(false),
+      },
+    );
   };
 
   return (

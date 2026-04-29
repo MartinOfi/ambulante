@@ -5,7 +5,7 @@ import { createElement, type ReactNode } from "react";
 
 import { useCancelOrderMutation } from "./useCancelOrderMutation";
 import { authService } from "@/shared/services/auth";
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { cancelOrder } from "@/features/orders/actions";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { queryKeys } from "@/shared/query/keys";
 import type { Order } from "@/shared/schemas/order";
@@ -14,8 +14,8 @@ vi.mock("@/shared/services/auth", () => ({
   authService: { getSession: vi.fn() },
 }));
 
-vi.mock("@/features/orders/services/orders.mock", () => ({
-  ordersService: { accept: vi.fn(), cancel: vi.fn() },
+vi.mock("@/features/orders/actions", () => ({
+  cancelOrder: vi.fn(),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
@@ -23,7 +23,9 @@ vi.mock("@/shared/utils/logger", () => ({
 }));
 
 const mockGetSession = vi.mocked(authService.getSession);
-const mockCancel = vi.mocked(ordersService.cancel);
+const mockCancelOrder = vi.mocked(cancelOrder);
+
+const ORDER_PUBLIC_ID = "11111111-1111-4111-8111-111111111111";
 
 function makeWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { readonly children: ReactNode }) {
@@ -32,7 +34,7 @@ function makeWrapper(queryClient: QueryClient) {
 }
 
 const STUB_ORDER_ENVIADO: Order = {
-  id: "order-1",
+  id: ORDER_PUBLIC_ID,
   clientId: "client-1",
   storeId: "store-1",
   status: ORDER_STATUS.ENVIADO,
@@ -48,6 +50,12 @@ const STUB_SESSION_CLIENT = {
   expiresAt: 9999999999,
 };
 
+const SUCCESS_RESULT = {
+  ok: true,
+  publicId: ORDER_PUBLIC_ID,
+  status: ORDER_STATUS.CANCELADO,
+} as const;
+
 beforeEach(() => {
   vi.resetAllMocks();
 });
@@ -62,12 +70,12 @@ describe("useCancelOrderMutation", () => {
     });
 
     await act(async () => {
-      result.current.mutate("order-1");
+      result.current.mutate({ publicId: ORDER_PUBLIC_ID });
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toBeInstanceOf(Error);
-    expect(mockCancel).not.toHaveBeenCalled();
+    expect(mockCancelOrder).not.toHaveBeenCalled();
   });
 
   it("throws when role is store", async () => {
@@ -82,17 +90,16 @@ describe("useCancelOrderMutation", () => {
     });
 
     await act(async () => {
-      result.current.mutate("order-1");
+      result.current.mutate({ publicId: ORDER_PUBLIC_ID });
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(mockCancel).not.toHaveBeenCalled();
+    expect(mockCancelOrder).not.toHaveBeenCalled();
   });
 
-  it("calls ordersService.cancel with orderId when authenticated as client", async () => {
+  it("calls cancelOrder Server Action with the input when authenticated as client", async () => {
     mockGetSession.mockResolvedValueOnce(STUB_SESSION_CLIENT);
-    const cancelled: Order = { ...STUB_ORDER_ENVIADO, status: ORDER_STATUS.CANCELADO };
-    mockCancel.mockResolvedValueOnce(cancelled);
+    mockCancelOrder.mockResolvedValueOnce(SUCCESS_RESULT);
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
     const { result } = renderHook(() => useCancelOrderMutation(), {
@@ -100,63 +107,91 @@ describe("useCancelOrderMutation", () => {
     });
 
     await act(async () => {
-      result.current.mutate("order-1");
+      result.current.mutate({ publicId: ORDER_PUBLIC_ID, reason: "Cambié de idea" });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockCancel).toHaveBeenCalledWith("order-1");
+    expect(mockCancelOrder).toHaveBeenCalledWith({
+      publicId: ORDER_PUBLIC_ID,
+      reason: "Cambié de idea",
+    });
+    expect(result.current.data).toEqual({
+      publicId: ORDER_PUBLIC_ID,
+      status: ORDER_STATUS.CANCELADO,
+    });
+  });
+
+  it("throws and surfaces message when cancelOrder returns ok:false", async () => {
+    mockGetSession.mockResolvedValueOnce(STUB_SESSION_CLIENT);
+    mockCancelOrder.mockResolvedValueOnce({
+      ok: false,
+      errorCode: "INVALID_TRANSITION",
+      message: "No podés cancelar después de que la tienda aceptó el pedido.",
+    });
+
+    const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    const { result } = renderHook(() => useCancelOrderMutation(), {
+      wrapper: makeWrapper(qc),
+    });
+
+    await act(async () => {
+      result.current.mutate({ publicId: ORDER_PUBLIC_ID });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    const error = result.current.error;
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toMatch(/aceptó/i);
   });
 
   it("applies optimistic CANCELADO status before the request resolves", async () => {
     mockGetSession.mockResolvedValue(STUB_SESSION_CLIENT);
-    let resolveCancel!: (value: Order) => void;
-    mockCancel.mockReturnValueOnce(
-      new Promise<Order>((res) => {
+    let resolveCancel!: (value: typeof SUCCESS_RESULT) => void;
+    mockCancelOrder.mockReturnValueOnce(
+      new Promise<typeof SUCCESS_RESULT>((res) => {
         resolveCancel = res;
       }),
     );
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
-    qc.setQueryData(queryKeys.orders.byId("order-1"), STUB_ORDER_ENVIADO);
+    qc.setQueryData(queryKeys.orders.byId(ORDER_PUBLIC_ID), STUB_ORDER_ENVIADO);
 
     renderHook(() => useCancelOrderMutation(), { wrapper: makeWrapper(qc) });
 
     act(() => {
-      qc.getMutationCache().getAll()[0]?.execute("order-1");
+      qc.getMutationCache().getAll()[0]?.execute({ publicId: ORDER_PUBLIC_ID });
     });
 
-    // Assert optimistic update applied before request resolves
     await waitFor(() => {
-      const cached = qc.getQueryData<{ status: string }>(queryKeys.orders.byId("order-1"));
+      const cached = qc.getQueryData<{ status: string }>(queryKeys.orders.byId(ORDER_PUBLIC_ID));
       return cached?.status === ORDER_STATUS.CANCELADO;
     });
 
-    const resolved: Order = { ...STUB_ORDER_ENVIADO, status: ORDER_STATUS.CANCELADO };
     await act(async () => {
-      resolveCancel(resolved);
+      resolveCancel(SUCCESS_RESULT);
     });
   });
 
   it("rolls back optimistic update on error", async () => {
     mockGetSession.mockResolvedValue(STUB_SESSION_CLIENT);
-    mockCancel.mockRejectedValueOnce(new Error("network error"));
+    mockCancelOrder.mockRejectedValueOnce(new Error("network error"));
 
     const qc = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
-    qc.setQueryData(queryKeys.orders.byId("order-1"), STUB_ORDER_ENVIADO);
+    qc.setQueryData(queryKeys.orders.byId(ORDER_PUBLIC_ID), STUB_ORDER_ENVIADO);
 
     const { result } = renderHook(() => useCancelOrderMutation(), {
       wrapper: makeWrapper(qc),
     });
 
     await act(async () => {
-      result.current.mutate("order-1");
+      result.current.mutate({ publicId: ORDER_PUBLIC_ID });
     });
 
     await waitFor(
       () => {
-        const cached = qc.getQueryData<{ status: string }>(queryKeys.orders.byId("order-1"));
+        const cached = qc.getQueryData<{ status: string }>(queryKeys.orders.byId(ORDER_PUBLIC_ID));
         expect(cached?.status).toBe(ORDER_STATUS.ENVIADO);
       },
       { timeout: 3000 },
