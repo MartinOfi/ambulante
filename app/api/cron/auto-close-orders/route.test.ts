@@ -39,6 +39,7 @@ vi.mock("@/shared/utils/logger", () => ({
 }));
 
 import { ORDER_AUTOCLOSE_HOURS } from "@/shared/constants/order";
+import { ORDER_DOMAIN_EVENT } from "@/shared/domain/events";
 import { POST } from "./route";
 
 const VALID_TOKEN = "Bearer test-cron-secret-min-16";
@@ -122,7 +123,7 @@ describe("POST /api/cron/auto-close-orders", () => {
 
       expect(mockPublish).toHaveBeenCalledOnce();
       const event = mockPublish.mock.calls[0][0];
-      expect(event.type).toBe("ORDER_FINISHED");
+      expect(event.type).toBe(ORDER_DOMAIN_EVENT.ORDER_FINISHED);
       expect(event.orderId).toBe(row.order_public_id);
       expect(event.clientId).toBe(row.client_public_id);
       expect(event.storeId).toBe(row.store_public_id);

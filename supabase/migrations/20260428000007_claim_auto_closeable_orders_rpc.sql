@@ -24,7 +24,9 @@ as $$
       o.customer_id,
       o.store_id,
       o.created_at  as sent_at,
-      o.updated_at  as accepted_at  -- updated_at reflects the last status change (aceptado)
+      -- CTE snapshot: updated_at is read here, before the UPDATE below fires, so the
+    -- value is the pre-transition timestamp — exactly the proxy for accepted_at we need.
+    o.updated_at  as accepted_at
     from public.orders o
     where o.status = 'aceptado'
       and o.updated_at < now() - make_interval(hours => p_autoclose_hours)
@@ -33,8 +35,8 @@ as $$
   ),
   updated as (
     update public.orders
-       set status     = 'finalizado',
-           updated_at = now()
+       set status = 'finalizado'
+       -- updated_at is managed by the trg_orders_updated_at trigger; no explicit set needed.
      where id in (select id from claimed)
      returning id, public_id
   )
