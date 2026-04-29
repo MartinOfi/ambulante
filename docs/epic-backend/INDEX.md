@@ -43,7 +43,7 @@
 | B5.3 | Upload helper con optimización de imagen | ⚪ | B5.2 | M | — | `infra.md` (sección Utils). |
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
 | B6.4 | Reconnect + backoff + test <5s | ⚪ | B6.3 | M | — | `testing.md`. |
-| B7.3 | Route Handler `/api/cron/auto-close-orders` | ⚪ | B7.2 | M | `lock-skip-locked`, `lock-short-transactions` | — |
+| B7.3 | Route Handler `/api/cron/auto-close-orders` | ✅ | B7.2 | M | `lock-skip-locked`, `lock-short-transactions` | — |
 | B7.4 | Runbook: cómo desactivar / reactivar / auditar un cron | ⚪ | B7.3 | S | — | — |
 | B7.5 | Tests de integración concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B8.3 | Retry + dead subscription cleanup | ⚪ | B8.2 | M | — | — |
@@ -116,6 +116,7 @@
 | B6.3 | Integración Realtime ↔ React Query | ✅ |
 | B7.1 | Migración schedule_crons + helper pg_net | ✅ |
 | B7.2 | Route Handler `/api/cron/expire-orders` con SKIP LOCKED | ✅ |
+| B7.3 | Route Handler `/api/cron/auto-close-orders` | ✅ |
 | B8.1 | VAPID keys + tabla + endpoint de subscribe | ✅ |
 | B8.2 | Domain event listener: OrderStatusChanged → webpush | ✅ |
 
@@ -130,7 +131,7 @@ para arrancar la siguiente.
 | C-B1-schema | B1.1 → B1.2 → B1.3 → B1.4 → B1.5 | todas ✅ |
 | C-B4-auth | B4.1 → B4.2 → B4.3 → B4.4 | todas ✅ |
 | C-B6-realtime | B6.1 → B6.2 → B6.3 → B6.4 | B6.4 pendiente |
-| C-B7-cron | B7.1 → B7.2 → B7.3 | B7.3 pendiente |
+| C-B7-cron | B7.1 → B7.2 → B7.3 | todas ✅ |
 | C-B8-push | B8.1 → B8.2 → B8.3 | B8.3 pendiente |
 
 Los campos `Continues with:` de cada `tasks/Bx.y.md` siguen indicando la continuación lógica;
