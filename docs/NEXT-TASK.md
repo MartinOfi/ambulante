@@ -59,6 +59,8 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
+| [NT-30](#nt-30--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar B11-B (audit log e2e) o cualquier tarea de webhooks |
+| [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
 
 ---
 
@@ -433,7 +435,7 @@
 
 ---
 
-### NT-28 — Refactorizar rutas push para usar SupabasePushSubscriptionRepository
+### NT-31 — Refactorizar rutas push para usar SupabasePushSubscriptionRepository
 - **Categoría:** backend / arquitectura
 - **Contexto:** `app/api/push/subscribe/route.ts` y `app/api/push/unsubscribe/route.ts` llaman a `supabase.rpc("current_user_id")` y `supabase.from("push_subscriptions")` directamente, en lugar de usar `SupabasePushSubscriptionRepository`. Esto duplica la lógica de resolución de usuario y crea drift entre el `select` de la ruta (`id, endpoint, created_at, updated_at`) y el `PUSH_SELECT` del repositorio. Descubierto en revisión de B3.3.
 - **Aceptación:** ambas rutas instancian `SupabasePushSubscriptionRepository`, llaman `upsertByEndpoint` (subscribe) y buscan por endpoint para luego llamar `delete(id)` (unsubscribe). Tests actualizados para reflejar la interfaz del repositorio.
@@ -457,6 +459,18 @@
 - **Dependencias:** B10.3 (consumer real del helper).
 - **Ticket:** —
 - **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
+
+### NT-30 — Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example`
+
+- **Categoría:** DX / docs
+- **Contexto:** El schema `shared/config/env.schema.ts` declara `SUPABASE_WEBHOOK_SECRET` (`z.string().min(16).optional()`), pero la variable **no aparece** en `.env.example`. Resultado: un dev que clona el repo no se entera de que existe hasta que ejecuta el código que la lee. `prod-setup.md` (B14.1) sí la documenta, pero `.env.example` es la fuente de verdad para la copia local.
+- **Aceptación:** `.env.example` incluye un bloque comentado para `SUPABASE_WEBHOOK_SECRET` con instrucción de generación (`openssl rand -hex 32`) y nota de uso (Database Webhooks de Supabase → endpoints de la app).
+- **Archivos afectados:** `.env.example`.
+- **Estimación:** S
+- **Cuándo retomarlo:** cuando se ejecute **B11-B** (audit log e2e) — ahí es cuando los Database Webhooks empiezan a usarse de verdad y el dev local va a necesitar el secret. Se puede hacer antes si surge otra tarea que toque webhooks.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por B14.1 al inventariar variables. No se arregló ahí porque el entregable de B14.1 es estrictamente `prod-setup.md`; tocar `.env.example` era scope creep.
 
 ---
 
