@@ -3,18 +3,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { ordersService } from "@/features/orders/services/orders.mock";
+import { orderRepository } from "@/shared/repositories";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import type { Order } from "@/shared/schemas/order";
 import { useOrderQuery } from "./useOrderQuery";
 
-vi.mock("@/features/orders/services/orders.mock", () => ({
-  ordersService: {
-    getById: vi.fn(),
+vi.mock("@/shared/repositories", () => ({
+  orderRepository: {
+    findById: vi.fn(),
   },
 }));
 
-const ORDER_ID = "order-123";
+const findByIdMock = vi.mocked(orderRepository.findById);
+
+const ORDER_ID = "11111111-1111-4111-8111-111111111111";
 
 const MOCK_ORDER: Order = {
   id: ORDER_ID,
@@ -42,17 +44,17 @@ describe("useOrderQuery", () => {
     vi.clearAllMocks();
   });
 
-  it("calls ordersService.getById with the given orderId", async () => {
-    vi.mocked(ordersService.getById).mockResolvedValueOnce(MOCK_ORDER);
+  it("calls orderRepository.findById with the given orderId", async () => {
+    findByIdMock.mockResolvedValueOnce(MOCK_ORDER);
     const { wrapper } = createWrapper();
 
     renderHook(() => useOrderQuery(ORDER_ID), { wrapper });
 
-    await waitFor(() => expect(ordersService.getById).toHaveBeenCalledWith(ORDER_ID));
+    await waitFor(() => expect(findByIdMock).toHaveBeenCalledWith(ORDER_ID));
   });
 
   it("returns order data on success", async () => {
-    vi.mocked(ordersService.getById).mockResolvedValueOnce(MOCK_ORDER);
+    findByIdMock.mockResolvedValueOnce(MOCK_ORDER);
     const { wrapper } = createWrapper();
 
     const { result } = renderHook(() => useOrderQuery(ORDER_ID), { wrapper });
@@ -62,7 +64,7 @@ describe("useOrderQuery", () => {
   });
 
   it("returns null when order is not found", async () => {
-    vi.mocked(ordersService.getById).mockResolvedValueOnce(null);
+    findByIdMock.mockResolvedValueOnce(null);
     const { wrapper } = createWrapper();
 
     const { result } = renderHook(() => useOrderQuery(ORDER_ID), { wrapper });
@@ -71,8 +73,8 @@ describe("useOrderQuery", () => {
     expect(result.current.data).toBeNull();
   });
 
-  it("exposes isError when the service throws", async () => {
-    vi.mocked(ordersService.getById).mockRejectedValueOnce(new Error("Not found"));
+  it("exposes isError when the repository throws", async () => {
+    findByIdMock.mockRejectedValueOnce(new Error("Not found"));
     const { wrapper } = createWrapper();
 
     const { result } = renderHook(() => useOrderQuery(ORDER_ID), { wrapper });

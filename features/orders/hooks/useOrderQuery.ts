@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import type { Order } from "@/shared/schemas/order";
-import { ordersService } from "@/features/orders/services";
+import { orderRepository } from "@/shared/repositories";
 
 export function useOrderQuery(orderId: string) {
   return useQuery<Order | null>({
     queryKey: queryKeys.orders.byId(orderId),
-    queryFn: () => ordersService.getById(orderId),
+    queryFn: () => orderRepository.findById(orderId),
     staleTime: 30_000,
   });
 }
