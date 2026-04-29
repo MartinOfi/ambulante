@@ -18,4 +18,22 @@ export interface CreateOrderInput {
 
 export type UpdateOrderInput = Partial<Pick<Order, "status" | "notes">>;
 
-export type OrderRepository = Repository<Order, CreateOrderInput, UpdateOrderInput, OrderFilters>;
+export const DEFAULT_ORDER_HISTORY_PAGE_SIZE = 20;
+export const MAX_ORDER_HISTORY_PAGE_SIZE = 100;
+
+export interface FindByCustomerOptions {
+  // Opaco: encode/decode vía shared/repositories/supabase/cursor.
+  readonly cursor?: string | null;
+  readonly limit?: number;
+  readonly status?: OrderStatus;
+}
+
+export interface OrderHistoryPage {
+  readonly orders: readonly Order[];
+  readonly nextCursor: string | null;
+}
+
+export interface OrderRepository
+  extends Repository<Order, CreateOrderInput, UpdateOrderInput, OrderFilters> {
+  findByCustomer(customerId: string, opts?: FindByCustomerOptions): Promise<OrderHistoryPage>;
+}

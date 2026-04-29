@@ -4,9 +4,13 @@ import type {
   OrderFilters,
   CreateOrderInput,
   UpdateOrderInput,
+  FindByCustomerOptions,
+  OrderHistoryPage,
 } from "@/shared/repositories/order";
+import { DEFAULT_ORDER_HISTORY_PAGE_SIZE } from "@/shared/repositories/order";
 import type { SupabaseClient } from "./client";
 import { mapOrderRow, domainStatusToDb, dbStatusToDomain, type DbOrderRow } from "./mappers";
+import { decodeOrderHistoryCursor, encodeOrderHistoryCursor } from "./cursor";
 
 // Single query: order + joined customer/store UUIDs + nested order_items
 const ORDERS_SELECT =
@@ -99,6 +103,54 @@ export class SupabaseOrderRepository implements OrderRepository {
   async delete(id: string): Promise<void> {
     const { error } = await this.client.from("orders").delete().eq("public_id", id);
     if (error !== null) throw new Error(`SupabaseOrderRepository.delete: ${error.message}`);
+  }
+
+  async findByCustomer(
+    customerId: string,
+    opts: FindByCustomerOptions = {},
+  ): Promise<OrderHistoryPage> {
+    const customerInternalId = await this.resolveUserInternalId(customerId);
+    const limit = opts.limit ?? DEFAULT_ORDER_HISTORY_PAGE_SIZE;
+    const fetchSize = limit + 1;
+    const decodedCursor = opts.cursor ? decodeOrderHistoryCursor(opts.cursor) : null;
+
+    let filterChain = this.client
+      .from("orders")
+      .select(`${ORDERS_SELECT}, id`)
+      .eq("customer_id", customerInternalId);
+
+    if (opts.status !== undefined) {
+      filterChain = filterChain.eq("status", domainStatusToDb(opts.status));
+    }
+
+    if (decodedCursor !== null) {
+      // Compound keyset: (created_at, id) < (cursor.createdAt, cursor.id)
+      filterChain = filterChain.or(
+        `created_at.lt.${decodedCursor.createdAt},and(created_at.eq.${decodedCursor.createdAt},id.lt.${decodedCursor.id})`,
+      );
+    }
+
+    const query = filterChain
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(fetchSize);
+
+    const { data, error } = await query;
+    if (error !== null) {
+      throw new Error(`SupabaseOrderRepository.findByCustomer: ${error.message}`);
+    }
+
+    const rows = (data ?? []) as unknown as Array<DbOrderRow & { id: number }>;
+    const hasMore = rows.length > limit;
+    const visible = hasMore ? rows.slice(0, limit) : rows;
+
+    let nextCursor: string | null = null;
+    if (hasMore && visible.length > 0) {
+      const last = visible[visible.length - 1]!;
+      nextCursor = encodeOrderHistoryCursor({ createdAt: last.created_at, id: Number(last.id) });
+    }
+
+    return { orders: visible.map(mapOrderRow), nextCursor };
   }
 
   private async resolveUserInternalId(publicId: string): Promise<number> {

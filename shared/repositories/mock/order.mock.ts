@@ -4,7 +4,10 @@ import type {
   OrderFilters,
   CreateOrderInput,
   UpdateOrderInput,
+  FindByCustomerOptions,
+  OrderHistoryPage,
 } from "@/shared/repositories/order";
+import { DEFAULT_ORDER_HISTORY_PAGE_SIZE } from "@/shared/repositories/order";
 import { logger } from "@/shared/utils/logger";
 
 function generateId(): string {
@@ -30,6 +33,22 @@ export class MockOrderRepository implements OrderRepository {
 
   async findById(id: string): Promise<Order | null> {
     return this.orders.find((order) => order.id === id) ?? null;
+  }
+
+  async findByCustomer(
+    customerId: string,
+    opts: FindByCustomerOptions = {},
+  ): Promise<OrderHistoryPage> {
+    const limit = opts.limit ?? DEFAULT_ORDER_HISTORY_PAGE_SIZE;
+    // Mock no implementa cursor real — devuelve la primera página y termina.
+    // Suficiente para tests de UI sin Supabase. La paginación real se prueba
+    // en SupabaseOrderRepository.test contra el query builder.
+    const filtered = this.orders
+      .filter((order) => order.clientId === customerId)
+      .filter((order) => opts.status === undefined || order.status === opts.status)
+      .slice()
+      .sort((a, b) => (b.createdAt > a.createdAt ? 1 : b.createdAt < a.createdAt ? -1 : 0));
+    return { orders: filtered.slice(0, limit), nextCursor: null };
   }
 
   async create(input: CreateOrderInput): Promise<Order> {

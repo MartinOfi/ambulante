@@ -158,4 +158,129 @@ describe("SupabaseOrderRepository", () => {
       expect(queryMock.eq).toHaveBeenCalledWith("public_id", "order-uuid");
     });
   });
+
+  describe("findByCustomer", () => {
+    // Necesitamos extender el queryMock con .or() porque keyset usa esa
+    // sintaxis cuando hay cursor. createMockSupabaseClient no la incluye.
+    let orMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      orMock = vi.fn().mockReturnThis();
+      (queryMock as unknown as { or: typeof orMock }).or = orMock;
+    });
+
+    function makeRowWithId(overrides: Record<string, unknown> = {}) {
+      return { ...makeOrderRow(), id: 100, ...overrides };
+    }
+
+    function setRows(rows: Array<ReturnType<typeof makeRowWithId>>) {
+      // El query terminal (cuando no hay status filter) resuelve en .limit().
+      queryMock.limit.mockResolvedValue({ data: rows, error: null });
+    }
+
+    it("resuelve customerId UUID a internal id antes de filtrar", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid");
+      expect(queryMock.eq).toHaveBeenCalledWith("customer_id", 7);
+    });
+
+    it("ordena por created_at DESC y id DESC, limita a fetchSize = limit + 1", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid", { limit: 20 });
+      expect(queryMock.order).toHaveBeenCalledWith("created_at", { ascending: false });
+      expect(queryMock.order).toHaveBeenCalledWith("id", { ascending: false });
+      expect(queryMock.limit).toHaveBeenCalledWith(21);
+    });
+
+    it("usa default page size cuando no se pasa limit", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid");
+      expect(queryMock.limit).toHaveBeenCalledWith(21); // 20 + 1
+    });
+
+    it("sin cursor no llama .or()", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid");
+      expect(orMock).not.toHaveBeenCalled();
+    });
+
+    it("con cursor agrega .or() con sintaxis keyset compuesta", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      const cursor = Buffer.from(
+        JSON.stringify({ createdAt: "2026-04-29T12:00:00.000Z", id: 50 }),
+        "utf8",
+      ).toString("base64url");
+      await repo.findByCustomer("client-uuid", { cursor });
+      expect(orMock).toHaveBeenCalledTimes(1);
+      const arg = orMock.mock.calls[0]?.[0] as string;
+      expect(arg).toContain("created_at.lt.2026-04-29T12:00:00.000Z");
+      expect(arg).toContain("created_at.eq.2026-04-29T12:00:00.000Z");
+      expect(arg).toContain("id.lt.50");
+    });
+
+    it("cursor inválido se trata como null (primera página)", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid", { cursor: "garbage!!!" });
+      expect(orMock).not.toHaveBeenCalled();
+    });
+
+    it("filtra por status cuando se pasa", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      await repo.findByCustomer("client-uuid", { status: "CANCELADO" });
+      expect(queryMock.eq).toHaveBeenCalledWith("status", "cancelado");
+    });
+
+    it("nextCursor=null cuando rows.length <= limit (no hay siguiente página)", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      const rows = Array.from({ length: 3 }, (_, i) =>
+        makeRowWithId({ public_id: `o-${i}`, id: 100 - i }),
+      );
+      setRows(rows);
+      const page = await repo.findByCustomer("client-uuid", { limit: 20 });
+      expect(page.orders).toHaveLength(3);
+      expect(page.nextCursor).toBeNull();
+    });
+
+    it("nextCursor encoded con created_at + id de la última row visible cuando hay siguiente página", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      // limit=2, fetchSize=3, devolvemos 3 rows → hay más, drop la última.
+      const rows = [
+        makeRowWithId({ public_id: "o-1", id: 102, created_at: "2026-04-29T15:00:00Z" }),
+        makeRowWithId({ public_id: "o-2", id: 101, created_at: "2026-04-29T14:00:00Z" }),
+        makeRowWithId({ public_id: "o-3", id: 100, created_at: "2026-04-29T13:00:00Z" }),
+      ];
+      setRows(rows);
+      const page = await repo.findByCustomer("client-uuid", { limit: 2 });
+      expect(page.orders).toHaveLength(2);
+      expect(page.nextCursor).not.toBeNull();
+      // El cursor codifica la última row visible (la #2 en el array, no la dropped).
+      const decoded = JSON.parse(Buffer.from(page.nextCursor!, "base64url").toString("utf8")) as {
+        createdAt: string;
+        id: number;
+      };
+      expect(decoded.createdAt).toBe("2026-04-29T14:00:00Z");
+      expect(decoded.id).toBe(101);
+    });
+
+    it("empty list → nextCursor null", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      setRows([]);
+      const page = await repo.findByCustomer("client-uuid");
+      expect(page.orders).toEqual([]);
+      expect(page.nextCursor).toBeNull();
+    });
+
+    it("throws cuando Supabase devuelve error", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 7 }, error: null });
+      queryMock.limit.mockResolvedValue({ data: null, error: { message: "DB pagination error" } });
+      await expect(repo.findByCustomer("client-uuid")).rejects.toThrow("DB pagination error");
+    });
+  });
 });

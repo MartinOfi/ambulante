@@ -19,6 +19,9 @@ export function OrderHistoryScreen({
   isLoading,
   activeStatus,
   onStatusChange,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
 }: OrderHistoryScreenProps) {
   if (isLoading) {
     return (
@@ -32,7 +35,11 @@ export function OrderHistoryScreen({
 
   return (
     <div className="flex flex-col">
-      <div className="flex gap-2 overflow-x-auto px-4 pb-2 pt-4" role="toolbar" aria-label="Filtrar por estado">
+      <div
+        className="flex gap-2 overflow-x-auto px-4 pb-2 pt-4"
+        role="toolbar"
+        aria-label="Filtrar por estado"
+      >
         {FILTER_OPTIONS.map(({ label, value }) => {
           const isActive = activeStatus === value;
           return (
@@ -41,9 +48,7 @@ export function OrderHistoryScreen({
               aria-pressed={isActive}
               onClick={() => onStatusChange(value)}
               className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-amber-500 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isActive ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {label}
@@ -67,6 +72,19 @@ export function OrderHistoryScreen({
           ))}
         </ul>
       )}
+
+      {hasMore && onLoadMore !== undefined ? (
+        <div className="flex justify-center px-4 pb-6">
+          <button
+            type="button"
+            onClick={onLoadMore}
+            disabled={isLoadingMore}
+            className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-60"
+          >
+            {isLoadingMore ? "Cargando…" : "Cargar más"}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

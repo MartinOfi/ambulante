@@ -9,8 +9,8 @@ vi.mock("@/shared/hooks/useSession", () => ({
   useSession: vi.fn(),
 }));
 
-vi.mock("@/features/orders/hooks/useOrdersQuery", () => ({
-  useOrdersQuery: vi.fn(),
+vi.mock("@/features/orders/hooks/useOrderHistory", () => ({
+  useOrderHistory: vi.fn(),
 }));
 
 vi.mock("@/features/orders/hooks/useStatusParam", () => ({
@@ -18,10 +18,10 @@ vi.mock("@/features/orders/hooks/useStatusParam", () => ({
 }));
 
 import { useSession } from "@/shared/hooks/useSession";
-import { useOrdersQuery } from "@/features/orders/hooks/useOrdersQuery";
+import { useOrderHistory } from "@/features/orders/hooks/useOrderHistory";
 
 const mockUseSession = vi.mocked(useSession);
-const mockUseOrdersQuery = vi.mocked(useOrdersQuery);
+const mockUseOrderHistory = vi.mocked(useOrderHistory);
 
 const MOCK_SESSION = {
   accessToken: "tok",
@@ -30,14 +30,24 @@ const MOCK_SESSION = {
   user: { id: "user-1", email: "test@test.com", role: "client" as const },
 };
 
+function buildHookReturn(
+  override: Partial<ReturnType<typeof useOrderHistory>> = {},
+): ReturnType<typeof useOrderHistory> {
+  return {
+    data: { pages: [], pageParams: [] },
+    isLoading: false,
+    isError: false,
+    error: null,
+    fetchNextPage: vi.fn(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    ...override,
+  } as unknown as ReturnType<typeof useOrderHistory>;
+}
+
 describe("OrderHistoryScreenContainer", () => {
   beforeEach(() => {
-    mockUseOrdersQuery.mockReturnValue({
-      data: [],
-      isLoading: false,
-      isError: false,
-      error: null,
-    } as unknown as ReturnType<typeof useOrdersQuery>);
+    mockUseOrderHistory.mockReturnValue(buildHookReturn());
   });
 
   it("renders empty state when unauthenticated", () => {
@@ -67,7 +77,7 @@ describe("OrderHistoryScreenContainer", () => {
     expect(screen.getByText(/no tenés pedidos/i)).toBeInTheDocument();
   });
 
-  it("passes isLoading=true when query is loading", () => {
+  it("renders skeleton when loading", () => {
     mockUseSession.mockReturnValue({
       status: "authenticated",
       session: MOCK_SESSION,
@@ -76,15 +86,51 @@ describe("OrderHistoryScreenContainer", () => {
       signOut: vi.fn(),
     });
 
-    mockUseOrdersQuery.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      error: null,
-    } as unknown as ReturnType<typeof useOrdersQuery>);
+    mockUseOrderHistory.mockReturnValue(
+      buildHookReturn({ data: undefined, isLoading: true }),
+    );
 
     renderWithProviders(<OrderHistoryScreenContainer />);
 
     expect(screen.getByTestId("orders-loading")).toBeInTheDocument();
+  });
+
+  it("renders 'Cargar más' button when hasNextPage is true", () => {
+    mockUseSession.mockReturnValue({
+      status: "authenticated",
+      session: MOCK_SESSION,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+    });
+
+    mockUseOrderHistory.mockReturnValue(
+      buildHookReturn({
+        data: {
+          pages: [
+            {
+              orders: [
+                {
+                  id: "o-1",
+                  clientId: "user-1",
+                  storeId: "store-1",
+                  status: "FINALIZADO",
+                  items: [],
+                  createdAt: "2026-04-29T10:00:00.000Z",
+                  updatedAt: "2026-04-29T10:00:00.000Z",
+                },
+              ],
+              nextCursor: "next",
+            },
+          ],
+          pageParams: [null],
+        },
+        hasNextPage: true,
+      }),
+    );
+
+    renderWithProviders(<OrderHistoryScreenContainer />);
+
+    expect(screen.getByRole("button", { name: /cargar más/i })).toBeInTheDocument();
   });
 });
