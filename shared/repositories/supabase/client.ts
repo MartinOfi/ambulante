@@ -8,7 +8,7 @@ import type { NextRequest, NextResponse } from "next/server";
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} is not set`);
+  if (!value?.trim()) throw new Error(`${name} is not set`);
   return value;
 }
 

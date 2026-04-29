@@ -51,13 +51,11 @@ export { SupabaseAuditLogService } from "./supabase/audit-log.supabase";
 export { SupabasePushSubscriptionRepository } from "./supabase/push-subscriptions.supabase";
 export { createBrowserClient } from "./supabase/client";
 
-// ── Factory singletons: real Supabase when env var present, mocks otherwise ───
-// Mirrors services/index.ts. Safe in test environments because every test that
-// exercises repository-backed code mocks at the @/shared/services layer
-// (vi.mock("@/shared/services/...")), preventing this module from being evaluated.
-// _createBrowserClient() — and thus the NEXT_PUBLIC_SUPABASE_URL check inside
-// client.ts — is only called when isMock is false, i.e. when the env var exists.
-const isMock = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+// ── Factory singletons: real Supabase when both env vars present, mocks otherwise ─
+// Mirrors services/index.ts. Both vars are required — createBrowserClient() calls
+// getRequiredEnv() for each. Gating on both prevents an import-time throw when only
+// one is set (e.g. .env.example ships URL but not ANON_KEY).
+const isMock = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const _client = isMock ? null : _createBrowserClient();
 
