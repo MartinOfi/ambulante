@@ -59,6 +59,7 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
+| [NT-30](#nt-30--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
 
 ---
 
@@ -443,6 +444,20 @@
 - **Dependencias:** B3.3 ✅.
 - **Ticket:** —
 - **Notas:** El repositorio usa `resolveUserInternalId(publicId)` mientras las rutas actuales usan `rpc("current_user_id")` — hay que alinear el mecanismo de resolución. El issue de `onConflict: "endpoint"` que no valida ownership (endpoint puede ser reasignado entre usuarios) también debe resolverse aquí.
+
+---
+
+### NT-30 — Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests)
+
+- **Categoría:** testing / DX
+- **Contexto:** En `app/api/cron/_test-helpers/concurrent-fixtures.ts` el code review de B7-A flagueó dos cosas que no son CRITICAL/HIGH y se difieren: (a) `cleanupIdentity` ignora errores de los 4 deletes secuenciales — si la subquery de `audit_log` falla, el fallback `?? []` produce un `.in("row_id", [])` silencioso; en una re-run con leftovers de un run previo el siguiente `beforeEach` siembra encima sin advertir. Las aserciones filtran por `store_id` así que no genera false-positives, pero es robustez. (b) `seedOrders` y `cleanupIdentity` usan `as string` / `as number` sobre las columnas devueltas por PostgREST en lugar de type-guards — viola CLAUDE.md §6.1. Ambos puntos son test-only, low blast radius.
+- **Aceptación:** `cleanupIdentity` lanza explícitamente si cualquier paso falla (con mensaje contextualizado); las lecturas de PostgREST en el helper se validan con un Zod schema local en lugar de `as` casts; tests siguen verdes.
+- **Archivos afectados:** `app/api/cron/_test-helpers/concurrent-fixtures.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** la próxima vez que se toque un cron test (ej. al agregar B7.5 si llegase a aparecer, o al introducir un tercer cron). No urgente; el código actual funciona y los tests son determinísticos.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por code review de B7-A.
 
 ---
 

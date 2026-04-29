@@ -150,6 +150,41 @@ Ambas specs usan `makeSessionCookie(role, userId)` + `context.addCookies()` con 
 
 ---
 
+## §17 — Cron concurrent tests
+
+Viven junto a cada Route Handler de cron (`app/api/cron/<job>/route.concurrent.test.ts`) y validan el contrato de `for update skip locked` bajo contención real disparando 5 invocaciones paralelas de `POST` contra el mismo lote de filas. Los unit tests vecinos (`route.test.ts`) cubren la lógica del handler con mocks; estos files cubren el comportamiento que sólo se manifiesta contra Postgres real.
+
+| Archivo | Job | Qué verifica |
+|---|---|---|
+| `app/api/cron/expire-orders/route.concurrent.test.ts` | expire-orders | 5 workers paralelos sobre N órdenes `enviado` con `created_at < now() - 10min`: cada una transiciona a `expirado` exactamente una vez, throughput < 20s, sin deadlocks |
+| `app/api/cron/auto-close-orders/route.concurrent.test.ts` | auto-close-orders | 5 workers paralelos sobre N órdenes `aceptado` con `updated_at < now() - 2h`: cada una transiciona a `finalizado` exactamente una vez, throughput < 20s, sin deadlocks |
+
+**Pre-requisito:** Supabase local corriendo (`pnpm supabase:start`). Si no es alcanzable, los tests se skipean silenciosamente vía `describe.skipIf` (top-level await sobre `isLocalSupabaseReachable`).
+
+**Diseño de aislamiento:** cada archivo crea su propio `users` + `stores` con marker `concurrent-test-<uuid>` en `beforeAll`, siembra N órdenes en `beforeEach` y limpia en `afterEach`. Las aserciones filtran por `store_id` para tolerar otras órdenes preexistentes en la DB local compartida (ej. de fixtures de seed o de otro file en paralelo).
+
+**Mocks deliberados:** sólo `createServiceRoleClient` (bypass del check `https://`), `SupabaseAuditLogService` (para no contaminar `audit_log`), `eventBus.publish` (para capturar eventos publicados), `env` y `logger`. El RPC `claim_*` y la transición real corren contra Postgres.
+
+### Helper compartido — `app/api/cron/_test-helpers/concurrent-fixtures.ts`
+
+| Nombre | Firma | Descripción |
+|---|---|---|
+| `LOCAL_SUPABASE_URL` / `LOCAL_SERVICE_ROLE_KEY` | constant | URL + JWT well-known del CLI de Supabase local. Safe to commit (sólo válidos contra `supabase start`) |
+| `createLocalServiceRoleClient` | `() => SupabaseClient` | Crea un client `@supabase/supabase-js` apuntando a localhost con service-role |
+| `isLocalSupabaseReachable` | `() => Promise<boolean>` | Ping con timeout 1.5s a `/rest/v1/` (PostgREST root es más estable que `/auth/v1/health` post-restart) |
+| `seedIdentity` | `(client) => Promise<{ userId, storeId, testRunId }>` | Crea un user + store con marker UUID; usar en `beforeAll` |
+| `seedOrders` | `({ client, identity, count, status, createdAt, updatedAt? }) => Promise<{ publicIds, internalIds }>` | Inserta N órdenes con timestamps en el pasado. `updatedAt` opcional para simular `accepted_at` viejo (sólo aplica a `status='aceptado'`) |
+| `cleanupIdentity` | `(client, identity) => Promise<void>` | Borra audit_log + orders + store + user del run. Usar en `afterAll` |
+| `readOrderStatuses` | `(client, internalIds) => Promise<readonly string[]>` | Lee `status` de los IDs sembrados — para asertar el estado post-claim |
+
+**No es un test** — vive en una carpeta `_test-helpers/` (Next.js trata `_*` como private; no se rutea).
+
+### Bug histórico capturado por estos tests
+
+Durante la implementación de B7-A, el integration test reveló que `auto-close-orders/route.ts` validaba la respuesta del RPC con `z.string().datetime()` (sólo acepta sufijo `Z`), pero PostgREST serializa `timestamptz` con offset numérico (`+00:00`). Los unit tests usaban `Date.toISOString()` que produce `Z` → never broke. Fix: `.datetime({ offset: true })`.
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`

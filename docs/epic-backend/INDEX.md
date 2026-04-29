@@ -25,7 +25,7 @@
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
 | B5 | Storage (buckets + RLS + upload helpers) | 4 | 3/4 | 🟡 |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
-| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 3/4 | 🟡 |
+| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 4/4 | ✅ |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 0/3 | ⚪ |
 | B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
@@ -40,7 +40,7 @@
 |---|---|---|---|---|---|---|
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
-| B7-A | Cron: runbook + tests concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
+| B7-A | Cron: runbook + tests concurrentes | ✅ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B8.4 | Test E2E del loop completo | ⚪ | B8.3 | L | — | `testing.md`. |
 | B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ⚪ | B4.4, B3.1, B6.3, B5.2 | XL | `data-n-plus-one`, `query-index-types` | `features.md`. |
 | B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
