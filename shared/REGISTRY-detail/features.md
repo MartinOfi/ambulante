@@ -278,6 +278,28 @@
 
 ---
 
+### `features/admin-observability/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `SlowQueriesPanel` | `features/admin-observability/components/SlowQueriesPanel/SlowQueriesPanel.tsx` | componente dumb | Tabla de top queries lentas: rank, media (ms), llamadas, total (ms), query truncada |
+| `SlowQueriesPanelContainer` | `features/admin-observability/components/SlowQueriesPanel/SlowQueriesPanel.container.tsx` | componente smart | Conecta `useSlowQueriesQuery`; propaga isLoading + mensaje de error |
+| `useSlowQueriesQuery` | `features/admin-observability/hooks/useSlowQueriesQuery.ts` | hook | React Query: GET `/api/admin/slow-queries`; staleTime 60s |
+| `SLOW_QUERIES_LIMIT` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | Número máximo de queries a mostrar (20) |
+| `SLOW_QUERIES_STALE_TIME_MS` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | staleTime de la query (60 000 ms) |
+| `QUERY_TRUNCATE_LENGTH` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | Longitud máxima de texto de query a mostrar (120 chars) |
+
+#### admin-observability feature completa (B12.1)
+- **Ruta app:** pendiente (conectar desde `app/(admin)/admin/...`)
+- **API dumb:** `<SlowQueriesPanel queries isLoading error />`
+- **API smart:** `<SlowQueriesPanelContainer />` — sin props
+- **Route Handler:** `GET /api/admin/slow-queries` — auth + `is_admin()` RPC + `get_top_slow_queries()` RPC; responde `{ data: SlowQuery[] }`
+- **SQL:** `supabase/migrations/20260428000007_get_top_slow_queries_fn.sql` — SECURITY DEFINER function; `is_admin()` guard interno; lee `pg_stat_statements` ordenado por `mean_exec_time desc`
+- **Tipo compartido:** `SlowQuery` + `slowQuerySchema` en `shared/types/observability.ts`
+- **Tests:** 15 tests en 2 archivos (route handler 7, SlowQueriesPanel 8)
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:

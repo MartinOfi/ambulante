@@ -35,4 +35,7 @@ export const queryKeys = {
     all: () => ["users"] as const,
     byId: (id: string) => ["users", "by-id", id] as const,
   },
+  admin: {
+    slowQueries: () => ["admin", "slowQueries"] as const,
+  },
 } as const;

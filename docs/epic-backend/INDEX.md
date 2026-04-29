@@ -69,7 +69,7 @@
 | B11.5 | Swap user management | ⚪ | B3.1 | M | — | `features.md`. |
 | B11.6 | Ensure audit_log append-only enforcement (trigger) | ⚪ | B1.2 | S | — | `domain.md`. |
 | B11.7 | Swap audit_log writer en Server Actions críticas | ⚪ | B11.6, B9.4, B10.5 | M | — | `domain.md`. |
-| B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ⚪ | B1.1 | M | `monitor-pg-stat-statements` | `features.md`. |
+| B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ✅ | B1.1 | M | `monitor-pg-stat-statements` | `features.md`. |
 | B12.2 | Slow query alerts → Sentry | ⚪ | B12.1, B7.1 | M | `monitor-pg-stat-statements` | — |
 | B12.3 | Structured server-side logging con request IDs | ⚪ | — | M | — | `data.md` (sección Logger). |
 | B12.4 | Supabase logs → Sentry breadcrumbs | ✅ | — | S | — | — |

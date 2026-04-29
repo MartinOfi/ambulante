@@ -18,6 +18,7 @@ Viven en `shared/types/`. Son el contrato del dominio — **siempre derivar de s
 | `User` | `shared/types/user.ts` | Usuario autenticado; `displayName` opcional |
 | `UserRole` | `shared/types/user.ts` | `"client" \| "store" \| "admin"` |
 | `Session` | `shared/types/user.ts` | Sesión de Supabase Auth: `accessToken`, `refreshToken`, `expiresAt` (Unix timestamp positivo), `user` |
+| `SlowQuery` | `shared/types/observability.ts` | Resumen de query lenta de `pg_stat_statements`: `calls`, `totalExecTimeMs`, `meanExecTimeMs`, `queryText` |
 
 ---
 
@@ -56,6 +57,11 @@ Viven en `shared/schemas/`. Son la fuente de verdad de validación — **siempre
 #### auth — `features/auth/schemas/auth.schemas.ts`
 - `loginSchema`, `registerSchema` (con `.refine()` password === confirmPassword), `forgotPasswordSchema`, `resetPasswordSchema` (incluye `token` string no vacío)
 - **Tipos exportados:** `LoginValues`, `RegisterValues`, `ForgotPasswordValues`, `ResetPasswordValues`
+
+#### observability — `shared/types/observability.ts`
+- `slowQuerySchema` — valida query lenta: `calls` (int nonneg), `totalExecTimeMs`/`meanExecTimeMs` (nonneg), `queryText` (string min 1)
+- `slowQueryArraySchema` — `z.array(slowQuerySchema)` — array de slow queries para el endpoint `/api/admin/slow-queries`
+- **Tipo exportado:** `SlowQuery`
 
 ---
 

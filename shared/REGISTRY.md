@@ -227,6 +227,11 @@
 | UserManagementPage / UserManagementPageContainer | feature-component | `features/user-management/components/UserManagementPage/` | features.md §13 |
 | UserTable | feature-component | `features/user-management/components/UserTable/` | features.md §13 |
 | SuspendConfirmDialog | feature-component | `features/user-management/components/SuspendConfirmDialog/` | features.md §13 |
+| SlowQueriesPanel / SlowQueriesPanelContainer | feature-component | `features/admin-observability/components/SlowQueriesPanel/` | features.md §13 |
+| useSlowQueriesQuery | hook | `features/admin-observability/hooks/useSlowQueriesQuery.ts` | features.md §13 |
+| SLOW_QUERIES_LIMIT / SLOW_QUERIES_STALE_TIME_MS / QUERY_TRUNCATE_LENGTH | constant | `features/admin-observability/constants/admin-observability.constants.ts` | features.md §13 |
+| GET /api/admin/slow-queries | route-handler | `app/api/admin/slow-queries/route.ts` | infra.md §14 |
+| SlowQuery / slowQuerySchema / slowQueryArraySchema | type + schema | `shared/types/observability.ts` | domain.md §7 |
 
 ---
 

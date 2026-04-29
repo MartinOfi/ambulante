@@ -301,3 +301,19 @@ Elimina una suscripción Web Push por endpoint. RLS restringe a las filas del us
 - **Delete:** `.delete().eq("endpoint", endpoint).select("id")` — 404 si `data.length === 0`
 - **Body esperado:** `{ endpoint: string (URL) }`
 - **Respuestas:** 204 (éxito) | 400 (validación) | 401 | 404 | 500
+
+---
+
+## §14 — Admin API Route Handlers
+
+Route Handlers server-only para el panel de administración. Requieren autenticación y verificación de rol admin vía `supabase.rpc("is_admin")`.
+
+### GET /api/admin/slow-queries — `app/api/admin/slow-queries/route.ts`
+
+Devuelve el top 20 de queries más lentas leídas de `pg_stat_statements` via la función `get_top_slow_queries`.
+
+- **Auth:** `supabase.auth.getUser()` → 401 si no hay usuario
+- **Admin check:** `supabase.rpc("is_admin")` → 403 si no es admin; 500 si la RPC falla
+- **Data:** `supabase.rpc("get_top_slow_queries", { p_limit: 20 })` → snake_case mapeado a camelCase + validado con `slowQueryArraySchema`
+- **Logging:** `serverLogger.error(...)` en los tres paths de error de servidor
+- **Respuestas:** 200 con `{ data: SlowQuery[] }` | 401 | 403 | 500
