@@ -278,7 +278,7 @@ Cuatro factories que wrappean `@supabase/ssr` con la configuración de cookies c
 
 ## §11 — Repositories
 
-> Capa de acceso a datos detrás de interfaces genéricas. Hoy: mocks en memoria. Mañana: Supabase. **Nunca importar los mocks directamente — usar el singleton exportado desde `shared/repositories/index.ts`.**
+> Capa de acceso a datos detrás de interfaces genéricas. La factory en `shared/repositories/index.ts` lee `NEXT_PUBLIC_SUPABASE_URL` al inicio: si está ausente exporta los singletons mock (§11 mocks); si está presente instancia las implementaciones Supabase de §11b con `createBrowserClient()`. **Nunca importar los mocks ni las clases Supabase directamente — usar el singleton exportado desde `shared/repositories/index.ts`.**
 
 ### `Repository<Entity, CreateInput, UpdateInput, Filters>` (base interface)
 - **Ruta:** `shared/repositories/base.ts`
@@ -287,26 +287,26 @@ Cuatro factories que wrappean `@supabase/ssr` con la configuración de cookies c
 ### StoreRepository / storeRepository
 - **Ruta interface:** `shared/repositories/store.ts` → `StoreRepository`, `StoreFilters`, `FindNearbyInput`, `CreateStoreInput`, `UpdateStoreInput`
 - **Ruta mock:** `shared/repositories/mock/store.mock.ts`
-- **Descripción:** Extiende `Repository<Store,...>` con `findNearby({ coords, radiusMeters })`. La implementación mock filtra por distancia haversiana y ordena por cercanía.
-- **Singleton:** `import { storeRepository } from '@/shared/repositories'`
+- **Descripción:** Extiende `Repository<Store,...>` con `findNearby({ coords, radiusMeters })`. Mock filtra por distancia haversiana y ordena por cercanía. Supabase llama RPC `find_stores_nearby`.
+- **Singleton (factory):** `import { storeRepository } from '@/shared/repositories'` — mock si `NEXT_PUBLIC_SUPABASE_URL` ausente, `SupabaseStoreRepository` si presente.
 
 ### OrderRepository / orderRepository
 - **Ruta interface:** `shared/repositories/order.ts` → `OrderRepository`, `OrderFilters`, `CreateOrderInput`, `UpdateOrderInput`
 - **Ruta mock:** `shared/repositories/mock/order.mock.ts`
 - **Descripción:** Filtros: `storeId`, `clientId`, `status`. `create` genera `id`, `createdAt`, `updatedAt`. `update` actualiza `updatedAt`.
-- **Singleton:** `import { orderRepository } from '@/shared/repositories'`
+- **Singleton (factory):** `import { orderRepository } from '@/shared/repositories'` — mock si `NEXT_PUBLIC_SUPABASE_URL` ausente, `SupabaseOrderRepository` si presente.
 
 ### UserRepository / userRepository
 - **Ruta interface:** `shared/repositories/user.ts` → `UserRepository`, `UserFilters`, `CreateUserInput`, `UpdateUserInput`
 - **Ruta mock:** `shared/repositories/mock/user.mock.ts`
 - **Descripción:** Extiende `Repository<User,...>` con `findByEmail(email)`. Filtros: `role`.
-- **Singleton:** `import { userRepository } from '@/shared/repositories'`
+- **Singleton (factory):** `import { userRepository } from '@/shared/repositories'` — mock si `NEXT_PUBLIC_SUPABASE_URL` ausente, `SupabaseUserRepository` si presente.
 
 ### ProductRepository / productRepository
 - **Ruta interface:** `shared/repositories/product.ts` → `ProductRepository`, `ProductFilters`, `CreateProductInput`, `UpdateProductInput`
 - **Ruta mock:** `shared/repositories/mock/product.mock.ts`
 - **Descripción:** Filtros: `storeId`, `isAvailable`.
-- **Singleton:** `import { productRepository } from '@/shared/repositories'`
+- **Singleton (factory):** `import { productRepository } from '@/shared/repositories'` — mock si `NEXT_PUBLIC_SUPABASE_URL` ausente, `SupabaseProductRepository` si presente.
 
 ### PushSubscriptionRepository / pushSubscriptionRepository
 - **Ruta interface:** `shared/repositories/push-subscriptions.ts` → `PushSubscriptionRepository`, `PushSubscription`, `PushSubscriptionFilters`, `CreatePushSubscriptionInput`, `UpdatePushSubscriptionInput`
