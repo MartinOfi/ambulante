@@ -91,21 +91,20 @@ begin
    where key = p_key;
 
   if not found then
-    -- First request: start with max tokens, consume one. Next token is
-    -- available immediately if max >= 2; otherwise refill takes 1/rate seconds.
+    -- First request: start with max tokens, consume one. The caller is being
+    -- served (allowed=true), so reset_at_ms must reflect "when can the NEXT
+    -- request succeed". For max>=2 the next request succeeds immediately
+    -- (>=1 token left). For max=1 the next request must wait one full refill
+    -- cycle — the existing-row blocked branch will compute that exactly when
+    -- the second request arrives, so here we just say "now" to keep
+    -- semantics consistent with all other allowed=true cases.
     insert into public.rate_limit_buckets (key, tokens, last_refill_at, updated_at)
     values (p_key, p_max_requests::double precision - 1, v_now, v_now);
-
-    v_seconds_until_next := case
-      when p_max_requests >= 2 then 0
-      when v_refill_per_sec > 0 then 1.0 / v_refill_per_sec
-      else p_window_seconds::double precision
-    end;
 
     return query select
       true,
       (p_max_requests::double precision - 1),
-      (extract(epoch from v_now) * 1000 + v_seconds_until_next * 1000);
+      (extract(epoch from v_now) * 1000)::double precision;
     return;
   end if;
 

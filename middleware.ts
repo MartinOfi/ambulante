@@ -54,8 +54,11 @@ async function applyRateLimit(request: NextRequest): Promise<NextResponse | null
       {
         status: 429,
         headers: {
+          // Clamp to >=1 so clock skew between DB and Node never produces
+          // Retry-After: 0 (which aggressive clients interpret as "retry now"
+          // and undermines rate limiting). RFC 7231 allows 0 but it's pointless.
           [RATE_LIMIT_HEADERS.retryAfter]: String(
-            Math.ceil((result.resetAtMs - Date.now()) / 1000),
+            Math.max(1, Math.ceil((result.resetAtMs - Date.now()) / 1000)),
           ),
           [RATE_LIMIT_HEADERS.limit]: String(rule.maxRequests),
           [RATE_LIMIT_HEADERS.remaining]: "0",
