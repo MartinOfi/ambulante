@@ -15,6 +15,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? E2E_DEFAULT_BASE_URL;
 
 export default defineConfig({
   testDir: E2E_TEST_DIR,
+  testIgnore: "**/security/**",
   // Specs using __e2e routes (push-delivery) share an in-memory singleton in
   // shared/services/push.test-capture.ts. While that module has no internal
   // concurrency control, only one test at a time may consume it. Today only

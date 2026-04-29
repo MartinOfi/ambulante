@@ -280,10 +280,25 @@ Para estado global del cliente. Usar solo cuando React state local no alcance.
 | `RateLimitService` | interface | `check(input): Promise<RateLimitResult>` |
 | `RateLimitCheckInput` | interface | `{ identifier: string; rule: RateLimitRule }` |
 | `RateLimitResult` | interface | `{ allowed: boolean; remaining: number; resetAtMs: number }` |
-| `InMemoryRateLimiter` | class | Implementa `RateLimitService` con `Map` en memoria (dev only — per-isolate) |
-| `createRateLimitService` | factory | Retorna `InMemoryRateLimiter`; swap a Upstash cuando las env vars estén presentes (futuro backend task) |
+| `InMemoryRateLimiter` | class | Implementa `RateLimitService` con `Map` en memoria (dev/test only — per-isolate) |
+| `createRateLimitService` | factory | Retorna `InMemoryRateLimiter` (default in-process). Para producción usar `createRateLimiterFromEnv` |
 
-**Notas de producción:** `InMemoryRateLimiter` usa un `Map` por isolate de Edge Runtime — no comparte estado entre instancias de Vercel. Swappear a `@upstash/ratelimit` cuando se configure Supabase/backend.
+### Service Supabase — `shared/services/rate-limit.supabase.ts` (B13-A)
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `SupabaseRateLimiter` | class | Token-bucket leaky con estado compartido in-DB. Llama RPC `check_rate_limit(p_key, p_max_requests, p_window_seconds)` en cada chequeo. Fail-open + log si la RPC falla (rate limit es defense-in-depth, no auth). |
+| `RateLimitRpcClient` | interface | DI seam — cliente con método `rpc("check_rate_limit", args)` que retorna `PromiseLike<RateLimitRpcResponse>`. Permite testear sin `@supabase/*`. |
+| `RateLimitRpcArgs` / `RateLimitRpcResponse` | interface | Shapes del par RPC. |
+| `createSupabaseRateLimitService(client)` | factory | Wrapper sobre `SupabaseRateLimiter`. |
+
+### Factory env-aware — `shared/services/rate-limit.factory.ts` (B13-A)
+
+| Nombre | Tipo | Descripción |
+|---|---|---|
+| `createRateLimiterFromEnv()` | factory | Retorna `SupabaseRateLimiter` si `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` están seteadas; de lo contrario `InMemoryRateLimiter`. Usado por `middleware.ts` al cargar el módulo. |
+
+**Backend (B13-A):** la migration `20260429141719_rate_limit.sql` crea la tabla `public.rate_limit_buckets` (token bucket con `key text PK`, `tokens double precision`, `last_refill_at`, `updated_at`), la función `check_rate_limit(key, max, window_seconds)` (con `pg_advisory_xact_lock(hashtext(key))` para serialización por key, sin tocar `FOR UPDATE` — skill rule `lock-advisory`), y `cleanup_rate_limit_buckets(ttl_seconds)`. RLS deny-all + `grant execute … to service_role`.
 
 ---
 
