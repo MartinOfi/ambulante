@@ -62,6 +62,7 @@
 | [NT-30](#nt-30--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar B11-B (audit log e2e) o cualquier tarea de webhooks |
 | [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
 | [NT-32](#nt-32--vitest-9-tests-fallan-en-13-archivos-pre-existente) | Vitest: 9 tests fallan en 13 archivos (pre-existente) | testing / DX | M | antes de que el rojo se normalice y la suite pierda valor como gate |
+| [NT-33](#nt-33--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
 
 ---
 
@@ -446,6 +447,20 @@
 - **Dependencias:** B3.3 ✅.
 - **Ticket:** —
 - **Notas:** El repositorio usa `resolveUserInternalId(publicId)` mientras las rutas actuales usan `rpc("current_user_id")` — hay que alinear el mecanismo de resolución. El issue de `onConflict: "endpoint"` que no valida ownership (endpoint puede ser reasignado entre usuarios) también debe resolverse aquí.
+
+---
+
+### NT-33 — Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests)
+
+- **Categoría:** testing / DX
+- **Contexto:** En `app/api/cron/_test-helpers/concurrent-fixtures.ts` el code review de B7-A flagueó dos cosas que no son CRITICAL/HIGH y se difieren: (a) `cleanupIdentity` ignora errores de los 4 deletes secuenciales — si la subquery de `audit_log` falla, el fallback `?? []` produce un `.in("row_id", [])` silencioso; en una re-run con leftovers de un run previo el siguiente `beforeEach` siembra encima sin advertir. Las aserciones filtran por `store_id` así que no genera false-positives, pero es robustez. (b) `seedOrders` y `cleanupIdentity` usan `as string` / `as number` sobre las columnas devueltas por PostgREST en lugar de type-guards — viola CLAUDE.md §6.1. Ambos puntos son test-only, low blast radius.
+- **Aceptación:** `cleanupIdentity` lanza explícitamente si cualquier paso falla (con mensaje contextualizado); las lecturas de PostgREST en el helper se validan con un Zod schema local en lugar de `as` casts; tests siguen verdes.
+- **Archivos afectados:** `app/api/cron/_test-helpers/concurrent-fixtures.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** la próxima vez que se toque un cron test (ej. al agregar B7.5 si llegase a aparecer, o al introducir un tercer cron). No urgente; el código actual funciona y los tests son determinísticos.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por code review de B7-A.
 
 ---
 

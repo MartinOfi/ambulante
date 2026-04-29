@@ -16,12 +16,16 @@ import { createServiceRoleClient } from "@/shared/repositories/supabase/client";
 import { logger } from "@/shared/utils/logger";
 import type { AuditLogService } from "@/shared/services/audit-log";
 
+// PostgREST serializes timestamptz with a numeric offset (e.g. "+00:00"), not
+// the bare "Z" form — so .datetime() must be called with { offset: true } to
+// accept it. Caught by route.concurrent.test.ts (B7-A); the unit-test mocks
+// happened to use Z-format so the strict default was never exercised.
 const ClaimRowSchema = z.object({
   order_public_id: z.string().uuid(),
   client_public_id: z.string().uuid(),
   store_public_id: z.string().uuid(),
-  sent_at: z.string().datetime(),
-  accepted_at: z.string().datetime(),
+  sent_at: z.string().datetime({ offset: true }),
+  accepted_at: z.string().datetime({ offset: true }),
 });
 
 type ClaimRow = z.infer<typeof ClaimRowSchema>;

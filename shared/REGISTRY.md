@@ -13,7 +13,7 @@
 | Domain: tipos TS, schemas Zod, state machine, domain events, constantes, routes | [`REGISTRY-detail/domain.md`](./REGISTRY-detail/domain.md) |
 | Infraestructura: utils puros, design tokens, config de entorno, stores Zustand | [`REGISTRY-detail/infra.md`](./REGISTRY-detail/infra.md) |
 | Componentes/hooks de features existentes (OrderTracking, StoreDetailSheet, store-shell) | [`REGISTRY-detail/features.md`](./REGISTRY-detail/features.md) |
-| Test utilities (renderWithProviders, factories de entidades) o pgTAP RLS tests (`supabase/tests/`) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
+| Test utilities (renderWithProviders, factories de entidades), pgTAP RLS tests (`supabase/tests/`) o cron concurrent integration tests (`app/api/cron/*/route.concurrent.test.ts`) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
 
 ---
 
@@ -61,6 +61,8 @@
 | createSetTimeoutScheduler | domain | `shared/domain/timeouts.ts` | domain.md §12 |
 | createTestQueryClient | test-util | `shared/test-utils/render.tsx` | testing.md §14 |
 | createOrder / createUser / createStore / createOrderItem | test-util | `shared/test-utils/factories.ts` | testing.md §14 |
+| concurrent-fixtures (seedIdentity / seedOrders / cleanupIdentity / isLocalSupabaseReachable / createLocalServiceRoleClient) | test-util | `app/api/cron/_test-helpers/concurrent-fixtures.ts` | testing.md §17 |
+| route.concurrent.test.ts (expire-orders / auto-close-orders) | integration-test | `app/api/cron/<job>/route.concurrent.test.ts` | testing.md §17 |
 | dequeueAll | query | `shared/query/offline-queue.ts` | data.md §2b |
 | Divider | ui-component | `shared/components/layout/` | ui.md §2 |
 | enqueueItem | query | `shared/query/offline-queue.ts` | data.md §2b |

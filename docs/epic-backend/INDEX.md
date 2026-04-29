@@ -25,7 +25,7 @@
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
 | B5 | Storage (buckets + RLS + upload helpers) | 4 | 4/4 | ✅ |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
-| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 3/4 | 🟡 |
+| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 4/4 | ✅ |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 4/4 | ✅ |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 0/3 | ⚪ |
 | B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
@@ -39,7 +39,6 @@
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
-| B7-A | Cron: runbook + tests concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ⚪ | B4.4, B3.1, B6.3, B5.2 | XL | `data-n-plus-one`, `query-index-types` | `features.md`. |
 | B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
 | B9-C | Cliente: push subscribe + profile | ⚪ | B8.1, B9-A | M | — | `features.md`. |
@@ -92,6 +91,7 @@
 | B7.1 | Migración schedule_crons + helper pg_net | ✅ |
 | B7.2 | Route Handler `/api/cron/expire-orders` con SKIP LOCKED | ✅ |
 | B7.3 | Route Handler `/api/cron/auto-close-orders` | ✅ |
+| B7-A | Cron: runbook + tests concurrentes | ✅ |
 | B8.1 | VAPID keys + tabla + endpoint de subscribe | ✅ |
 | B8.2 | Domain event listener: OrderStatusChanged → webpush | ✅ |
 | B8.3 | Retry + dead subscription cleanup | ✅ |
