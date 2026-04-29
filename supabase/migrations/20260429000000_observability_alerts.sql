@@ -75,22 +75,29 @@ grant  execute on function internal.snapshot_slow_query_baseline() to postgres;
 -- ---------------------------------------------------------------------------
 -- Returns one row per breaching query. A query is "breaching" when:
 --   - mean_exec_time_ms > p_threshold_ms (absolute), or
---   - mean_exec_time_ms > baseline_mean_ms * 1.5 (relative regression)
--- baseline_mean_ms is the most recent baseline entry at least 6 days old; if
--- absent (e.g. before the first weekly snapshot ran), the relative check is
--- skipped and only the absolute threshold applies.
-create or replace function internal.get_slow_queries_for_alerts(
-  p_threshold_ms numeric default 100,
-  p_limit        int     default 50
+--   - mean_exec_time_ms > baseline_mean_ms * p_baseline_factor (relative regression)
+-- baseline_mean_ms is the most recent baseline entry at least p_baseline_min_age_days
+-- days old; if absent (e.g. before the first weekly snapshot ran), the relative
+-- check is skipped and only the absolute threshold applies.
+--
+-- Lives in `public` schema so PostgREST exposes it via /rest/v1/rpc/<name> for
+-- the service-role-authenticated cron route handler. Restricted via explicit
+-- grants — anon and authenticated cannot execute it. The matching B12.1
+-- function `get_top_slow_queries` follows the same pattern.
+create or replace function public.get_slow_queries_for_alerts(
+  p_threshold_ms              numeric default 100,
+  p_limit                     int     default 50,
+  p_baseline_factor           numeric default 1.5,
+  p_baseline_min_age_days     int     default 6
 )
   returns table(
-    queryid           bigint,
-    mean_exec_time_ms numeric,
-    calls             bigint,
+    queryid            bigint,
+    mean_exec_time_ms  numeric,
+    calls              bigint,
     total_exec_time_ms numeric,
-    query_text        text,
-    baseline_mean_ms  numeric,
-    breach_kind       text
+    query_text         text,
+    baseline_mean_ms   numeric,
+    breach_kind        text
   )
   language plpgsql
   security definer
@@ -117,7 +124,7 @@ begin
         b.queryid,
         b.mean_exec_time_ms as baseline_mean_ms
       from public.slow_query_baselines b
-      where b.captured_at <= now() - interval '6 days'
+      where b.captured_at <= now() - make_interval(days => p_baseline_min_age_days)
       order by b.queryid, b.captured_at desc
     )
     select
@@ -127,28 +134,31 @@ begin
       cs.total_exec_time_ms,
       cs.query_text,
       bl.baseline_mean_ms,
+      -- WHERE clause below guarantees at least one branch matches; no `else`
+      -- needed. Order matters: combined breach must be checked before its
+      -- individual sub-conditions.
       case
         when bl.baseline_mean_ms is not null
-             and cs.mean_exec_time_ms > bl.baseline_mean_ms * 1.5
+             and cs.mean_exec_time_ms > bl.baseline_mean_ms * p_baseline_factor
              and cs.mean_exec_time_ms > p_threshold_ms then 'absolute_and_regression'
         when bl.baseline_mean_ms is not null
-             and cs.mean_exec_time_ms > bl.baseline_mean_ms * 1.5 then 'regression'
+             and cs.mean_exec_time_ms > bl.baseline_mean_ms * p_baseline_factor then 'regression'
         when cs.mean_exec_time_ms > p_threshold_ms then 'absolute'
-        else 'none'
       end as breach_kind
     from current_stats cs
     left join baseline bl on bl.queryid = cs.queryid
     where cs.mean_exec_time_ms > p_threshold_ms
        or (bl.baseline_mean_ms is not null
-           and cs.mean_exec_time_ms > bl.baseline_mean_ms * 1.5)
+           and cs.mean_exec_time_ms > bl.baseline_mean_ms * p_baseline_factor)
     order by cs.mean_exec_time_ms desc
     limit p_limit;
 end;
 $$;
 
-revoke all      on function internal.get_slow_queries_for_alerts(numeric, int) from public;
-grant  execute  on function internal.get_slow_queries_for_alerts(numeric, int) to service_role;
-grant  execute  on function internal.get_slow_queries_for_alerts(numeric, int) to postgres;
+revoke all      on function public.get_slow_queries_for_alerts(numeric, int, numeric, int) from public;
+revoke all      on function public.get_slow_queries_for_alerts(numeric, int, numeric, int) from anon, authenticated;
+grant  execute  on function public.get_slow_queries_for_alerts(numeric, int, numeric, int) to service_role;
+grant  execute  on function public.get_slow_queries_for_alerts(numeric, int, numeric, int) to postgres;
 
 -- ---------------------------------------------------------------------------
 -- 4. Cron schedules — idempotent (unschedule first to survive re-runs).

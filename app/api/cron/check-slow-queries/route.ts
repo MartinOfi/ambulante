@@ -3,7 +3,9 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { env } from "@/shared/config/env";
 import {
+  BASELINE_MIN_AGE_DAYS,
   QUERY_TEXT_MAX_LENGTH,
+  SLOW_QUERY_BASELINE_FACTOR,
   SLOW_QUERY_MAX_RESULTS,
   SLOW_QUERY_THRESHOLD_MS,
 } from "@/shared/constants/observability";
@@ -11,7 +13,7 @@ import { createServiceRoleClient } from "@/shared/repositories/supabase/client";
 import { getOrCreateRequestLogger } from "@/shared/utils/server-logger";
 import { reportSlowQuery, type SlowQueryAlertPayload } from "@/shared/utils/sentry";
 
-const breachKindSchema = z.enum(["absolute", "regression", "absolute_and_regression", "none"]);
+const breachKindSchema = z.enum(["absolute", "regression", "absolute_and_regression"]);
 
 // Postgres bigint is JSON-serialized as a string by PostgREST when it overflows
 // JS-safe integer range — accept both shapes and normalize to string downstream.
@@ -44,7 +46,7 @@ function rowToPayload(row: SlowQueryRow, requestId: string): SlowQueryAlertPaylo
     totalExecTimeMs: row.total_exec_time_ms,
     queryText: truncateQueryText(row.query_text),
     baselineMeanMs: row.baseline_mean_ms,
-    breachKind: row.breach_kind === "none" ? "absolute" : row.breach_kind,
+    breachKind: row.breach_kind,
     requestId,
   };
 }
@@ -73,6 +75,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { data, error: rpcError } = await client.rpc("get_slow_queries_for_alerts", {
     p_threshold_ms: SLOW_QUERY_THRESHOLD_MS,
     p_limit: SLOW_QUERY_MAX_RESULTS,
+    p_baseline_factor: SLOW_QUERY_BASELINE_FACTOR,
+    p_baseline_min_age_days: BASELINE_MIN_AGE_DAYS,
   });
 
   if (rpcError !== null) {

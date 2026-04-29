@@ -10,6 +10,11 @@ import { userRoleSchema } from "@/shared/schemas/user";
 
 const rateLimiter = createRateLimitService();
 
+// Intentional in-place mutation: NextResponse has no clean copy constructor
+// for the body+cookies+status combination, and each call site holds the only
+// reference to the response object. Reassigning headers via `new NextResponse(
+// response.body, response)` would lose the cookies that Supabase wrote during
+// session refresh. Returning the same instance keeps the call sites readable.
 function tagWithRequestId(response: NextResponse, requestId: string): NextResponse {
   response.headers.set(REQUEST_ID_HEADER, requestId);
   return response;
