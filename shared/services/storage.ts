@@ -2,6 +2,7 @@ import { MOCK_STORAGE_BASE_URL } from "@/shared/constants/storage";
 
 import type {
   GetPublicUrlParams,
+  GetSignedUrlParams,
   RemoveParams,
   StorageResult,
   StorageService,
@@ -26,5 +27,12 @@ export const storageService: StorageService = {
 
   getPublicUrl({ bucket, path }: GetPublicUrlParams): string {
     return `${MOCK_STORAGE_BASE_URL}/${bucket}/${path}`;
+  },
+
+  async getSignedUrl({ bucket, path }: GetSignedUrlParams): Promise<StorageResult<string>> {
+    return {
+      success: true,
+      data: `${MOCK_STORAGE_BASE_URL}/${bucket}/${path}?signed=mock`,
+    };
   },
 };
