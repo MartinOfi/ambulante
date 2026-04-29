@@ -253,6 +253,58 @@ jobs:
       - name: Run RLS benchmark
         run: psql "$SUPABASE_DB_URL" -f scripts/rls-benchmark.sql
 
+  security-smoke:
+    name: Security Smoke (RLS + fuzz + rate limit)
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+      NEXT_PUBLIC_APP_URL: http://localhost:3110
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.0"
+          cache: pnpm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.95.5
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start local Supabase
+        run: |
+          supabase start
+          until pg_isready -h 127.0.0.1 -p 54322 -U postgres; do sleep 1; done
+
+      - name: Export Supabase env
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+
+      - name: Run security smoke tests
+        run: pnpm test:e2e:security
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-security-report
+          path: playwright-report/
+          retention-days: 7
+
   bundle-analysis:
     name: Bundle Analysis
     runs-on: ubuntu-latest

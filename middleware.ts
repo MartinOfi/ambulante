@@ -2,11 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import { RATE_LIMIT_RULES } from "@/shared/constants/rate-limit";
 import { getRequiredRole } from "@/shared/utils/route-access";
 import { ROUTES } from "@/shared/constants/routes";
-import { createRateLimitService } from "@/shared/services/rate-limit";
+import { createRateLimiterFromEnv } from "@/shared/services/rate-limit.factory";
 import { createMiddlewareClient } from "@/shared/repositories/supabase/client";
 import { userRoleSchema } from "@/shared/schemas/user";
 
-const rateLimiter = createRateLimitService();
+const rateLimiter = createRateLimiterFromEnv();
 
 // x-real-ip is set by Vercel's reverse proxy and cannot be forged by the client.
 // x-forwarded-for rightmost entry is the one appended by the trusted proxy.

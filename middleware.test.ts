@@ -10,8 +10,8 @@ function makeRequest(path: string, headers: Record<string, string> = {}): NextRe
 // --- Rate limit mock (stateful per describe block, reset in beforeEach) ---
 const rateLimitStore = new Map<string, number>();
 
-vi.mock("@/shared/services/rate-limit", () => ({
-  createRateLimitService: () => ({
+vi.mock("@/shared/services/rate-limit.factory", () => ({
+  createRateLimiterFromEnv: () => ({
     check: vi.fn(({ identifier }: { identifier: string }) => {
       const count = (rateLimitStore.get(identifier) ?? 0) + 1;
       rateLimitStore.set(identifier, count);

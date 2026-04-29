@@ -59,6 +59,8 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
+| [NT-30](#nt-30--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
+| [NT-31](#nt-31--tests-fallan-en-local-sin-env-vars-de-supabase-módulos-repositoriesindexts) | Tests fallan en local sin env vars de Supabase | testing / DevEx | S | próximo onboarding de dev nuevo |
 
 ---
 
@@ -457,6 +459,30 @@
 - **Dependencias:** B10.3 (consumer real del helper).
 - **Ticket:** —
 - **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
+
+### NT-30 — Guard en CI contra timestamps duplicados de migrations
+
+- **Categoría:** infra / DevEx
+- **Contexto:** Descubierto al ejecutar **B13-A**: dos pares de migrations (`20260428000004` y `20260428000007`) tenían timestamp duplicado. Postgres rechaza el segundo INSERT en `supabase_migrations.schema_migrations` con `duplicate key`, por lo que `pnpm supabase db reset` bombeaba en cualquier worktree fresh. Lo arreglé renombrando las dos colisiones a slots libres (`0008` y `0009`), pero CI no detecta esto automáticamente.
+- **Aceptación:** un check de CI (`db-migrations` job o uno nuevo) escanea `supabase/migrations/*.sql`, extrae los 14-char prefixes con `awk` o `grep`, y falla si encuentra duplicados. Idealmente también valida formato `YYYYMMDDhhmmss_*.sql`.
+- **Archivos afectados:** `.github/workflows/ci.yml`, posiblemente nuevo `scripts/check-migration-timestamps.sh`.
+- **Estimación:** S
+- **Cuándo retomarlo:** próxima vez que toque CI (o en B14.2 cuando se establezca preview DB por PR).
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** El error se manifiesta como exit-1 con `duplicate key value violates unique constraint "schema_migrations_pkey"` durante `supabase start` o `supabase db reset`. Tarda en detectarse porque depende de un worktree fresh sin DB cacheada.
+
+### NT-31 — Tests fallan en local sin env vars de Supabase (módulos `repositories/index.ts`)
+
+- **Categoría:** testing / DevEx
+- **Contexto:** Descubierto al ejecutar **B13-A**: `pnpm test` falla con ~18 tests rojos en local porque `shared/repositories/supabase/client.ts` lanza al cargarse si `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY` no están definidas, y `shared/repositories/index.ts` re-exporta del cliente Supabase. Cualquier test que importe `@/shared/repositories` (auth, hooks, varios features) revienta a module-load. Pre-existente — no lo introduje yo, pero noté que los tests verdes en local sólo lo están si las env vars están seteadas.
+- **Aceptación:** los tests pasan en una checkout fresh sin `.env.local`. Una de dos opciones: (a) lazy-load del cliente Supabase (constants se evalúan en el primer uso, no al import); (b) `vitest.setup.ts` setea env vars dummy para tests que no necesitan Supabase real.
+- **Archivos afectados:** `shared/repositories/supabase/client.ts`, `vitest.setup.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** próximo onboarding de dev nuevo, o cuando se prepare el go-live (B14).
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** Workaround actual: setear env vars antes de `pnpm test`. CI no detecta el bug porque el job `test-unit` corre con env stubs implícitos.
 
 ---
 

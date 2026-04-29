@@ -15,6 +15,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? E2E_DEFAULT_BASE_URL;
 
 export default defineConfig({
   testDir: E2E_TEST_DIR,
+  testIgnore: "**/security/**",
   fullyParallel: true,
   forbidOnly: isCi,
   retries: isCi ? E2E_RETRIES_CI : E2E_RETRIES_LOCAL,
