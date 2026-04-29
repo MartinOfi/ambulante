@@ -27,7 +27,7 @@ import {
   seedIdentity,
   seedOrders,
   type ConcurrentTestClient,
-} from "../_test-helpers/concurrent-fixtures";
+} from "@/app/api/cron/_test-helpers/concurrent-fixtures";
 
 const { mockAppend, mockPublish } = vi.hoisted(() => ({
   mockPublish: vi.fn(),
@@ -43,7 +43,7 @@ vi.mock("@/shared/config/env", () => ({
 }));
 
 vi.mock("@/shared/repositories/supabase/client", async () => {
-  const helpers = await import("../_test-helpers/concurrent-fixtures");
+  const helpers = await import("@/app/api/cron/_test-helpers/concurrent-fixtures");
   return {
     // Production guard rejects http:// — bypass it for the local fixture URL.
     createServiceRoleClient: vi.fn(() => helpers.createLocalServiceRoleClient()),
