@@ -117,6 +117,15 @@ jobs:
       - name: Run RLS static analysis
         run: bash scripts/rls-lint.sh
 
+  check-import-boundary:
+    name: Supabase Import Boundary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for @supabase imports outside allowed directories
+        run: bash scripts/check-supabase-imports.sh
+
   db-migrations:
     name: DB Migrations & Audit
     runs-on: ubuntu-latest
