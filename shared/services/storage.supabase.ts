@@ -5,6 +5,7 @@ import {
   STORAGE_BUCKETS,
   STORAGE_SIZE_LIMITS,
 } from "@/shared/constants/storage";
+import type { StorageBucket } from "@/shared/constants/storage";
 
 import type {
   GetPublicUrlParams,
@@ -38,15 +39,15 @@ export interface SupabaseStorageClient {
   from(bucket: string): SupabaseStorageBucket;
 }
 
-// ── Validation lookup tables (keyed by bucket value string) ───────────────────
+// ── Validation lookup tables (exhaustive over StorageBucket) ─────────────────
 
-const SIZE_LIMIT_BY_BUCKET: Record<string, number> = {
+const SIZE_LIMIT_BY_BUCKET: Record<StorageBucket, number> = {
   [STORAGE_BUCKETS.PRODUCTS]: STORAGE_SIZE_LIMITS.PRODUCTS,
   [STORAGE_BUCKETS.STORE_LOGOS]: STORAGE_SIZE_LIMITS.STORE_LOGOS,
   [STORAGE_BUCKETS.VALIDATION_DOCS]: STORAGE_SIZE_LIMITS.VALIDATION_DOCS,
 };
 
-const ALLOWED_MIME_TYPES_BY_BUCKET: Record<string, readonly string[]> = {
+const ALLOWED_MIME_TYPES_BY_BUCKET: Record<StorageBucket, readonly string[]> = {
   [STORAGE_BUCKETS.PRODUCTS]: STORAGE_ALLOWED_MIME_TYPES.PRODUCTS,
   [STORAGE_BUCKETS.STORE_LOGOS]: STORAGE_ALLOWED_MIME_TYPES.STORE_LOGOS,
   [STORAGE_BUCKETS.VALIDATION_DOCS]: STORAGE_ALLOWED_MIME_TYPES.VALIDATION_DOCS,
@@ -56,6 +57,12 @@ const ALLOWED_MIME_TYPES_BY_BUCKET: Record<string, readonly string[]> = {
 
 function validateUpload(params: UploadParams): StorageResult<void> {
   const sizeLimit = SIZE_LIMIT_BY_BUCKET[params.bucket];
+  const allowedTypes = ALLOWED_MIME_TYPES_BY_BUCKET[params.bucket];
+
+  if (sizeLimit === undefined || allowedTypes === undefined) {
+    return { success: false, error: "Bucket de almacenamiento no reconocido." };
+  }
+
   if (params.file.size > sizeLimit) {
     return {
       success: false,
@@ -63,7 +70,6 @@ function validateUpload(params: UploadParams): StorageResult<void> {
     };
   }
 
-  const allowedTypes = ALLOWED_MIME_TYPES_BY_BUCKET[params.bucket];
   if (!allowedTypes.includes(params.file.type)) {
     return {
       success: false,
@@ -77,12 +83,16 @@ function validateUpload(params: UploadParams): StorageResult<void> {
 // ── Factory ───────────────────────────────────────────────────────────────────
 
 export function createSupabaseStorageService(client?: SupabaseStorageClient): StorageService {
+  let resolvedClient: SupabaseStorageClient | null = client ?? null;
+
   function getClient(): SupabaseStorageClient {
-    if (client) return client;
-    return createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    ).storage;
+    if (!resolvedClient) {
+      resolvedClient = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      ).storage;
+    }
+    return resolvedClient;
   }
 
   return {
