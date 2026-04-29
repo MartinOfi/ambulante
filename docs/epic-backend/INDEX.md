@@ -43,7 +43,6 @@
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
 | B7.4 | Runbook: cómo desactivar / reactivar / auditar un cron | ⚪ | B7.3 | S | — | — |
 | B7.5 | Tests de integración concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
-| B8.3 | Retry + dead subscription cleanup | ✅ | B8.2 | M | — | — |
 | B8.4 | Test E2E del loop completo | ⚪ | B8.3 | L | — | `testing.md`. |
 | B9.1 | Swap auth en features/auth + landing | ⚪ | B4.4 | M | — | `features.md`. |
 | B9.2 | Swap stores nearby + feed del mapa | ⚪ | B3.1, B6.3 | L | `data-n-plus-one`, `query-index-types` | `features.md`. |
