@@ -5,6 +5,7 @@ import "server-only";
 import pino from "pino";
 
 import type { ErrorHook, LogContext, Logger } from "@/shared/utils/logger";
+import { readOrCreateRequestId } from "@/shared/utils/request-id";
 
 type NodeEnv = "development" | "test" | "production";
 
@@ -73,6 +74,20 @@ export function generateRequestId(): string {
 export function createRequestLogger(requestId: string): Logger {
   const child = baseLogger.child({ requestId }) as PinoInstance;
   return wrapPinoChild(child);
+}
+
+export interface RequestScopedLogger {
+  readonly logger: Logger;
+  readonly requestId: string;
+}
+
+// Accept Headers, Request, or NextRequest — anything that carries the inbound headers.
+// Used by Route Handlers and Server Actions to bind the request id from middleware
+// (or generate one when arriving from an unmediated context, e.g. cron) to all logs.
+export function getOrCreateRequestLogger(source: Headers | Request): RequestScopedLogger {
+  const headers = source instanceof Headers ? source : source.headers;
+  const requestId = readOrCreateRequestId(headers);
+  return { logger: createRequestLogger(requestId), requestId };
 }
 
 const resolvedEnv = (process.env.NODE_ENV as NodeEnv | undefined) ?? "development";
