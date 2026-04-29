@@ -8,6 +8,8 @@ import type {
 import type { SupabaseClient } from "./client";
 import { mapUserRow, domainRoleToDb, type DbUserRow } from "./mappers";
 
+const MAX_USERS_PER_QUERY = 500;
+
 export class SupabaseUserRepository implements UserRepository {
   constructor(private readonly client: SupabaseClient) {}
 
@@ -20,6 +22,10 @@ export class SupabaseUserRepository implements UserRepository {
     if (filters?.suspended !== undefined) {
       query = query.eq("suspended", filters.suspended);
     }
+
+    // Defensive cap until pagination lands (NT in NEXT-TASK.md). Prevents
+    // unbounded admin-page scans on production with many users.
+    query = query.limit(MAX_USERS_PER_QUERY);
 
     const { data, error } = await query;
     if (error !== null) throw new Error(`SupabaseUserRepository.findAll: ${error.message}`);

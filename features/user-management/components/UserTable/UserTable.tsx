@@ -2,6 +2,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/utils/cn";
 import { USER_ROLES } from "@/shared/constants/user";
+import { getSuspensionStatus, SUSPENSION_STATUS } from "@/shared/domain/user-suspension";
 import type { UserRole } from "@/shared/schemas/user";
 import type { UserTableProps } from "./UserTable.types";
 
@@ -17,7 +18,7 @@ const ROLE_VARIANT: Record<UserRole, "default" | "secondary" | "outline"> = {
   [USER_ROLES.admin]: "outline",
 };
 
-export function UserTable({ users, pendingUserId, onSuspend, onReinstate }: UserTableProps) {
+export function UserTable({ users, pendingUserId, onSuspend, onReactivate, onView }: UserTableProps) {
   if (users.length === 0) {
     return (
       <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] p-12 text-center">
@@ -47,8 +48,10 @@ export function UserTable({ users, pendingUserId, onSuspend, onReinstate }: User
         </thead>
         <tbody className="divide-y divide-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))]">
           {users.map((user) => {
-            const isSuspended = user.suspended === true;
+            const status = getSuspensionStatus(user);
+            const isSuspended = status === SUSPENSION_STATUS.SUSPENDED;
             const isPending = pendingUserId === user.id;
+            const isAdmin = user.role === USER_ROLES.admin;
 
             return (
               <tr
@@ -81,28 +84,38 @@ export function UserTable({ users, pendingUserId, onSuspend, onReinstate }: User
                     </Badge>
                   )}
                 </td>
-                <td className="px-4 py-3 text-right">
-                  {isSuspended ? (
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
                     <Button
                       size="sm"
-                      variant="outline"
-                      disabled={isPending}
-                      onClick={() => onReinstate(user.id)}
-                      aria-label={`Reactivar usuario ${user.email}`}
+                      variant="ghost"
+                      onClick={() => onView(user.id)}
+                      aria-label={`Ver detalle de ${user.email}`}
                     >
-                      {isPending ? "Procesando…" : "Reactivar"}
+                      Ver
                     </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      disabled={isPending || user.role === USER_ROLES.admin}
-                      onClick={() => onSuspend(user.id)}
-                      aria-label={`Suspender usuario ${user.email}`}
-                    >
-                      {isPending ? "Procesando…" : "Suspender"}
-                    </Button>
-                  )}
+                    {isSuspended ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={isPending}
+                        onClick={() => onReactivate(user.id)}
+                        aria-label={`Reactivar usuario ${user.email}`}
+                      >
+                        {isPending ? "Procesando…" : "Reactivar"}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={isPending || isAdmin}
+                        onClick={() => onSuspend(user.id)}
+                        aria-label={`Suspender usuario ${user.email}`}
+                      >
+                        {isPending ? "Procesando…" : "Suspender"}
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );

@@ -29,7 +29,7 @@
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 0/3 | ⚪ |
 | B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
-| B11 | Swap admin (features Admin consumen backend real) | 3 | 0/3 | ⚪ |
+| B11 | Swap admin (features Admin consumen backend real) | 3 | 1/3 | 🟡 |
 | B12 | Observability backend | 3 | 2/3 | 🟡 |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 0/2 | ⚪ |
 | B14 | Deploy producción | 4 | 0/4 | ⚪ |
@@ -51,7 +51,6 @@
 | B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
 | B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ⚪ | B3.1, B5.4 | XL | `query-composite-indexes`, `data-pagination` | `features.md`. |
 | B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
-| B11-C | Admin: user management | ⚪ | B3.1 | M | — | `features.md`. |
 | B12-A | Observability: structured logging + slow query alerts | ⚪ | B12.1, B7.1 | L | `monitor-pg-stat-statements` | `data.md` (Logger). |
 | B13-A | Hardening: rate limiting in-DB + security smoke tests | ⚪ | B3.1, B2.3 | XL | `lock-short-transactions`, `lock-advisory` | `data.md`, `testing.md`. |
 | B13-B | Hardening: seed data + runbooks (rollback + incident) | ⚪ | B1.2, B4.1, B0.3, B12-A | M | — | `testing.md` (Seed). |
@@ -98,6 +97,7 @@
 | B8.1 | VAPID keys + tabla + endpoint de subscribe | ✅ |
 | B8.2 | Domain event listener: OrderStatusChanged → webpush | ✅ |
 | B8.3 | Retry + dead subscription cleanup | ✅ |
+| B11-C | Admin: user management | ✅ |
 | B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ✅ |
 | B12.4 | Supabase logs → Sentry breadcrumbs | ✅ |
 
