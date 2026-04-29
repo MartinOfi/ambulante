@@ -145,8 +145,22 @@ Viven en `e2e/`. Corren contra el dev server (puerto 3100). CI usa `workers: 1`.
 |---|---|
 | `e2e/realtime.spec.ts` | Propagación de aceptación de pedido <5s (store-demo-1); toggle de disponibilidad <2s (B6.3) |
 | `e2e/realtime-propagation.spec.ts` | SLA PRD §7.2: aceptación de pedido propagada al cliente en <5s (store-demo-2, seed B6.4 "Taco E2E B6.4") + timing assertion explícito con `Date.now()` |
+| `e2e/push-delivery.spec.ts` | Loop completo del push (B8.4): subscribe → submit RECIBIDO → store accept → captura del payload del push en mock. Crea órdenes únicas por test run via `POST /api/__e2e/order`, capturadas via `/api/__e2e/push-capture` |
 
-Ambas specs usan `makeSessionCookie(role, userId)` + `context.addCookies()` con `SESSION_COOKIE_NAME` para autenticar sin UI. `realtime-propagation.spec.ts` usa `store-demo-2` para evitar conflictos de estado con `realtime.spec.ts` (que consume el order RECIBIDO de `store-demo-1`).
+Las specs usan `makeSessionCookie(role, userId)` + `context.addCookies()` con `SESSION_COOKIE_NAME` para autenticar sin UI. `realtime-propagation.spec.ts` usa `store-demo-2` para evitar conflictos de estado con `realtime.spec.ts` (que consume el order RECIBIDO de `store-demo-1`). `push-delivery.spec.ts` evita conflictos creando una orden con `productId` único por timestamp y localizándola por su `id` truncado en DOM (no comparte seeds con las otras dos specs).
+
+### Test-only push capture infrastructure (B8.4)
+
+Para validar el dispatcher de push end-to-end sin un VAPID server real, el repo expone (gated por `process.env.E2E_TEST_MODE === "1"`):
+
+| Archivo | Rol |
+|---|---|
+| `shared/services/push.test-capture.ts` | Singleton in-memory: `subscribeUser/unsubscribeUser/listCapturedPushes/clearCaptureStore` + factory `createTestCapturePushSender()` que implementa `ServerPushSender` capturando solo si el user está suscrito |
+| `shared/domain/events/wiring.e2e.ts` | `registerE2EPushListener()` — wirea el `push-on-status-change` listener al `eventBus` con el sender de captura + `storeRepository` mock. Idempotente (segunda llamada devuelve el mismo unregister fn) |
+| `app/api/__e2e/push-capture/route.ts` | `GET ?userId=` lista capturas; `POST {action, userId}` subscribe/unsubscribe; `DELETE` clear. 404 si `E2E_TEST_MODE` ≠ `"1"` |
+| `app/api/__e2e/order/route.ts` | `POST` crea orden directa en estado `RECIBIDO` (bypass del state machine). 404 si `E2E_TEST_MODE` ≠ `"1"` |
+| `instrumentation.ts` | En boot del runtime nodejs, si `isE2ETestMode()` invoca `registerE2EPushListener()` |
+| `playwright.config.ts` (`webServer.env.E2E_TEST_MODE = "1"`) | Activa la cadena entera durante runs de Playwright |
 
 ---
 

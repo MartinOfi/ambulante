@@ -490,6 +490,20 @@
 
 ---
 
+### NT-30 — Compatibilidad Node 24 al cargar `next.config.ts`
+
+- **Categoría:** infra / DX
+- **Contexto:** En Node 24.12.0 + Next 15.5.15, el `next-config-ts/require-hook.js` evalúa `next.config.ts` antes de aplicar el shim de `server-only`. Como `next.config.ts` importa `./shared/config/env.runtime` (que tiene `import "server-only";`), el `dev` falla con `Error: This module cannot be imported from a Client Component module.` antes de levantar. Bloquea `pnpm dev` y `pnpm test:e2e` en ese Node. Descubierto al correr `e2e/push-delivery.spec.ts` (B8.4); afecta a TODAS las specs E2E existentes.
+- **Aceptación:** `pnpm dev` y `pnpm test:e2e` arrancan sin errores en Node 24.x. Soluciones posibles: (a) inline el `parseEnv` directo en `next.config.ts` sin pasar por `env.runtime` (que mantiene su `server-only`); (b) sacar `import "server-only";` de `env.runtime.ts` y dejar la guarda solo en consumers; (c) pinear `engines.node` a 20.x en `package.json` y agregar `.nvmrc`.
+- **Archivos afectados:** `next.config.ts`, `shared/config/env.runtime.ts`, `package.json`, `.nvmrc` (a crear).
+- **Estimación:** S
+- **Cuándo retomarlo:** antes de habilitar CI con E2E o si el equipo crece a Node 24 como default. Hasta entonces, los devs siguen en Node 20.x.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por B8.4. Los unit tests de la infra de captura (`push.test-capture.test.ts`, `wiring.e2e.test.ts`, `__e2e/*/route.test.ts`) cubren la lógica al margen de este blocker — el spec E2E fue verificado por typecheck + lint + 22 unit tests, no por ejecución contra dev server.
+
+---
+
 ## Cómo se alimenta este doc durante la ejecución del epic
 
 Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
