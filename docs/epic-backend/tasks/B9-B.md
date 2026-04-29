@@ -6,7 +6,7 @@
 
 > **Atajos:** [INDEX](../INDEX.md) · [convenciones](../convenciones.md) · [portabilidad](../portabilidad.md) · [decisiones](../decisiones.md)
 
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-29, started: 13:09]
 - **Por qué:** Slice vertical del **ciclo completo del pedido del lado cliente**: arma carrito, lo envía, trackea el estado en vivo, lo cancela si todavía puede, y al final lo ve en su historial. Las 5 sub-etapas comparten el mismo modelo (`Order` + state machine + domain events) y se rompen entre sí si se diseñan separadas (ej: el snapshot de productos que se decide en submit afecta lo que muestra tracking e historial).
 - **Entregable:**
   1. **Cart + submit:** Server Action `submitOrder(input)` en `features/order-flow/actions.ts` con validación Zod, state machine check, transacción atómica (orders + order_items con snapshot de productos), emite `OrderCreated` post-commit. Tests unitarios + E2E.

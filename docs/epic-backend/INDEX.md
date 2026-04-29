@@ -38,7 +38,7 @@
 
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
-| B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
+| B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | 🟡 | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
 | B9-C | Cliente: push subscribe + profile | ⚪ | B8.1, B9-A | M | — | `features.md`. |
 | B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ⚪ | B4.4, B5.4, B5.2 | XL | — | `features.md`. |
 | B10-B | Tienda: operación (availability + location + catálogo CRUD) | ⚪ | B3.1, B5.3, B10-A | XL | `data-batch-inserts` | `features.md`. |
