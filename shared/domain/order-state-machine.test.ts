@@ -218,6 +218,28 @@ describe("transition — happy paths", () => {
     );
     expect(next.status).toBe(ORDER_STATUS.CANCELADO);
   });
+
+  it("ACEPTADO → FINALIZADO via SISTEMA_AUTO_CIERRA (auto-close 2h, PRD §7.6)", () => {
+    const orderAceptado: Order = {
+      ...baseOrderEnviado,
+      status: ORDER_STATUS.ACEPTADO,
+      receivedAt: LATER_DATE,
+      acceptedAt: LATER_DATE,
+    };
+    const next = assertOk(
+      transition({
+        order: orderAceptado,
+        event: makeEvent(ORDER_EVENT.SISTEMA_AUTO_CIERRA, EVEN_LATER_DATE),
+        actor: ORDER_ACTOR.SISTEMA,
+      }),
+    );
+    expect(next.status).toBe(ORDER_STATUS.FINALIZADO);
+    expect((next as { finishedAt: Date }).finishedAt).toEqual(EVEN_LATER_DATE);
+    // onTheWayAt equals finishedAt because no EN_CAMINO step occurred
+    expect((next as { onTheWayAt: Date }).onTheWayAt).toEqual(EVEN_LATER_DATE);
+    expect((next as { acceptedAt: Date }).acceptedAt).toEqual(LATER_DATE);
+    expect((next as { receivedAt: Date }).receivedAt).toEqual(LATER_DATE);
+  });
 });
 
 // ====================================================================
@@ -346,6 +368,21 @@ describe("transition — invalid transitions", () => {
       expect(error.event).toBe(ORDER_EVENT.CLIENTE_CANCELA);
     }
   });
+
+  it("ENVIADO + SISTEMA_AUTO_CIERRA → INVALID_TRANSITION (auto-close solo aplica a ACEPTADO)", () => {
+    const error = assertErr(
+      transition({
+        order: baseOrderEnviado,
+        event: makeEvent(ORDER_EVENT.SISTEMA_AUTO_CIERRA),
+        actor: ORDER_ACTOR.SISTEMA,
+      }),
+    );
+    expect(error.kind).toBe("INVALID_TRANSITION");
+    if (error.kind === "INVALID_TRANSITION") {
+      expect(error.from).toBe(ORDER_STATUS.ENVIADO);
+      expect(error.event).toBe(ORDER_EVENT.SISTEMA_AUTO_CIERRA);
+    }
+  });
 });
 
 // ====================================================================
@@ -411,6 +448,28 @@ describe("transition — unauthorized actors", () => {
       }),
     );
     expect(error.kind).toBe("UNAUTHORIZED_ACTOR");
+  });
+
+  it("SISTEMA_AUTO_CIERRA por CLIENTE → UNAUTHORIZED_ACTOR (solo sistema puede auto-cerrar)", () => {
+    const orderAceptado: Order = {
+      ...baseOrderEnviado,
+      status: ORDER_STATUS.ACEPTADO,
+      receivedAt: LATER_DATE,
+      acceptedAt: LATER_DATE,
+    };
+    const error = assertErr(
+      transition({
+        order: orderAceptado,
+        event: makeEvent(ORDER_EVENT.SISTEMA_AUTO_CIERRA),
+        actor: ORDER_ACTOR.CLIENTE,
+      }),
+    );
+    expect(error.kind).toBe("UNAUTHORIZED_ACTOR");
+    if (error.kind === "UNAUTHORIZED_ACTOR") {
+      expect(error.actor).toBe(ORDER_ACTOR.CLIENTE);
+      expect(error.event).toBe(ORDER_EVENT.SISTEMA_AUTO_CIERRA);
+      expect(error.required).toContain(ORDER_ACTOR.SISTEMA);
+    }
   });
 });
 
