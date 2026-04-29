@@ -25,13 +25,13 @@
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
 | B5 | Storage (buckets + RLS + upload helpers) | 4 | 3/4 | 🟡 |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
-| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 5 | 3/5 | 🟡 |
+| B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 3/4 | 🟡 |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
-| B9 | Swap cliente (features Cliente consumen backend real) | 8 | 0/8 | ⚪ |
-| B10 | Swap tienda (features Tienda consumen backend real) | 8 | 0/8 | ⚪ |
-| B11 | Swap admin (features Admin consumen backend real) | 7 | 0/7 | ⚪ |
-| B12 | Observability backend | 4 | 1/4 | 🟡 |
-| B13 | Hardening (rate limiting real, seed data, runbooks) | 5 | 0/5 | ⚪ |
+| B9 | Swap cliente (features Cliente consumen backend real) | 3 | 0/3 | ⚪ |
+| B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
+| B11 | Swap admin (features Admin consumen backend real) | 3 | 0/3 | ⚪ |
+| B12 | Observability backend | 3 | 2/3 | 🟡 |
+| B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 0/2 | ⚪ |
 | B14 | Deploy producción | 4 | 0/4 | ⚪ |
 
 ## Tareas pendientes (🟢 ready / ⚪ pending / 🔴 blocked)
@@ -40,45 +40,25 @@
 |---|---|---|---|---|---|---|
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
-| B7.4 | Runbook: cómo desactivar / reactivar / auditar un cron | ⚪ | B7.3 | S | — | — |
-| B7.5 | Tests de integración concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
+| B7-A | Cron: runbook + tests concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B8.4 | Test E2E del loop completo | ⚪ | B8.3 | L | — | `testing.md`. |
-| B9.1 | Swap auth en features/auth + landing | ⚪ | B4.4 | M | — | `features.md`. |
-| B9.2 | Swap stores nearby + feed del mapa | ⚪ | B3.1, B6.3 | L | `data-n-plus-one`, `query-index-types` | `features.md`. |
-| B9.3 | Swap store detail + products | ⚪ | B3.1, B5.2 | M | — | `features.md`. |
-| B9.4 | Swap cart + submit order (con snapshot + transacción corta) | ⚪ | B3.1 | L | `lock-short-transactions`, `data-batch-inserts` | `features.md`. |
-| B9.5 | Swap order tracking + realtime subscription | ⚪ | B6.3 | M | — | `features.md`. |
-| B9.6 | Swap order history | ⚪ | B3.1 | M | `data-pagination` | — |
-| B9.7 | Swap cancel flow | ⚪ | B9.4 | S | — | — |
-| B9.8 | Swap push subscribe del cliente + profile | ⚪ | B8.1 | M | — | `features.md`. |
-| B10.1 | Swap auth + onboarding tienda | ⚪ | B4.4, B5.4 | L | — | `features.md`. |
-| B10.2 | Swap availability toggle + location publishing | ⚪ | B3.1 | L | `data-batch-inserts` (si se buffering) | `features.md`. |
-| B10.3 | Swap catálogo CRUD + image upload | ⚪ | B3.1, B5.3 | L | — | `features.md`. |
-| B10.4 | Swap incoming orders inbox + realtime | ⚪ | B6.3 | M | — | `features.md`. |
-| B10.5 | Swap accept/reject/finalize state transitions | ⚪ | B9.4 | L | `lock-short-transactions` | — |
-| B10.6 | Swap store profile + logo upload | ⚪ | B5.2 | M | — | `features.md`. |
-| B10.7 | Swap analytics básico de tienda | ⚪ | B3.1 | M | `query-composite-indexes` | `features.md`. |
-| B10.8 | Swap push subscribe de tienda | ⚪ | B8.1 | S | — | `features.md`. |
-| B11.1 | Swap dashboard KPIs | ⚪ | B3.1 | M | `query-composite-indexes`, `data-pagination` | `features.md`. |
-| B11.2 | Swap store validation queue | ⚪ | B5.4 | M | — | `features.md`. |
-| B11.3 | Swap content moderation | ⚪ | B3.1 | M | — | `features.md`. |
-| B11.4 | Swap audit log reader | ⚪ | B3.1 | M | `data-pagination` | `features.md`. |
-| B11.5 | Swap user management | ⚪ | B3.1 | M | — | `features.md`. |
-| B11.6 | Ensure audit_log append-only enforcement (trigger) | ⚪ | B1.2 | S | — | `domain.md`. |
-| B11.7 | Swap audit_log writer en Server Actions críticas | ⚪ | B11.6, B9.4, B10.5 | M | — | `domain.md`. |
-| B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ✅ | B1.1 | M | `monitor-pg-stat-statements` | `features.md`. |
-| B12.2 | Slow query alerts → Sentry | ⚪ | B12.1, B7.1 | M | `monitor-pg-stat-statements` | — |
-| B12.3 | Structured server-side logging con request IDs | ⚪ | — | M | — | `data.md` (sección Logger). |
-| B12.4 | Supabase logs → Sentry breadcrumbs | ✅ | — | S | — | — |
-| B13.1 | Rate limiting in-DB (leaky bucket con tabla + RLS) | ⚪ | B3.1 | L | `lock-short-transactions`, `lock-advisory` | `data.md`. |
-| B13.2 | Seed data fixtures para dev | ⚪ | B1.2, B4.1 | M | — | `testing.md` (sección Seed data). |
-| B13.3 | Runbook: rollback de migración | ⚪ | B0.3 | S | — | — |
-| B13.4 | Runbook: incident response | ⚪ | B12.3 | S | — | — |
-| B13.5 | Security smoke tests en CI | ⚪ | B13.1, B2.3 | L | — | `testing.md`. |
+| B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ⚪ | B4.4, B3.1, B6.3, B5.2 | XL | `data-n-plus-one`, `query-index-types` | `features.md`. |
+| B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
+| B9-C | Cliente: push subscribe + profile | ⚪ | B8.1, B9-A | M | — | `features.md`. |
+| B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ⚪ | B4.4, B5.4, B5.2 | XL | — | `features.md`. |
+| B10-B | Tienda: operación (availability + location + catálogo CRUD) | ⚪ | B3.1, B5.3, B10-A | XL | `data-batch-inserts` | `features.md`. |
+| B10-C | Tienda: manejo de pedidos (inbox realtime + accept/reject/finalize) | ⚪ | B6.3, B9-B | L | `lock-short-transactions` | `features.md`. |
+| B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
+| B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ⚪ | B3.1, B5.4 | XL | `query-composite-indexes`, `data-pagination` | `features.md`. |
+| B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
+| B11-C | Admin: user management | ⚪ | B3.1 | M | — | `features.md`. |
+| B12-A | Observability: structured logging + slow query alerts | ⚪ | B12.1, B7.1 | L | `monitor-pg-stat-statements` | `data.md` (Logger). |
+| B13-A | Hardening: rate limiting in-DB + security smoke tests | ⚪ | B3.1, B2.3 | XL | `lock-short-transactions`, `lock-advisory` | `data.md`, `testing.md`. |
+| B13-B | Hardening: seed data + runbooks (rollback + incident) | ⚪ | B1.2, B4.1, B0.3, B12-A | M | — | `testing.md` (Seed). |
 | B14.1 | Crear proyecto Supabase Cloud + inyectar secrets | ⚪ | — | M | `conn-pooling` | — |
 | B14.2 | Pipeline CI: preview DB por PR (Supabase branching opcional) → approval → prod | ⚪ | B14.1, B0.4 | L | — | — |
 | B14.3 | Release-please integration | ⚪ | — | S | — | — |
-| B14.4 | Go-live checklist + disaster recovery baseline | ⚪ | B14.2, B13.4 | M | — | — |
+| B14.4 | Go-live checklist + disaster recovery baseline | ⚪ | B14.2, B13-B | M | — | — |
 
 ## Tareas done (compactas)
 
@@ -118,6 +98,18 @@
 | B8.1 | VAPID keys + tabla + endpoint de subscribe | ✅ |
 | B8.2 | Domain event listener: OrderStatusChanged → webpush | ✅ |
 | B8.3 | Retry + dead subscription cleanup | ✅ |
+| B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ✅ |
+| B12.4 | Supabase logs → Sentry breadcrumbs | ✅ |
+
+## Re-shape vertical (2026-04-29)
+
+El epic se reorganizó de **horizontal por capa** a **vertical por feature**. 32 tareas pendientes de B7/B9/B10/B11/B12/B13 se fusionaron en 14 tareas que entregan slices completos (auth + landing + map juntos, en vez de uno por chat). Las tareas originales viven en [`tasks/_archived/`](./tasks/_archived/) — útil cuando una nueva tarea referencia un campo `Por qué`/`Entregable` original.
+
+Reglas del re-shape:
+- **No tocar tareas done o en curso** — preservación total.
+- **Cada tarea nueva entrega ~1500-2500 líneas con 1 review pass.** Si crece >2500, splittear (ver nota en `B9-B.md`).
+- **El campo `Tareas originales fusionadas:` al final de cada `Bx-Y.md`** lista qué IDs viejos absorbió.
+- B14 sin cambios (gates humanos secuenciales — fusionar reduce control).
 
 ## Cadenas (HISTÓRICO — auto-continuación eliminada)
 
