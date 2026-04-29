@@ -40,6 +40,7 @@ export default defineConfig({
     env: {
       NODE_ENV: "development",
       NEXT_PUBLIC_APP_URL: baseURL,
+      E2E_TEST_MODE: "1",
     },
   },
 });
