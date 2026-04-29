@@ -105,4 +105,24 @@ describe("GET /api/admin/slow-queries", () => {
     const json = await response.json();
     expect(json.data).toEqual([]);
   });
+
+  it("returns 500 when response data fails schema validation", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: "admin-uuid" } }, error: null });
+    mockRpc.mockResolvedValueOnce({ data: true, error: null }).mockResolvedValueOnce({
+      data: [
+        {
+          calls: "not-a-number",
+          total_exec_time_ms: 100,
+          mean_exec_time_ms: 10,
+          query_text: "select 1",
+        },
+      ],
+      error: null,
+    });
+    const { GET } = await import("./route");
+    const response = await GET(makeRequest());
+    expect(response.status).toBe(500);
+    const json = await response.json();
+    expect(json).toHaveProperty("error");
+  });
 });

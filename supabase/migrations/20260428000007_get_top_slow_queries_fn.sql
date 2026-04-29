@@ -33,3 +33,5 @@ begin
     limit p_limit;
 end;
 $$;
+
+grant execute on function public.get_top_slow_queries(int) to authenticated;

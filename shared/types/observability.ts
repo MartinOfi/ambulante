@@ -4,7 +4,7 @@ export const slowQuerySchema = z.object({
   calls: z.number().int().nonnegative(),
   totalExecTimeMs: z.number().nonnegative(),
   meanExecTimeMs: z.number().nonnegative(),
-  queryText: z.string(),
+  queryText: z.string().min(1),
 });
 
 export const slowQueryArraySchema = z.array(slowQuerySchema);

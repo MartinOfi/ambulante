@@ -1,3 +1,4 @@
+import { QUERY_TRUNCATE_LENGTH } from "@/features/admin-observability/constants/admin-observability.constants";
 import type { SlowQueriesPanelProps } from "./SlowQueriesPanel.types";
 
 function formatMs(ms: number): string {
@@ -7,8 +8,6 @@ function formatMs(ms: number): string {
 function truncate(text: string, maxLength: number): string {
   return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
 }
-
-const QUERY_TRUNCATE_LENGTH = 120;
 
 export function SlowQueriesPanel({ queries, isLoading, error }: SlowQueriesPanelProps) {
   if (isLoading) {
@@ -39,7 +38,7 @@ export function SlowQueriesPanel({ queries, isLoading, error }: SlowQueriesPanel
         </thead>
         <tbody>
           {queries.map((query, index) => (
-            <tr key={index} className="border-b last:border-0 hover:bg-muted/30">
+            <tr key={query.queryText} className="border-b last:border-0 hover:bg-muted/30">
               <td className="px-4 py-3 tabular-nums text-muted-foreground">{index + 1}</td>
               <td className="px-4 py-3 tabular-nums font-medium">
                 {formatMs(query.meanExecTimeMs)}

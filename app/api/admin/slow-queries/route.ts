@@ -4,9 +4,9 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
+import { SLOW_QUERIES_LIMIT } from "@/features/admin-observability/constants/admin-observability.constants";
 import { slowQueryArraySchema } from "@/shared/types/observability";
-
-const SLOW_QUERIES_LIMIT = 20;
+import { serverLogger } from "@/shared/utils/server-logger";
 
 export async function GET(_request: NextRequest): Promise<NextResponse> {
   const supabase = await createRouteHandlerClient();
@@ -23,6 +23,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
   const { data: isAdmin, error: adminError } = await supabase.rpc("is_admin");
 
   if (adminError) {
+    serverLogger.error("is_admin RPC failed", { error: adminError });
     return NextResponse.json({ error: "Error verificando permisos." }, { status: 500 });
   }
 
@@ -35,6 +36,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
   });
 
   if (rpcError) {
+    serverLogger.error("get_top_slow_queries RPC failed", { error: rpcError });
     return NextResponse.json({ error: "Error obteniendo queries lentas." }, { status: 500 });
   }
 
@@ -55,6 +57,9 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
   const parsed = slowQueryArraySchema.safeParse(mapped);
 
   if (!parsed.success) {
+    serverLogger.error("slow queries response failed schema validation", {
+      issues: parsed.error.issues,
+    });
     return NextResponse.json({ error: "Respuesta del servidor inválida." }, { status: 500 });
   }
 
