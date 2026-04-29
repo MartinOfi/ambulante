@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { timingSafeEqual } from "crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -56,7 +57,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
 
-  if (request.headers.get("Authorization") !== `Bearer ${secret}`) {
+  const incoming = request.headers.get("Authorization") ?? "";
+  const expected = `Bearer ${secret}`;
+  const incomingBuf = Buffer.from(incoming);
+  const expectedBuf = Buffer.from(expected);
+  const authorized =
+    incomingBuf.byteLength === expectedBuf.byteLength && timingSafeEqual(incomingBuf, expectedBuf);
+  if (!authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -78,8 +85,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   for (const event of events) {
     if (WARN_AND_ABOVE.has(event.level)) {
-      dispatchToSentry(event);
-      dispatched += 1;
+      try {
+        dispatchToSentry(event);
+        dispatched += 1;
+      } catch (err) {
+        logger.error("supabase-logs webhook: failed to dispatch to Sentry", { err, event });
+      }
     }
   }
 
