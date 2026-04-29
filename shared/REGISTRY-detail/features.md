@@ -287,6 +287,7 @@
 | `useSlowQueriesQuery` | `features/admin-observability/hooks/useSlowQueriesQuery.ts` | hook | React Query: GET `/api/admin/slow-queries`; staleTime 60s |
 | `SLOW_QUERIES_LIMIT` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | Número máximo de queries a mostrar (20) |
 | `SLOW_QUERIES_STALE_TIME_MS` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | staleTime de la query (60 000 ms) |
+| `QUERY_TRUNCATE_LENGTH` | `features/admin-observability/constants/admin-observability.constants.ts` | constant | Longitud máxima de texto de query a mostrar (120 chars) |
 
 #### admin-observability feature completa (B12.1)
 - **Ruta app:** pendiente (conectar desde `app/(admin)/admin/...`)
