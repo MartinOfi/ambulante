@@ -8,7 +8,7 @@ import { logger } from "@/shared/utils/logger";
 
 import type { PushNotificationPayload, ServerPushSender } from "./push.types";
 import type { PushService, PushPermissionStatus, PushSubscriptionData } from "./push.types";
-import type { PushSubscriptionRepository } from "@/shared/repositories/push-subscriptions";
+import type { PushSubscription, PushSubscriptionRepository } from "@/shared/repositories";
 
 // ── Browser-facing PushService stub (implemented in B6) ───────────────────────
 
@@ -30,13 +30,83 @@ export const supabasePushService: PushService = {
   },
 };
 
-// ── Server-side push sender (B8.2) ────────────────────────────────────────────
+// ── Retry + dead subscription cleanup (B8.3) ──────────────────────────────────
+
+const MAX_PUSH_RETRY_ATTEMPTS = 3;
+const PUSH_BASE_BACKOFF_MS = 1_000;
+const DEAD_SUBSCRIPTION_HTTP_CODES = new Set([404, 410]);
+
+interface WebPushError extends Error {
+  readonly statusCode: number;
+}
+
+function isWebPushError(err: unknown): err is WebPushError {
+  if (!(err instanceof Error) || !("statusCode" in err)) return false;
+  return typeof (err as { statusCode: unknown }).statusCode === "number";
+}
+
+function defaultDelay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+interface SendWithRetryOptions {
+  readonly subscription: PushSubscription;
+  readonly serializedPayload: string;
+  readonly pushRepo: PushSubscriptionRepository;
+  readonly delayFn: (ms: number) => Promise<void>;
+}
+
+async function sendWithRetry({
+  subscription,
+  serializedPayload,
+  pushRepo,
+  delayFn,
+}: SendWithRetryOptions): Promise<void> {
+  const pushSub = {
+    endpoint: subscription.endpoint,
+    keys: { p256dh: subscription.p256dh, auth: subscription.authKey },
+  };
+
+  for (let attempt = 1; attempt <= MAX_PUSH_RETRY_ATTEMPTS; attempt++) {
+    try {
+      await webpush.sendNotification(pushSub, serializedPayload);
+      return;
+    } catch (err) {
+      if (isWebPushError(err) && DEAD_SUBSCRIPTION_HTTP_CODES.has(err.statusCode)) {
+        await pushRepo.delete(subscription.id);
+        logger.warn("Dead push subscription removed", {
+          subscriptionId: subscription.id,
+          statusCode: err.statusCode,
+        });
+        return;
+      }
+
+      if (attempt < MAX_PUSH_RETRY_ATTEMPTS) {
+        await delayFn(PUSH_BASE_BACKOFF_MS * 2 ** (attempt - 1));
+      } else {
+        logger.error("Push notification failed after max retries", {
+          subscriptionId: subscription.id,
+          userId: subscription.userId,
+          reason: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+  }
+}
+
+// ── Server-side push sender (B8.2 + B8.3) ────────────────────────────────────
 
 interface ServerPushSenderDeps {
   readonly pushRepo: PushSubscriptionRepository;
+  readonly delayFn?: (ms: number) => Promise<void>;
 }
 
-export function createServerPushSender({ pushRepo }: ServerPushSenderDeps): ServerPushSender {
+export function createServerPushSender({
+  pushRepo,
+  delayFn = defaultDelay,
+}: ServerPushSenderDeps): ServerPushSender {
   const subject = process.env.VAPID_SUBJECT;
   const publicKey = process.env.VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
@@ -54,23 +124,13 @@ export function createServerPushSender({ pushRepo }: ServerPushSenderDeps): Serv
 
     if (subscriptions.length === 0) return;
 
-    const results = await Promise.allSettled(
+    const serializedPayload = JSON.stringify(payload);
+
+    await Promise.allSettled(
       subscriptions.map((sub) =>
-        webpush.sendNotification(
-          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.authKey } },
-          JSON.stringify(payload),
-        ),
+        sendWithRetry({ subscription: sub, serializedPayload, pushRepo, delayFn }),
       ),
     );
-
-    for (const result of results) {
-      if (result.status === "rejected") {
-        logger.error("Failed to deliver push notification", {
-          userId,
-          reason: result.reason,
-        });
-      }
-    }
   }
 
   return { sendToUser };
