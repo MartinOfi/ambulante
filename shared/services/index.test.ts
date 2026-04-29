@@ -114,17 +114,16 @@ describe("services/index factory", () => {
       await expect(pushService.subscribe()).rejects.toThrow("TODO");
     });
 
-    it("storageService.upload throws a TODO error", async () => {
+    it("storageService.upload returns StorageResult (does not throw)", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
       const { storageService } = await import("./index");
-      await expect(
-        storageService.upload({
-          bucket: STORAGE_BUCKETS.STORE_LOGOS,
-          path: "test.jpg",
-          file: new Blob(),
-        }),
-      ).rejects.toThrow("TODO");
+      const result = await storageService.upload({
+        bucket: STORAGE_BUCKETS.STORE_LOGOS,
+        path: "test.jpg",
+        file: new Blob(),
+      });
+      expect(result).toHaveProperty("success");
     });
 
     it("throws at module load when URL is set but ANON_KEY is missing", async () => {
