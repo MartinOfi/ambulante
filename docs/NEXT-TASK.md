@@ -67,6 +67,8 @@
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
 | [NT-37](#nt-37--tests-fallan-en-local-sin-env-vars-de-supabase-módulos-repositoriesindexts) | Tests fallan en local sin env vars de Supabase | testing / DevEx | S | próximo onboarding de dev nuevo |
+| [NT-38](#nt-38--authsupabasetouser-devuelve-authuid-en-vez-de-publicusersmpublic_id) | `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id` | backend / arquitectura | S | antes de B10-B (location publishing real) |
+| [NT-39](#nt-39--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
 
 ---
 
@@ -592,6 +594,34 @@
 
 ---
 
+### NT-38 — `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id`
+
+- **Categoría:** backend / arquitectura
+- **Contexto:** `shared/services/auth.supabase.ts:37-46` mapea el user de Supabase a nuestro tipo `User` con `id: sbUser.id`, pero `sbUser.id` es el `auth.users.id` (UUID emitido por Supabase Auth), mientras que **todos los repositories** consultan por `public.users.public_id` (otro UUID, generado vía `gen_random_uuid()` en el trigger `handle_new_auth_user`). Son IDs **distintos** linkeados por el FK `public.users.auth_user_id`. Hoy el bug está enmascarado porque `useLocationPublishing`, `useStoreProfileQuery` y demás hooks aún corren contra mocks (los mocks usan el mismo UUID en ambos lados via `SEED_USER_IDS`). Cuando los hooks se conecten a Supabase real, queries como `storeRepository.findByOwnerId(session.user.id)` no van a matchear nunca. El Server Action de B10-A.2a (descubridor) ya lo resuelve internamente con un lookup adicional a `public.users where auth_user_id = ?`, pero ese workaround no escala — hay que arreglarlo en la capa de auth.
+- **Aceptación:** `authService.getSession()` y `getUser()` devuelven `User.id === public.users.public_id` (no `auth.uid()`). Tests unitarios prueban: signin → session.user.id === public_id consultando la DB. `useLocationPublishing.test.ts` y similares siguen verde. Hooks reales matchean rows en la DB.
+- **Archivos afectados:** `shared/services/auth.supabase.ts` (toUser, toSession), posiblemente `shared/utils/auth-helpers.ts` (extractRole), tests unitarios de auth.supabase.test.ts. Considerar añadir cache de la lookup auth→public_id por sesión para no pegar contra `users` en cada `getSession()`.
+- **Estimación:** S
+- **Cuándo retomarlo:** **antes de B10-B** (la fase de location publishing real depende de que `findByOwnerId` matchee). Idealmente como su propio PR pequeño post-merge de B10-A.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por B10-A.2a. Hoy el code path mock en `shared/services/auth.ts` (mock de auth) no tiene el bug porque sus seeds usan `SEED_USER_IDS.store` directo como `user.id`. Sólo pega cuando se sale del mock.
+
+---
+
+### NT-39 — Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales
+
+- **Categoría:** backend / types
+- **Contexto:** `shared/schemas/store.ts` define `photoUrl: z.string().url()` y `tagline: z.string()` y `priceFromArs: z.number().min(0)` como **requeridos**, pero la DB los acepta como NULL (`alter table public.stores add column ... text` sin NOT NULL en `20260428000008_store_profile_extras.sql`) y el mapper `mapStoreRow` ya tiene fallbacks: `photo_url ?? PLACEHOLDER_PHOTO_URL`, `tagline ?? ""`, `price_from_ars ?? 0`. La rigidez del schema obliga al onboarding a inventar valores placeholder antes del INSERT (B10-A.2a usa `"https://ambulante.app/placeholder-store.png"`, `tagline=businessName`, `priceFromArs=0`), y al perfil (B10-A.3) a mostrarlos al usuario hasta que los reemplace. Modela mal la realidad: una tienda recién registrada **conceptualmente** no tiene logo / tagline / precio mínimo todavía.
+- **Aceptación:** `storeSchema` declara `photoUrl: z.string().url().optional()`, `tagline: z.string().optional()`, `priceFromArs: z.number().min(0).optional()`. `CreateStoreInput` los hace opcionales. `SupabaseStoreRepository.create` los inserta como NULL si vienen undefined. Mapper `mapStoreRow` mantiene los fallbacks por compat. Componentes consumidores (`StoreCard`, `StoreMarker`, etc.) tratan undefined como "sin foto/tagline/precio" en la UI (probablemente ya lo hacen vía los fallbacks del mapper). Tests de schema, repo y componentes verdes.
+- **Archivos afectados:** `shared/schemas/store.ts`, `shared/repositories/store.ts` (CreateStoreInput / UpdateStoreInput), `shared/repositories/supabase/stores.supabase.ts` (create — manejar undefined), `shared/repositories/supabase/mappers.ts` (verificar fallbacks). Posibles ajustes en `features/store-profile/`, `features/map/`, `features/store-shell/`.
+- **Estimación:** M
+- **Cuándo retomarlo:** **junto con B10-A.3** (profile editor real). Cuando el editor exista, los placeholders pueden reemplazarse y el schema relajado representa el ciclo de vida correcto. Antes no urge porque los fallbacks del mapper enmascaran.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por B10-A.2a. Workaround actual: `submit-store-onboarding.ts` define `PENDING_STORE_PLACEHOLDER` con valores que pasan Zod. Después del fix, el placeholder se elimina y el INSERT pasa los campos como undefined.
+
+---
+
 ## Cómo se alimenta este doc durante la ejecución del epic
 
 Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
@@ -609,3 +639,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 |---|---|
 | 2026-04-21 | Reescritura completa con formato estructurado. Poblado inicial: NT-01 a NT-25 (3 originales + 22 nuevos del brainstorming + decisiones post-MVP del PRD). |
 | 2026-04-29 | NT-32 agregado — vitest 9 fails preexistentes detectados durante cierre de B14.3. |
+| 2026-04-29 | NT-38 + NT-39 agregados — bug `auth.uid` vs `public_id` y rigidez de `Store` schema, ambos descubiertos durante cierre parcial de B10-A (commits hasta `2a482a97`). |
