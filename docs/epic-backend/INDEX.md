@@ -21,13 +21,13 @@
 | B0 | Setup de Supabase local + CLI + entorno | 4 | 4/4 | ✅ |
 | B1 | Schema core + extensiones + índices + monitoring foundations | 5 | 5/5 | ✅ |
 | B2 | RLS policies + pgTAP tests + performance RLS | 5 | 5/5 | ✅ |
-| B3 | Boundaries de portabilidad (Repository + Facades + lint rule) | 4 | 3/4 | 🟡 |
+| B3 | Boundaries de portabilidad (Repository + Facades + lint rule) | 4 | 4/4 | ✅ |
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
 | B5 | Storage (buckets + RLS + upload helpers) | 4 | 4/4 | ✅ |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
 | B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 4/4 | ✅ |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 4/4 | ✅ |
-| B9 | Swap cliente (features Cliente consumen backend real) | 3 | 0/3 | ⚪ |
+| B9 | Swap cliente (features Cliente consumen backend real) | 3 | 1/3 | 🟡 |
 | B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
 | B11 | Swap admin (features Admin consumen backend real) | 3 | 1/3 | 🟡 |
 | B12 | Observability backend | 3 | 3/3 | ✅ |
@@ -38,8 +38,6 @@
 
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
-| B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
-| B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ⚪ | B4.4, B3.1, B6.3, B5.2 | XL | `data-n-plus-one`, `query-index-types` | `features.md`. |
 | B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
 | B9-C | Cliente: push subscribe + profile | ⚪ | B8.1, B9-A | M | — | `features.md`. |
 | B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ⚪ | B4.4, B5.4, B5.2 | XL | — | `features.md`. |
@@ -100,6 +98,8 @@
 | B13-A | Hardening: rate limiting in-DB + security smoke tests | ✅ |
 | B14.1 | Crear proyecto Supabase Cloud + inyectar secrets | ✅ |
 | B14.3 | Release-please integration | ✅ |
+| B3.4 | CI check: no hay imports rotos | ✅ |
+| B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ✅ |
 
 ## Re-shape vertical (2026-04-29)
 
