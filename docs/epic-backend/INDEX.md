@@ -32,7 +32,7 @@
 | B11 | Swap admin (features Admin consumen backend real) | 3 | 0/3 | ⚪ |
 | B12 | Observability backend | 3 | 2/3 | 🟡 |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 0/2 | ⚪ |
-| B14 | Deploy producción | 4 | 0/4 | ⚪ |
+| B14 | Deploy producción | 4 | 1/4 | 🟡 |
 
 ## Tareas pendientes (🟢 ready / ⚪ pending / 🔴 blocked)
 
@@ -57,7 +57,6 @@
 | B13-B | Hardening: seed data + runbooks (rollback + incident) | ⚪ | B1.2, B4.1, B0.3, B12-A | M | — | `testing.md` (Seed). |
 | B14.1 | Crear proyecto Supabase Cloud + inyectar secrets | ⚪ | — | M | `conn-pooling` | — |
 | B14.2 | Pipeline CI: preview DB por PR (Supabase branching opcional) → approval → prod | ⚪ | B14.1, B0.4 | L | — | — |
-| B14.3 | Release-please integration | ⚪ | — | S | — | — |
 | B14.4 | Go-live checklist + disaster recovery baseline | ⚪ | B14.2, B13-B | M | — | — |
 
 ## Tareas done (compactas)
@@ -100,6 +99,7 @@
 | B8.3 | Retry + dead subscription cleanup | ✅ |
 | B12.1 | Admin panel: top slow queries (pg_stat_statements reader) | ✅ |
 | B12.4 | Supabase logs → Sentry breadcrumbs | ✅ |
+| B14.3 | Release-please integration | ✅ |
 
 ## Re-shape vertical (2026-04-29)
 

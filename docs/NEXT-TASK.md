@@ -59,6 +59,7 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
+| [NT-30](#nt-30--vitest-9-tests-fallan-en-13-archivos-pre-existente) | Vitest: 9 tests fallan en 13 archivos (pre-existente) | testing / DX | M | antes de que el rojo se normalice y la suite pierda valor como gate |
 
 ---
 
@@ -458,6 +459,21 @@
 - **Ticket:** —
 - **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
 
+### NT-30 — Vitest: 9 tests fallan en 13 archivos (pre-existente)
+
+- **Categoría:** testing / DX
+- **Contexto:** Detectado durante el cierre de B14.3 (2026-04-29). Al correr `pnpm vitest run` en el worktree de B14.3, vitest reporta `Test Files 13 failed | 179 passed (192)` y `Tests 9 failed | 1629 passed (1638)`. El diff de B14.3 toca solo `release-please-config.json`, `commitlint.config.cjs` y un markdown — vitest no carga ninguno de los tres, por lo que las fallas son **preexistentes en main** (no introducidas por B14.3). Probable origen: alguno de los merges recientes (`feat(b5.3)`, `feat(b7.3)`, `feat(b12.1)`) dejó tests rotos sin gate de CI que los rebote, o cambió un fixture compartido que rompe múltiples archivos.
+- **Aceptación:**
+  - `pnpm vitest run` retorna exit 0 con 0 tests fallados.
+  - Si alguna de las 9 fallas corresponde a un test obsoleto (covering código removido), borrar el test con commit explícito; no parchearlo.
+  - CI bloquea PRs con tests rojos (verificar que el workflow `ci.yml` corre vitest y falla en rojo — si no, agregarlo como sub-tarea).
+- **Archivos afectados:** desconocido — primer paso es correr `pnpm vitest run --reporter=default 2>&1 | tee /tmp/vitest.log` desde main y triagear el listado.
+- **Estimación:** M (depende de si es 1 root cause común o 9 bugs separados — triage primero, fix después).
+- **Cuándo retomarlo:** **Antes** de que se normalice el rojo y la suite pierda valor como gate de regresión. Idealmente la próxima sesión que abra worktree limpio sobre main.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** Descubierto por B14.3 — el cierre de B14.3 mergeó sobre rojo preexistente sabiendo que el diff es config-only y no podía haberlo causado. Anotado acá para que no se naturalice.
+
 ---
 
 ## Cómo se alimenta este doc durante la ejecución del epic
@@ -476,3 +492,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | Fecha | Cambio |
 |---|---|
 | 2026-04-21 | Reescritura completa con formato estructurado. Poblado inicial: NT-01 a NT-25 (3 originales + 22 nuevos del brainstorming + decisiones post-MVP del PRD). |
+| 2026-04-29 | NT-30 agregado — vitest 9 fails preexistentes detectados durante cierre de B14.3. |
