@@ -8,7 +8,7 @@ import {
   subscribeUser,
 } from "@/shared/services/push.test-capture";
 
-import { registerE2EPushListener } from "./wiring.e2e";
+import { registerE2EPushListener, resetE2EWiring } from "./wiring.e2e";
 
 const CLIENT_ID = "demo-client-1";
 const STORE_ID = "store-demo-1";
@@ -37,6 +37,7 @@ beforeEach(() => {
 
 afterEach(() => {
   unregister();
+  resetE2EWiring();
   clearCaptureStore();
 });
 

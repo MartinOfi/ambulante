@@ -16,9 +16,13 @@ const HTTP_BAD_REQUEST = 400;
 const HTTP_OK = 200;
 const HTTP_NO_CONTENT = 204;
 
+const MAX_USER_ID_LENGTH = 128;
+
+const userIdSchema = z.string().min(1).max(MAX_USER_ID_LENGTH);
+
 const subscribeBodySchema = z.object({
   action: z.enum(["subscribe", "unsubscribe"]),
-  userId: z.string().min(1),
+  userId: userIdSchema,
 });
 
 function notFoundIfDisabled(): NextResponse | null {
@@ -33,12 +37,12 @@ export async function GET(request: Request): Promise<NextResponse> {
   if (disabled !== null) return disabled;
 
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-  if (userId === null || userId.length === 0) {
+  const parsed = userIdSchema.safeParse(searchParams.get("userId"));
+  if (!parsed.success) {
     return NextResponse.json({ error: "userId is required" }, { status: HTTP_BAD_REQUEST });
   }
 
-  return NextResponse.json({ captures: listCapturedPushes(userId) }, { status: HTTP_OK });
+  return NextResponse.json({ captures: listCapturedPushes(parsed.data) }, { status: HTTP_OK });
 }
 
 export async function POST(request: Request): Promise<NextResponse> {

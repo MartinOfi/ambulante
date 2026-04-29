@@ -7,5 +7,7 @@ export async function register() {
       const { registerE2EPushListener } = await import("./shared/domain/events/wiring.e2e");
       registerE2EPushListener();
     }
+    // Production wiring (registerDomainEventListeners) is not invoked yet — pending
+    // Supabase env in dev/prod (B9-C/B10-D). Add the else branch when those land.
   }
 }

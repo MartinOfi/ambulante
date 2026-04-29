@@ -12,10 +12,14 @@ export interface CapturedPush {
 }
 
 interface CaptureStore {
-  readonly subscribed: Set<string>;
-  captures: ReadonlyArray<CapturedPush>;
+  readonly subscribed: Set<string>; // reference fixed; content mutated via .add()/.delete()/.clear()
+  captures: ReadonlyArray<CapturedPush>; // reference replaced on each append/clear (immutable)
 }
 
+// Module-level singleton — shared across all test workers running in the same Next.js
+// dev-server process. Safe only while specs using __e2e routes run serially.
+// Playwright's `workers: 1` in CI enforces this; locally `fullyParallel` is OK only
+// while push-delivery.spec.ts is the only consumer and has no concurrent tests.
 const store: CaptureStore = {
   subscribed: new Set<string>(),
   captures: [],

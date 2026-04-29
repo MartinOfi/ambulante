@@ -59,6 +59,7 @@ const serverOnlyEnvSchema = z.object({
       { message: "debe ser un email (mailto:user@domain.com) o URL https://" },
     )
     .optional(),
+  E2E_TEST_MODE: z.literal("1").optional(),
 });
 
 const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((data, ctx) => {
@@ -67,6 +68,14 @@ const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((
       code: z.ZodIssueCode.custom,
       message: "NEXT_PUBLIC_APP_URL debe ser https:// en producción",
       path: ["NEXT_PUBLIC_APP_URL"],
+    });
+  }
+
+  if (data.NODE_ENV === "production" && data.E2E_TEST_MODE === "1") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "E2E_TEST_MODE no puede estar activo en producción",
+      path: ["E2E_TEST_MODE"],
     });
   }
 
