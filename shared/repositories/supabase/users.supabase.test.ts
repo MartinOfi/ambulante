@@ -29,10 +29,7 @@ describe("SupabaseUserRepository", () => {
         makeDbRow(),
         makeDbRow({ public_id: "u2", role: "tienda", email: "t@test.com" }),
       ];
-      // findAll resolves from the query chain (no terminal single/maybeSingle)
-      queryMock.eq.mockResolvedValue({ data: rows, error: null });
-      // When no filters, it calls select directly
-      vi.spyOn(queryMock, "select").mockResolvedValue({ data: rows, error: null });
+      queryMock.limit.mockResolvedValue({ data: rows, error: null });
 
       const users = await repo.findAll();
       expect(users).toHaveLength(2);
@@ -42,19 +39,25 @@ describe("SupabaseUserRepository", () => {
 
     it("applies role filter", async () => {
       const rows = [makeDbRow()];
-      queryMock.eq.mockResolvedValue({ data: rows, error: null });
+      queryMock.limit.mockResolvedValue({ data: rows, error: null });
       await repo.findAll({ role: "client" });
       expect(queryMock.eq).toHaveBeenCalledWith("role", "cliente");
     });
 
     it("applies suspended filter", async () => {
-      queryMock.eq.mockResolvedValue({ data: [], error: null });
+      queryMock.limit.mockResolvedValue({ data: [], error: null });
       await repo.findAll({ suspended: true });
       expect(queryMock.eq).toHaveBeenCalledWith("suspended", true);
     });
 
+    it("applies a defensive row cap", async () => {
+      queryMock.limit.mockResolvedValue({ data: [], error: null });
+      await repo.findAll();
+      expect(queryMock.limit).toHaveBeenCalledWith(500);
+    });
+
     it("throws on Supabase error", async () => {
-      vi.spyOn(queryMock, "select").mockResolvedValue({
+      queryMock.limit.mockResolvedValue({
         data: null,
         error: { message: "DB error" },
       });

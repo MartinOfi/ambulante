@@ -63,6 +63,8 @@
 | [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
 | [NT-32](#nt-32--vitest-9-tests-fallan-en-13-archivos-pre-existente) | Vitest: 9 tests fallan en 13 archivos (pre-existente) | testing / DX | M | antes de que el rojo se normalice y la suite pierda valor como gate |
 | [NT-33](#nt-33--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
+| [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
+| [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 
 ---
 
@@ -533,6 +535,34 @@
 - **Dependencias:** —
 - **Ticket:** —
 - **Notas:** descubierto por B8.4. Los unit tests de la infra de captura (`push.test-capture.test.ts`, `wiring.e2e.test.ts`, `__e2e/*/route.test.ts`) cubren la lógica al margen de este blocker — el spec E2E fue verificado por typecheck + lint + 22 unit tests, no por ejecución contra dev server.
+
+---
+
+### NT-34 — Paginación real en listado admin de usuarios
+
+- **Categoría:** backend / perf
+- **Contexto:** `SupabaseUserRepository.findAll` aplica un cap defensivo de 500 filas (`MAX_USERS_PER_QUERY`) introducido en B11-C para evitar scans no acotados en prod, pero la UI admin (`features/user-management/`) no pagina — si la base supera ese tope, el admin solo ve los primeros 500 ordenados arbitrariamente. Hay que agregar paginación real (cursor o offset/limit) tanto en repo como en hook+UI.
+- **Aceptación:** `UserFilters` admite `limit` + `offset` (o `cursor`). `useUsersQuery` propaga la página y agrega `page` al query key. UI muestra controles de paginación o virtualización. El cap de 500 sigue como guardrail por `query.range()` por defecto.
+- **Archivos afectados:** `shared/repositories/user.ts`, `shared/repositories/supabase/users.supabase.ts`, `shared/repositories/mock/user.mock.ts`, `features/user-management/hooks/useUsersQuery.ts`, `features/user-management/components/UserManagementPage/**`.
+- **Estimación:** M
+- **Cuándo retomarlo:** cuando la base real de `users` supere ~500 filas o cuando el admin reporte que no encuentra a alguien por scrolling.
+- **Dependencias:** B11-C ✅.
+- **Ticket:** —
+- **Notas:** descubierto por B11-C (HIGH #3 del code review). El cap inline en el repo es la mitigación temporal; un `LIMIT 500` ciego no es solución a largo plazo.
+
+---
+
+### NT-35 — Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin
+
+- **Categoría:** a11y / UX
+- **Contexto:** `SuspendConfirmDialog` (y por extensión todos los modales custom del admin que comparten patrón) usan `role="dialog"` + `aria-modal="true"` pero no atrapan el foco dentro del modal mientras está abierto, ni cierran con `Escape`. El backdrop click cancela, pero usuarios solo-teclado no pueden dismiss y los screen readers anuncian el contenido fuera del modal pese al `aria-modal`. La solución limpia es migrar el patrón de modal admin a `@radix-ui/react-dialog` (ya disponible vía shadcn).
+- **Aceptación:** todos los `*ConfirmDialog` del admin usan `<Dialog>` de shadcn (Radix). Soportan focus trap, Escape para cancelar, scroll lock, y ARIA correcta automáticamente. Tests verifican focus inicial, navegación con Tab y dismiss con Escape.
+- **Archivos afectados:** `features/user-management/components/SuspendConfirmDialog/**`, otros `*ConfirmDialog` en `features/store-validation/`, `features/content-moderation/`.
+- **Estimación:** M
+- **Cuándo retomarlo:** auditoría de a11y, integración con WCAG 2.1 AA, o feedback de usuarios con teclado/screen readers.
+- **Dependencias:** B11-C ✅.
+- **Ticket:** —
+- **Notas:** descubierto por B11-C (MEDIUM #7 del code review). Patrón compartido entre features → vale la pena hacerlo de un solo PR cross-feature en vez de uno por modal.
 
 ---
 

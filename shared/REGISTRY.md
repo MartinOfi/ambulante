@@ -226,14 +226,23 @@
 | createSupabaseBrowserClient / SupabaseClient | factory + type | `shared/repositories/supabase/client.ts` | data.md §11b |
 | mapUserRow / mapStoreRow / mapProductRow / mapOrderRow / mapPushSubscriptionRow | mapper | `shared/repositories/supabase/mappers.ts` | data.md §11b |
 | userSchema / sessionSchema | schema | `shared/schemas/user.ts` | domain.md §7b |
-| suspendUserSchema / reinstateUserSchema / SuspendUserInput / ReinstateUserInput | schema | `shared/schemas/user-management.ts` | domain.md §7b |
-| createUserManagementService / UserManagementService | service | `features/user-management/services/userManagement.service.ts` | data.md §4 |
+| suspendUserSchema / reactivateUserSchema / userDetailQuerySchema / SuspendUserInput / ReactivateUserInput / UserDetailQueryInput | schema | `shared/schemas/user-management.ts` | domain.md §7b |
+| SUSPENSION_STATUS / SuspensionStatus / getSuspensionStatus / assertCanSuspend / assertCanReactivate / isProtectedRole | domain | `shared/domain/user-suspension.ts` | domain.md §12 |
+| createUserManagementService / UserManagementService / UserDetail / ListUsersInput | service | `features/user-management/services/userManagement.service.ts` | data.md §4 |
+| getUserManagementService | factory | `features/user-management/services/userManagement.factory.ts` | data.md §4 |
 | useUsersQuery | hook | `features/user-management/hooks/useUsersQuery.ts` | data.md §3 |
+| useUserDetailQuery | hook | `features/user-management/hooks/useUserDetailQuery.ts` | data.md §3 |
 | useSuspendUserMutation | hook | `features/user-management/hooks/useSuspendUserMutation.ts` | data.md §3 |
-| useReinstateUserMutation | hook | `features/user-management/hooks/useReinstateUserMutation.ts` | data.md §3 |
+| useReactivateUserMutation | hook | `features/user-management/hooks/useReactivateUserMutation.ts` | data.md §3 |
+| useUserManagementFilters | hook | `features/user-management/hooks/useUserManagementFilters.ts` | features.md §13 |
+| suspendUserAction / reactivateUserAction / UserManagementActionResult | server-action | `features/user-management/server-actions/user-management-actions.ts` | features.md §13 |
 | UserManagementPage / UserManagementPageContainer | feature-component | `features/user-management/components/UserManagementPage/` | features.md §13 |
+| UserDetailPage / UserDetailPageContainer | feature-component | `features/user-management/components/UserDetailPage/` | features.md §13 |
 | UserTable | feature-component | `features/user-management/components/UserTable/` | features.md §13 |
+| UserOrdersTable | feature-component | `features/user-management/components/UserOrdersTable/` | features.md §13 |
+| UserFiltersBar / RoleFilter / StatusFilter | feature-component | `features/user-management/components/UserFiltersBar/` | features.md §13 |
 | SuspendConfirmDialog | feature-component | `features/user-management/components/SuspendConfirmDialog/` | features.md §13 |
+| GET /admin/users / /admin/users/[userId] | next-route | `app/(admin)/admin/users/` | features.md §13 |
 | SlowQueriesPanel / SlowQueriesPanelContainer | feature-component | `features/admin-observability/components/SlowQueriesPanel/` | features.md §13 |
 | useSlowQueriesQuery | hook | `features/admin-observability/hooks/useSlowQueriesQuery.ts` | features.md §13 |
 | SLOW_QUERIES_LIMIT / SLOW_QUERIES_STALE_TIME_MS / QUERY_TRUNCATE_LENGTH | constant | `features/admin-observability/constants/admin-observability.constants.ts` | features.md §13 |

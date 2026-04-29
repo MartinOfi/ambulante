@@ -32,7 +32,7 @@ const ADMIN_USER: User = {
 
 describe("UserTable", () => {
   it("renders an empty state when no users are provided", () => {
-    render(<UserTable users={[]} pendingUserId={null} onSuspend={vi.fn()} onReinstate={vi.fn()} />);
+    render(<UserTable users={[]} pendingUserId={null} onSuspend={vi.fn()} onReactivate={vi.fn()} onView={vi.fn()} />);
 
     expect(screen.getByText(/no hay usuarios para mostrar/i)).toBeInTheDocument();
   });
@@ -43,7 +43,7 @@ describe("UserTable", () => {
         users={[ACTIVE_CLIENT, SUSPENDED_STORE]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -57,7 +57,7 @@ describe("UserTable", () => {
         users={[ACTIVE_CLIENT]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -72,7 +72,7 @@ describe("UserTable", () => {
         users={[SUSPENDED_STORE]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -87,7 +87,7 @@ describe("UserTable", () => {
         users={[ADMIN_USER]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -103,7 +103,7 @@ describe("UserTable", () => {
         users={[ACTIVE_CLIENT]}
         pendingUserId={null}
         onSuspend={onSuspend}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -119,7 +119,7 @@ describe("UserTable", () => {
         users={[SUSPENDED_STORE]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={onReinstate}
+        onReactivate={onReinstate} onView={vi.fn()}
       />,
     );
 
@@ -134,7 +134,7 @@ describe("UserTable", () => {
         users={[ACTIVE_CLIENT]}
         pendingUserId="user-1"
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -149,7 +149,7 @@ describe("UserTable", () => {
         users={[SUSPENDED_STORE]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 
@@ -162,7 +162,7 @@ describe("UserTable", () => {
         users={[ACTIVE_CLIENT]}
         pendingUserId={null}
         onSuspend={vi.fn()}
-        onReinstate={vi.fn()}
+        onReactivate={vi.fn()} onView={vi.fn()}
       />,
     );
 

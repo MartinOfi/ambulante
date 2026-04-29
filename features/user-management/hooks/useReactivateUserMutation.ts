@@ -3,32 +3,31 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { suspendUserAction } from "@/features/user-management/server-actions/user-management-actions";
-import type { SuspendUserInput } from "@/shared/schemas/user-management";
+import { reactivateUserAction } from "@/features/user-management/server-actions/user-management-actions";
 
-export interface UseSuspendUserMutationInput {
+export interface UseReactivateUserMutationInput {
   readonly onSuccess?: () => void;
   readonly onError?: (message: string) => void;
 }
 
-const FALLBACK_MESSAGE = "No se pudo suspender el usuario";
+const FALLBACK_MESSAGE = "No se pudo reactivar el usuario";
 
-export function useSuspendUserMutation({ onSuccess, onError }: UseSuspendUserMutationInput) {
+export function useReactivateUserMutation({ onSuccess, onError }: UseReactivateUserMutationInput) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: SuspendUserInput) => {
-      const result = await suspendUserAction(input);
+    mutationFn: async (userId: string) => {
+      const result = await reactivateUserAction({ userId });
       if (result.ok === false) throw new Error(result.error);
       return result;
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (_data, userId) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.users.all() });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.users.byId(variables.userId) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.users.byId(userId) });
       onSuccess?.();
     },
     onError: (error: unknown) => {
-      logger.error("useSuspendUserMutation: error suspending user", { error });
+      logger.error("useReactivateUserMutation: error reactivating user", { error });
       const message = error instanceof Error && error.message.length > 0 ? error.message : FALLBACK_MESSAGE;
       onError?.(message);
     },

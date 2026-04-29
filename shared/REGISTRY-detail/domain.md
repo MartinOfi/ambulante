@@ -211,6 +211,19 @@ Máquina de estados tipada del pedido (PRD §6). Discriminated union `Order` con
 - **Errores posibles:** `TERMINAL_STATE` | `INVALID_TRANSITION` | `UNAUTHORIZED_ACTOR`
 - **Tipos exportados:** `Order`, `OrderActor`, `OrderEvent`, `TransitionError`, `TransitionResult`, `Result<T,E>`, `TransitionWithAuditInput`, variantes `OrderEnviado` … `OrderExpirado`
 
+### User suspension state machine — `shared/domain/user-suspension.ts`
+
+State machine TS-only para el suspension status del usuario admin (B11-C). El storage es `users.suspended` (boolean en BD); el dominio expone una vista discriminada y guards que bloquean transiciones inválidas.
+
+- **API:**
+  - `SUSPENSION_STATUS` — re-export de `USER_SUSPENSION_STATUS` (`{ ACTIVE: "active", SUSPENDED: "suspended" }`) para colocación cerca del state machine
+  - `getSuspensionStatus(user)` — `user.suspended === true ? SUSPENDED : ACTIVE`
+  - `assertCanSuspend(user)` — throw si role es admin (`isProtectedRole`) o si ya está SUSPENDED
+  - `assertCanReactivate(user)` — throw si está ACTIVE (no se puede reactivar lo que no está suspendido)
+  - `isProtectedRole(role)` — `true` para `admin` (futuro: extender con otros roles protegidos)
+  - `UserManagementDomainError` — error class typed; `toUserMessage` en Server Actions sólo expone `.message` cuando el error es de esta clase. Errores no-domain (Supabase/Postgres) colapsan a un mensaje genérico para no leakear info a la UI
+- **Tipos exportados:** `SuspensionStatus`, `UserManagementDomainError`
+
 ### Audit log domain — `shared/domain/audit-log.ts`
 
 Schemas Zod y tipos TS para las entradas del log de auditoría inmutable (PRD §6.2).

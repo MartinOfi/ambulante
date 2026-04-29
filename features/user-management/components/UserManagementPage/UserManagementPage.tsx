@@ -1,5 +1,6 @@
 import { UserTable } from "@/features/user-management/components/UserTable";
 import { SuspendConfirmDialog } from "@/features/user-management/components/SuspendConfirmDialog";
+import { UserFiltersBar } from "@/features/user-management/components/UserFiltersBar";
 import type { UserManagementPageProps } from "./UserManagementPage.types";
 
 export function UserManagementPage({
@@ -7,12 +8,22 @@ export function UserManagementPage({
   isLoading,
   errorMessage,
   pendingUserId,
+  roleFilter,
+  statusFilter,
+  searchQuery,
   suspendDialogEmail,
+  suspendReason,
   isSuspendPending,
+  suspendErrorMessage,
+  onRoleChange,
+  onStatusChange,
+  onSearchChange,
   onSuspendRequest,
   onSuspendConfirm,
   onSuspendCancel,
-  onReinstate,
+  onSuspendReasonChange,
+  onReactivate,
+  onView,
 }: UserManagementPageProps) {
   return (
     <div className="space-y-6">
@@ -24,6 +35,15 @@ export function UserManagementPage({
           Suspendé o reactivá cuentas de clientes y tiendas.
         </p>
       </div>
+
+      <UserFiltersBar
+        roleFilter={roleFilter}
+        statusFilter={statusFilter}
+        searchQuery={searchQuery}
+        onRoleChange={onRoleChange}
+        onStatusChange={onStatusChange}
+        onSearchChange={onSearchChange}
+      />
 
       {errorMessage !== null && (
         <div
@@ -37,7 +57,10 @@ export function UserManagementPage({
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }, (_, index) => (
-            <div key={index} className="h-14 animate-pulse rounded-lg bg-[hsl(var(--surface))]" />
+            <div
+              key={`skeleton-${index}`}
+              className="h-14 animate-pulse rounded-lg bg-[hsl(var(--surface))]"
+            />
           ))}
         </div>
       ) : (
@@ -45,14 +68,18 @@ export function UserManagementPage({
           users={users}
           pendingUserId={pendingUserId}
           onSuspend={onSuspendRequest}
-          onReinstate={onReinstate}
+          onReactivate={onReactivate}
+          onView={onView}
         />
       )}
 
       <SuspendConfirmDialog
         isOpen={suspendDialogEmail !== null}
         userEmail={suspendDialogEmail ?? ""}
+        reason={suspendReason}
         isPending={isSuspendPending}
+        errorMessage={suspendErrorMessage}
+        onReasonChange={onSuspendReasonChange}
         onConfirm={onSuspendConfirm}
         onCancel={onSuspendCancel}
       />

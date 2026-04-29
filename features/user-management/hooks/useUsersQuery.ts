@@ -2,17 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/query/keys";
-import type { UserManagementService } from "@/features/user-management/services/userManagement.service";
+import { getUserManagementService } from "@/features/user-management/services/userManagement.factory";
 import type { UserRole } from "@/shared/schemas/user";
+import type { SuspensionStatus } from "@/shared/domain/user-suspension";
 
 export interface UseUsersQueryInput {
-  readonly service: UserManagementService;
   readonly role?: UserRole;
+  readonly status?: SuspensionStatus;
 }
 
-export function useUsersQuery({ service, role }: UseUsersQueryInput) {
+export function useUsersQuery({ role, status }: UseUsersQueryInput = {}) {
   return useQuery({
-    queryKey: queryKeys.users.all(),
-    queryFn: () => service.listUsers({ role }),
+    queryKey: [...queryKeys.users.all(), { role, status }] as const,
+    queryFn: () => getUserManagementService().listUsers({ role, status }),
   });
 }

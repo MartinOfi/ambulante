@@ -234,20 +234,38 @@
 
 | Nombre | Ruta | Tipo | Descripción |
 |---|---|---|---|
-| `UserManagementPage` | `features/user-management/components/UserManagementPage/UserManagementPage.tsx` | componente dumb | Página de gestión de usuarios: listado con acciones de suspensión/reactivación |
-| `UserManagementPageContainer` | `features/user-management/components/UserManagementPage/UserManagementPage.container.tsx` | componente smart | Conecta hooks de data y estado local del diálogo de confirmación |
-| `UserTable` | `features/user-management/components/UserTable/UserTable.tsx` | componente dumb | Tabla de usuarios con badges de rol/estado y botones de acción |
-| `SuspendConfirmDialog` | `features/user-management/components/SuspendConfirmDialog/SuspendConfirmDialog.tsx` | componente dumb | Modal de confirmación de suspensión con overlay; accesible vía `role="dialog"` |
-| `useUsersQuery` | `features/user-management/hooks/useUsersQuery.ts` | hook | Lista usuarios vía React Query; key: `queryKeys.users.all()` |
-| `useSuspendUserMutation` | `features/user-management/hooks/useSuspendUserMutation.ts` | hook | Suspende usuario y cancela pedidos activos; invalida `users.all()` |
-| `useReinstateUserMutation` | `features/user-management/hooks/useReinstateUserMutation.ts` | hook | Reactiva usuario suspendido; invalida `users.all()` |
-| `createUserManagementService` | `features/user-management/services/userManagement.service.ts` | service factory | Crea `UserManagementService` — `listUsers`, `suspendUser` (+ cancelOrderActivos), `reinstateUser` |
+| `UserManagementPage` | `features/user-management/components/UserManagementPage/UserManagementPage.tsx` | componente dumb | Página de gestión: filtros (rol/estado/búsqueda) + listado + diálogo de suspensión con motivo |
+| `UserManagementPageContainer` | `features/user-management/components/UserManagementPage/UserManagementPage.container.tsx` | componente smart | Conecta `useUsersQuery`, mutations de Server Actions, `useUserManagementFilters` (URL state via nuqs), búsqueda client-side por email/nombre |
+| `UserDetailPage` | `features/user-management/components/UserDetailPage/UserDetailPage.tsx` | componente dumb | Vista de detalle: encabezado del usuario + acciones (suspend/reactivate) + tabla de orders |
+| `UserDetailPageContainer` | `features/user-management/components/UserDetailPage/UserDetailPage.container.tsx` | componente smart | Conecta `useUserDetailQuery` + mutations + navegación con `useRouter` |
+| `UserTable` | `features/user-management/components/UserTable/UserTable.tsx` | componente dumb | Tabla con badges, acción "Ver" (detail), suspend/reactivate. Admin no se puede suspender |
+| `UserOrdersTable` | `features/user-management/components/UserOrdersTable/UserOrdersTable.tsx` | componente dumb | Tabla de pedidos del usuario en su detail; badge por status, total ARS, fecha en es-AR |
+| `UserFiltersBar` | `features/user-management/components/UserFiltersBar/UserFiltersBar.tsx` | componente dumb | Search input + selects de rol/estado; tipos `RoleFilter` / `StatusFilter` con sentinel `"all"` |
+| `SuspendConfirmDialog` | `features/user-management/components/SuspendConfirmDialog/SuspendConfirmDialog.tsx` | componente dumb | Modal con textarea de motivo (min 3 chars). Confirm deshabilitado hasta motivo válido |
+| `useUsersQuery` | `features/user-management/hooks/useUsersQuery.ts` | hook | Lista usuarios vía React Query con filtros `role`/`status`; key incluye filtros |
+| `useUserDetailQuery` | `features/user-management/hooks/useUserDetailQuery.ts` | hook | Trae user + orders del usuario; key: `queryKeys.users.byId(userId)` |
+| `useSuspendUserMutation` | `features/user-management/hooks/useSuspendUserMutation.ts` | hook | Llama `suspendUserAction` con `{userId, reason}`; invalida `users.all()` y `users.byId()` |
+| `useReactivateUserMutation` | `features/user-management/hooks/useReactivateUserMutation.ts` | hook | Llama `reactivateUserAction(userId)`; invalida ambas keys |
+| `useUserManagementFilters` | `features/user-management/hooks/useUserManagementFilters.ts` | hook | URL state con `nuqs` para `role`, `status`, `q`. Sentinel `"all"` se serializa como `null` |
+| `suspendUserAction` / `reactivateUserAction` | `features/user-management/server-actions/user-management-actions.ts` | server-action | `"use server"`. Gate por `is_admin()` RPC. Instancian `SupabaseUserRepository` + `SupabaseOrderRepository` (route handler client). Devuelven `UserManagementActionResult` |
+| `createUserManagementService` | `features/user-management/services/userManagement.service.ts` | service factory | `listUsers(role/status)`, `getUserDetail(userId)`, `suspendUser({userId, reason})`, `reactivateUser({userId})`. Aplica state machine `assertCanSuspend`/`assertCanReactivate` |
+| `getUserManagementService` | `features/user-management/services/userManagement.factory.ts` | factory client-only | Singleton browser-side: instancia `SupabaseUserRepository` + `SupabaseOrderRepository` con `createBrowserClient()` |
 
 #### Detalle de componentes
-- `UserManagementPage` — Props: `users`, `isLoading`, `errorMessage`, `pendingUserId`, `suspendDialogEmail`, `isSuspendPending`, `onSuspendRequest`, `onSuspendConfirm`, `onSuspendCancel`, `onReinstate`
-- `UserTable` — Props: `users: readonly User[]`, `pendingUserId: string | null`, `onSuspend`, `onReinstate`. Admin no puede suspenderse.
-- `SuspendConfirmDialog` — Props: `isOpen`, `userEmail`, `isPending`, `onConfirm`, `onCancel`. Render null si `!isOpen`.
-- **Usado en:** `app/(admin)/admin/users/page.tsx`
+- `UserManagementPage` — Props extendidas con filtros (`roleFilter`, `statusFilter`, `searchQuery`), `suspendReason`, `suspendErrorMessage` y handlers de filtros + view + reason change
+- `UserDetailPage` — Props con `user | null`, `orders`, error/loading + handlers de suspend/reactivate/back
+- `UserTable` — Props: `users`, `pendingUserId`, `onSuspend`, `onReactivate`, `onView`. Admin: botón Suspender disabled
+- `UserOrdersTable` — Props: `orders`. Empty state si no hay pedidos. Badge por status con `statusVariant()` interno
+- `UserFiltersBar` — Props: filtros + handlers. Sentinel `"all"` para "sin filtro"
+- `SuspendConfirmDialog` — Props ahora incluyen `reason`, `errorMessage`, `onReasonChange`. Confirma sólo si `reason.trim().length >= 3`
+- **Usado en:** `app/(admin)/admin/users/page.tsx`, `app/(admin)/admin/users/[userId]/page.tsx`
+
+#### State machine + portabilidad
+- State machine **TS-only** sobre `users.suspended` (boolean) — no requiere migración SQL. Estados: `SUSPENSION_STATUS.ACTIVE` / `SUSPENSION_STATUS.SUSPENDED`
+- `assertCanSuspend(user)` rechaza si ya está suspendido o si rol es admin (`isProtectedRole`)
+- `assertCanReactivate(user)` rechaza si no está suspendido
+- Server Actions usan `createRouteHandlerClient` (no `createServerClient`) porque las cookies son writable en Server Actions, igual que en Route Handlers
+- `reason` del suspend se loguea en server-side logger (futuro: B11-B audit log lo persiste)
 
 ---
 
