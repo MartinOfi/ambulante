@@ -6,3 +6,4 @@
 | 2026-04-28 | B5.1 iniciada: crear buckets + RLS de Storage. |
 | 2026-04-28 | B5.1 cerrada: 3 buckets + 13 RLS policies. Fixes: search_path, stores_view security_invoker, duplicate timestamps. |
 | 2026-04-29 | **Re-shape vertical del epic.** Las 32 tareas pendientes de B7/B9/B10/B11/B12/B13 se fusionaron en 14 tareas verticales por feature (slice por feature, no por capa). Pendientes pasaron de 38 a 21 (-45%). Tareas originales archivadas en `tasks/_archived/`. Done preservado intacto. Motivación: tareas chicas con bookkeeping pesado (5 archivos de meta por 2 de código real); fusiones agrupan flows que se rompían entre sí cuando se diseñaban separados. Nuevas: B7-A, B9-A/B/C, B10-A/B/C/D, B11-A/B/C, B12-A, B13-A/B. |
+| 2026-04-29 | B5.4 cerrada: hook `useValidationDoc` + `<ValidationDocViewer>` integrado en `StoreDetailPanel` via slot pattern. Phase B5 ✅ 4/4. NT-30 abierto por fails preexistentes en `shared/services/index.test.ts`. |

@@ -59,6 +59,7 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
+| [NT-30](#nt-30--reparar-sharedservicesindextestts--9-fails-preexistentes) | Reparar `shared/services/index.test.ts` — 9 fails preexistentes | testing / tech debt | S | antes de B14 (deploy prod) |
 
 ---
 
@@ -443,6 +444,20 @@
 - **Dependencias:** B3.3 ✅.
 - **Ticket:** —
 - **Notas:** El repositorio usa `resolveUserInternalId(publicId)` mientras las rutas actuales usan `rpc("current_user_id")` — hay que alinear el mecanismo de resolución. El issue de `onConflict: "endpoint"` que no valida ownership (endpoint puede ser reasignado entre usuarios) también debe resolverse aquí.
+
+---
+
+### NT-30 — Reparar `shared/services/index.test.ts` — 9 fails preexistentes
+
+- **Categoría:** testing / tech debt
+- **Contexto:** El test file `shared/services/index.test.ts` tiene 9-10 tests rojos (timeout / `NEXT_PUBLIC_SUPABASE_ANON_KEY is not set`) que existen en `main` y se arrastraron desde B5.2 / B6.x. Las causas son (a) `index.ts` ahora tira al cargar si `URL` está set y `ANON_KEY` no — los tests del modo "absent" no stubean ambas envs; (b) `realtimeService.subscribe` y `authService` ya no son TODO stubs, así que los tests "throws TODO" timeoutean. Detectado al ejecutar B5.4.
+- **Aceptación:** `shared/services/index.test.ts` 12/12 verde en CI sin tocar lógica de `index.ts` ni de los facades; los tests de "supabase stub mode" reflejan el comportamiento actual (auth con redirect, realtime con broadcast real) o se eliminan si ya no aportan valor.
+- **Archivos afectados:** `shared/services/index.test.ts`.
+- **Estimación:** S
+- **Cuándo retomarlo:** antes de B14 (deploy prod) o cuando un cambio en `shared/services/*` necesite tests confiables como guard.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** descubierto por B5.4. Mantener `vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key")` en cada `it` del bloque "absent" o moverlo a `beforeEach`. Para los stubs TODO, eliminar y reemplazar por aserciones de comportamiento real.
 
 ---
 

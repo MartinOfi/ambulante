@@ -1,8 +1,13 @@
-import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
+import {
+  STORE_VALIDATION_STATUS,
+  VALIDATION_DOC_TYPES,
+} from "@/features/store-validation/constants";
 import type { StoreValidationService } from "@/features/store-validation/services/store-validation.service";
 import type {
+  GetValidationDocInput,
   PendingStore,
   RejectStoreInput,
+  ValidationDocMeta,
 } from "@/features/store-validation/types/store-validation.types";
 
 const SEED_STORES: readonly PendingStore[] = [
@@ -18,6 +23,23 @@ const SEED_STORES: readonly PendingStore[] = [
     tagline: "Los mejores tacos del barrio",
     ownerId: "11111111-1111-1111-1111-111111111111",
     validationStatus: STORE_VALIDATION_STATUS.pending,
+    documents: {
+      [VALIDATION_DOC_TYPES.ID_FRONT]: {
+        path: "store-pending-store-1/id_front.jpg",
+        mimeType: "image/jpeg",
+        filename: "dni-frente.jpg",
+      },
+      [VALIDATION_DOC_TYPES.ID_BACK]: {
+        path: "store-pending-store-1/id_back.jpg",
+        mimeType: "image/jpeg",
+        filename: "dni-dorso.jpg",
+      },
+      [VALIDATION_DOC_TYPES.BUSINESS_PROOF]: {
+        path: "store-pending-store-1/business_proof.pdf",
+        mimeType: "application/pdf",
+        filename: "habilitacion-municipal.pdf",
+      },
+    },
   },
   {
     id: "pending-store-2",
@@ -31,6 +53,13 @@ const SEED_STORES: readonly PendingStore[] = [
     tagline: "Receta familiar desde 1982",
     ownerId: "22222222-2222-2222-2222-222222222222",
     validationStatus: STORE_VALIDATION_STATUS.pending,
+    documents: {
+      [VALIDATION_DOC_TYPES.ID_FRONT]: {
+        path: "store-pending-store-2/id_front.png",
+        mimeType: "image/png",
+        filename: "cedula-frente.png",
+      },
+    },
   },
   {
     id: "approved-store-1",
@@ -53,7 +82,10 @@ export class MockStoreValidationService implements StoreValidationService {
   private stores: PendingStore[];
 
   constructor() {
-    this.stores = SEED_STORES.map((store) => ({ ...store }));
+    this.stores = SEED_STORES.map((store) => ({
+      ...store,
+      documents: store.documents ? { ...store.documents } : undefined,
+    }));
   }
 
   async getPendingStores(): Promise<readonly PendingStore[]> {
@@ -81,6 +113,14 @@ export class MockStoreValidationService implements StoreValidationService {
     this.stores = this.stores.map((store, i) => (i === index ? updated : store));
 
     return updated;
+  }
+
+  async getValidationDoc({
+    storeId,
+    docType,
+  }: GetValidationDocInput): Promise<ValidationDocMeta | null> {
+    const store = this.stores.find((s) => s.id === storeId);
+    return store?.documents?.[docType] ?? null;
   }
 
   async rejectStore({ storeId, reason }: RejectStoreInput): Promise<PendingStore> {

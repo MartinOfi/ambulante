@@ -23,7 +23,7 @@
 | B2 | RLS policies + pgTAP tests + performance RLS | 5 | 5/5 | ✅ |
 | B3 | Boundaries de portabilidad (Repository + Facades + lint rule) | 4 | 3/4 | 🟡 |
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
-| B5 | Storage (buckets + RLS + upload helpers) | 4 | 3/4 | 🟡 |
+| B5 | Storage (buckets + RLS + upload helpers) | 4 | 4/4 | ✅ |
 | B6 | Realtime wiring | 4 | 4/4 | ✅ |
 | B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 3/4 | 🟡 |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
@@ -39,7 +39,6 @@
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
-| B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
 | B7-A | Cron: runbook + tests concurrentes | ⚪ | B7.2, B7.3 | M | `lock-skip-locked`, `lock-deadlock-prevention` | `testing.md`. |
 | B8.4 | Test E2E del loop completo | ⚪ | B8.3 | L | — | `testing.md`. |
 | B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ⚪ | B4.4, B3.1, B6.3, B5.2 | XL | `data-n-plus-one`, `query-index-types` | `features.md`. |
@@ -88,6 +87,7 @@
 | B5.1 | Crear buckets + RLS de Storage | ✅ |
 | B5.2 | Implementación del facade `StorageService` | ✅ |
 | B5.3 | Upload helper con optimización de imagen | ✅ |
+| B5.4 | Flow admin: revisar documentos de validación | ✅ |
 | B6.1 | Habilitar Realtime + publicar tablas necesarias | ✅ |
 | B6.2 | Implementación del facade `RealtimeService` | ✅ |
 | B6.3 | Integración Realtime ↔ React Query | ✅ |
