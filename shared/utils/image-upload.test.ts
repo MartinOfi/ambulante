@@ -29,7 +29,6 @@ interface DepsHarness {
 }
 
 const PNG_MIME = "image/png";
-const JPEG_MIME = "image/jpeg";
 const PDF_MIME = "application/pdf";
 
 const buildFile = (size: number, type: string, name = "photo.png"): File => {
