@@ -16,4 +16,5 @@ export interface UserRepository extends Repository<
   UserFilters
 > {
   findByEmail(email: string): Promise<User | null>;
+  findByAuthUserId(authUserId: string): Promise<User | null>;
 }

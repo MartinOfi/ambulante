@@ -56,6 +56,19 @@ export class SupabaseUserRepository implements UserRepository {
     return mapUserRow(data as DbUserRow);
   }
 
+  async findByAuthUserId(authUserId: string): Promise<User | null> {
+    const { data, error } = await this.client
+      .from("users")
+      .select("public_id, role, display_name, email, suspended")
+      .eq("auth_user_id", authUserId)
+      .maybeSingle();
+
+    if (error !== null)
+      throw new Error(`SupabaseUserRepository.findByAuthUserId: ${error.message}`);
+    if (data === null) return null;
+    return mapUserRow(data as DbUserRow);
+  }
+
   async create(input: CreateUserInput): Promise<User> {
     const { data, error } = await this.client
       .from("users")

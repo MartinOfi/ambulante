@@ -33,6 +33,12 @@ export class MockUserRepository implements UserRepository {
     return this.users.find((user) => user.email === email) ?? null;
   }
 
+  async findByAuthUserId(_authUserId: string): Promise<User | null> {
+    // Mock no mantiene mapping auth_user_id → User. El dominio User no expone
+    // authUserId; quien necesite resolver desde Supabase Auth usa la impl real.
+    return null;
+  }
+
   async create(input: CreateUserInput): Promise<User> {
     const newUser: User = { ...input };
     this.users = [...this.users, newUser];
