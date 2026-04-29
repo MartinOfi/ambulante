@@ -23,7 +23,7 @@
 | B2 | RLS policies + pgTAP tests + performance RLS | 5 | 5/5 | ✅ |
 | B3 | Boundaries de portabilidad (Repository + Facades + lint rule) | 4 | 3/4 | 🟡 |
 | B4 | Auth real (Supabase Auth + Google + magic link + middleware) | 4 | 4/4 | ✅ |
-| B5 | Storage (buckets + RLS + upload helpers) | 4 | 1/4 | 🟡 |
+| B5 | Storage (buckets + RLS + upload helpers) | 4 | 2/4 | 🟡 |
 | B6 | Realtime wiring | 4 | 3/4 | 🟡 |
 | B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 5 | 2/5 | 🟡 |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 3/4 | 🟡 |
@@ -39,7 +39,6 @@
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
 | B3.4 | CI check: no hay imports rotos | ⚪ | B3.3 | S | — | — |
-| B5.2 | Implementación del facade `StorageService` | ⚪ | B5.1, B3.2 | M | — | `data.md`. |
 | B5.3 | Upload helper con optimización de imagen | ⚪ | B5.2 | M | — | `infra.md` (sección Utils). |
 | B5.4 | Flow admin: revisar documentos de validación | ⚪ | B5.2 | M | — | `features.md`. |
 | B6.4 | Reconnect + backoff + test <5s | ⚪ | B6.3 | M | — | `testing.md`. |
@@ -111,6 +110,7 @@
 | B4.3 | Implementación completa del facade `AuthService` | ✅ |
 | B4.4 | Callbacks OAuth + confirm email + error pages | ✅ |
 | B5.1 | Crear buckets + RLS de Storage | ✅ |
+| B5.2 | Implementación del facade `StorageService` | ✅ |
 | B6.1 | Habilitar Realtime + publicar tablas necesarias | ✅ |
 | B6.2 | Implementación del facade `RealtimeService` | ✅ |
 | B6.3 | Integración Realtime ↔ React Query | ✅ |

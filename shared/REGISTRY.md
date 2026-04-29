@@ -36,10 +36,10 @@
 | supabasePushService / createPushClient / createServerPushSender / getServerPushSender | service-stub + server-sender | `shared/services/push.supabase.ts` | data.md §5 |
 | ServerPushSender / PushNotificationPayload | type | `shared/services/push.types.ts` | data.md §5 |
 | createPushOnStatusChangeListener / PushListener | domain-listener | `shared/domain/events/listeners/push-on-status-change.ts` | domain.md §12 |
-| supabaseStorageService / createStorageClient | service-stub | `shared/services/storage.supabase.ts` | data.md §5 |
+| supabaseStorageService / createSupabaseStorageService / SupabaseStorageBucket / SupabaseStorageClient | service | `shared/services/storage.supabase.ts` | data.md §5 |
 | storageService | service | `shared/services/storage.ts` | data.md §4 |
-| StorageService / UploadParams / RemoveParams / GetPublicUrlParams / StorageResult / UploadResult | type | `shared/services/storage.types.ts` | data.md §4 |
-| STORAGE_BUCKETS / StorageBucket / STORAGE_SIZE_LIMITS / MOCK_STORAGE_BASE_URL | constant | `shared/constants/storage.ts` | domain.md §8 |
+| StorageService / UploadParams / RemoveParams / GetPublicUrlParams / GetSignedUrlParams / StorageResult / UploadResult | type | `shared/services/storage.types.ts` | data.md §4 |
+| STORAGE_BUCKETS / StorageBucket / STORAGE_SIZE_LIMITS / STORAGE_ALLOWED_MIME_TYPES / MOCK_STORAGE_BASE_URL | constant | `shared/constants/storage.ts` | domain.md §8 |
 | storage_buckets migration (products / store-logos / validation-docs) + RLS policies | sql-migration | `supabase/migrations/20260428000006_storage_buckets.sql` | domain.md §17 |
 | Badge | ui-component | `shared/components/ui/badge.tsx` | ui.md §1 |
 | Button | ui-component | `shared/components/ui/button.tsx` | ui.md §1 |

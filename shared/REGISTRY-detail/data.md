@@ -248,11 +248,14 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - **Helper:** `createPushClient()` — disponible para B6.
 - **Tests:** `shared/services/push.supabase.test.ts` (7 casos — envío múltiple, shape correcto, JSON serializado, sin subscripciones, userId correcto, resiliencia a rechazo parcial).
 
-### `supabaseStorageService` — `shared/services/storage.supabase.ts`
-- Implementa `StorageService` (misma interface que `storage.ts`).
-- Importa `createClient` de `@supabase/supabase-js`.
-- **Helper:** `createStorageClient()` — disponible para B8.
-- Todos los métodos lanzan `Error("TODO — implementar en B8")`.
+### `supabaseStorageService` / `createSupabaseStorageService` — `shared/services/storage.supabase.ts`
+- Implementa `StorageService` completo con `upload`, `getPublicUrl`, `getSignedUrl`, `remove`.
+- Usa `createBrowserClient` de `@supabase/ssr` (lazy, solo si no se inyecta cliente).
+- **Validación integrada en `upload`:** tamaño vs `STORAGE_SIZE_LIMITS`, MIME type vs `STORAGE_ALLOWED_MIME_TYPES`. El error se retorna como `StorageResult<UploadResult>` con `success: false` antes de hacer ninguna llamada a red.
+- **DI interfaces exportadas:** `SupabaseStorageBucket`, `SupabaseStorageClient` — permiten inyección de mocks en tests sin `vi.mock`.
+- **Factory:** `createSupabaseStorageService(client?)` — inyecta el cliente o crea uno lazy vía `@supabase/ssr`.
+- **Singleton:** `supabaseStorageService = createSupabaseStorageService()`.
+- **Tests:** `shared/services/storage.supabase.test.ts` (15 casos — upload válido, size limit exacto, over-limit, MIME permitido/rechazado por bucket, error de Supabase, contentType forwarded, getPublicUrl, getSignedUrl ok/error, remove ok/error).
 
 ---
 

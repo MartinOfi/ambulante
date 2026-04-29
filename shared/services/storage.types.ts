@@ -16,6 +16,12 @@ export interface GetPublicUrlParams {
   readonly path: string;
 }
 
+export interface GetSignedUrlParams {
+  readonly bucket: StorageBucket;
+  readonly path: string;
+  readonly expiresIn: number;
+}
+
 export type StorageResult<T> =
   | { readonly success: true; readonly data: T }
   | { readonly success: false; readonly error: string };
@@ -29,4 +35,5 @@ export interface StorageService {
   upload(params: UploadParams): Promise<StorageResult<UploadResult>>;
   remove(params: RemoveParams): Promise<StorageResult<void>>;
   getPublicUrl(params: GetPublicUrlParams): string;
+  getSignedUrl(params: GetSignedUrlParams): Promise<StorageResult<string>>;
 }
