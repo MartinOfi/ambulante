@@ -232,6 +232,24 @@ describe("createServerPushSender", () => {
       expect(repo.delete).not.toHaveBeenCalled();
     });
 
+    it("logs error and resolves when pushRepo.delete throws on dead subscription", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      vi.mocked(repo.delete as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("DB unavailable"),
+      );
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+      const errorSpy = vi.spyOn(logger, "error");
+
+      vi.mocked(webpush.sendNotification).mockRejectedValueOnce(new FakeWebPushError(410, "Gone"));
+
+      await expect(sender.sendToUser("user-uuid-1", payload)).resolves.toBeUndefined();
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to delete dead push subscription"),
+        expect.objectContaining({ subscriptionId: sub.id }),
+      );
+    });
+
     it("logs structured error after all retries are exhausted", async () => {
       const sub = makePushSubscription();
       const repo = makePushRepo([sub]);

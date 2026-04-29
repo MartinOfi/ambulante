@@ -77,16 +77,17 @@ async function sendWithRetry({
       if (isWebPushError(err) && DEAD_SUBSCRIPTION_HTTP_CODES.has(err.statusCode)) {
         try {
           await pushRepo.delete(subscription.id);
+          logger.error("Dead push subscription removed", {
+            subscriptionId: subscription.id,
+            statusCode: err.statusCode,
+          });
         } catch (deleteErr) {
           logger.error("Failed to delete dead push subscription", {
             subscriptionId: subscription.id,
+            statusCode: err.statusCode,
             reason: deleteErr instanceof Error ? deleteErr.message : String(deleteErr),
           });
         }
-        logger.error("Dead push subscription removed", {
-          subscriptionId: subscription.id,
-          statusCode: err.statusCode,
-        });
         return;
       }
 
