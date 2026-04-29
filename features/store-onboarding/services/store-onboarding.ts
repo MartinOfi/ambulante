@@ -1,12 +1,13 @@
-import type { StoreOnboardingData } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 import type { StoreOnboardingService } from "@/features/store-onboarding/types";
+import type { StoreOnboardingData } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 
-const mockStoreOnboardingService: StoreOnboardingService = {
-  async submit(_data: StoreOnboardingData) {
-    // Simulates a 600ms network call. Replace with Supabase when backend lands.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    return { success: true };
+// Real implementation backed by the Server Action. The action import is lazy
+// so jsdom-based tests that inject a mock service via prop never load
+// next/headers (which the action's Supabase client transitively requires).
+export const storeOnboardingService: StoreOnboardingService = {
+  async submit(data: StoreOnboardingData) {
+    const { submitStoreOnboardingAction } =
+      await import("@/features/store-onboarding/server-actions/store-onboarding-actions");
+    return submitStoreOnboardingAction(data);
   },
 };
-
-export { mockStoreOnboardingService as storeOnboardingService };
