@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PushSubscription, PushSubscriptionRepository } from "@/shared/repositories";
+import { logger } from "@/shared/utils/logger";
 
 import { createServerPushSender } from "./push.supabase";
 import type { PushNotificationPayload } from "./push.types";
@@ -15,6 +16,16 @@ vi.mock("web-push", () => ({
 import webpush from "web-push";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
+
+class FakeWebPushError extends Error {
+  readonly statusCode: number;
+  constructor(statusCode: number, message: string) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+const noopDelay = vi.fn().mockResolvedValue(undefined);
 
 function makePushSubscription(overrides: Partial<PushSubscription> = {}): PushSubscription {
   return {
@@ -34,7 +45,7 @@ function makePushRepo(subscriptions: PushSubscription[] = []): PushSubscriptionR
     findById: vi.fn().mockResolvedValue(null),
     create: vi.fn(),
     update: vi.fn(),
-    delete: vi.fn(),
+    delete: vi.fn().mockResolvedValue(undefined),
     findByEndpoint: vi.fn().mockResolvedValue(null),
     upsertByEndpoint: vi.fn(),
   };
@@ -112,32 +123,148 @@ describe("createServerPushSender", () => {
     const sub1 = makePushSubscription({ endpoint: "https://fcm.example.com/1" });
     const sub2 = makePushSubscription({ endpoint: "https://fcm.example.com/2" });
     const repo = makePushRepo([sub1, sub2]);
-    const sender = createServerPushSender({ pushRepo: repo });
+    const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
 
     vi.mocked(webpush.sendNotification)
+      .mockRejectedValueOnce(new Error("subscription expired"))
+      .mockRejectedValueOnce(new Error("subscription expired"))
       .mockRejectedValueOnce(new Error("subscription expired"))
       .mockResolvedValueOnce({} as never);
 
     await expect(sender.sendToUser("user-uuid-1", payload)).resolves.toBeUndefined();
-    expect(webpush.sendNotification).toHaveBeenCalledTimes(2);
   });
 
-  it("still sends to remaining subscriptions after one fails", async () => {
+  it("still sends to remaining subscriptions after one fails all retries", async () => {
     const sub1 = makePushSubscription({ endpoint: "https://fcm.example.com/1" });
     const sub2 = makePushSubscription({ endpoint: "https://fcm.example.com/2" });
     const repo = makePushRepo([sub1, sub2]);
-    const sender = createServerPushSender({ pushRepo: repo });
+    const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
 
     vi.mocked(webpush.sendNotification)
+      .mockRejectedValueOnce(new Error("gone"))
+      .mockRejectedValueOnce(new Error("gone"))
       .mockRejectedValueOnce(new Error("gone"))
       .mockResolvedValueOnce({} as never);
 
     await sender.sendToUser("user-uuid-1", payload);
 
-    expect(webpush.sendNotification).toHaveBeenNthCalledWith(
-      2,
+    expect(webpush.sendNotification).toHaveBeenCalledWith(
       expect.objectContaining({ endpoint: sub2.endpoint }),
       expect.any(String),
     );
+  });
+
+  // ── Retry + dead subscription cleanup (B8.3) ────────────────────────────────
+
+  describe("retry and dead subscription cleanup", () => {
+    it("retries sendNotification up to 3 times on transient error", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+
+      vi.mocked(webpush.sendNotification)
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockResolvedValueOnce({} as never);
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(webpush.sendNotification).toHaveBeenCalledTimes(3);
+    });
+
+    it("applies exponential backoff between retries", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const delayFn = vi.fn().mockResolvedValue(undefined);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn });
+
+      vi.mocked(webpush.sendNotification)
+        .mockRejectedValueOnce(new Error("error"))
+        .mockRejectedValueOnce(new Error("error"))
+        .mockResolvedValueOnce({} as never);
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(delayFn).toHaveBeenCalledTimes(2);
+      expect(delayFn).toHaveBeenNthCalledWith(1, 1_000);
+      expect(delayFn).toHaveBeenNthCalledWith(2, 2_000);
+    });
+
+    it("removes dead subscription on 410 Gone and does not retry", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+
+      vi.mocked(webpush.sendNotification).mockRejectedValueOnce(new FakeWebPushError(410, "Gone"));
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(webpush.sendNotification).toHaveBeenCalledTimes(1);
+      expect(repo.delete).toHaveBeenCalledWith(sub.id);
+    });
+
+    it("removes dead subscription on 404 Not Found and does not retry", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+
+      vi.mocked(webpush.sendNotification).mockRejectedValueOnce(
+        new FakeWebPushError(404, "Not Found"),
+      );
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(webpush.sendNotification).toHaveBeenCalledTimes(1);
+      expect(repo.delete).toHaveBeenCalledWith(sub.id);
+    });
+
+    it("does not delete subscription on transient error", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+
+      vi.mocked(webpush.sendNotification)
+        .mockRejectedValueOnce(new Error("transient"))
+        .mockResolvedValueOnce({} as never);
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(repo.delete).not.toHaveBeenCalled();
+    });
+
+    it("logs error and resolves when pushRepo.delete throws on dead subscription", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      vi.mocked(repo.delete as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("DB unavailable"),
+      );
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+      const errorSpy = vi.spyOn(logger, "error");
+
+      vi.mocked(webpush.sendNotification).mockRejectedValueOnce(new FakeWebPushError(410, "Gone"));
+
+      await expect(sender.sendToUser("user-uuid-1", payload)).resolves.toBeUndefined();
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to delete dead push subscription"),
+        expect.objectContaining({ subscriptionId: sub.id }),
+      );
+    });
+
+    it("logs structured error after all retries are exhausted", async () => {
+      const sub = makePushSubscription();
+      const repo = makePushRepo([sub]);
+      const sender = createServerPushSender({ pushRepo: repo, delayFn: noopDelay });
+      const errorSpy = vi.spyOn(logger, "error");
+
+      vi.mocked(webpush.sendNotification).mockRejectedValue(new Error("persistent error"));
+
+      await sender.sendToUser("user-uuid-1", payload);
+
+      expect(webpush.sendNotification).toHaveBeenCalledTimes(3);
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("retries"),
+        expect.objectContaining({ subscriptionId: sub.id }),
+      );
+    });
   });
 });
