@@ -24,6 +24,7 @@ export const ORDER_EVENT = {
   CLIENTE_CONFIRMA_CAMINO: "CLIENTE_CONFIRMA_CAMINO",
   CLIENTE_CANCELA: "CLIENTE_CANCELA",
   SISTEMA_EXPIRA: "SISTEMA_EXPIRA",
+  SISTEMA_AUTO_CIERRA: "SISTEMA_AUTO_CIERRA",
 } as const;
 
 export type OrderEventType = (typeof ORDER_EVENT)[keyof typeof ORDER_EVENT];
@@ -272,6 +273,26 @@ const TRANSITION_MAP: TransitionMap = {
         status: ORDER_STATUS.CANCELADO,
         cancelledAt: occurredAt,
       }),
+    },
+    // PRD §7.6: ACEPTADO orders not closed within 2h are auto-closed by the system.
+    // No EN_CAMINO step occurred, so onTheWayAt is set to the close timestamp.
+    [ORDER_EVENT.SISTEMA_AUTO_CIERRA]: {
+      requiredActors: [ORDER_ACTOR.SISTEMA],
+      apply: (order, occurredAt): OrderFinalizado => {
+        // Safe: TRANSITION_MAP key guarantees order.status === ACEPTADO here
+        const aceptado = order as OrderAceptado;
+        return {
+          id: aceptado.id,
+          clientId: aceptado.clientId,
+          storeId: aceptado.storeId,
+          sentAt: aceptado.sentAt,
+          status: ORDER_STATUS.FINALIZADO,
+          receivedAt: aceptado.receivedAt,
+          acceptedAt: aceptado.acceptedAt,
+          onTheWayAt: occurredAt,
+          finishedAt: occurredAt,
+        };
+      },
     },
   },
 
