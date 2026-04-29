@@ -6,7 +6,7 @@
 
 > **Atajos:** [INDEX](../INDEX.md) · [convenciones](../convenciones.md) · [portabilidad](../portabilidad.md) · [decisiones](../decisiones.md)
 
-- **Estado:** ⚪ pending
+- **Estado:** 🟡 in-progress [owner: chat-2026-04-29, started: 11:00]
 - **Por qué:** Slice vertical "primer contacto del cliente con el producto": registrarse o loguearse, ver el mapa con tiendas reales y abrir el detalle de una. Es UN flujo desde el punto de vista del usuario — diseñar el auth, las queries de stores nearby y el detalle juntos evita inconsistencias (ej: el `featuredImage` que se decide en el repo de stores tiene que cuadrar con lo que muestra el detalle).
 - **Entregable:**
   1. **Auth + landing:** `features/landing/**` y `features/auth/**` (o `app/(auth)/*`) consumen `AuthService` real (login, register, magic link, OAuth). Reemplaza los mocks. Tests unitarios y E2E del flow.
