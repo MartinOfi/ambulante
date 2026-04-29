@@ -36,6 +36,7 @@ const serverOnlyEnvSchema = z.object({
   DATABASE_URL_POOLER: databaseUrl.optional(),
   DATABASE_URL_DIRECT: databaseUrl.optional(),
   CRON_SECRET: z.string().min(16).optional(),
+  SUPABASE_WEBHOOK_SECRET: z.string().min(16).optional(),
   VAPID_PUBLIC_KEY: z.string().min(1).optional(),
   VAPID_PRIVATE_KEY: z.string().min(1).optional(),
   VAPID_SUBJECT: z
