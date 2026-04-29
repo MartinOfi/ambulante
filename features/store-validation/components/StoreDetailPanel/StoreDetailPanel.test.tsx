@@ -126,4 +126,34 @@ describe("StoreDetailPanel", () => {
     const img = screen.getByRole("img", { name: /taco loco/i });
     expect(img).toBeInTheDocument();
   });
+
+  it("does not render the validation docs section when slot is not provided", () => {
+    render(
+      <StoreDetailPanel
+        store={PENDING_STORE}
+        isApproving={false}
+        isRejecting={false}
+        onApprove={vi.fn()}
+        onReject={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("validation-docs-section")).not.toBeInTheDocument();
+  });
+
+  it("renders the validation docs section when slot is provided", () => {
+    render(
+      <StoreDetailPanel
+        store={PENDING_STORE}
+        isApproving={false}
+        isRejecting={false}
+        onApprove={vi.fn()}
+        onReject={vi.fn()}
+        validationDocsSlot={<div data-testid="docs-stub">docs</div>}
+      />,
+    );
+
+    expect(screen.getByTestId("validation-docs-section")).toBeInTheDocument();
+    expect(screen.getByTestId("docs-stub")).toBeInTheDocument();
+  });
 });

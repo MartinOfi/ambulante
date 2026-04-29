@@ -21,6 +21,16 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(),
 }));
 
+vi.mock("@/features/store-validation/hooks/useValidationDoc", () => ({
+  useValidationDoc: vi.fn(() => ({
+    data: null,
+    isLoading: false,
+    isError: false,
+    error: null,
+    isSuccess: true,
+  })),
+}));
+
 import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
 import { useApproveStoreMutation } from "@/features/store-validation/hooks/useApproveStoreMutation";
 import { useRejectStoreMutation } from "@/features/store-validation/hooks/useRejectStoreMutation";
@@ -96,6 +106,19 @@ describe("StoreDetailPanelContainer", () => {
     renderWithProviders(<StoreDetailPanelContainer storeId="store-1" />);
 
     expect(screen.getByText("Taco Loco")).toBeInTheDocument();
+  });
+
+  it("injects the validation docs section when the store is found", () => {
+    mockUseStoreValidationQueueQuery.mockReturnValue({
+      data: [PENDING_STORE],
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
+
+    renderWithProviders(<StoreDetailPanelContainer storeId="store-1" />);
+
+    expect(screen.getByTestId("validation-docs-section")).toBeInTheDocument();
   });
 
   it("passes isApproving=true to the panel when approve mutation is pending", () => {

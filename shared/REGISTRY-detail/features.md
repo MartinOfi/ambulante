@@ -204,6 +204,13 @@
 | `StoreDetailPanel` | `features/store-validation/components/StoreDetailPanel/` | componente | Detalle de tienda pendiente (dumb): foto, nombre, tagline, kind, precio, distancia + botones Aprobar/Rechazar |
 | `StoreDetailPanelContainer` | `features/store-validation/components/StoreDetailPanel/` | componente | Smart wrapper: conecta `useApproveStoreMutation` + `useRejectStoreMutation`; gestiona `isRejectDialogOpen`; prop `onActionComplete` |
 | `RejectStoreDialog` | `features/store-validation/components/RejectStoreDialog/` | componente | Modal de rechazo (dumb, `role="dialog"`): textarea con validación Zod, botones Confirmar/Cancelar |
+| `useValidationDoc` | `features/store-validation/hooks/useValidationDoc.ts` | hook | React Query: cadena `storeValidationService.getValidationDoc` → `storageService.getSignedUrl` para el bucket `validation-docs`. staleTime 55min |
+| `ValidationDocViewer` | `features/store-validation/components/ValidationDocViewer/` | componente dumb | Visualiza un doc de validación (PDF→`<iframe>`, image→`<Image unoptimized fill>`); estados loading/error/empty |
+| `ValidationDocViewerContainer` | `features/store-validation/components/ValidationDocViewer/` | componente smart | Conecta `useValidationDoc(storeId, docType)` y propaga al dumb |
+| `VALIDATION_DOC_TYPES` | `features/store-validation/constants.ts` | constant | Enum-like: `id_front`, `id_back`, `business_proof` |
+| `VALIDATION_DOC_TYPE_LABELS` | `features/store-validation/constants.ts` | constant | Labels en español por doc type |
+| `ValidationDocType` | `features/store-validation/types/store-validation.types.ts` | type | Union derivado de `VALIDATION_DOC_TYPES` |
+| `ValidationDocMeta` | `features/store-validation/types/store-validation.types.ts` | type | `{ path; mimeType; filename }` — metadata por documento |
 
 #### store-validation feature completa (F14.2)
 
@@ -216,9 +223,10 @@
   - `StoreDetailPanel.tsx` (dumb) — Props: `store`, `isApproving`, `isRejecting`, `onApprove`, `onReject`. Botones con `aria-label="Aprobar tienda"` / `"Rechazar tienda"`, deshabilitados cuando `isBusy`.
   - `StoreDetailPanel.container.tsx` (smart, `"use client"`) — encuentra tienda en la cola por `storeId`; renderiza `data-testid="store-not-found"` si no existe; gestiona `isRejectDialogOpen` con `useState`; llama mutaciones con `onSuccess: onActionComplete`.
   - `RejectStoreDialog.tsx` (dumb, `"use client"`) — `react-hook-form` + `zodResolver(rejectStoreSchema)`; devuelve `null` cuando `open=false`; `<div role="dialog" aria-modal="true">`; textarea con `id="rejection-reason"`.
-- **Service:** `storeValidationService` en `features/store-validation/services/store-validation.service.mock.ts`; interfaz `StoreValidationService` con 4 métodos (`getPendingStores`, `getStoreById`, `approveStore`, `rejectStore`); 3 tiendas seed; latencia simulada 300ms.
+- **Service:** `storeValidationService` en `features/store-validation/services/store-validation.service.mock.ts`; interfaz `StoreValidationService` con 5 métodos (`getPendingStores`, `getStoreById`, `approveStore`, `rejectStore`, `getValidationDoc`); 3 tiendas seed con `documents` por doc type; latencia simulada 300ms.
 - **Sidebar:** `features/admin-shell/components/AdminSidebar/AdminSidebar.tsx` incluye nav item "Validación de tiendas" → `ROUTES.admin.stores`.
-- **Tests:** 45 tests en 9 archivos (service 10, hooks 8, components 27).
+- **Documentos de validación (B5.4):** El `StoreDetailPanel` acepta un `validationDocsSlot?: ReactNode` — el container inyecta 3 `ValidationDocViewerContainer` (uno por `VALIDATION_DOC_TYPES`). El hook `useValidationDoc` encadena la metadata del service mock con `storageService.getSignedUrl` (bucket `validation-docs`, expiresIn 1h, staleTime 55min). El dumb viewer ramifica entre PDF (`<iframe>`) e imagen (`<Image unoptimized fill>`) según `mimeType`.
+- **Tests:** 60 tests en 12 archivos (service 13, hooks 11, components 36).
 
 ---
 

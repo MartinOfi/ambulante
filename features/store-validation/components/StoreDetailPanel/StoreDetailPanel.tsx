@@ -10,6 +10,7 @@ export function StoreDetailPanel({
   isRejecting,
   onApprove,
   onReject,
+  validationDocsSlot,
 }: StoreDetailPanelProps) {
   const isBusy = isApproving || isRejecting;
 
@@ -33,6 +34,22 @@ export function StoreDetailPanel({
         <dt className="text-zinc-500">Distancia</dt>
         <dd className="font-medium text-zinc-900">{store.distanceMeters}m</dd>
       </dl>
+
+      {validationDocsSlot !== undefined ? (
+        <section
+          aria-labelledby="validation-docs-heading"
+          className="flex flex-col gap-3"
+          data-testid="validation-docs-section"
+        >
+          <h3
+            id="validation-docs-heading"
+            className="text-sm font-semibold uppercase tracking-wide text-zinc-500"
+          >
+            Documentos de validación
+          </h3>
+          <div className="flex flex-col gap-3">{validationDocsSlot}</div>
+        </section>
+      ) : null}
 
       <div className="flex gap-3">
         <Button variant="default" disabled={isBusy} onClick={onApprove} aria-label="Aprobar tienda">

@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { MockStoreValidationService } from "./store-validation.service.mock";
-import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
+import {
+  STORE_VALIDATION_STATUS,
+  VALIDATION_DOC_TYPES,
+} from "@/features/store-validation/constants";
 
 // Seed IDs kept for documentation; tests derive IDs dynamically from the service
 const _STORE_IDS = {
@@ -110,6 +113,35 @@ describe("MockStoreValidationService", () => {
       await expect(
         service.rejectStore({ storeId: "non-existent-id", reason: "Motivo" }),
       ).rejects.toThrow();
+    });
+  });
+
+  describe("getValidationDoc", () => {
+    it("returns the doc meta when the store has it uploaded", async () => {
+      const doc = await service.getValidationDoc({
+        storeId: "pending-store-1",
+        docType: VALIDATION_DOC_TYPES.ID_FRONT,
+      });
+      expect(doc).not.toBeNull();
+      expect(doc?.path).toMatch(/^store-pending-store-1\//);
+      expect(doc?.mimeType).toBeTruthy();
+      expect(doc?.filename).toBeTruthy();
+    });
+
+    it("returns null when the store has no doc of that type", async () => {
+      const doc = await service.getValidationDoc({
+        storeId: "pending-store-2",
+        docType: VALIDATION_DOC_TYPES.BUSINESS_PROOF,
+      });
+      expect(doc).toBeNull();
+    });
+
+    it("returns null when the store does not exist", async () => {
+      const doc = await service.getValidationDoc({
+        storeId: "non-existent-id",
+        docType: VALIDATION_DOC_TYPES.ID_FRONT,
+      });
+      expect(doc).toBeNull();
     });
   });
 });
