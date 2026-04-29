@@ -5,9 +5,12 @@
 --      absolute 100ms threshold from B12.1.
 --   2. internal.snapshot_slow_query_baseline() — captures the current mean per queryid.
 --      Called weekly by cron.
---   3. internal.get_slow_queries_for_alerts(p_threshold_ms, p_limit) — returns rows
---      that breach either the absolute threshold or the relative baseline ratio.
---      Called every 5 minutes by /api/cron/check-slow-queries.
+--   3. public.get_slow_queries_for_alerts(p_threshold_ms, p_limit, p_baseline_factor,
+--      p_baseline_min_age_days) — returns rows that breach either the absolute
+--      threshold or the relative baseline ratio. Called every 5 minutes by
+--      /api/cron/check-slow-queries via PostgREST .rpc(). Lives in `public` because
+--      PostgREST only exposes functions in the schemas listed in supabase/config.toml
+--      (public, graphql_public); execute is restricted to service_role + postgres.
 --   4. cron schedules: check-slow-queries (*/5 * * * *) and snapshot-slow-query-baseline
 --      (weekly on Sunday at 03:00 UTC).
 --
