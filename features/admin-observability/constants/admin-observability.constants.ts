@@ -1,0 +1,2 @@
+export const SLOW_QUERIES_LIMIT = 20;
+export const SLOW_QUERIES_STALE_TIME_MS = 60_000;
