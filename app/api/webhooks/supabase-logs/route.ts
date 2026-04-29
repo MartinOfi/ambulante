@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { timingSafeEqual } from "crypto";
+import { createHash, timingSafeEqual } from "crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -59,11 +59,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const incoming = request.headers.get("Authorization") ?? "";
   const expected = `Bearer ${secret}`;
-  const incomingBuf = Buffer.from(incoming);
-  const expectedBuf = Buffer.from(expected);
-  const authorized =
-    incomingBuf.byteLength === expectedBuf.byteLength && timingSafeEqual(incomingBuf, expectedBuf);
-  if (!authorized) {
+  const digest = (s: string) => createHash("sha256").update(s).digest();
+  if (!timingSafeEqual(digest(incoming), digest(expected))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
