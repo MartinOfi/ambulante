@@ -242,6 +242,7 @@ describe("createServerPushSender", () => {
 
       await sender.sendToUser("user-uuid-1", payload);
 
+      expect(webpush.sendNotification).toHaveBeenCalledTimes(3);
       expect(errorSpy).toHaveBeenCalledWith(
         expect.stringContaining("retries"),
         expect.objectContaining({ subscriptionId: sub.id }),

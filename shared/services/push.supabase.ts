@@ -75,8 +75,15 @@ async function sendWithRetry({
       return;
     } catch (err) {
       if (isWebPushError(err) && DEAD_SUBSCRIPTION_HTTP_CODES.has(err.statusCode)) {
-        await pushRepo.delete(subscription.id);
-        logger.warn("Dead push subscription removed", {
+        try {
+          await pushRepo.delete(subscription.id);
+        } catch (deleteErr) {
+          logger.error("Failed to delete dead push subscription", {
+            subscriptionId: subscription.id,
+            reason: deleteErr instanceof Error ? deleteErr.message : String(deleteErr),
+          });
+        }
+        logger.error("Dead push subscription removed", {
           subscriptionId: subscription.id,
           statusCode: err.statusCode,
         });
@@ -91,6 +98,7 @@ async function sendWithRetry({
           userId: subscription.userId,
           reason: err instanceof Error ? err.message : String(err),
         });
+        return;
       }
     }
   }
@@ -154,6 +162,8 @@ function createServiceRoleClient() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+// Singleton safe for server environments where VAPID keys are constant per process.
+// Tests must NOT call this function — use createServerPushSender directly with injected deps.
 let _serverPushSender: ServerPushSender | undefined;
 
 export function getServerPushSender(): ServerPushSender {
