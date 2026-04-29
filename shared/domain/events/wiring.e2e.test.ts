@@ -57,11 +57,19 @@ describe("registerE2EPushListener", () => {
   });
 
   it("does not capture a push when the client is not subscribed", async () => {
+    // Sentinel subscriber proves the listener is alive — without it, this test would
+    // pass even if registerE2EPushListener silently no-op'd (regression of MEDIUM-2).
+    const sentinelClientId = `${CLIENT_ID}-other`;
+    subscribeUser(sentinelClientId);
+
+    eventBus.publish({ ...makeOrderAcceptedEvent(), clientId: sentinelClientId });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(listCapturedPushes(sentinelClientId)).toHaveLength(1);
+
     eventBus.publish(makeOrderAcceptedEvent());
-
     await Promise.resolve();
     await Promise.resolve();
-
     expect(listCapturedPushes(CLIENT_ID)).toHaveLength(0);
   });
 
