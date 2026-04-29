@@ -289,7 +289,9 @@ Al terminar código:
 
 ## 10. Backend (Supabase)
 
-El backend corre sobre **Supabase** (Postgres + Auth + Realtime + Storage + PostGIS). La implementación se ejecuta en el epic [`docs/EPIC-BACKEND.md`](./docs/EPIC-BACKEND.md), siguiendo el plan operativo de [`docs/PARALLEL-EXECUTION-BACKEND.md`](./docs/PARALLEL-EXECUTION-BACKEND.md) y el template de agente [`docs/PROMPT-TEMPLATE-BACKEND.md`](./docs/PROMPT-TEMPLATE-BACKEND.md).
+El backend corre sobre **Supabase** (Postgres + Auth + Realtime + Storage + PostGIS). La implementación se ejecuta desde el índice [`docs/epic-backend/INDEX.md`](./docs/epic-backend/INDEX.md), siguiendo el plan operativo de [`docs/PARALLEL-EXECUTION-BACKEND.md`](./docs/PARALLEL-EXECUTION-BACKEND.md). Cada tarea se arranca con el slash command `/b-start <ID>` (que activa el flujo de [`docs/workflows/backend-task-protocol.md`](./docs/workflows/backend-task-protocol.md)) y se cierra con `/b-finish`.
+
+> **Histórico:** los archivos legacy `docs/EPIC-BACKEND.md` y `docs/PROMPT-TEMPLATE-BACKEND.md` quedan como redirecciones para compatibilidad — NO leerlos.
 
 ### 10.1 Skill obligatoria para tareas de backend
 

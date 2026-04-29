@@ -1,65 +1,55 @@
 # Code review final + cierre del worktree (PASO 9)
 
-Este paso se ejecuta **siempre** cuando la cadena cierra (Caso A del PASO 8).
+Este paso lo orquestra `/b-finish`. Documentado acá para que cualquier chat lo siga si se ejecuta manualmente.
 
 ---
 
-## 9.1 · Code review
+## 9.1 · Pasada 1 — full review
 
-1. Ejecutá el agente de code review:
+1. Calculá los archivos modificados:
+   ```bash
+   git diff main...HEAD --name-only
    ```
-   /everything-claude-code:code-reviewer
+2. Lanzá el agente `everything-claude-code:code-reviewer` pasándole la lista completa.
+3. Tomá **todos los issues** (critical, high, medium, low).
+4. **Antes de empezar a fixear**, marcá el commit actual como punto de referencia:
+   ```bash
+   git rev-parse HEAD > /tmp/.b-review-baseline
    ```
+   Ese SHA es la base para la pasada 2 focalizada.
 
-2. El agente va a revisar **todos los archivos creados o modificados en esta cadena**.
+## 9.2 · Fixes
 
-3. Tomá **todos los issues** que reporte — critical, high, medium y low — y fixealos uno por uno.
-   **No existe prioridad que excuse dejar un issue sin resolver**, con una única excepción: el protocolo de deuda técnica (ver `docs/workflows/debt-protocol.md`). Aplicalo así:
-   - El fix depende completamente de algo que no existe todavía → anotalo en `Notas:` de la tarea futura. No es deuda.
-   - El fix cambia el contrato de algo ya existente o requiere migración → registralo como `DT-N` en el epic y agregá `Resuelve: DT-N` en la tarea futura.
-   - Cualquier otro caso → fixealo ahora. Severity baja no es excusa para diferir.
+Aplicá los fixes según severidad:
+- **CRITICAL + HIGH:** todos, sin excepción (regla del workflow).
+- **MEDIUM:** todos los straightforward; los que cambian contrato → registrar como `DT-N` en `docs/EPIC-ARCHITECTURE.md § Deuda técnica` (ver `debt-protocol.md`) y diferir.
+- **LOW:** mismo criterio que MEDIUM.
 
-4. Por cada fix, corré `npx tsc --noEmit` y `npx vitest run` para verificar que no rompiste nada.
+Por cada fix corré `npx tsc --noEmit --silent` y los tests del archivo tocado para no regresionar.
 
-5. Si algún fix es complejo, aplicá el PASO 3 (auditoría) antes de escribirlo.
+## 9.3 · Pasada 2 — focalizada en los fixes (no full)
 
-6. **Segunda pasada obligatoria (gate duro):** una vez aplicados todos los fixes, volvé a ejecutar el agente de code review. Esta segunda pasada es la prueba objetiva — no tu declaración de que terminaste.
-   **No podés avanzar al 9.2 hasta que la segunda pasada devuelva 0 CRITICAL y 0 HIGH** sin una entrada de deuda técnica que los justifique. Si aparecen issues nuevos, fixealos y repetí la pasada.
-   Declarar "listo" sin haber corrido la segunda pasada es una violación de protocolo.
+**Objetivo:** detectar regresiones introducidas por los fixes de 9.2, no re-revisar todo el branch.
+
+1. Calculá los archivos tocados DESDE la baseline:
+   ```bash
+   git diff "$(cat /tmp/.b-review-baseline)"...HEAD --name-only
+   ```
+2. Lanzá `everything-claude-code:code-reviewer` con **esa lista filtrada**.
+3. **Gate:** la pasada 2 debe devolver 0 CRITICAL y 0 HIGH.
+   - Si la pasada 2 detecta un issue que toca un archivo NO incluido en la lista filtrada (ej: regresión en otro archivo por cambio de contrato), entonces lanzá una pasada 3 full sobre todos los archivos del branch. No es lo común — sólo si pasada 2 lo gatilla.
+4. Si quedan issues → fixealos, actualizá baseline (`git rev-parse HEAD > /tmp/.b-review-baseline`), volvé a 9.3 punto 1.
+
+**Por qué no re-revisamos todo:** la pasada 1 ya validó el estado pre-fix. La pasada 2 enfocada cuesta ~5x menos en tokens y el riesgo de regresión silente está acotado al diff de los fixes.
+
+## 9.4 · Verificación post-fix (silenciosa)
+
+Corré los 4 checks de `verification.md`. NO pegues outputs verbosos — pegá solo el veredicto si todo pasa o el fragmento relevante si falla.
+
+## 9.5 · Consulta al usuario (gestionada por `/b-finish`)
+
+`/b-finish` imprime el bloque de confirmación. Esperá `s` (sí) antes de mergear / borrar worktree.
 
 ---
 
-## 9.2 · Verificación post-fix
-
-Corré los 4 checks de `docs/workflows/verification.md` una vez más y pegá el output:
-
-```bash
-npx tsc --noEmit
-npx vitest run
-wc -l <archivos-tocados>
-grep -rn 'console\.log\|: any\b' <archivos-tocados>
-```
-
----
-
-## 9.3 · Consulta al usuario
-
-Una vez que el code review esté limpio y la verificación pase, imprimí **exactamente** esto:
-
-```
-✅ Code review completo. No quedan issues.
-
-¿Querés que:
-1. Commitee todos los cambios con el mensaje de cierre
-2. Mergee `<branch>` a `main`
-3. Borre el worktree `<dir>` y la branch `<branch>`
-
-Respondé s (sí a todo) o decime qué pasos omitir.
-```
-
-- Si el usuario responde **s** o equivalente → ejecutá los 3 pasos en orden:
-  1. `git add -p` (o por archivo) + `git commit -m "feat(fX.Y): <descripción>"`.
-  2. Desde el principal: `git -C /Users/martinoficialdegui/Desktop/ambulante merge --no-ff <branch>`.
-  3. Desde el principal: `git worktree remove <dir> && git branch -d <branch>`.
-- Si el usuario pide omitir algún paso → respetalo y reportá qué quedó pendiente.
-- Si hay conflictos en el merge → reportalos con detalle y esperá instrucciones. No fuerces.
+**Resumen:** pasada 1 full → fixes → pasada 2 focalizada en diff de fixes → gate 0/0 → verificación silenciosa → confirmación humana.

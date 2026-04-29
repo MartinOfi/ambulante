@@ -1,25 +1,41 @@
-# Verificación final — 4 checks obligatorios (PASO 6)
+# Verificación final — 4 checks (PASO 6)
 
-Ejecutá los 4 y pegá el output en el chat. Si algo falla, fijalo antes de cerrar la tarea.
+Corré los 4 checks abajo. **Outputs silenciosos** — sólo imprimís el veredicto, no el log completo.
 
 ```bash
 # 1. TypeScript — 0 errores
-npx tsc --noEmit
+npx tsc --noEmit 2>&1 | tail -5
 
-# 2. Tests — todos verdes, coverage ≥80% en archivos nuevos
-npx vitest run
+# 2. Tests — todos verdes (reporter compacto)
+npx vitest run --reporter=dot 2>&1 | tail -10
 
 # 3. Tamaño de archivos — ningún componente >200 líneas, ningún archivo >300
-wc -l <archivos-tocados>
+git diff main...HEAD --name-only | xargs wc -l 2>/dev/null | tail -1
 
 # 4. Artefactos prohibidos — debe devolver vacío
-grep -rn 'console\.log\|: any\b' <archivos-tocados>
+git diff main...HEAD --name-only | xargs grep -nE 'console\.log|: any\b' 2>/dev/null || echo "OK: 0 matches"
 ```
 
 **Criterios de aceptación:**
-- `tsc`: 0 errores, 0 warnings de tipo.
-- `vitest`: 0 tests fallando; coverage ≥80% para cada archivo nuevo con lógica.
-- `wc -l`: ningún componente supera 200, ningún otro archivo supera 300.
-- `grep`: output vacío (cero matches).
+- `tsc`: 0 errores.
+- `vitest`: 0 fail.
+- `wc`: ningún componente >200 líneas, ningún archivo >300.
+- `grep`: `OK: 0 matches`.
 
-Si alguno no pasa → fijalo y volvé a correr ese check antes de avanzar.
+**Output esperado (silencioso):**
+```
+✅ tsc 0 errors · vitest <N> passed · max <N> lines · grep OK
+```
+
+Si algo falla → fijá el problema antes de avanzar. NO sigas con verificación parcial.
+
+## DB-only checks (sólo si tu tarea toca SQL/migraciones)
+
+```bash
+pnpm supabase:reset --silent 2>&1 | tail -3
+pnpm supabase:test 2>&1 | tail -5
+[ -f scripts/db-audit-fk-indexes.sql ] && psql "$SUPABASE_DB_URL" -t -A -f scripts/db-audit-fk-indexes.sql | head -5
+[ -f scripts/check-supabase-imports.sh ] && bash scripts/check-supabase-imports.sh
+```
+
+Veredicto esperado: `reset OK · pgtap OK · fk-audit empty · imports OK`.

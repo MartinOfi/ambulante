@@ -63,17 +63,17 @@ Regla práctica: **tareas de la misma fase que tocan DB se serializan** para el 
 
 ## Cómo abrir una wave
 
-1. **Verificar el gating en el epic.** Buscás las tareas del gate en `docs/EPIC-BACKEND.md` y confirmás `✅ done`.
+1. **Verificar el gating en el INDEX.** Buscás las tareas del gate en `docs/epic-backend/INDEX.md` y confirmás `✅ done`.
 2. **No esperás a chats anteriores que sigan corriendo.** Solo importa el gate explícito.
-3. **Crear los worktrees** desde el directorio principal:
+3. **Abrir un chat de Claude por tarea** desde el directorio principal:
    ```bash
-   git worktree add ../ambulante-b<task-id> -b feat/b<task-id>-<slug>
+   cd ~/Desktop/ambulante && claude
    ```
-4. **Abrir un chat de Claude por worktree** con `cd` al worktree antes:
-   ```bash
-   cd ~/Desktop/ambulante-b1-2 && claude
+4. **Adentro del chat, ejecutar `/b-start <ID>`.** El comando crea el worktree, claimea la tarea en `INDEX.md`, comparte la instancia de Supabase si está corriendo, y arranca el flujo de `docs/workflows/backend-task-protocol.md`.
    ```
-5. **Pegar el template** de `docs/PROMPT-TEMPLATE-BACKEND.md` con `{{TASK_IDS}}` reemplazado.
+   /b-start B7.3
+   ```
+5. **`PROMPT-TEMPLATE-BACKEND.md` está deprecado.** No lo pegues. `/b-start` lo reemplaza.
 6. **No tocar chats de waves anteriores.** Terminan solos cuando completan.
 
 ---
@@ -568,39 +568,26 @@ Estos 5 flujos son **completamente independientes** entre sí: archivos distinto
 
 ### Antes de abrir una wave
 
-1. Abrir el epic y verificar que **el gating de esa wave** esté cumplido.
+1. Abrir `docs/epic-backend/INDEX.md` y verificar que **el gating de esa wave** esté cumplido.
 2. **No verificar nada más.** No importa si chats anteriores siguen vivos.
-3. Verificar que las tareas no estén ya `🟡 in-progress` (race protection).
-4. Crear los worktrees:
-   ```bash
-   git worktree add ../ambulante-b<task-id> -b feat/b<task-id>-<slug>
-   ```
-5. Abrir N ventanas de Claude Code, una por worktree:
-   ```bash
-   cd ~/Desktop/ambulante-b<task-id> && claude
-   ```
+3. Verificar que las tareas no estén ya `🟡 in-progress` (race protection — INDEX las muestra en la tabla de pendientes).
 
 ### Al abrir cada chat de la wave
 
-1. Copiar el template de `docs/PROMPT-TEMPLATE-BACKEND.md`.
-2. Reemplazar `{{TASK_IDS}}` con el Task ID.
-3. Pegar como primer mensaje. El PASO 0 verifica aislamiento.
+1. Desde el principal: `cd ~/Desktop/ambulante && claude`.
+2. Adentro del chat: `/b-start <ID>`. El comando hace el setup completo (worktree + claim + supabase compartido + activación de `backend-task-protocol.md`).
 
 ### Durante la ejecución
 
-- Cada chat reporta progreso vía `## PASO N · …`.
-- Al cerrar tarea, el epic se actualiza automáticamente (PASO 7).
-- Si la tarea tiene `Continues with:`, auto-claim del siguiente eslabón (PASO 8).
+- Cada chat ejecuta UNA tarea. **No hay auto-continuación de cadenas.**
+- Al cerrar la tarea con `/b-finish`, si tenía `Continues with:`, el comando imprime el comando exacto para arrancar el siguiente eslabón en chat NUEVO.
 - **Vos abrís nuevas waves apenas su gating se cumpla.** No esperás a que los chats activos cierren.
 
 ### Al cerrar una wave
 
-1. Verificar tareas ✅ en el epic.
+1. Verificar tareas ✅ en `docs/epic-backend/INDEX.md`.
 2. `git pull` en el directorio principal para traer actualizaciones.
-3. Limpiar worktrees:
-   ```bash
-   git worktree remove ../ambulante-b<task-id>
-   ```
+3. `/b-finish` ya borra los worktrees uno por uno cuando confirmás merge. No hace falta cleanup manual.
 4. Si se completó la fase, pasar a la siguiente.
 
 ### Manejo de bloqueos
@@ -617,7 +604,7 @@ Estos 5 flujos son **completamente independientes** entre sí: archivos distinto
 | Anti-patrón | Por qué está mal | Qué hacer |
 |---|---|---|
 | "Espero a que Wave A entera cierre antes de abrir Wave B" | Wave B se desbloquea con su gating. Dejás tiempo sin usar. | Abrí Wave B apenas su gating se cumpla. |
-| "Cierro chats de Wave A cuando abro Wave B" | Chats de cadena tienen tareas pendientes; cerrarlos rompe auto-continue. | Dejá chats vivos hasta que terminen solos. |
+| "Cierro chats de Wave A cuando abro Wave B" | Cada chat ejecuta UNA tarea; cerrarlo prematuramente la deja a medias. | Dejá los chats vivos hasta que `/b-finish` cierre. |
 | "Todos los chats comparten `~/Desktop/ambulante/`" | Race condition en `.git/HEAD`. | Cada chat en su propio worktree. |
 | "Salto B2.5 (lint SQL) porque es chico" | El lint previene regresiones en policies futuras. | Hacelo en la wave correcta. |
 | "Mergeo B9 antes de que cierre B4" | B9 importa del facade real que B4 llena. Sin B4, es vaporware. | Respetá gating de trilliza. |
