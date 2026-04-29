@@ -135,6 +135,21 @@ SQL script that generates production-scale synthetic data and asserts the 5 most
 
 ---
 
+---
+
+## §16 — E2E Playwright specs
+
+Viven en `e2e/`. Corren contra el dev server (puerto 3100). CI usa `workers: 1`.
+
+| Archivo | Qué verifica |
+|---|---|
+| `e2e/realtime.spec.ts` | Propagación de aceptación de pedido <5s (store-demo-1); toggle de disponibilidad <2s (B6.3) |
+| `e2e/realtime-propagation.spec.ts` | SLA PRD §7.2: aceptación de pedido propagada al cliente en <5s (store-demo-2, seed B6.4 "Taco E2E B6.4") + timing assertion explícito con `Date.now()` |
+
+Ambas specs usan `makeSessionCookie(role, userId)` + `context.addCookies()` con `SESSION_COOKIE_NAME` para autenticar sin UI. `realtime-propagation.spec.ts` usa `store-demo-2` para evitar conflictos de estado con `realtime.spec.ts` (que consume el order RECIBIDO de `store-demo-1`).
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`

@@ -57,7 +57,7 @@ const DEMO_SEEDS = [
     status: ORDER_STATUS.RECIBIDO,
     items: [{ productId: "p5", productName: "Pizza porción", productPriceArs: 900, quantity: 2 }],
   },
-  // Seed for E2E realtime test: newest RECIBIDO for demo-client-1 at store-demo-1
+  // Seed for E2E realtime test (realtime.spec.ts): RECIBIDO for demo-client-1 at store-demo-1
   {
     clientId: DEMO_CLIENT_ID,
     storeId: "store-demo-1",
@@ -65,6 +65,14 @@ const DEMO_SEEDS = [
     items: [
       { productId: "p6", productName: "Pizza porción E2E", productPriceArs: 900, quantity: 1 },
     ],
+  },
+  // Seed for B6.4 propagation SLA test (realtime-propagation.spec.ts): uses store-demo-2 to
+  // avoid state conflicts with the store-demo-1 order above when both suites run in the same server.
+  {
+    clientId: DEMO_CLIENT_ID,
+    storeId: "store-demo-2",
+    status: ORDER_STATUS.RECIBIDO,
+    items: [{ productId: "p7", productName: "Taco E2E B6.4", productPriceArs: 800, quantity: 2 }],
   },
 ] as const;
 
