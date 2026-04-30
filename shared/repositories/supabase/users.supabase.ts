@@ -14,7 +14,9 @@ export class SupabaseUserRepository implements UserRepository {
   constructor(private readonly client: SupabaseClient) {}
 
   async findAll(filters?: UserFilters): Promise<readonly User[]> {
-    let query = this.client.from("users").select("public_id, role, display_name, email, suspended");
+    let query = this.client
+      .from("users")
+      .select("public_id, role, display_name, email, suspended, avatar_url");
 
     if (filters?.role !== undefined) {
       query = query.eq("role", domainRoleToDb(filters.role));
@@ -35,7 +37,7 @@ export class SupabaseUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {
     const { data, error } = await this.client
       .from("users")
-      .select("public_id, role, display_name, email, suspended")
+      .select("public_id, role, display_name, email, suspended, avatar_url")
       .eq("public_id", id)
       .maybeSingle();
 
@@ -47,7 +49,7 @@ export class SupabaseUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const { data, error } = await this.client
       .from("users")
-      .select("public_id, role, display_name, email, suspended")
+      .select("public_id, role, display_name, email, suspended, avatar_url")
       .eq("email", email)
       .maybeSingle();
 
@@ -59,7 +61,7 @@ export class SupabaseUserRepository implements UserRepository {
   async findByAuthUserId(authUserId: string): Promise<User | null> {
     const { data, error } = await this.client
       .from("users")
-      .select("public_id, role, display_name, email, suspended")
+      .select("public_id, role, display_name, email, suspended, avatar_url")
       .eq("auth_user_id", authUserId)
       .maybeSingle();
 
@@ -79,7 +81,7 @@ export class SupabaseUserRepository implements UserRepository {
         email: input.email,
         suspended: input.suspended ?? false,
       })
-      .select("public_id, role, display_name, email, suspended")
+      .select("public_id, role, display_name, email, suspended, avatar_url")
       .single();
 
     if (error !== null) throw new Error(`SupabaseUserRepository.create: ${error.message}`);
@@ -90,13 +92,14 @@ export class SupabaseUserRepository implements UserRepository {
     const patch: Record<string, unknown> = {};
     if (input.role !== undefined) patch.role = domainRoleToDb(input.role);
     if (input.displayName !== undefined) patch.display_name = input.displayName;
+    if (input.avatarUrl !== undefined) patch.avatar_url = input.avatarUrl;
     if (input.suspended !== undefined) patch.suspended = input.suspended;
 
     const { data, error } = await this.client
       .from("users")
       .update(patch)
       .eq("public_id", id)
-      .select("public_id, role, display_name, email, suspended")
+      .select("public_id, role, display_name, email, suspended, avatar_url")
       .single();
 
     if (error !== null) throw new Error(`SupabaseUserRepository.update: ${error.message}`);

@@ -51,9 +51,13 @@ export class MockUserRepository implements UserRepository {
       logger.error("MockUserRepository.update: user not found", { id });
       throw new Error(`User with id "${id}" not found`);
     }
-    const updated: User = { ...this.users[index], ...input };
-    this.users = [...this.users.slice(0, index), updated, ...this.users.slice(index + 1)];
-    return updated;
+    const { avatarUrl: avatarUrlPatch, ...rest } = input;
+    const next: User = { ...this.users[index], ...rest };
+    if (avatarUrlPatch !== undefined) {
+      next.avatarUrl = avatarUrlPatch ?? undefined;
+    }
+    this.users = [...this.users.slice(0, index), next, ...this.users.slice(index + 1)];
+    return next;
   }
 
   async delete(id: string): Promise<void> {

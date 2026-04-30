@@ -12,6 +12,7 @@ export const userSchema = z
       .email("El email no tiene un formato válido"),
     role: userRoleSchema,
     displayName: z.string().optional(),
+    avatarUrl: z.string().url("La URL del avatar no es válida").optional(),
     suspended: z.boolean().optional(),
   })
   .strict();

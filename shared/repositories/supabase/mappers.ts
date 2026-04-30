@@ -66,6 +66,7 @@ export interface DbUserRow {
   display_name: string | null;
   email: string | null;
   suspended: boolean | null;
+  avatar_url?: string | null;
 }
 
 export function mapUserRow(row: DbUserRow): User {
@@ -74,6 +75,7 @@ export function mapUserRow(row: DbUserRow): User {
     email: row.email ?? "",
     role: dbRoleToDomain(row.role),
     displayName: row.display_name ?? undefined,
+    avatarUrl: row.avatar_url ?? undefined,
     suspended: row.suspended ?? undefined,
   };
 }

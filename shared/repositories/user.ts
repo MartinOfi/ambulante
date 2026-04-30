@@ -7,7 +7,10 @@ export interface UserFilters {
 }
 
 export type CreateUserInput = User;
-export type UpdateUserInput = Partial<Omit<User, "id" | "email">>;
+export type UpdateUserInput = Partial<Omit<User, "id" | "email" | "avatarUrl">> & {
+  // null permite borrar explícitamente el avatar (SET avatar_url = NULL).
+  readonly avatarUrl?: string | null;
+};
 
 export interface UserRepository extends Repository<
   User,
