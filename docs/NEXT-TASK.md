@@ -67,6 +67,7 @@
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
 | [NT-37](#nt-37--tests-fallan-en-local-sin-env-vars-de-supabase-módulos-repositoriesindexts) | Tests fallan en local sin env vars de Supabase | testing / DevEx | S | próximo onboarding de dev nuevo |
+| [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
 
 ---
 
@@ -590,6 +591,18 @@
 - **Ticket:** —
 - **Notas:** Workaround actual: setear env vars antes de `pnpm test`. CI no detecta el bug porque el job `test-unit` corre con env stubs implícitos.
 
+### NT-38 — Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C
+
+- **Categoría:** refactor / cleanup
+- **Contexto:** Descubierto al ejecutar **B9-B.5**. El swap de hooks cliente (`useSendOrderMutation`, `useCancelOrderMutation`, `useOrderQuery`, `useOrdersQuery` para historial) ya migró fuera de `orders.mock.ts`. Pero los hooks lado tienda (`useAcceptOrderMutation`, `useRejectOrderMutation`, `useFinalizeOrderMutation`, `useStoreOrdersQuery`) y el barrel `features/orders/services/index.ts` aún importan el mock. Se decide **defer** el borrado total a B10-C (manejo de pedidos lado tienda).
+- **Aceptación:** post B10-C, hacer grep de `orders.mock` en todo el repo. Si retorna 0 imports, borrar `features/orders/services/orders.mock.ts`, `features/orders/services/orders.service.ts` (interface ya redundante post-swaps) y simplificar/borrar `features/orders/services/index.ts`. Verificar `pnpm typecheck` + suite.
+- **Archivos afectados:** `features/orders/services/orders.mock.ts`, `features/orders/services/orders.service.ts`, `features/orders/services/index.ts`, todos los tests del lado tienda.
+- **Estimación:** S
+- **Cuándo retomarlo:** al cerrar B10-C.
+- **Dependencias:** B10-C.
+- **Ticket:** —
+- **Notas:** Hooks lado tienda hoy usan `ordersService.{accept,reject,finalize,findByStore}` (mock). B10-C los swappea a Server Actions / repo real, eliminando la última dependencia.
+
 ---
 
 ## Cómo se alimenta este doc durante la ejecución del epic
@@ -609,3 +622,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 |---|---|
 | 2026-04-21 | Reescritura completa con formato estructurado. Poblado inicial: NT-01 a NT-25 (3 originales + 22 nuevos del brainstorming + decisiones post-MVP del PRD). |
 | 2026-04-29 | NT-32 agregado — vitest 9 fails preexistentes detectados durante cierre de B14.3. |
+| 2026-04-30 | NT-38 agregado — defer de borrado total `orders.mock.ts` hasta cierre de B10-C. |
