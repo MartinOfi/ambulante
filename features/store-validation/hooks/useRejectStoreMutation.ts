@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { storeValidationService } from "@/features/store-validation/services/store-validation.service.mock";
+import { storeValidationService } from "@/features/store-validation/services";
 import type {
   PendingStore,
   RejectStoreInput,
