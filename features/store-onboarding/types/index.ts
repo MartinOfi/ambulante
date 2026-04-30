@@ -1,4 +1,5 @@
 import type { StoreOnboardingData } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
+import type { SubmitStoreOnboardingResult } from "@/features/store-onboarding/services/submit-store-onboarding";
 
 export type {
   StepFiscalValues,
@@ -11,5 +12,5 @@ export type {
 export type OnboardingStep = 1 | 2 | 3;
 
 export interface StoreOnboardingService {
-  submit(data: StoreOnboardingData): Promise<{ success: boolean; error?: string }>;
+  submit(data: StoreOnboardingData): Promise<SubmitStoreOnboardingResult>;
 }

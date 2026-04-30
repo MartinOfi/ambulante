@@ -326,6 +326,26 @@
 
 ---
 
+### `features/store-onboarding/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `submitStoreOnboarding` | `features/store-onboarding/services/submit-store-onboarding.ts` | service fn | Lógica de dominio del onboarding: valida usuario, rol, suspensión, datos Zod y crea la tienda |
+| `SubmitStoreOnboardingDeps` | `features/store-onboarding/services/submit-store-onboarding.ts` | interface | Deps inyectadas: `getCurrentUser`, `createStore`, `generateStoreId` |
+| `SubmitStoreOnboardingResult` | `features/store-onboarding/services/submit-store-onboarding.ts` | type | Union discriminada: `{ success: true; storeId }` \| `{ success: false; error }` |
+| `submitStoreOnboardingAction` | `features/store-onboarding/server-actions/store-onboarding-actions.ts` | server-action | `"use server"`. Crea session + service-role clients, cablea deps reales, llama `submitStoreOnboarding` |
+| `storeOnboardingSchema` | `features/store-onboarding/schemas/store-onboarding.schemas.ts` | schema | Zod: valida el formulario multi-step de alta de tienda (CUIT 11 dígitos con módulo 11) |
+| `StoreOnboardingData` | `features/store-onboarding/schemas/store-onboarding.schemas.ts` | type | `z.infer<typeof storeOnboardingSchema>` — campos: `businessName`, `kind`, `cuit`, `neighborhood`, `coverageNotes?`, `days`, `openTime`, `closeTime` |
+
+#### store-onboarding service (B10-A.2)
+- **Patrón DI:** `submitStoreOnboarding(data, deps)` — toda la lógica de dominio sin acoplamiento a Supabase; testeable con mocks.
+- **Flujo de guards:** unauthenticated → wrong role → suspended → Zod parse → `createStore` → return `storeId`.
+- **Persistencia:** la tienda se crea con `status="closed"` (invisible hasta aprobación) y `cuit` almacenado para la cola de validación admin.
+- **Server Action:** usa dos clientes Supabase distintos — session client (anon key + cookies) para leer el usuario, service role client para el INSERT que bypasea las RLS policies de `stores` (sin INSERT policy para el rol autenticado).
+- **Tests:** 11 tests en `submit-store-onboarding.test.ts`.
+
+---
+
 ## Cuándo promover a `shared/`
 
 Un ítem de feature pasa a `shared/` cuando:

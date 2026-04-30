@@ -10,7 +10,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 const validService: StoreOnboardingService = {
-  submit: vi.fn().mockResolvedValue({ success: true }),
+  submit: vi.fn().mockResolvedValue({ success: true, storeId: "store-id-mock" }),
 };
 
 const failingService: StoreOnboardingService = {

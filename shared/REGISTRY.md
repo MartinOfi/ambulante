@@ -253,6 +253,9 @@
 | SLOW_QUERIES_LIMIT / SLOW_QUERIES_STALE_TIME_MS / QUERY_TRUNCATE_LENGTH | constant | `features/admin-observability/constants/admin-observability.constants.ts` | features.md §13 |
 | GET /api/admin/slow-queries | route-handler | `app/api/admin/slow-queries/route.ts` | infra.md §14 |
 | SlowQuery / slowQuerySchema / slowQueryArraySchema | type + schema | `shared/types/observability.ts` | domain.md §7 |
+| submitStoreOnboarding / SubmitStoreOnboardingDeps / SubmitStoreOnboardingResult | service fn + types | `features/store-onboarding/services/submit-store-onboarding.ts` | features.md §13 |
+| submitStoreOnboardingAction | server-action | `features/store-onboarding/server-actions/store-onboarding-actions.ts` | features.md §13 |
+| storeOnboardingSchema / StoreOnboardingData | schema + type | `features/store-onboarding/schemas/store-onboarding.schemas.ts` | features.md §13 |
 
 ---
 

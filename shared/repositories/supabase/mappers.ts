@@ -5,6 +5,7 @@ import type { Order, OrderItem } from "@/shared/schemas/order";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import type { OrderStatus } from "@/shared/constants/order";
 import type { PushSubscription } from "@/shared/repositories/push-subscriptions";
+import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
 
 // ── User role mappings ─────────────────────────────────────────────────────────
 
@@ -94,9 +95,8 @@ export interface DbStoreViewRow {
   lat: number | null;
   lng: number | null;
   distance_meters?: number | null;
+  cuit?: string | null;
 }
-
-const PLACEHOLDER_PHOTO_URL = "https://ambulante.app/placeholder-store.png";
 
 export function mapStoreRow(row: DbStoreViewRow): Store {
   return {
@@ -106,10 +106,11 @@ export function mapStoreRow(row: DbStoreViewRow): Store {
     description: row.description ?? undefined,
     kind: dbCategoryToKind(row.category),
     status: dbAvailableToStatus(row.available),
-    photoUrl: row.photo_url ?? PLACEHOLDER_PHOTO_URL,
+    photoUrl: row.photo_url ?? PLACEHOLDER_STORE_PHOTO_URL,
     tagline: row.tagline ?? "",
     priceFromArs: row.price_from_ars !== null ? Number(row.price_from_ars) : 0,
     hours: row.hours ?? undefined,
+    cuit: row.cuit ?? undefined,
     location: {
       lat: row.lat ?? 0,
       lng: row.lng ?? 0,

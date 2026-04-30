@@ -31,6 +31,13 @@ export const storeSchema = z
       .uuid("El ID del dueño debe ser un UUID válido"),
     description: z.string().optional(),
     hours: z.string().optional(),
+    // Fiscal identifier stored at registration for admin validation (B10-A / B5.4).
+    // Modulo-11 checkdigit is NOT re-validated here: this schema is used for reads
+    // from the DB, and the digit was already validated at onboarding time (stepFiscalSchema).
+    cuit: z
+      .string()
+      .regex(/^\d{11}$/)
+      .optional(),
   })
   .strict();
 
