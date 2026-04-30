@@ -68,6 +68,18 @@ describe("submitStoreOnboarding", () => {
     if (!result.success) expect(result.error).toMatch(/permiso|rol|tienda/i);
   });
 
+  it("returns error when the store-role user is suspended", async () => {
+    const { deps } = createDeps({
+      getCurrentUser: vi.fn().mockResolvedValue({ ...STORE_USER, suspended: true }),
+    });
+
+    const result = await submitStoreOnboarding(VALID_DATA, deps);
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/suspendida|soporte/i);
+    expect(deps.createStore).not.toHaveBeenCalled();
+  });
+
   it("returns error when input data fails Zod validation", async () => {
     const { deps } = createDeps();
     const invalid: StoreOnboardingData = { ...VALID_DATA, cuit: "12345" };
@@ -105,6 +117,14 @@ describe("submitStoreOnboarding", () => {
       name: VALID_DATA.businessName,
       kind: VALID_DATA.kind,
     });
+  });
+
+  it("persists cuit in the store record for admin validation", async () => {
+    const { deps, createdInputs } = createDeps();
+
+    await submitStoreOnboarding(VALID_DATA, deps);
+
+    expect(createdInputs[0]).toMatchObject({ cuit: VALID_DATA.cuit });
   });
 
   it("creates the store with status='closed' so it is not visible publicly until approved", async () => {

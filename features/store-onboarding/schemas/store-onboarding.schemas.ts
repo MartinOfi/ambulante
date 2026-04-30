@@ -56,11 +56,14 @@ const stepHoursBaseSchema = z.object({
 const CLOSE_AFTER_OPEN_MESSAGE = "El horario de cierre debe ser posterior al de apertura";
 const CLOSE_AFTER_OPEN_PATH = ["closeTime"];
 
+// MVP: string comparison (HH:MM) rejects midnight-crossing shifts (e.g. 22:00–02:00).
+// Acceptable for v1 — ambulante stores are assumed to operate within a single calendar day.
 export const stepHoursSchema = stepHoursBaseSchema.refine(
   (data) => data.closeTime > data.openTime,
   { message: CLOSE_AFTER_OPEN_MESSAGE, path: CLOSE_AFTER_OPEN_PATH },
 );
 
+// Same midnight-crossing caveat as stepHoursSchema above.
 export const storeOnboardingSchema = stepFiscalSchema
   .merge(stepZoneSchema)
   .merge(stepHoursBaseSchema)

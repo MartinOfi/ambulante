@@ -28,7 +28,7 @@
 | B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 4/4 | ✅ |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 4/4 | ✅ |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 1/3 | 🟡 |
-| B10 | Swap tienda (features Tienda consumen backend real) | 4 | 0/4 | ⚪ |
+| B10 | Swap tienda (features Tienda consumen backend real) | 4 | 1/4 | 🟡 |
 | B11 | Swap admin (features Admin consumen backend real) | 3 | 1/3 | 🟡 |
 | B12 | Observability backend | 3 | 3/3 | ✅ |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 1/2 | 🟡 |
@@ -40,7 +40,6 @@
 |---|---|---|---|---|---|---|
 | B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ⚪ | B9-A, B6.3 | XL | `lock-short-transactions`, `data-batch-inserts`, `data-pagination` | `features.md`. |
 | B9-C | Cliente: push subscribe + profile | ⚪ | B8.1, B9-A | M | — | `features.md`. |
-| B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ⚪ | B4.4, B5.4, B5.2 | XL | — | `features.md`. |
 | B10-B | Tienda: operación (availability + location + catálogo CRUD) | ⚪ | B3.1, B5.3, B10-A | XL | `data-batch-inserts` | `features.md`. |
 | B10-C | Tienda: manejo de pedidos (inbox realtime + accept/reject/finalize) | ⚪ | B6.3, B9-B | L | `lock-short-transactions` | `features.md`. |
 | B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
@@ -100,6 +99,7 @@
 | B14.3 | Release-please integration | ✅ |
 | B3.4 | CI check: no hay imports rotos | ✅ |
 | B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ✅ |
+| B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ✅ |
 
 ## Re-shape vertical (2026-04-29)
 

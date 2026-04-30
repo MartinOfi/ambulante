@@ -1,10 +1,11 @@
--- pgTAP test: B10-A.1 — validation_status migration
--- Covers: enum store_validation_status, column on stores, default, NOT NULL.
+-- pgTAP test: B10-A — validation_status + cuit migration
+-- Covers: enum store_validation_status, column on stores, default, NOT NULL,
+--         validation_status index, cuit column, and stores_view exposure.
 -- Run with: pnpm supabase:test
 
 begin;
 
-select plan(6);
+select plan(10);
 
 -- 1. enum type store_validation_status exists
 select ok(
@@ -75,6 +76,51 @@ select is(
   ),
   'NO',
   'validation_status should be NOT NULL'
+);
+
+-- 7. index on validation_status exists for efficient admin queue queries
+select has_index(
+  'public',
+  'stores',
+  'stores_validation_status_idx',
+  'stores_validation_status_idx index should exist on public.stores'
+);
+
+-- 8. cuit column exists on stores
+select ok(
+  exists(
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'stores'
+      and column_name = 'cuit'
+  ),
+  'public.stores.cuit column should exist'
+);
+
+-- 9. cuit column is nullable (optional at DB level; required by onboarding form)
+select is(
+  (
+    select is_nullable
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'stores'
+      and column_name = 'cuit'
+  ),
+  'YES',
+  'stores.cuit should be nullable'
+);
+
+-- 10. stores_view exposes cuit
+select ok(
+  exists(
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'stores_view'
+      and column_name = 'cuit'
+  ),
+  'stores_view should expose the cuit column'
 );
 
 select * from finish();

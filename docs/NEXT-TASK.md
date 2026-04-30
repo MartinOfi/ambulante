@@ -622,6 +622,20 @@
 
 ---
 
+### NT-40 — `SupabaseStoreRepository.create` hace 3 round-trips sin transacción ni dedup
+
+- **Categoría:** backend / reliability
+- **Contexto:** `create()` ejecuta 3 queries secuenciales: (1) SELECT `users.id` interno, (2) INSERT en `stores`, (3) SELECT desde `stores_view` para re-fetch. Si el step 3 falla (view recreada, lag temporal) la fila ya existe en DB pero la Server Action retorna `{ success: false }`. El usuario reintenta y choca contra la UNIQUE constraint de `public_id` o CUIT. El nuevo campo `cuit` (B10-A) hace este escenario más probable de ser visible al usuario. Detectado durante code review de cierre B10-A.
+- **Aceptación:** Una de: (a) envolver los 3 steps en una RPC Postgres que retorne el row completo, o (b) agregar dedup en la Server Action (`checkIfStoreExists` antes de `createStore`) para idempotencia, o (c) hacer que `create()` use `RETURNING *` junto con un JOIN a `users` para eliminar el re-fetch separado.
+- **Archivos afectados:** `shared/repositories/supabase/stores.supabase.ts` (`create`), `features/store-onboarding/server-actions/store-onboarding-actions.ts` (dedup guard opcional).
+- **Estimación:** M
+- **Cuándo retomarlo:** antes de go-live (B14) o cuando se agrege retry logic al onboarding. Hoy el riesgo es bajo porque la cadena de éxitos en un deploy fresco es casi 100%.
+- **Dependencias:** —
+- **Ticket:** —
+- **Notas:** Pre-existente en la implementación de `create()`. Descubierto por code-reviewer durante cierre de B10-A.
+
+---
+
 ## Cómo se alimenta este doc durante la ejecución del epic
 
 Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:

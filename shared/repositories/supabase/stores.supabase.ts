@@ -10,7 +10,7 @@ import type { SupabaseClient } from "./client";
 import { mapStoreRow, dbAvailableToStatus, type DbStoreViewRow } from "./mappers";
 
 const STORES_VIEW_SELECT =
-  "public_id, owner_public_id, name, description, category, available, photo_url, tagline, price_from_ars, hours, lat, lng";
+  "public_id, owner_public_id, name, description, category, available, photo_url, tagline, price_from_ars, hours, lat, lng, cuit";
 
 export class SupabaseStoreRepository implements StoreRepository {
   constructor(private readonly client: SupabaseClient) {}
@@ -101,6 +101,7 @@ export class SupabaseStoreRepository implements StoreRepository {
         tagline: input.tagline,
         price_from_ars: input.priceFromArs,
         hours: input.hours ?? null,
+        cuit: input.cuit ?? null,
       })
       .select("public_id, owner_id")
       .single();
