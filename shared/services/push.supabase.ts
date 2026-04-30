@@ -25,6 +25,9 @@ export const supabasePushService: PushService = {
   async unsubscribe(): Promise<boolean> {
     throw new Error("TODO — implementar en B6");
   },
+  async getActiveSubscription(): Promise<PushSubscriptionData | null> {
+    throw new Error("TODO — implementar en B6");
+  },
   async sendTestNotification(_title: string, _body: string): Promise<void> {
     throw new Error("TODO — implementar en B6");
   },

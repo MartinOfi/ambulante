@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import { useSession } from "@/shared/hooks/useSession";
 import { useLocationPermission } from "@/features/profile/hooks/useLocationPermission";
 import { useNotificationPrefs } from "@/features/profile/hooks/useNotificationPrefs";
@@ -14,11 +13,6 @@ export function ProfilePageContainer() {
   const { status: locationStatus, requestPermission } = useLocationPermission();
   const { prefs, notificationPermission, togglePref, requestNotificationPermission } =
     useNotificationPrefs();
-
-  const handleSignOut = useCallback(async () => {
-    await sessionResult.signOut();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionResult.signOut]);
 
   if (sessionResult.status === "loading") {
     return null;
@@ -37,10 +31,14 @@ export function ProfilePageContainer() {
       onRequestLocation={requestPermission}
       onTogglePref={togglePref}
       onRequestNotificationPermission={requestNotificationPermission}
-      onSignOut={handleSignOut}
-      avatarSlot={isAuthenticated ? <AvatarUploadContainer currentUrl={user.avatarUrl} /> : undefined}
+      onSignOut={sessionResult.signOut}
+      avatarSlot={
+        isAuthenticated ? <AvatarUploadContainer currentUrl={user.avatarUrl} /> : undefined
+      }
       displayNameEditorSlot={
-        isAuthenticated ? <DisplayNameFieldContainer initialValue={user.displayName ?? ""} /> : undefined
+        isAuthenticated ? (
+          <DisplayNameFieldContainer initialValue={user.displayName ?? ""} />
+        ) : undefined
       }
       pushOptInSlot={isAuthenticated ? <PushOptInToggleContainer /> : undefined}
     />

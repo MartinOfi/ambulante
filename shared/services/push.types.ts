@@ -13,6 +13,10 @@ export interface PushService {
   requestPermission(): Promise<PushPermissionStatus>;
   subscribe(): Promise<PushSubscriptionData | null>;
   unsubscribe(): Promise<boolean>;
+  // Lectura no destructiva del estado de suscripción al cargar la UI.
+  // Mock: refleja activeSubscription. Real: consulta
+  // navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).
+  getActiveSubscription(): Promise<PushSubscriptionData | null>;
   sendTestNotification(title: string, body: string): Promise<void>;
 }
 

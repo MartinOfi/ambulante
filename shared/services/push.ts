@@ -64,6 +64,10 @@ export function createMockPushService(): PushService {
     return true;
   }
 
+  async function getActiveSubscription(): Promise<PushSubscriptionData | null> {
+    return activeSubscription;
+  }
+
   // @mock-only — uses the Notification constructor directly (browser-only).
   // Real implementation must use ServiceWorkerRegistration.showNotification()
   // via the push subscription. See CLAUDE.md §9 (iOS Safari constraint).
@@ -96,6 +100,7 @@ export function createMockPushService(): PushService {
     requestPermission,
     subscribe,
     unsubscribe,
+    getActiveSubscription,
     sendTestNotification,
   };
 }

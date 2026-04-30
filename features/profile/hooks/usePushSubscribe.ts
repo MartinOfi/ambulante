@@ -25,12 +25,34 @@ export function usePushSubscribe(): UsePushSubscribeReturn {
   // El permiso del browser puede cambiar fuera de la app (ajustes del usuario).
   // Refrescamos al montar y cuando la pestaña vuelve a estar visible.
   useEffect(() => {
-    function refresh() {
+    function refreshPermission() {
       setPermission(pushService.getPermissionStatus());
     }
-    refresh();
-    document.addEventListener("visibilitychange", refresh);
-    return () => document.removeEventListener("visibilitychange", refresh);
+    refreshPermission();
+    document.addEventListener("visibilitychange", refreshPermission);
+    return () => document.removeEventListener("visibilitychange", refreshPermission);
+  }, []);
+
+  // Inicializar isSubscribed leyendo el estado actual de la suscripción del
+  // browser (no destructivo). Sin esto, el toggle siempre arrancaría en OFF
+  // aunque el usuario tenga ya una suscripción activa, generando UX errónea
+  // y riesgo de doble-suscripción al re-suscribir desde el wizard.
+  useEffect(() => {
+    let cancelled = false;
+    async function loadInitial() {
+      try {
+        const current = await pushService.getActiveSubscription();
+        if (!cancelled) setIsSubscribed(current !== null);
+      } catch (error) {
+        logger.error("usePushSubscribe.getActiveSubscription failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+    void loadInitial();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const subscribe = useCallback(async () => {

@@ -162,6 +162,30 @@ describe("createMockPushService", () => {
     });
   });
 
+  describe("getActiveSubscription", () => {
+    it("retorna null antes de subscribe", async () => {
+      const result = await service.getActiveSubscription();
+      expect(result).toBeNull();
+    });
+
+    it("retorna la suscripción activa después de subscribe", async () => {
+      vi.stubGlobal("Notification", makeMockNotification("granted"));
+      const subscription = await service.subscribe();
+
+      const result = await service.getActiveSubscription();
+      expect(result).toEqual(subscription);
+    });
+
+    it("retorna null después de unsubscribe", async () => {
+      vi.stubGlobal("Notification", makeMockNotification("granted"));
+      await service.subscribe();
+      await service.unsubscribe();
+
+      const result = await service.getActiveSubscription();
+      expect(result).toBeNull();
+    });
+  });
+
   describe("sendTestNotification", () => {
     it("creates a Notification when permission is granted", async () => {
       const mockNotification = makeMockNotification("granted");

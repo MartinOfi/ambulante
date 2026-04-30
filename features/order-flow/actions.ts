@@ -12,6 +12,7 @@ import {
 import type { OrderItem } from "@/shared/schemas/order";
 import type { Product } from "@/shared/schemas/product";
 import { ORDER_STATUS } from "@/shared/constants/order";
+import { STORE_STATUS } from "@/shared/constants/store";
 import { eventBus } from "@/shared/domain/event-bus";
 import { ORDER_DOMAIN_EVENT } from "@/shared/domain/events";
 import { serverLogger } from "@/shared/utils/server-logger";
@@ -25,8 +26,6 @@ import {
   type SubmitOrderInput,
   type SubmitOrderItemInput,
 } from "@/features/order-flow/schemas";
-
-const STORE_OPEN_STATUS = "open" as const;
 
 export type SubmitOrderResult =
   | { readonly ok: true; readonly publicId: string; readonly status: typeof ORDER_STATUS.ENVIADO }
@@ -76,7 +75,7 @@ export async function submitOrder(input: SubmitOrderInput): Promise<SubmitOrderR
     if (customer === null) return fail(SUBMIT_ORDER_ERROR_CODE.UNAUTHENTICATED);
 
     const store = await new SupabaseStoreRepository(client).findById(storeId);
-    if (store === null || store.status !== STORE_OPEN_STATUS) {
+    if (store === null || store.status !== STORE_STATUS.open) {
       return fail(SUBMIT_ORDER_ERROR_CODE.STORE_UNAVAILABLE);
     }
 
