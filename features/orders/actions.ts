@@ -16,6 +16,17 @@ import {
   type CancelOrderErrorCode,
 } from "@/features/orders/cancel.constants";
 import { getCancelRejectionMessage } from "@/features/orders/state-machine";
+import {
+  storeOrderTransitionInputSchema,
+  type StoreOrderTransitionInput,
+} from "@/features/orders/store-transitions.schemas";
+import {
+  STORE_ORDER_TRANSITION_ERROR_CODE,
+  type StoreOrderTransitionErrorCode,
+  ACCEPT_ORDER_ERROR_MESSAGE,
+  REJECT_ORDER_ERROR_MESSAGE,
+  FINALIZE_ORDER_ERROR_MESSAGE,
+} from "@/features/orders/store-transitions.constants";
 
 export type CancelOrderResult =
   | {
@@ -134,5 +145,252 @@ export async function cancelOrder(input: CancelOrderInput): Promise<CancelOrderR
   } catch (error) {
     serverLogger.error("cancelOrder failed", { publicId, error });
     return fail(CANCEL_ORDER_ERROR_CODE.INTERNAL_ERROR);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Store order state transitions: accept / reject / finalize
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AcceptOrderResult =
+  | { readonly ok: true; readonly publicId: string; readonly status: typeof ORDER_STATUS.ACEPTADO }
+  | {
+      readonly ok: false;
+      readonly errorCode: StoreOrderTransitionErrorCode;
+      readonly message: string;
+    };
+
+export type RejectOrderResult =
+  | { readonly ok: true; readonly publicId: string; readonly status: typeof ORDER_STATUS.RECHAZADO }
+  | {
+      readonly ok: false;
+      readonly errorCode: StoreOrderTransitionErrorCode;
+      readonly message: string;
+    };
+
+export type FinalizeOrderResult =
+  | {
+      readonly ok: true;
+      readonly publicId: string;
+      readonly status: typeof ORDER_STATUS.FINALIZADO;
+    }
+  | {
+      readonly ok: false;
+      readonly errorCode: StoreOrderTransitionErrorCode;
+      readonly message: string;
+    };
+
+interface StoreRpcResult {
+  readonly ok?: boolean;
+  readonly publicId?: string;
+  readonly error?: "unauthenticated" | "not_found" | "invalid_transition";
+  readonly currentStatus?: string;
+}
+
+function failStore(
+  errorCode: StoreOrderTransitionErrorCode,
+  messages: Readonly<Record<StoreOrderTransitionErrorCode, string>>,
+): { ok: false; errorCode: StoreOrderTransitionErrorCode; message: string } {
+  return { ok: false, errorCode, message: messages[errorCode] };
+}
+
+function mapStoreRpcError(
+  payload: StoreRpcResult,
+  messages: Readonly<Record<StoreOrderTransitionErrorCode, string>>,
+): { ok: false; errorCode: StoreOrderTransitionErrorCode; message: string } {
+  if (payload.error === "unauthenticated")
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED, messages);
+  if (payload.error === "not_found")
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.ORDER_NOT_FOUND, messages);
+  if (payload.error === "invalid_transition")
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INVALID_TRANSITION, messages);
+  return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR, messages);
+}
+
+async function publishAcceptedEvent(
+  client: Awaited<ReturnType<typeof createRouteHandlerClient>>,
+  publicId: string,
+): Promise<void> {
+  try {
+    const order = await new SupabaseOrderRepository(client).findById(publicId);
+    if (order === null) return;
+    const now = new Date();
+    eventBus.publish({
+      type: ORDER_DOMAIN_EVENT.ORDER_ACCEPTED,
+      orderId: order.id,
+      clientId: order.clientId,
+      storeId: order.storeId,
+      occurredAt: now,
+      sentAt: new Date(order.createdAt),
+      receivedAt: now,
+      acceptedAt: now,
+    });
+  } catch (error) {
+    serverLogger.warn("acceptOrder: publishAcceptedEvent failed (non-fatal)", { publicId, error });
+  }
+}
+
+async function publishRejectedEvent(
+  client: Awaited<ReturnType<typeof createRouteHandlerClient>>,
+  publicId: string,
+): Promise<void> {
+  try {
+    const order = await new SupabaseOrderRepository(client).findById(publicId);
+    if (order === null) return;
+    const now = new Date();
+    eventBus.publish({
+      type: ORDER_DOMAIN_EVENT.ORDER_REJECTED,
+      orderId: order.id,
+      clientId: order.clientId,
+      storeId: order.storeId,
+      occurredAt: now,
+      sentAt: new Date(order.createdAt),
+      receivedAt: now,
+      rejectedAt: now,
+    });
+  } catch (error) {
+    serverLogger.warn("rejectOrder: publishRejectedEvent failed (non-fatal)", { publicId, error });
+  }
+}
+
+async function publishFinishedEvent(
+  client: Awaited<ReturnType<typeof createRouteHandlerClient>>,
+  publicId: string,
+): Promise<void> {
+  try {
+    const order = await new SupabaseOrderRepository(client).findById(publicId);
+    if (order === null) return;
+    const now = new Date();
+    eventBus.publish({
+      type: ORDER_DOMAIN_EVENT.ORDER_FINISHED,
+      orderId: order.id,
+      clientId: order.clientId,
+      storeId: order.storeId,
+      occurredAt: now,
+      sentAt: new Date(order.createdAt),
+      receivedAt: now,
+      acceptedAt: now,
+      onTheWayAt: now,
+      finishedAt: now,
+    });
+  } catch (error) {
+    serverLogger.warn("finalizeOrder: publishFinishedEvent failed (non-fatal)", {
+      publicId,
+      error,
+    });
+  }
+}
+
+export async function acceptOrder(input: StoreOrderTransitionInput): Promise<AcceptOrderResult> {
+  const parsed = storeOrderTransitionInputSchema.safeParse(input);
+  if (parsed.success === false) {
+    const message = parsed.error.issues[0]?.message ?? ACCEPT_ORDER_ERROR_MESSAGE.VALIDATION_ERROR;
+    return { ok: false, errorCode: STORE_ORDER_TRANSITION_ERROR_CODE.VALIDATION_ERROR, message };
+  }
+  const { publicId } = parsed.data;
+  try {
+    const client = await createRouteHandlerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null)
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED,
+        ACCEPT_ORDER_ERROR_MESSAGE,
+      );
+    const { data, error } = await client.rpc("accept_order_by_store", { p_public_id: publicId });
+    if (error !== null) {
+      serverLogger.error("acceptOrder: RPC failed", { publicId, error });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        ACCEPT_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = (data ?? {}) as StoreRpcResult;
+    if (payload.ok !== true) return mapStoreRpcError(payload, ACCEPT_ORDER_ERROR_MESSAGE);
+    await publishAcceptedEvent(client, publicId);
+    return { ok: true, publicId, status: ORDER_STATUS.ACEPTADO };
+  } catch (error) {
+    serverLogger.error("acceptOrder failed", { publicId, error });
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR, ACCEPT_ORDER_ERROR_MESSAGE);
+  }
+}
+
+export async function rejectOrder(input: StoreOrderTransitionInput): Promise<RejectOrderResult> {
+  const parsed = storeOrderTransitionInputSchema.safeParse(input);
+  if (parsed.success === false) {
+    const message = parsed.error.issues[0]?.message ?? REJECT_ORDER_ERROR_MESSAGE.VALIDATION_ERROR;
+    return { ok: false, errorCode: STORE_ORDER_TRANSITION_ERROR_CODE.VALIDATION_ERROR, message };
+  }
+  const { publicId } = parsed.data;
+  try {
+    const client = await createRouteHandlerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null)
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED,
+        REJECT_ORDER_ERROR_MESSAGE,
+      );
+    const { data, error } = await client.rpc("reject_order_by_store", { p_public_id: publicId });
+    if (error !== null) {
+      serverLogger.error("rejectOrder: RPC failed", { publicId, error });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        REJECT_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = (data ?? {}) as StoreRpcResult;
+    if (payload.ok !== true) return mapStoreRpcError(payload, REJECT_ORDER_ERROR_MESSAGE);
+    await publishRejectedEvent(client, publicId);
+    return { ok: true, publicId, status: ORDER_STATUS.RECHAZADO };
+  } catch (error) {
+    serverLogger.error("rejectOrder failed", { publicId, error });
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR, REJECT_ORDER_ERROR_MESSAGE);
+  }
+}
+
+export async function finalizeOrder(
+  input: StoreOrderTransitionInput,
+): Promise<FinalizeOrderResult> {
+  const parsed = storeOrderTransitionInputSchema.safeParse(input);
+  if (parsed.success === false) {
+    const message =
+      parsed.error.issues[0]?.message ?? FINALIZE_ORDER_ERROR_MESSAGE.VALIDATION_ERROR;
+    return { ok: false, errorCode: STORE_ORDER_TRANSITION_ERROR_CODE.VALIDATION_ERROR, message };
+  }
+  const { publicId } = parsed.data;
+  try {
+    const client = await createRouteHandlerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null)
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED,
+        FINALIZE_ORDER_ERROR_MESSAGE,
+      );
+    const { data, error } = await client.rpc("finalize_order_by_store", { p_public_id: publicId });
+    if (error !== null) {
+      serverLogger.error("finalizeOrder: RPC failed", { publicId, error });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        FINALIZE_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = (data ?? {}) as StoreRpcResult;
+    if (payload.ok !== true) return mapStoreRpcError(payload, FINALIZE_ORDER_ERROR_MESSAGE);
+    await publishFinishedEvent(client, publicId);
+    return { ok: true, publicId, status: ORDER_STATUS.FINALIZADO };
+  } catch (error) {
+    serverLogger.error("finalizeOrder failed", { publicId, error });
+    return failStore(
+      STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+      FINALIZE_ORDER_ERROR_MESSAGE,
+    );
   }
 }

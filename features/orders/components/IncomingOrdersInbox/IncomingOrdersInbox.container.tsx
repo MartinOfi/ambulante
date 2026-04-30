@@ -22,18 +22,18 @@ export function IncomingOrdersInboxContainer() {
   const finalizeMutation = useFinalizeOrderMutation();
 
   const pendingOrderId =
-    (acceptMutation.isPending ? acceptMutation.variables : null) ??
-    (rejectMutation.isPending ? rejectMutation.variables : null) ??
-    (finalizeMutation.isPending ? finalizeMutation.variables : null) ??
+    (acceptMutation.isPending ? acceptMutation.variables?.publicId : null) ??
+    (rejectMutation.isPending ? rejectMutation.variables?.publicId : null) ??
+    (finalizeMutation.isPending ? finalizeMutation.variables?.publicId : null) ??
     null;
 
   return (
     <IncomingOrdersInbox
       orders={orders}
       isLoading={isLoading}
-      onAccept={(orderId) => acceptMutation.mutate(orderId)}
-      onReject={(orderId) => rejectMutation.mutate(orderId)}
-      onFinalize={(orderId) => finalizeMutation.mutate(orderId)}
+      onAccept={(orderId) => acceptMutation.mutate({ publicId: orderId })}
+      onReject={(orderId) => rejectMutation.mutate({ publicId: orderId })}
+      onFinalize={(orderId) => finalizeMutation.mutate({ publicId: orderId })}
       pendingOrderId={pendingOrderId}
     />
   );

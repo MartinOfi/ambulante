@@ -19,24 +19,33 @@ export function OrderActionsContainer({ order }: OrderActionsContainerProps) {
   const finalizeMutation = useFinalizeOrderMutation();
 
   const handleAccept = useCallback(() => {
-    acceptMutation.mutate(order.id, {
-      onSuccess: () => toast.success("Pedido aceptado"),
-      onError: () => toast.error("No se pudo aceptar el pedido. Intentá de nuevo."),
-    });
+    acceptMutation.mutate(
+      { publicId: order.id },
+      {
+        onSuccess: () => toast.success("Pedido aceptado"),
+        onError: () => toast.error("No se pudo aceptar el pedido. Intentá de nuevo."),
+      },
+    );
   }, [acceptMutation, order.id]);
 
   const handleReject = useCallback(() => {
-    rejectMutation.mutate(order.id, {
-      onSuccess: () => toast.success("Pedido rechazado"),
-      onError: () => toast.error("No se pudo rechazar el pedido. Intentá de nuevo."),
-    });
+    rejectMutation.mutate(
+      { publicId: order.id },
+      {
+        onSuccess: () => toast.success("Pedido rechazado"),
+        onError: () => toast.error("No se pudo rechazar el pedido. Intentá de nuevo."),
+      },
+    );
   }, [rejectMutation, order.id]);
 
   const handleFinalize = useCallback(() => {
-    finalizeMutation.mutate(order.id, {
-      onSuccess: () => toast.success("Pedido finalizado"),
-      onError: () => toast.error("No se pudo finalizar el pedido. Intentá de nuevo."),
-    });
+    finalizeMutation.mutate(
+      { publicId: order.id },
+      {
+        onSuccess: () => toast.success("Pedido finalizado"),
+        onError: () => toast.error("No se pudo finalizar el pedido. Intentá de nuevo."),
+      },
+    );
   }, [finalizeMutation, order.id]);
 
   return (
