@@ -1,6 +1,6 @@
 # Dev Seed — Guía de uso
 
-Datos de desarrollo cargados automáticamente en `supabase db reset`.
+Datos de desarrollo cargados automáticamente en `pnpm supabase:reset`.
 Referencia rápida de cuentas, tiendas y pedidos disponibles para testear localmente.
 
 ---

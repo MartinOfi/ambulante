@@ -398,7 +398,7 @@ select
   '3 tacos de pollo',
   now() - interval '45 minutes',
   'Me cambié de lugar, no llego',
-  now() - interval '50 minutes'
+  now() - interval '40 minutes'
 from
   public.stores s,
   public.users c
@@ -465,7 +465,28 @@ on conflict (public_id) do nothing;
 -- Order items — snapshot del producto al momento de la orden
 -- product_snapshot contiene name, description y price para preservarlos aunque
 -- el producto sea editado o eliminado posteriormente (PRD §7.4).
+--
+-- Idempotency: delete-then-reinsert en lugar de NOT EXISTS (que es no-atómico
+-- y puede duplicar bajo ejecuciones concurrentes). Borramos primero los items
+-- de las órdenes seed (identificadas por public_id fijo) y reinsertamos.
 -- ─────────────────────────────────────────────────────────────────────────────
+
+delete from public.order_items
+where order_id in (
+  select id from public.orders
+  where public_id in (
+    '30000000-0000-0000-0000-000000000001',
+    '30000000-0000-0000-0000-000000000002',
+    '30000000-0000-0000-0000-000000000003',
+    '30000000-0000-0000-0000-000000000004',
+    '30000000-0000-0000-0000-000000000005',
+    '30000000-0000-0000-0000-000000000006',
+    '30000000-0000-0000-0000-000000000007',
+    '30000000-0000-0000-0000-000000000008',
+    '30000000-0000-0000-0000-000000000009',
+    '30000000-0000-0000-0000-000000000010'
+  )
+);
 
 -- Order 1 (enviado, tienda 1): choripán simple
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -477,10 +498,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000001'
-  and p.public_id = '20000000-0000-0000-0000-000000000001'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000001';
 
 -- Order 2 (recibido, tienda 2): nigiri salmón + edamame
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -492,10 +510,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000002'
-  and p.public_id = '20000000-0000-0000-0000-000000000005'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000005';
 
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
 select
@@ -506,10 +521,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000002'
-  and p.public_id = '20000000-0000-0000-0000-000000000008'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000008';
 
 -- Order 3 (aceptado, tienda 1): choripán chimichurri + morcipán
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -521,10 +533,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000003'
-  and p.public_id = '20000000-0000-0000-0000-000000000002'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000002';
 
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
 select
@@ -535,10 +544,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000003'
-  and p.public_id = '20000000-0000-0000-0000-000000000003'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000003';
 
 -- Order 4 (en_camino, tienda 4): burrito + guacamole
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -550,10 +556,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000004'
-  and p.public_id = '20000000-0000-0000-0000-000000000014'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000014';
 
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
 select
@@ -564,10 +567,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000004'
-  and p.public_id = '20000000-0000-0000-0000-000000000015'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000015';
 
 -- Order 5 (finalizado, tienda 3): kilo chocolate
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -579,10 +579,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000005'
-  and p.public_id = '20000000-0000-0000-0000-000000000009'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000009';
 
 -- Order 6 (rechazado, tienda 2): california rolls x2 + edamame
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -594,10 +591,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000006'
-  and p.public_id = '20000000-0000-0000-0000-000000000006'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000006';
 
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
 select
@@ -608,10 +602,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000006'
-  and p.public_id = '20000000-0000-0000-0000-000000000008'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000008';
 
 -- Order 7 (cancelado, tienda 4): tacos de pollo x3
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -623,10 +614,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000007'
-  and p.public_id = '20000000-0000-0000-0000-000000000013'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000013';
 
 -- Order 8 (expirado, tienda 5): latte x2 + medialunas
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -638,10 +626,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000008'
-  and p.public_id = '20000000-0000-0000-0000-000000000018'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000018';
 
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
 select
@@ -652,10 +637,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000008'
-  and p.public_id = '20000000-0000-0000-0000-000000000019'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000019';
 
 -- Order 9 (aceptado, tienda 1): bondiola a la plancha
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -667,10 +649,7 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000009'
-  and p.public_id = '20000000-0000-0000-0000-000000000004'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000004';
 
 -- Order 10 (finalizado, tienda 2): temaki atún x2
 insert into public.order_items (order_id, product_id, product_snapshot, quantity, unit_price)
@@ -682,7 +661,4 @@ select
   p.price
 from public.orders o, public.products p
 where o.public_id = '30000000-0000-0000-0000-000000000010'
-  and p.public_id = '20000000-0000-0000-0000-000000000007'
-  and not exists (
-    select 1 from public.order_items oi where oi.order_id = o.id and oi.product_id = p.id
-  );
+  and p.public_id = '20000000-0000-0000-0000-000000000007';

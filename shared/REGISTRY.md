@@ -118,8 +118,8 @@
 | createRateLimiterFromEnv | factory | `shared/services/rate-limit.factory.ts` | infra.md §12 |
 | public.rate_limit_buckets / public.check_rate_limit / public.cleanup_rate_limit_buckets | sql-migration | `supabase/migrations/20260429141719_rate_limit.sql` | infra.md §12 |
 | rate_limit (pgTAP) | pgtap-test | `supabase/tests/rate_limit.sql` | testing.md §15 |
-| security smoke (rate limit + fuzz + RLS) | e2e | `e2e/security/*.spec.ts` | testing.md §17 |
-| seed.sql (dev seed: usuarios, tiendas, productos, pedidos con UUIDs fijos) | sql-seed | `supabase/seed.sql` | testing.md §18 |
+| security smoke (rate limit + fuzz + RLS) | e2e | `e2e/security/*.spec.ts` | testing.md §18 |
+| seed.sql (dev seed: usuarios, tiendas, productos, pedidos con UUIDs fijos) | sql-seed | `supabase/seed.sql` | testing.md §19 |
 | REALTIME_CHANNELS | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | RECONNECT_INITIAL_DELAY_MS (y otros) | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |

@@ -200,7 +200,7 @@ Durante la implementación de B7-A, el integration test reveló que `auto-close-
 
 ---
 
-## §17 — Security smoke tests (B13-A)
+## §18 — Security smoke tests (B13-A)
 
 Viven en `e2e/security/` y corren con un Playwright config separado (`playwright.security.config.ts` — port 3110) para no contaminar la suite E2E principal. Comando: `pnpm test:e2e:security`. Requieren Supabase local corriendo y env vars `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (los tests RLS skipean en su ausencia).
 
@@ -214,7 +214,7 @@ Viven en `e2e/security/` y corren con un Playwright config separado (`playwright
 
 ---
 
-## §18 — Seed data
+## §19 — Seed data
 
 El seed vive en `supabase/seed.sql` y se aplica automáticamente al final de `pnpm supabase:reset` (después de correr todas las migraciones). Es idempotente — usa `ON CONFLICT DO NOTHING` con UUIDs fijos para que multiple ejecuciones no dupliquen datos.
 
