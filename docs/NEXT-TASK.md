@@ -68,6 +68,7 @@
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
 | [NT-37](#nt-37--tests-fallan-en-local-sin-env-vars-de-supabase-módulos-repositoriesindexts) | Tests fallan en local sin env vars de Supabase | testing / DevEx | S | próximo onboarding de dev nuevo |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
+| [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 
 ---
 
@@ -591,6 +592,18 @@
 - **Ticket:** —
 - **Notas:** Workaround actual: setear env vars antes de `pnpm test`. CI no detecta el bug porque el job `test-unit` corre con env stubs implícitos.
 
+### NT-39 — E2E happy path cliente (cart → submit → tracking → cancel → history)
+
+- **Categoría:** testing / E2E
+- **Contexto:** Descubierto al ejecutar **B9-B / B9-C**. El plan formal pedía 1 spec Playwright del golden path completo. Diferido por dependencias ambientales: requiere Supabase local levantado con seed completo (tienda activa + productos `available=true` para el customer fixture), VAPID keys configurados (sino el push opt-in falla en `pushManager.subscribe`), y service worker registrado vía serwist. Las suites unit/integration con mocks de repos ya cubren la lógica de submitOrder, cancelOrder y useOrderHistory; lo que falta es el wire end-to-end real.
+- **Aceptación:** `e2e/orders-flow.spec.ts` con un único test que: (1) setea cookie de sesión cliente con `setSessionCookie`, (2) navega al mapa, (3) abre detalle de tienda seedada, (4) agrega 1 producto al carrito, (5) submit → redirige a `/orders/{publicId}`, (6) ve estado ENVIADO en tracking, (7) cancel → ve CANCELADO, (8) navega a history y ve el pedido como CANCELADO. CI verde.
+- **Archivos afectados:** `e2e/orders-flow.spec.ts` (nuevo), `supabase/seed.sql` (agregar fixtures de tienda + productos para el cliente fixture).
+- **Estimación:** M
+- **Cuándo retomarlo:** al cerrar B14 (deploy producción) o cuando `pnpm supabase:reset` deje el repo con seed completo de cliente + tienda + productos.
+- **Dependencias:** B14.1 (Supabase Cloud setup) + B13-B (seed data + runbooks).
+- **Ticket:** —
+- **Notas:** Cubierto por unit/integration: 13 tests submitOrder, 14 cancelOrder + state-machine, 7 useOrderHistory, 22 repo findByCustomer, 7 cursor encode/decode. Risk asumido: posibles regresiones de wire (RLS policies, query keys, navigations) que sólo aparecen en E2E real.
+
 ### NT-38 — Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C
 
 - **Categoría:** refactor / cleanup
@@ -623,3 +636,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-21 | Reescritura completa con formato estructurado. Poblado inicial: NT-01 a NT-25 (3 originales + 22 nuevos del brainstorming + decisiones post-MVP del PRD). |
 | 2026-04-29 | NT-32 agregado — vitest 9 fails preexistentes detectados durante cierre de B14.3. |
 | 2026-04-30 | NT-38 agregado — defer de borrado total `orders.mock.ts` hasta cierre de B10-C. |
+| 2026-04-30 | NT-39 agregado — defer E2E happy path cliente hasta seed completo + VAPID en local. |
