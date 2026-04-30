@@ -289,15 +289,38 @@ Al terminar código:
 
 ## 10. Backend (Supabase)
 
-El backend corre sobre **Supabase** (Postgres + Auth + Realtime + Storage + PostGIS). La implementación se ejecuta desde el índice [`docs/epic-backend/INDEX.md`](./docs/epic-backend/INDEX.md), siguiendo el plan operativo de [`docs/PARALLEL-EXECUTION-BACKEND.md`](./docs/PARALLEL-EXECUTION-BACKEND.md). Cada tarea se arranca con el slash command `/b-start <ID>` (que activa el flujo de [`docs/workflows/backend-task-protocol.md`](./docs/workflows/backend-task-protocol.md)) y se cierra con `/b-finish`.
+El backend corre sobre **Supabase** (Postgres + Auth + Realtime + Storage + PostGIS). La implementación se ejecuta desde el índice [`docs/epic-backend/INDEX.md`](./docs/epic-backend/INDEX.md), siguiendo el plan operativo de [`docs/PARALLEL-EXECUTION-BACKEND.md`](./docs/PARALLEL-EXECUTION-BACKEND.md).
 
-> **Histórico:** los archivos legacy `docs/EPIC-BACKEND.md` y `docs/PROMPT-TEMPLATE-BACKEND.md` quedan como redirecciones para compatibilidad — NO leerlos.
+### 10.0 Flujo unificado para arrancar y cerrar tareas
 
-### 10.1 Skill obligatoria para tareas de backend
+**Comandos:**
 
-Cualquier tarea que escriba SQL, policies RLS, migraciones o índices **debe leer primero** las reglas aplicables de [`.claude/skills/supabase-postgres-best-practices/`](./.claude/skills/supabase-postgres-best-practices/). Cada bloque de tarea en el epic backend lista en su campo `Skill rules aplicables:` cuáles rules específicas del directorio `references/` aplican.
+- `/start <ID|texto>` — arranca cualquier tarea. Detecta el tier automáticamente leyendo el task file (si pasaste un Task ID) o el texto. Vos confirmás con Enter o pisás con `1`/`2`/`3`.
+- `/done` — cierra la tarea según el tier detectado por el prefijo de la branch (`t1/`, `t2/`, `t3/`).
 
-**No es opcional.** El code review rechaza PRs que violen reglas CRITICAL/HIGH de la skill.
+**Tiers:**
+
+| Tier | Cuándo aplica | Aislamiento | Ceremonia | Tiempo objetivo |
+|---|---|---|---|---|
+| **1** | TS-only, ≤5 archivos, sin SQL/RLS/auth/facade nuevo, estim S/M | branch normal en directorio principal | typecheck + test + commit + merge | 2-5 min |
+| **2** | L/XL o multi-feature o `--parallel` | worktree liviano | typecheck + test + merge + cleanup (gate Cursor) | 5-10 min |
+| **3** | SQL, migration, RLS, auth flow, facade/repo nuevo, trigger | worktree + claim INDEX + Supabase shared | full backend protocol (audit + 1-pass review + gates) | 20-30 min |
+
+**Reglas:**
+
+- **No elegís tier vos.** `/start` lo detecta y te muestra. Si no te convence, lo cambiás con un número antes de arrancar.
+- **No hay auto-continuación de cadenas.** Si la tarea tenía `Continues with: Bx.y`, `/done` (tier 3) imprime el comando para arrancar Bx.y en chat NUEVO.
+- **El SQL guard (`~/.claude/hooks/ambulante-backend-guard.sh`) bloquea mecánicamente** edits a `*.sql`, `supabase/migrations/`, `supabase/policies/`, `supabase/functions/` cuando estás en main. Eso es el único enforcement automático — el resto lo decide la heurística de `/start`.
+
+> **Comandos viejos deprecados:** `/b-start`, `/b-finish`, `/b-quick-start`, `/b-quick-finish` siguen funcionando como aliases de `/start` y `/done` para no romper costumbres, pero el flujo correcto hoy es `/start` + `/done`.
+
+> **Histórico:** los archivos legacy `docs/EPIC-BACKEND.md`, `docs/PROMPT-TEMPLATE-BACKEND.md` y `docs/workflows/backend-task-protocol.md` quedan como referencia para tier 3 — NO leerlos para tier 1 o 2.
+
+### 10.1 Skill obligatoria para tareas tier 3
+
+Cualquier tarea que escriba SQL, policies RLS, migraciones o índices (= tier 3) **debe leer primero** las reglas aplicables de [`.claude/skills/supabase-postgres-best-practices/`](./.claude/skills/supabase-postgres-best-practices/). Cada bloque de tarea en el epic backend lista en su campo `Skill rules aplicables:` cuáles rules específicas del directorio `references/` aplican.
+
+**No es opcional para tier 3.** El code review rechaza PRs que violen reglas CRITICAL/HIGH de la skill.
 
 > Nota: `.claude/` está gitignored por diseño (config per-developer). Si el directorio `.claude/skills/supabase-postgres-best-practices/` no existe en tu worktree, instalalo con:
 > ```
