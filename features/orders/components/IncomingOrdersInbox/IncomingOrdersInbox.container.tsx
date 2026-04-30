@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useSession } from "@/shared/hooks/useSession";
 import { useStoreOrdersQuery } from "@/features/orders/hooks/useStoreOrdersQuery";
 import { useNewOrderAlert } from "@/features/orders/hooks/useNewOrderAlert";
@@ -22,18 +23,33 @@ export function IncomingOrdersInboxContainer() {
   const finalizeMutation = useFinalizeOrderMutation();
 
   const pendingOrderId =
-    (acceptMutation.isPending ? acceptMutation.variables : null) ??
-    (rejectMutation.isPending ? rejectMutation.variables : null) ??
-    (finalizeMutation.isPending ? finalizeMutation.variables : null) ??
+    (acceptMutation.isPending ? acceptMutation.variables?.publicId : null) ??
+    (rejectMutation.isPending ? rejectMutation.variables?.publicId : null) ??
+    (finalizeMutation.isPending ? finalizeMutation.variables?.publicId : null) ??
     null;
 
   return (
     <IncomingOrdersInbox
       orders={orders}
       isLoading={isLoading}
-      onAccept={(orderId) => acceptMutation.mutate(orderId)}
-      onReject={(orderId) => rejectMutation.mutate(orderId)}
-      onFinalize={(orderId) => finalizeMutation.mutate(orderId)}
+      onAccept={(orderId) =>
+        acceptMutation.mutate(
+          { publicId: orderId },
+          { onError: () => toast.error("No se pudo aceptar el pedido. Intentá de nuevo.") },
+        )
+      }
+      onReject={(orderId) =>
+        rejectMutation.mutate(
+          { publicId: orderId },
+          { onError: () => toast.error("No se pudo rechazar el pedido. Intentá de nuevo.") },
+        )
+      }
+      onFinalize={(orderId) =>
+        finalizeMutation.mutate(
+          { publicId: orderId },
+          { onError: () => toast.error("No se pudo finalizar el pedido. Intentá de nuevo.") },
+        )
+      }
       pendingOrderId={pendingOrderId}
     />
   );

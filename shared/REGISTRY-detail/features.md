@@ -39,7 +39,14 @@
 | `useOrdersQuery` | `features/orders/hooks/useOrdersQuery.ts` | hook | Query de todos los pedidos del usuario |
 | `useStoreOrdersQuery` | `features/orders/hooks/useStoreOrdersQuery.ts` | hook | Query de pedidos de una tienda, ordenados por fecha descendente, con invalidación realtime |
 | `useNewOrderAlert` | `features/orders/hooks/useNewOrderAlert.ts` | hook | Dispara vibración + tono cuando llegan nuevos pedidos accionables; skips primera renderización |
-| `useAcceptOrderMutation` | `features/orders/hooks/useAcceptOrderMutation.ts` | hook | Mutación: tienda acepta pedido |
+| `useAcceptOrderMutation` | `features/orders/hooks/useAcceptOrderMutation.ts` | hook | Mutación: tienda acepta pedido — llama Server Action `acceptOrder`; optimistic update |
+| `useRejectOrderMutation` | `features/orders/hooks/useRejectOrderMutation.ts` | hook | Mutación: tienda rechaza pedido — llama Server Action `rejectOrder`; optimistic update |
+| `useFinalizeOrderMutation` | `features/orders/hooks/useFinalizeOrderMutation.ts` | hook | Mutación: tienda finaliza pedido — llama Server Action `finalizeOrder`; optimistic update |
+| `acceptOrder` | `features/orders/actions.ts` | server-action | `"use server"`. RECIBIDO→ACEPTADO vía RPC `accept_order_by_store`. Publica `ORDER_ACCEPTED`. Devuelve `AcceptOrderResult` |
+| `rejectOrder` | `features/orders/actions.ts` | server-action | `"use server"`. RECIBIDO→RECHAZADO vía RPC `reject_order_by_store`. Publica `ORDER_REJECTED`. Devuelve `RejectOrderResult` |
+| `finalizeOrder` | `features/orders/actions.ts` | server-action | `"use server"`. EN_CAMINO→FINALIZADO vía RPC `finalize_order_by_store`. Publica `ORDER_FINISHED`. Devuelve `FinalizeOrderResult` |
+| `StoreOrderTransitionInput` | `features/orders/store-transitions.schemas.ts` | type | `{ publicId: string (UUID) }` — input de las tres transiciones de tienda |
+| `StoreOrderTransitionErrorCode` | `features/orders/store-transitions.constants.ts` | type | Union: `UNAUTHENTICATED \| VALIDATION_ERROR \| ORDER_NOT_FOUND \| INVALID_TRANSITION \| INTERNAL_ERROR` |
 | `useSendOrderMutation` | `features/orders/hooks/useSendOrderMutation.ts` | hook | Mutación: cliente envía pedido |
 | `OrderTracking` | `features/orders/components/OrderTracking/` | componente | Pantalla de seguimiento de pedido en tiempo real |
 | `IncomingOrdersInbox` | `features/orders/components/IncomingOrdersInbox/` | componente | Bandeja de pedidos entrantes para la tienda (dumb + container) |

@@ -28,7 +28,7 @@
 | B7 | Cron & system jobs (pg_cron + pg_net + state machine) | 4 | 4/4 | ✅ |
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 4/4 | ✅ |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 3/3 | ✅ |
-| B10 | Swap tienda (features Tienda consumen backend real) | 4 | 1/4 | 🟡 |
+| B10 | Swap tienda (features Tienda consumen backend real) | 4 | 2/4 | 🟡 |
 | B11 | Swap admin (features Admin consumen backend real) | 3 | 1/3 | 🟡 |
 | B12 | Observability backend | 3 | 3/3 | ✅ |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 2/2 | ✅ |
@@ -39,7 +39,6 @@
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
 | B10-B | Tienda: operación (availability + location + catálogo CRUD) | ⚪ | B3.1, B5.3, B10-A | XL | `data-batch-inserts` | `features.md`. |
-| B10-C | Tienda: manejo de pedidos (inbox realtime + accept/reject/finalize) | ⚪ | B6.3, B9-B | L | `lock-short-transactions` | `features.md`. |
 | B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
 | B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ⚪ | B3.1, B5.4 | XL | `query-composite-indexes`, `data-pagination` | `features.md`. |
 | B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
@@ -100,6 +99,7 @@
 | B9-B | Cliente: flujo de pedido completo (cart→submit→tracking→history→cancel) | ✅ |
 | B9-C | Cliente: push subscribe + profile | ✅ |
 | B10-A | Tienda: onboarding completo (auth + alta + perfil con logo) | ✅ |
+| B10-C | Tienda: manejo de pedidos (inbox realtime + accept/reject/finalize) | ✅ |
 
 ## Re-shape vertical (2026-04-29)
 
