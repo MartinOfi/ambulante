@@ -19,7 +19,11 @@ const nextConfig: NextConfig = {
     dirs: ["app", "features", "shared"],
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      // Supabase Storage — covers avatar uploads and any public bucket URLs
+      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
+    ],
   },
   async headers() {
     return [

@@ -20,10 +20,9 @@ describe("AvatarUpload", () => {
     expect(screen.queryByAltText(/avatar actual/i)).not.toBeInTheDocument();
   });
 
-  it("muestra <img> cuando hay currentUrl", () => {
+  it("muestra la imagen de perfil cuando hay currentUrl", () => {
     render(<AvatarUpload {...baseProps} currentUrl="https://example.com/a.jpg" />);
-    const img = screen.getByAltText(/avatar actual/i) as HTMLImageElement;
-    expect(img.src).toBe("https://example.com/a.jpg");
+    expect(screen.getByAltText(/avatar actual/i)).toBeInTheDocument();
   });
 
   it("invoca onFileSelected cuando el usuario elige archivo", () => {

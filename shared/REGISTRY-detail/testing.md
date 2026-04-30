@@ -200,7 +200,7 @@ Durante la implementación de B7-A, el integration test reveló que `auto-close-
 
 ---
 
-## §17 — Security smoke tests (B13-A)
+## §18 — Security smoke tests (B13-A)
 
 Viven en `e2e/security/` y corren con un Playwright config separado (`playwright.security.config.ts` — port 3110) para no contaminar la suite E2E principal. Comando: `pnpm test:e2e:security`. Requieren Supabase local corriendo y env vars `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` (los tests RLS skipean en su ausencia).
 
@@ -211,6 +211,50 @@ Viven en `e2e/security/` y corren con un Playwright config separado (`playwright
 | `e2e/security/rls-anon-restricted.spec.ts` | Anon role contra PostgREST `/rest/v1/<tabla>` para 5 tablas restringidas (`orders`, `order_items`, `audit_log`, `push_subscriptions`, `rate_limit_buckets`) — SELECT devuelve `[]` o error, INSERT siempre falla |
 
 **Filosofía:** estos no atrapan bugs (eso es trabajo de unit/integration/pgTAP). Son alarmas para regresiones de configuración: alguien sacó RLS, alguien removió rate limit del middleware, alguien expuso un secret. Pocos, rápidos, fallos claros. Job dedicado en CI: `security-smoke` en `.github/workflows/ci.yml`.
+
+---
+
+## §19 — Seed data
+
+El seed vive en `supabase/seed.sql` y se aplica automáticamente al final de `pnpm supabase:reset` (después de correr todas las migraciones). Es idempotente — usa `ON CONFLICT DO NOTHING` con UUIDs fijos para que multiple ejecuciones no dupliquen datos.
+
+**Guía completa:** [`docs/workflows/dev-seed.md`](../../docs/workflows/dev-seed.md) — accounts, tiendas, productos, pedidos, coordenadas y UUIDs fijos.
+
+### Cómo aplicar
+
+```bash
+# Reset completo (migraciones + seed)
+pnpm supabase:reset
+
+# Solo el seed (sin resetear schema)
+npx supabase db query --file supabase/seed.sql
+```
+
+### Cuentas de desarrollo
+
+| Rol     | Email                           | Contraseña      | UUID auth                              |
+|---------|---------------------------------|-----------------|----------------------------------------|
+| cliente | `cliente@dev.ambulante.local`   | `Ambulante123!` | `00000000-0000-0000-0000-000000000001` |
+| tienda  | `tienda@dev.ambulante.local`    | `Ambulante123!` | `00000000-0000-0000-0000-000000000002` |
+| admin   | `admin@dev.ambulante.local`     | `Ambulante123!` | `00000000-0000-0000-0000-000000000003` |
+
+### Datos disponibles
+
+| Entidad  | Cantidad | Detalle |
+|----------|----------|---------|
+| Usuarios | 3        | cliente, tienda, admin |
+| Tiendas  | 5        | Palermo, San Telmo, Recoleta, Villa Crespo, Caballito |
+| Productos| 20       | 4 por tienda |
+| Pedidos  | 10       | Todos los estados del ciclo de vida representados |
+
+Los 10 pedidos cubren: `enviado`, `recibido`, `aceptado` (×2), `en_camino`, `finalizado` (×2), `rechazado`, `cancelado`, `expirado`.
+
+### Notas para tests de integración
+
+- Los **UUIDs fijos** permiten referenciar entidades en tests sin un lookup previo. Ver `docs/workflows/dev-seed.md` para la tabla completa.
+- El seed respeta **§7.2 del PRD**: `customer_location` es `NULL` para pedidos en estado `enviado` y `recibido`.
+- El seed respeta **§7.4 del PRD**: `order_items` incluye el campo `product_snapshot` jsonb.
+- Los tests pgTAP (`supabase/tests/`) no dependen del seed — crean y limpian su propia data en transacciones `BEGIN/ROLLBACK`. Los tests de integración que sí dependen del seed deben documentar esa dependencia explícitamente.
 
 ---
 

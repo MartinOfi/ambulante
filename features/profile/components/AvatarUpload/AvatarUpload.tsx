@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type ChangeEvent } from "react";
+import Image from "next/image";
 
 import { Stack, Row } from "@/shared/components/layout";
 import { Text } from "@/shared/components/typography";
@@ -39,11 +40,12 @@ export function AvatarUpload({
       </Text>
       <Row className="items-center gap-3">
         {currentUrl !== undefined ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={currentUrl}
             alt="Avatar actual"
-            className="h-16 w-16 rounded-full object-cover"
+            width={64}
+            height={64}
+            className="rounded-full object-cover"
           />
         ) : (
           <div

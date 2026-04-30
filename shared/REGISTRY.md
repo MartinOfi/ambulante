@@ -13,7 +13,7 @@
 | Domain: tipos TS, schemas Zod, state machine, domain events, constantes, routes | [`REGISTRY-detail/domain.md`](./REGISTRY-detail/domain.md) |
 | Infraestructura: utils puros, design tokens, config de entorno, stores Zustand | [`REGISTRY-detail/infra.md`](./REGISTRY-detail/infra.md) |
 | Componentes/hooks de features existentes (OrderTracking, StoreDetailSheet, store-shell) | [`REGISTRY-detail/features.md`](./REGISTRY-detail/features.md) |
-| Test utilities (renderWithProviders, factories de entidades), pgTAP RLS tests (`supabase/tests/`) o cron concurrent integration tests (`app/api/cron/*/route.concurrent.test.ts`) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
+| Test utilities (renderWithProviders, factories de entidades), pgTAP RLS tests (`supabase/tests/`), cron concurrent integration tests (`app/api/cron/*/route.concurrent.test.ts`) o seed data dev (`supabase/seed.sql`) | [`REGISTRY-detail/testing.md`](./REGISTRY-detail/testing.md) |
 
 ---
 
@@ -118,7 +118,8 @@
 | createRateLimiterFromEnv | factory | `shared/services/rate-limit.factory.ts` | infra.md §12 |
 | public.rate_limit_buckets / public.check_rate_limit / public.cleanup_rate_limit_buckets | sql-migration | `supabase/migrations/20260429141719_rate_limit.sql` | infra.md §12 |
 | rate_limit (pgTAP) | pgtap-test | `supabase/tests/rate_limit.sql` | testing.md §15 |
-| security smoke (rate limit + fuzz + RLS) | e2e | `e2e/security/*.spec.ts` | testing.md §17 |
+| security smoke (rate limit + fuzz + RLS) | e2e | `e2e/security/*.spec.ts` | testing.md §18 |
+| seed.sql (dev seed: usuarios, tiendas, productos, pedidos con UUIDs fijos) | sql-seed | `supabase/seed.sql` | testing.md §19 |
 | REALTIME_CHANNELS | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | RECONNECT_INITIAL_DELAY_MS (y otros) | constant | `shared/constants/realtime.ts` | domain.md §8 |
 | realtimeService | service | `shared/services/realtime.ts` | data.md §4 |
