@@ -214,6 +214,50 @@ Viven en `e2e/security/` y corren con un Playwright config separado (`playwright
 
 ---
 
+## §18 — Seed data
+
+El seed vive en `supabase/seed.sql` y se aplica automáticamente al final de `pnpm supabase:reset` (después de correr todas las migraciones). Es idempotente — usa `ON CONFLICT DO NOTHING` con UUIDs fijos para que multiple ejecuciones no dupliquen datos.
+
+**Guía completa:** [`docs/workflows/dev-seed.md`](../../docs/workflows/dev-seed.md) — accounts, tiendas, productos, pedidos, coordenadas y UUIDs fijos.
+
+### Cómo aplicar
+
+```bash
+# Reset completo (migraciones + seed)
+pnpm supabase:reset
+
+# Solo el seed (sin resetear schema)
+npx supabase db query --file supabase/seed.sql
+```
+
+### Cuentas de desarrollo
+
+| Rol     | Email                           | Contraseña      | UUID auth                              |
+|---------|---------------------------------|-----------------|----------------------------------------|
+| cliente | `cliente@dev.ambulante.local`   | `Ambulante123!` | `00000000-0000-0000-0000-000000000001` |
+| tienda  | `tienda@dev.ambulante.local`    | `Ambulante123!` | `00000000-0000-0000-0000-000000000002` |
+| admin   | `admin@dev.ambulante.local`     | `Ambulante123!` | `00000000-0000-0000-0000-000000000003` |
+
+### Datos disponibles
+
+| Entidad  | Cantidad | Detalle |
+|----------|----------|---------|
+| Usuarios | 3        | cliente, tienda, admin |
+| Tiendas  | 5        | Palermo, San Telmo, Recoleta, Villa Crespo, Caballito |
+| Productos| 20       | 4 por tienda |
+| Pedidos  | 10       | Todos los estados del ciclo de vida representados |
+
+Los 10 pedidos cubren: `enviado`, `recibido`, `aceptado` (×2), `en_camino`, `finalizado` (×2), `rechazado`, `cancelado`, `expirado`.
+
+### Notas para tests de integración
+
+- Los **UUIDs fijos** permiten referenciar entidades en tests sin un lookup previo. Ver `docs/workflows/dev-seed.md` para la tabla completa.
+- El seed respeta **§7.2 del PRD**: `customer_location` es `NULL` para pedidos en estado `enviado` y `recibido`.
+- El seed respeta **§7.4 del PRD**: `order_items` incluye el campo `product_snapshot` jsonb.
+- Los tests pgTAP (`supabase/tests/`) no dependen del seed — crean y limpian su propia data en transacciones `BEGIN/ROLLBACK`. Los tests de integración que sí dependen del seed deben documentar esa dependencia explícitamente.
+
+---
+
 ## Convenciones de tests en este repo
 
 - **Framework:** Vitest + `@testing-library/react`
