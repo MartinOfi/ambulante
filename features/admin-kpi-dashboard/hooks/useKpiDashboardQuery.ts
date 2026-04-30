@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { kpiDashboardService } from "@/features/admin-kpi-dashboard/services/kpi-dashboard.mock";
+import { kpiDashboardService } from "@/features/admin-kpi-dashboard/services/kpi-dashboard.adapter";
 import { KPI_QUERY_STALE_TIME_MS } from "@/features/admin-kpi-dashboard/constants/kpi-dashboard.constants";
 
 const KPI_DASHBOARD_QUERY_KEY = ["kpiDashboard"] as const;
