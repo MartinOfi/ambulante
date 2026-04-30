@@ -2,6 +2,7 @@
 
 import "server-only";
 
+import { z } from "zod";
 import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
 import { SupabaseOrderRepository } from "@/shared/repositories";
 import { ORDER_STATUS, type OrderStatus } from "@/shared/constants/order";
@@ -180,12 +181,16 @@ export type FinalizeOrderResult =
       readonly message: string;
     };
 
-interface StoreRpcResult {
-  readonly ok?: boolean;
-  readonly publicId?: string;
-  readonly error?: "unauthenticated" | "not_found" | "invalid_transition";
-  readonly currentStatus?: string;
-}
+const storeRpcResultSchema = z.discriminatedUnion("ok", [
+  z.object({ ok: z.literal(true), publicId: z.string() }),
+  z.object({
+    ok: z.literal(false),
+    error: z.enum(["unauthenticated", "not_found", "invalid_transition"]),
+    currentStatus: z.string().optional(),
+  }),
+]);
+type StoreRpcResult = z.infer<typeof storeRpcResultSchema>;
+type StoreRpcFailure = Extract<StoreRpcResult, { ok: false }>;
 
 function failStore(
   errorCode: StoreOrderTransitionErrorCode,
@@ -195,7 +200,7 @@ function failStore(
 }
 
 function mapStoreRpcError(
-  payload: StoreRpcResult,
+  payload: StoreRpcFailure,
   messages: Readonly<Record<StoreOrderTransitionErrorCode, string>>,
 ): { ok: false; errorCode: StoreOrderTransitionErrorCode; message: string } {
   if (payload.error === "unauthenticated")
@@ -214,16 +219,16 @@ async function publishAcceptedEvent(
   try {
     const order = await new SupabaseOrderRepository(client).findById(publicId);
     if (order === null) return;
-    const now = new Date();
+    const acceptedAt = new Date(order.updatedAt);
     eventBus.publish({
       type: ORDER_DOMAIN_EVENT.ORDER_ACCEPTED,
       orderId: order.id,
       clientId: order.clientId,
       storeId: order.storeId,
-      occurredAt: now,
+      occurredAt: acceptedAt,
       sentAt: new Date(order.createdAt),
-      receivedAt: now,
-      acceptedAt: now,
+      receivedAt: new Date(order.createdAt),
+      acceptedAt,
     });
   } catch (error) {
     serverLogger.warn("acceptOrder: publishAcceptedEvent failed (non-fatal)", { publicId, error });
@@ -237,16 +242,16 @@ async function publishRejectedEvent(
   try {
     const order = await new SupabaseOrderRepository(client).findById(publicId);
     if (order === null) return;
-    const now = new Date();
+    const rejectedAt = new Date(order.updatedAt);
     eventBus.publish({
       type: ORDER_DOMAIN_EVENT.ORDER_REJECTED,
       orderId: order.id,
       clientId: order.clientId,
       storeId: order.storeId,
-      occurredAt: now,
+      occurredAt: rejectedAt,
       sentAt: new Date(order.createdAt),
-      receivedAt: now,
-      rejectedAt: now,
+      receivedAt: new Date(order.createdAt),
+      rejectedAt,
     });
   } catch (error) {
     serverLogger.warn("rejectOrder: publishRejectedEvent failed (non-fatal)", { publicId, error });
@@ -260,18 +265,19 @@ async function publishFinishedEvent(
   try {
     const order = await new SupabaseOrderRepository(client).findById(publicId);
     if (order === null) return;
-    const now = new Date();
+    const finishedAt = new Date(order.updatedAt);
+    const sentAt = new Date(order.createdAt);
     eventBus.publish({
       type: ORDER_DOMAIN_EVENT.ORDER_FINISHED,
       orderId: order.id,
       clientId: order.clientId,
       storeId: order.storeId,
-      occurredAt: now,
-      sentAt: new Date(order.createdAt),
-      receivedAt: now,
-      acceptedAt: now,
-      onTheWayAt: now,
-      finishedAt: now,
+      occurredAt: finishedAt,
+      sentAt,
+      receivedAt: sentAt,
+      acceptedAt: sentAt,
+      onTheWayAt: sentAt,
+      finishedAt,
     });
   } catch (error) {
     serverLogger.warn("finalizeOrder: publishFinishedEvent failed (non-fatal)", {
@@ -307,8 +313,16 @@ export async function acceptOrder(input: StoreOrderTransitionInput): Promise<Acc
         ACCEPT_ORDER_ERROR_MESSAGE,
       );
     }
-    const payload = (data ?? {}) as StoreRpcResult;
-    if (payload.ok !== true) return mapStoreRpcError(payload, ACCEPT_ORDER_ERROR_MESSAGE);
+    const parseResult = storeRpcResultSchema.safeParse(data);
+    if (!parseResult.success) {
+      serverLogger.error("acceptOrder: unexpected RPC shape", { publicId, data });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        ACCEPT_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = parseResult.data;
+    if (!payload.ok) return mapStoreRpcError(payload, ACCEPT_ORDER_ERROR_MESSAGE);
     await publishAcceptedEvent(client, publicId);
     return { ok: true, publicId, status: ORDER_STATUS.ACEPTADO };
   } catch (error) {
@@ -343,8 +357,16 @@ export async function rejectOrder(input: StoreOrderTransitionInput): Promise<Rej
         REJECT_ORDER_ERROR_MESSAGE,
       );
     }
-    const payload = (data ?? {}) as StoreRpcResult;
-    if (payload.ok !== true) return mapStoreRpcError(payload, REJECT_ORDER_ERROR_MESSAGE);
+    const parseResult = storeRpcResultSchema.safeParse(data);
+    if (!parseResult.success) {
+      serverLogger.error("rejectOrder: unexpected RPC shape", { publicId, data });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        REJECT_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = parseResult.data;
+    if (!payload.ok) return mapStoreRpcError(payload, REJECT_ORDER_ERROR_MESSAGE);
     await publishRejectedEvent(client, publicId);
     return { ok: true, publicId, status: ORDER_STATUS.RECHAZADO };
   } catch (error) {
@@ -382,8 +404,16 @@ export async function finalizeOrder(
         FINALIZE_ORDER_ERROR_MESSAGE,
       );
     }
-    const payload = (data ?? {}) as StoreRpcResult;
-    if (payload.ok !== true) return mapStoreRpcError(payload, FINALIZE_ORDER_ERROR_MESSAGE);
+    const parseResult = storeRpcResultSchema.safeParse(data);
+    if (!parseResult.success) {
+      serverLogger.error("finalizeOrder: unexpected RPC shape", { publicId, data });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        FINALIZE_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = parseResult.data;
+    if (!payload.ok) return mapStoreRpcError(payload, FINALIZE_ORDER_ERROR_MESSAGE);
     await publishFinishedEvent(client, publicId);
     return { ok: true, publicId, status: ORDER_STATUS.FINALIZADO };
   } catch (error) {

@@ -26,7 +26,7 @@ export function OrderActionsContainer({ order }: OrderActionsContainerProps) {
         onError: () => toast.error("No se pudo aceptar el pedido. Intentá de nuevo."),
       },
     );
-  }, [acceptMutation, order.id]);
+  }, [acceptMutation.mutate, order.id]);
 
   const handleReject = useCallback(() => {
     rejectMutation.mutate(
@@ -36,7 +36,7 @@ export function OrderActionsContainer({ order }: OrderActionsContainerProps) {
         onError: () => toast.error("No se pudo rechazar el pedido. Intentá de nuevo."),
       },
     );
-  }, [rejectMutation, order.id]);
+  }, [rejectMutation.mutate, order.id]);
 
   const handleFinalize = useCallback(() => {
     finalizeMutation.mutate(
@@ -46,7 +46,7 @@ export function OrderActionsContainer({ order }: OrderActionsContainerProps) {
         onError: () => toast.error("No se pudo finalizar el pedido. Intentá de nuevo."),
       },
     );
-  }, [finalizeMutation, order.id]);
+  }, [finalizeMutation.mutate, order.id]);
 
   return (
     <OrderActions

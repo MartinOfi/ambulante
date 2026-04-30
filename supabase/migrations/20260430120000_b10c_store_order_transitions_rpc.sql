@@ -49,9 +49,12 @@ begin
     return jsonb_build_object('ok', false, 'error', 'unauthenticated');
   end if;
 
+  -- LIMIT 1 guards against TOO_MANY_ROWS if the no-UNIQUE invariant is ever violated.
   select id into v_store_id
   from public.stores
-  where owner_id = v_user_id;
+  where owner_id = v_user_id
+  order by id
+  limit 1;
 
   if v_store_id is null then
     return jsonb_build_object('ok', false, 'error', 'unauthenticated');
@@ -120,7 +123,9 @@ begin
 
   select id into v_store_id
   from public.stores
-  where owner_id = v_user_id;
+  where owner_id = v_user_id
+  order by id
+  limit 1;
 
   if v_store_id is null then
     return jsonb_build_object('ok', false, 'error', 'unauthenticated');
@@ -187,7 +192,9 @@ begin
 
   select id into v_store_id
   from public.stores
-  where owner_id = v_user_id;
+  where owner_id = v_user_id
+  order by id
+  limit 1;
 
   if v_store_id is null then
     return jsonb_build_object('ok', false, 'error', 'unauthenticated');
