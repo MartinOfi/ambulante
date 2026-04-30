@@ -4,6 +4,9 @@ import { useCallback } from "react";
 import { useSession } from "@/shared/hooks/useSession";
 import { useLocationPermission } from "@/features/profile/hooks/useLocationPermission";
 import { useNotificationPrefs } from "@/features/profile/hooks/useNotificationPrefs";
+import { AvatarUploadContainer } from "@/features/profile/components/AvatarUpload";
+import { DisplayNameFieldContainer } from "@/features/profile/components/DisplayNameField";
+import { PushOptInToggleContainer } from "@/features/profile/components/PushOptInToggle";
 import { ProfilePage } from "./ProfilePage";
 
 export function ProfilePageContainer() {
@@ -22,6 +25,7 @@ export function ProfilePageContainer() {
   }
 
   const user = sessionResult.status === "authenticated" ? sessionResult.session.user : null;
+  const isAuthenticated = user !== null;
 
   return (
     <ProfilePage
@@ -34,6 +38,11 @@ export function ProfilePageContainer() {
       onTogglePref={togglePref}
       onRequestNotificationPermission={requestNotificationPermission}
       onSignOut={handleSignOut}
+      avatarSlot={isAuthenticated ? <AvatarUploadContainer currentUrl={user.avatarUrl} /> : undefined}
+      displayNameEditorSlot={
+        isAuthenticated ? <DisplayNameFieldContainer initialValue={user.displayName ?? ""} /> : undefined
+      }
+      pushOptInSlot={isAuthenticated ? <PushOptInToggleContainer /> : undefined}
     />
   );
 }

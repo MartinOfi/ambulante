@@ -19,6 +19,9 @@ export function ProfilePage({
   onTogglePref,
   onRequestNotificationPermission,
   onSignOut,
+  avatarSlot,
+  displayNameEditorSlot,
+  pushOptInSlot,
 }: ProfilePageProps) {
   const t = useTranslations("Profile.Page");
 
@@ -31,6 +34,16 @@ export function ProfilePage({
         </Text>
       </Stack>
 
+      {avatarSlot !== undefined || displayNameEditorSlot !== undefined ? (
+        <Card className="p-4">
+          <Stack gap={4}>
+            <Text variant="heading-sm">Perfil</Text>
+            {avatarSlot}
+            {displayNameEditorSlot}
+          </Stack>
+        </Card>
+      ) : null}
+
       <Card className="p-4">
         <Stack gap={3}>
           <Text variant="heading-sm">{t("locationSection")}</Text>
@@ -39,8 +52,9 @@ export function ProfilePage({
       </Card>
 
       <Card className="p-4">
-        <Stack gap={3}>
+        <Stack gap={4}>
           <Text variant="heading-sm">{t("notificationsSection")}</Text>
+          {pushOptInSlot}
           <NotificationPrefs
             prefs={prefs}
             notificationPermission={notificationPermission}
