@@ -3,7 +3,6 @@ import { withSentryConfig } from "@sentry/nextjs";
 import withSerwist from "@serwist/next";
 import createNextIntlPlugin from "next-intl/plugin";
 import bundleAnalyzer from "@next/bundle-analyzer";
-import "./shared/config/env.runtime";
 import { HTTP_CACHE_CONTROL } from "./shared/config/cache-config";
 
 const withBundleAnalyzer = bundleAnalyzer({
