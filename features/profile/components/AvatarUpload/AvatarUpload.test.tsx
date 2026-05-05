@@ -20,10 +20,11 @@ describe("AvatarUpload", () => {
     expect(screen.queryByAltText(/avatar actual/i)).not.toBeInTheDocument();
   });
 
-  it("muestra <img> cuando hay currentUrl", () => {
+  it("muestra la imagen cuando hay currentUrl", () => {
     render(<AvatarUpload {...baseProps} currentUrl="https://example.com/a.jpg" />);
     const img = screen.getByAltText(/avatar actual/i) as HTMLImageElement;
-    expect(img.src).toBe("https://example.com/a.jpg");
+    // next/image rewrites src to /_next/image?url=<encoded>&w=...
+    expect(img.src).toContain(encodeURIComponent("https://example.com/a.jpg"));
   });
 
   it("invoca onFileSelected cuando el usuario elige archivo", () => {

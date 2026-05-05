@@ -100,11 +100,12 @@ describe("services/index factory", () => {
       expect(authService).toHaveProperty("onAuthStateChange");
     });
 
-    it("realtimeService.subscribe throws a TODO error", async () => {
+    it("realtimeService has subscribe / unsubscribe interface", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
       const { realtimeService } = await import("./index");
-      expect(() => realtimeService.subscribe("orders", () => {})).toThrow("TODO");
+      expect(realtimeService).toHaveProperty("subscribe");
+      expect(realtimeService).toHaveProperty("unsubscribe");
     });
 
     it("pushService.subscribe throws a TODO error", async () => {

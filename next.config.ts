@@ -19,7 +19,10 @@ const nextConfig: NextConfig = {
     dirs: ["app", "features", "shared"],
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "*.supabase.co" },
+    ],
   },
   async headers() {
     return [
