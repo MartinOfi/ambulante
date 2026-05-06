@@ -126,6 +126,15 @@ jobs:
       - name: Check for @supabase imports outside allowed directories
         run: bash scripts/check-supabase-imports.sh
 
+  check-migration-timestamps:
+    name: Migration Timestamp Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for duplicate or malformed migration timestamps
+        run: bash scripts/check-migration-timestamps.sh
+
   db-migrations:
     name: DB Migrations & Audit
     runs-on: ubuntu-latest

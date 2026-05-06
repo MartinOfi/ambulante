@@ -63,7 +63,6 @@
 | [NT-33](#nt-33--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
-| [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 | [NT-42](#nt-42--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
@@ -527,18 +526,6 @@ Mejorar mensajes de error de paridad VAPID cuando una sola clave está configura
 - **Ticket:** —
 - **Notas:** descubierto por B11-C (MEDIUM #7 del code review). Patrón compartido entre features → vale la pena hacerlo de un solo PR cross-feature en vez de uno por modal.
 
-### NT-36 — Guard en CI contra timestamps duplicados de migrations
-
-- **Categoría:** infra / DevEx
-- **Contexto:** Descubierto al ejecutar **B13-A**: dos pares de migrations (`20260428000004` y `20260428000007`) tenían timestamp duplicado. Postgres rechaza el segundo INSERT en `supabase_migrations.schema_migrations` con `duplicate key`, por lo que `pnpm supabase db reset` bombeaba en cualquier worktree fresh. Lo arreglé renombrando las dos colisiones a slots libres (`0008` y `0009`), pero CI no detecta esto automáticamente.
-- **Aceptación:** un check de CI (`db-migrations` job o uno nuevo) escanea `supabase/migrations/*.sql`, extrae los 14-char prefixes con `awk` o `grep`, y falla si encuentra duplicados. Idealmente también valida formato `YYYYMMDDhhmmss_*.sql`.
-- **Archivos afectados:** `.github/workflows/ci.yml`, posiblemente nuevo `scripts/check-migration-timestamps.sh`.
-- **Estimación:** S
-- **Cuándo retomarlo:** próxima vez que toque CI (o en B14.2 cuando se establezca preview DB por PR).
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** El error se manifiesta como exit-1 con `duplicate key value violates unique constraint "schema_migrations_pkey"` durante `supabase start` o `supabase db reset`. Tarda en detectarse porque depende de un worktree fresh sin DB cacheada.
-
 ### NT-39 — E2E happy path cliente (cart → submit → tracking → cancel → history)
 
 - **Categoría:** testing / E2E
@@ -627,3 +614,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
 | 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |
 | 2026-05-06 | NT-41 eliminado — resuelto (`resolvePublicId()` con cache in-memory; `toUser/toSession` ahora exponen `public.users.public_id`). |
+| 2026-05-06 | NT-36 eliminado — resuelto (`scripts/check-migration-timestamps.sh` + job `check-migration-timestamps` en CI). |
