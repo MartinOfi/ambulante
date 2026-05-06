@@ -1,6 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockAuth } = vi.hoisted(() => {
+const { mockAuth, mockMaybySingle, mockFrom } = vi.hoisted(() => {
+  const mockMaybySingle = vi.fn().mockResolvedValue({
+    data: { public_id: "public-user-123" },
+    error: null,
+  });
+  const mockEq = vi.fn().mockReturnValue({ maybeSingle: mockMaybySingle });
+  const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+  const mockFrom = vi.fn().mockReturnValue({ select: mockSelect });
+
   const mockAuth = {
     signInWithPassword: vi.fn(),
     signUp: vi.fn(),
@@ -11,11 +19,11 @@ const { mockAuth } = vi.hoisted(() => {
     getUser: vi.fn(),
     onAuthStateChange: vi.fn(),
   };
-  return { mockAuth };
+  return { mockAuth, mockMaybySingle, mockFrom };
 });
 
 vi.mock("@supabase/ssr", () => ({
-  createBrowserClient: vi.fn(() => ({ auth: mockAuth })),
+  createBrowserClient: vi.fn(() => ({ auth: mockAuth, from: mockFrom })),
 }));
 
 import { supabaseAuthService } from "./auth.supabase";
@@ -37,10 +45,12 @@ const mockSupabaseSession = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Restore default: resolves public_id for user-123
+  mockMaybySingle.mockResolvedValue({ data: { public_id: "public-user-123" }, error: null });
 });
 
 describe("supabaseAuthService.signIn", () => {
-  it("returns mapped session on success", async () => {
+  it("returns mapped session on success with public_id as user.id", async () => {
     mockAuth.signInWithPassword.mockResolvedValue({
       data: { session: mockSupabaseSession, user: mockSupabaseUser },
       error: null,
@@ -55,10 +65,32 @@ describe("supabaseAuthService.signIn", () => {
     if (result.success) {
       expect(result.data.accessToken).toBe("access-token-123");
       expect(result.data.refreshToken).toBe("refresh-token-123");
-      expect(result.data.user.id).toBe("user-123");
+      expect(result.data.user.id).toBe("public-user-123");
       expect(result.data.user.email).toBe("test@example.com");
       expect(result.data.user.role).toBe("client");
       expect(result.data.user.displayName).toBe("Test User");
+    }
+  });
+
+  it("falls back to auth.uid() when public.users lookup fails", async () => {
+    const fallbackUser = { ...mockSupabaseUser, id: "user-no-public-row" };
+    mockAuth.signInWithPassword.mockResolvedValue({
+      data: {
+        session: { ...mockSupabaseSession, user: fallbackUser },
+        user: fallbackUser,
+      },
+      error: null,
+    });
+    mockMaybySingle.mockResolvedValueOnce({ data: null, error: { message: "not found" } });
+
+    const result = await supabaseAuthService.signIn({
+      email: "test@example.com",
+      password: "password",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.user.id).toBe("user-no-public-row");
     }
   });
 
@@ -95,7 +127,7 @@ describe("supabaseAuthService.signIn", () => {
 });
 
 describe("supabaseAuthService.signUp", () => {
-  it("returns session when email confirmation is disabled", async () => {
+  it("returns session with public_id when email confirmation is disabled", async () => {
     mockAuth.signUp.mockResolvedValue({
       data: { session: mockSupabaseSession, user: mockSupabaseUser },
       error: null,
@@ -109,6 +141,7 @@ describe("supabaseAuthService.signUp", () => {
 
     expect(result.success).toBe(true);
     if (result.success && result.data) {
+      expect(result.data.user.id).toBe("public-user-123");
       expect(result.data.user.email).toBe("test@example.com");
     }
   });
@@ -286,7 +319,7 @@ describe("supabaseAuthService.signOut", () => {
 });
 
 describe("supabaseAuthService.getSession", () => {
-  it("returns mapped session when active session exists", async () => {
+  it("returns mapped session with public_id when active session exists", async () => {
     mockAuth.getSession.mockResolvedValue({
       data: { session: mockSupabaseSession },
       error: null,
@@ -297,6 +330,7 @@ describe("supabaseAuthService.getSession", () => {
     expect(session).not.toBeNull();
     expect(session?.accessToken).toBe("access-token-123");
     expect(session?.user.email).toBe("test@example.com");
+    expect(session?.user.id).toBe("public-user-123");
   });
 
   it("returns null when no session", async () => {
@@ -323,7 +357,7 @@ describe("supabaseAuthService.getSession", () => {
 });
 
 describe("supabaseAuthService.getUser", () => {
-  it("returns mapped user when authenticated", async () => {
+  it("returns mapped user with public_id when authenticated", async () => {
     mockAuth.getUser.mockResolvedValue({
       data: { user: mockSupabaseUser },
       error: null,
@@ -332,7 +366,7 @@ describe("supabaseAuthService.getUser", () => {
     const user = await supabaseAuthService.getUser();
 
     expect(user).not.toBeNull();
-    expect(user?.id).toBe("user-123");
+    expect(user?.id).toBe("public-user-123");
     expect(user?.email).toBe("test@example.com");
     expect(user?.role).toBe("client");
     expect(user?.displayName).toBe("Test User");
@@ -388,7 +422,7 @@ describe("supabaseAuthService.getUser", () => {
 });
 
 describe("supabaseAuthService.onAuthStateChange", () => {
-  it("calls callback with mapped session when event fires", () => {
+  it("calls callback with mapped session (public_id) when event fires", async () => {
     const mockUnsubscribe = vi.fn();
     mockAuth.onAuthStateChange.mockImplementation(
       (cb: (event: string, session: typeof mockSupabaseSession | null) => void) => {
@@ -402,8 +436,12 @@ describe("supabaseAuthService.onAuthStateChange", () => {
       received = session;
     });
 
+    // Inner callback is async — flush microtasks before asserting
+    await vi.waitFor(() => expect(received).not.toBe("sentinel"));
+
     expect(received).not.toBeNull();
     expect((received as { accessToken: string }).accessToken).toBe("access-token-123");
+    expect((received as { user: { id: string } }).user.id).toBe("public-user-123");
 
     unsubscribe();
     expect(mockUnsubscribe).toHaveBeenCalled();
@@ -421,6 +459,7 @@ describe("supabaseAuthService.onAuthStateChange", () => {
       received = session;
     });
 
+    // null path has no await — callback fires synchronously
     expect(received).toBeNull();
   });
 
