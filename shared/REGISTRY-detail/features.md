@@ -276,6 +276,28 @@
 
 ---
 
+### `features/store-dashboard/`
+
+| Nombre | Ruta | Tipo | Descripción |
+|---|---|---|---|
+| `StoreDashboard` | `features/store-dashboard/components/StoreDashboard/StoreDashboard.tsx` | componente dumb | Dashboard principal de la tienda: estado, pedidos entrantes, accesos rápidos y slot de notificaciones |
+| `StoreDashboardContainer` | `features/store-dashboard/components/StoreDashboard/StoreDashboard.container.tsx` | componente smart | Conecta `useAvailability`, `useLocationPublishing`, `useStoreOrdersQuery`; inyecta `<NotificationOptInContainer />` como slot |
+| `NotificationOptIn` | `features/store-dashboard/components/NotificationOptIn/NotificationOptIn.tsx` | componente dumb | Toggle de opt-in a notificaciones push con copy específico de la tienda ("Recibí avisos de pedidos nuevos") |
+| `NotificationOptInContainer` | `features/store-dashboard/components/NotificationOptIn/NotificationOptIn.container.tsx` | componente smart | Conecta `usePushSubscribe` (de `shared/hooks/`) y despacha `subscribe` / `unsubscribe` |
+
+#### NotificationOptIn (B10-D)
+- **Archivos:** `NotificationOptIn.tsx` (dumb), `NotificationOptIn.container.tsx` (smart, `"use client"`), `NotificationOptIn.types.ts`
+- **API dumb:** `<NotificationOptIn isSubscribed permission isPending isSupported onToggle />`
+- **API smart:** `<NotificationOptInContainer />` — sin props; extrae estado de `usePushSubscribe`
+- **Tipos exportados:** `NotificationOptInProps` (importa `PushPermissionStatus` de `shared/services/push.types`)
+- **Hook de datos:** `usePushSubscribe` → `shared/hooks/usePushSubscribe.ts` (promovido desde `features/profile/hooks/` en B10-D porque lo usan dos features)
+- **Copy tienda:** label activar = "Activar avisos de pedidos", activo = "Avisos de pedidos activados", denegado = "Permiso denegado en el navegador"
+- **Integración:** `StoreDashboardContainer` pasa `<NotificationOptInContainer />` como `notificationOptInSlot` al dumb `StoreDashboard`
+- **Tests:** 9 tests en `NotificationOptIn.test.tsx`
+- **Ruta app:** renderizado en `app/(store)/store/page.tsx` via `StoreDashboardContainer`
+
+---
+
 ### `features/store-analytics/`
 
 | Nombre | Ruta | Tipo | Descripción |

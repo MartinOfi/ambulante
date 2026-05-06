@@ -3,6 +3,7 @@
 import { useAvailability, useLocationPublishing } from "@/features/store-shell";
 import { useStoreOrdersQuery } from "@/features/orders/hooks/useStoreOrdersQuery";
 import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
+import { NotificationOptInContainer } from "@/features/store-dashboard/components/NotificationOptIn";
 import { StoreDashboard } from "./StoreDashboard";
 
 export function StoreDashboardContainer() {
@@ -20,6 +21,7 @@ export function StoreDashboardContainer() {
       incomingOrders={ordersQuery.data ?? []}
       isLoadingOrders={ordersQuery.isPending && storeId !== null}
       onToggleAvailability={toggle}
+      notificationOptInSlot={<NotificationOptInContainer />}
     />
   );
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Order } from "@/shared/schemas/order";
 import type { LocationPublishingStatus } from "@/features/store-shell";
 
@@ -7,4 +8,5 @@ export interface StoreDashboardProps {
   readonly incomingOrders: readonly Order[];
   readonly isLoadingOrders: boolean;
   readonly onToggleAvailability: () => void;
+  readonly notificationOptInSlot?: ReactNode;
 }
