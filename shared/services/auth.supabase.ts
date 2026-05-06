@@ -19,6 +19,8 @@ function createBrowserClient() {
   );
 }
 
+type BrowserClient = ReturnType<typeof createBrowserClient>;
+
 type SupabaseUser = {
   id: string;
   email?: string;
@@ -34,9 +36,32 @@ type SupabaseSession = {
   user: SupabaseUser;
 };
 
-function toUser(sbUser: SupabaseUser): User {
+// auth.users.id → public.users.public_id. Stable for the lifetime of the app.
+const publicIdCache = new Map<string, string>();
+
+async function resolvePublicId(client: BrowserClient, authUserId: string): Promise<string> {
+  const cached = publicIdCache.get(authUserId);
+  if (cached !== undefined) return cached;
+
+  const { data, error } = await client
+    .from("users")
+    .select("public_id")
+    .eq("auth_user_id", authUserId)
+    .maybeSingle();
+
+  if (error !== null || data === null) {
+    logger.error("resolvePublicId failed — falling back to auth.uid()", { authUserId, error });
+    return authUserId;
+  }
+
+  const publicId = (data as { public_id: string }).public_id;
+  publicIdCache.set(authUserId, publicId);
+  return publicId;
+}
+
+function toUser(publicId: string, sbUser: SupabaseUser): User {
   return {
-    id: sbUser.id,
+    id: publicId,
     email: sbUser.email ?? "",
     role: extractRole(sbUser.user_metadata, sbUser.app_metadata),
     displayName:
@@ -45,12 +70,12 @@ function toUser(sbUser: SupabaseUser): User {
   };
 }
 
-function toSession(sb: SupabaseSession): Session {
+function toSession(publicId: string, sb: SupabaseSession): Session {
   return {
     accessToken: sb.access_token,
     refreshToken: sb.refresh_token,
     expiresAt: sb.expires_at ?? Math.floor(Date.now() / 1000) + sb.expires_in,
-    user: toUser(sb.user),
+    user: toUser(publicId, sb.user),
   };
 }
 
@@ -65,7 +90,8 @@ export const supabaseAuthService: AuthService = {
       logger.error("signIn failed", { error });
       return { success: false, error: "Credenciales inválidas" };
     }
-    return { success: true, data: toSession(data.session) };
+    const publicId = await resolvePublicId(client, data.session.user.id);
+    return { success: true, data: toSession(publicId, data.session) };
   },
 
   async signUp(input: SignUpInput): Promise<AuthResult<Session | null>> {
@@ -84,7 +110,8 @@ export const supabaseAuthService: AuthService = {
     if (!data.session) {
       return { success: true, data: null };
     }
-    return { success: true, data: toSession(data.session) };
+    const publicId = await resolvePublicId(client, data.session.user.id);
+    return { success: true, data: toSession(publicId, data.session) };
   },
 
   async signInWithMagicLink(input: MagicLinkInput): Promise<AuthResult<void>> {
@@ -130,22 +157,29 @@ export const supabaseAuthService: AuthService = {
     const client = createBrowserClient();
     const { data, error } = await client.auth.getSession();
     if (error || !data.session) return null;
-    return toSession(data.session);
+    const publicId = await resolvePublicId(client, data.session.user.id);
+    return toSession(publicId, data.session);
   },
 
   async getUser(): Promise<User | null> {
     const client = createBrowserClient();
     const { data, error } = await client.auth.getUser();
     if (error || !data.user) return null;
-    return toUser(data.user);
+    const publicId = await resolvePublicId(client, data.user.id);
+    return toUser(publicId, data.user);
   },
 
   onAuthStateChange(callback: AuthStateChangeCallback): () => void {
     const client = createBrowserClient();
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
-      callback(session ? toSession(session) : null);
+    } = client.auth.onAuthStateChange(async (_event, session) => {
+      if (!session) {
+        callback(null);
+        return;
+      }
+      const publicId = await resolvePublicId(client, session.user.id);
+      callback(toSession(publicId, session));
     });
     return () => subscription.unsubscribe();
   },
