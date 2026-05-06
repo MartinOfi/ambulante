@@ -67,7 +67,6 @@
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
-| [NT-37](#nt-37--tests-fallan-en-local-sin-env-vars-de-supabase-módulos-repositoriesindexts) | Tests fallan en local sin env vars de Supabase | testing / DevEx | S | próximo onboarding de dev nuevo |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 | [NT-41](#nt-41--authsupabasetouser-devuelve-authuid-en-vez-de-publicuserspublic_id) | `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id` | backend / arquitectura | S | antes de B10-B (location publishing real) |
@@ -582,18 +581,6 @@
 - **Dependencias:** —
 - **Ticket:** —
 - **Notas:** El error se manifiesta como exit-1 con `duplicate key value violates unique constraint "schema_migrations_pkey"` durante `supabase start` o `supabase db reset`. Tarda en detectarse porque depende de un worktree fresh sin DB cacheada.
-
-### NT-37 — Tests fallan en local sin env vars de Supabase (módulos `repositories/index.ts`)
-
-- **Categoría:** testing / DevEx
-- **Contexto:** Descubierto al ejecutar **B13-A**: `pnpm test` falla con ~18 tests rojos en local porque `shared/repositories/supabase/client.ts` lanza al cargarse si `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY` no están definidas, y `shared/repositories/index.ts` re-exporta del cliente Supabase. Cualquier test que importe `@/shared/repositories` (auth, hooks, varios features) revienta a module-load. Pre-existente — no lo introduje yo, pero noté que los tests verdes en local sólo lo están si las env vars están seteadas. (Probablemente la misma causa raíz que NT-32, con foco en otro vector.)
-- **Aceptación:** los tests pasan en una checkout fresh sin `.env.local`. Una de dos opciones: (a) lazy-load del cliente Supabase (constants se evalúan en el primer uso, no al import); (b) `vitest.setup.ts` setea env vars dummy para tests que no necesitan Supabase real.
-- **Archivos afectados:** `shared/repositories/supabase/client.ts`, `vitest.setup.ts`.
-- **Estimación:** S
-- **Cuándo retomarlo:** próximo onboarding de dev nuevo, o cuando se prepare el go-live (B14). Considerar resolverlo junto con NT-32.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** Workaround actual: setear env vars antes de `pnpm test`. CI no detecta el bug porque el job `test-unit` corre con env stubs implícitos.
 
 ### NT-39 — E2E happy path cliente (cart → submit → tracking → cancel → history)
 
