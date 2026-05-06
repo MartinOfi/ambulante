@@ -25,9 +25,9 @@ export class SupabaseUserRepository implements UserRepository {
       query = query.eq("suspended", filters.suspended);
     }
 
-    // Defensive cap until pagination lands (NT in NEXT-TASK.md). Prevents
-    // unbounded admin-page scans on production with many users.
-    query = query.limit(MAX_USERS_PER_QUERY);
+    const limit = filters?.limit ?? MAX_USERS_PER_QUERY;
+    const offset = filters?.offset ?? 0;
+    query = query.range(offset, offset + limit - 1);
 
     const { data, error } = await query;
     if (error !== null) throw new Error(`SupabaseUserRepository.findAll: ${error.message}`);

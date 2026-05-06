@@ -26,6 +26,8 @@ import { logger } from "@/shared/utils/logger";
 export interface ListUsersInput {
   readonly role?: UserRole;
   readonly status?: SuspensionStatus;
+  readonly limit?: number;
+  readonly offset?: number;
 }
 
 export interface UserDetail {
@@ -71,8 +73,13 @@ function buildUserFilters(input: ListUsersInput): UserFilters {
   const filters: UserFilters = {};
   const withRole: UserFilters =
     input.role !== undefined ? { ...filters, role: input.role } : filters;
-  if (input.status === undefined) return withRole;
-  return { ...withRole, suspended: input.status === SUSPENSION_STATUS.SUSPENDED };
+  const withStatus: UserFilters =
+    input.status !== undefined
+      ? { ...withRole, suspended: input.status === SUSPENSION_STATUS.SUSPENDED }
+      : withRole;
+  const withLimit: UserFilters =
+    input.limit !== undefined ? { ...withStatus, limit: input.limit } : withStatus;
+  return input.offset !== undefined ? { ...withLimit, offset: input.offset } : withLimit;
 }
 
 export function createUserManagementService({
