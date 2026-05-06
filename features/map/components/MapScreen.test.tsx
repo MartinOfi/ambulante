@@ -82,6 +82,7 @@ function buildProps(overrides: Partial<MapScreenProps> = {}): MapScreenProps {
     onManualSearch: vi.fn(),
     cartItemCount: 0,
     cartTotal: 0,
+    isCheckingOut: false,
     onCheckout: vi.fn(),
     onSelectStore: vi.fn(),
     onDismissStoreDetail: vi.fn(),

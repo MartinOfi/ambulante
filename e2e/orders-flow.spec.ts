@@ -14,8 +14,13 @@ test.describe("orders flow — client golden path", () => {
   test("cart → submit → ENVIADO → cancel → CANCELADO → history", async ({ page }) => {
     await loginAsClient(page);
 
+    // NearbyBottomSheet starts in HALF snap; expand to FULL so store cards are in the DOM viewport
+    await page
+      .getByRole("button", { name: /expandir o colapsar hoja/i })
+      .click({ timeout: 15_000 });
+
     await expect(page.getByRole("button", { name: new RegExp(STORE_NAME, "i") })).toBeVisible({
-      timeout: 15_000,
+      timeout: 8_000,
     });
 
     await page.getByRole("button", { name: new RegExp(STORE_NAME, "i") }).click();
@@ -27,7 +32,9 @@ test.describe("orders flow — client golden path", () => {
 
     await page.getByRole("button", { name: /cerrar detalle/i }).click();
 
-    await expect(page.getByRole("region", { name: /resumen del carrito/i })).toBeVisible();
+    await expect(page.getByRole("region", { name: /resumen del carrito/i })).toBeVisible({
+      timeout: 5_000,
+    });
     await page.getByRole("button", { name: /enviar pedido/i }).click();
 
     await page.waitForURL("**/orders/**", { timeout: 20_000 });

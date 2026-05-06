@@ -8,6 +8,7 @@ import { MAX_EXPAND_RADIUS } from "@/features/map/constants";
 import { useRadiusParam } from "@/features/map/hooks/useRadiusParam";
 import { useStoresNearbyQuery } from "@/features/map/hooks/useStoresNearbyQuery";
 import { useStoresAvailabilityRealtime } from "@/features/map/hooks/useStoresAvailabilityRealtime";
+import { toast } from "sonner";
 import { submitOrder } from "@/features/order-flow/actions";
 import { MapScreen } from "./MapScreen";
 
@@ -16,6 +17,7 @@ export function MapScreenContainer() {
   const geo = useGeolocation();
   const router = useRouter();
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const coords = geo.status === "granted" ? geo.coords : null;
   const { data: stores = [] } = useStoresNearbyQuery({ coords, radius });
@@ -32,9 +34,10 @@ export function MapScreenContainer() {
     setRadius(MAX_EXPAND_RADIUS);
   }, [setRadius]);
 
+  const geoRequest = geo.request;
   const handleRecenter = useCallback(() => {
-    geo.request();
-  }, [geo.request]);
+    geoRequest();
+  }, [geoRequest]);
 
   const handleManualSearch = useCallback(() => {}, []);
 
@@ -48,15 +51,30 @@ export function MapScreenContainer() {
 
   const handleCheckout = useCallback(async () => {
     if (activeStoreId === null || items.length === 0) return;
-
-    const result = await submitOrder({
-      storeId: activeStoreId,
-      items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+    let didStart = false;
+    setIsCheckingOut((prev) => {
+      if (prev) return prev;
+      didStart = true;
+      return true;
     });
-
-    if (result.ok) {
-      clearCart();
-      router.push(`/orders/${result.publicId}`);
+    if (!didStart) return;
+    try {
+      const result = await submitOrder({
+        storeId: activeStoreId,
+        items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+      });
+      if (result.ok) {
+        clearCart();
+        router.push(`/orders/${result.publicId}`);
+      } else {
+        console.error("[checkout] submitOrder returned !ok", result);
+        toast.error("No pudimos enviar tu pedido. Intentá de nuevo.");
+      }
+    } catch (err) {
+      console.error("[checkout] unexpected error during submitOrder", err);
+      toast.error("Ocurrió un error inesperado. Intentá de nuevo.");
+    } finally {
+      setIsCheckingOut(false);
     }
   }, [activeStoreId, items, clearCart, router]);
 
@@ -69,6 +87,7 @@ export function MapScreenContainer() {
       selectedStoreId={selectedStoreId}
       cartItemCount={cartItemCount}
       cartTotal={cartTotal}
+      isCheckingOut={isCheckingOut}
       onRadiusChange={setRadius}
       onExpandRadius={handleExpandRadius}
       onRecenter={handleRecenter}

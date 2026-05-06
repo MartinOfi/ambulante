@@ -27,6 +27,7 @@ export interface MapScreenProps {
   readonly selectedStoreId: string | null;
   readonly cartItemCount: number;
   readonly cartTotal: number;
+  readonly isCheckingOut: boolean;
   readonly onRadiusChange: (next: RadiusValue) => void;
   readonly onExpandRadius: () => void;
   readonly onRecenter: () => void;
@@ -45,6 +46,7 @@ export function MapScreen({
   selectedStoreId,
   cartItemCount,
   cartTotal,
+  isCheckingOut,
   onRadiusChange,
   onExpandRadius,
   onRecenter,
@@ -82,7 +84,12 @@ export function MapScreen({
             onExpandRadius={onExpandRadius}
             onSelectStore={onSelectStore}
           />
-          <CartSummaryBar itemCount={cartItemCount} total={cartTotal} onCheckout={onCheckout} />
+          <CartSummaryBar
+            itemCount={cartItemCount}
+            total={cartTotal}
+            isLoading={isCheckingOut}
+            onCheckout={onCheckout}
+          />
         </>
       )}
 

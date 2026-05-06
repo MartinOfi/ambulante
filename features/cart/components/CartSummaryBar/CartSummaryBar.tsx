@@ -3,7 +3,7 @@
 import { formatPrice } from "@/shared/utils/format";
 import type { CartSummaryBarProps } from "./CartSummaryBar.types";
 
-export function CartSummaryBar({ itemCount, total, onCheckout }: CartSummaryBarProps) {
+export function CartSummaryBar({ itemCount, total, isLoading, onCheckout }: CartSummaryBarProps) {
   if (itemCount === 0) return null;
 
   return (
@@ -22,9 +22,10 @@ export function CartSummaryBar({ itemCount, total, onCheckout }: CartSummaryBarP
       <button
         type="button"
         onClick={onCheckout}
-        className="bg-black text-white text-sm font-medium px-5 py-2.5 rounded-xl active:scale-95 transition-transform"
+        disabled={isLoading}
+        className="bg-black text-white text-sm font-medium px-5 py-2.5 rounded-xl active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Enviar pedido
+        {isLoading ? "Enviando…" : "Enviar pedido"}
       </button>
     </div>
   );
