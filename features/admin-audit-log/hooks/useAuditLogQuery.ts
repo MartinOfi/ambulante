@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { auditLogService } from "@/features/admin-audit-log/services/audit-log.mock";
+import { fetchAuditLog } from "@/features/admin-audit-log/actions/fetch-audit-log";
 
 const AUDIT_LOG_QUERY_KEY_PREFIX = "auditLog" as const;
 
@@ -14,11 +14,8 @@ function buildQueryKey(orderId: string): readonly [AuditLogQueryKey] {
 
 export function useAuditLogQuery(orderId: string | null) {
   return useQuery({
-    queryKey: orderId ? buildQueryKey(orderId) : [AUDIT_LOG_QUERY_KEY_PREFIX, null],
-    queryFn: async () => {
-      if (!orderId) return null;
-      return auditLogService.findByOrderId(orderId);
-    },
+    queryKey: buildQueryKey(orderId ?? ""),
+    queryFn: () => fetchAuditLog(orderId ?? ""),
     enabled: orderId !== null && orderId.trim().length > 0,
     staleTime: 30_000,
     retry: false,

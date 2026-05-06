@@ -29,21 +29,20 @@
 | B8 | Web Push delivery (VAPID + subscriptions + triggers) | 4 | 4/4 | ✅ |
 | B9 | Swap cliente (features Cliente consumen backend real) | 3 | 3/3 | ✅ |
 | B10 | Swap tienda (features Tienda consumen backend real) | 4 | 4/4 | ✅ |
-| B11 | Swap admin (features Admin consumen backend real) | 3 | 2/3 | 🟡 |
+| B11 | Swap admin (features Admin consumen backend real) | 3 | 3/3 | ✅ |
 | B12 | Observability backend | 3 | 3/3 | ✅ |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 2/2 | ✅ |
 | B14 | Deploy producción | 4 | 4/4 | ✅ |
 
 ## Tareas pendientes (🟢 ready / ⚪ pending / 🔴 blocked)
 
-| ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
-|---|---|---|---|---|---|---|
-| B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
+*(todas las tareas del epic están completas)*
 
 ## Tareas done (compactas)
 
 | ID | Título | Estado |
 |---|---|---|
+| B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ✅ |
 | B10-B | Tienda: operación (availability + location + catálogo CRUD) | ✅ |
 | B10-D | Tienda: analytics + push | ✅ |
 | B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ✅ |

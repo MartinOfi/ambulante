@@ -234,6 +234,19 @@ Schemas Zod y tipos TS para las entradas del log de auditoría inmutable (PRD §
 - **Campos:** `id`, `orderId`, `actor` (enum CLIENTE/TIENDA/SISTEMA), `eventType` (8 eventos), `fromStatus`, `toStatus`, `occurredAt: Date`
 - **Tipos exportados:** `AuditLogEntry`, `NewAuditLogEntry`
 
+#### DB enforcement — append-only trigger (B11-B)
+Migración `supabase/migrations/20260505000001_b11b_audit_log_immutability.sql`:
+- `public.audit_log_deny_mutations()` — función PL/pgSQL que lanza `restrict_violation` en cualquier `UPDATE` o `DELETE` sobre `audit_log`
+- `trg_audit_log_immutability` — trigger `BEFORE UPDATE OR DELETE FOR EACH ROW` vinculado a `audit_log`
+- Fires para todos los roles incluyendo `service_role` (los triggers no pueden ser bypaseados por RLS)
+- Garantía: el log es verdaderamente inmutable en capa DB, no solo a nivel policy
+
+#### DB audit writes — atomic (B11-B)
+Migración `supabase/migrations/20260505000002_b11b_audit_rpc_writes.sql`:
+- Los 4 RPCs de transición (`accept_order_by_store`, `reject_order_by_store`, `finalize_order_by_store`, `cancel_order_by_customer`) insertan en `audit_log` en la misma transacción que el `UPDATE orders`
+- Si el INSERT falla, el UPDATE también se revierte (atomicidad garantizada)
+- `new_values` JSONB con campos: `orderId`, `actor`, `eventType`, `fromStatus`, `toStatus`, `occurredAt`
+
 ### Domain events + event bus
 
 #### `shared/domain/events.ts`
