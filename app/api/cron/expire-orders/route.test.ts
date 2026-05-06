@@ -166,6 +166,9 @@ describe("POST /api/cron/expire-orders", () => {
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ count: 1, auditFailures: 0 });
       expect(mockPublish).toHaveBeenCalledOnce();
+      const event = mockPublish.mock.calls[0][0];
+      expect(event.type).toBe("ORDER_EXPIRED");
+      expect(event.sentAt).toEqual(new Date(row.sent_at));
     });
 
     it("appends one audit log entry per expired order", async () => {

@@ -37,12 +37,21 @@ function buildOrderForTransition(row: ClaimRow): OrderEnviado | OrderRecibido {
 
   if (domainStatus === ORDER_STATUS.ENVIADO) {
     return { ...base, status: ORDER_STATUS.ENVIADO };
+  } else if (domainStatus === ORDER_STATUS.RECIBIDO) {
+    if (row.received_at === null) {
+      logger.warn("expire-orders: RECIBIDO order missing received_at, falling back to sentAt", {
+        orderId: row.order_public_id,
+      });
+    }
+    return {
+      ...base,
+      status: ORDER_STATUS.RECIBIDO,
+      receivedAt: row.received_at !== null ? new Date(row.received_at) : base.sentAt,
+    };
+  } else {
+    // The SQL WHERE clause guarantees status ∈ {enviado, recibido} — this is unreachable.
+    throw new Error(`Unexpected status for expiration: ${domainStatus}`);
   }
-  return {
-    ...base,
-    status: ORDER_STATUS.RECIBIDO,
-    receivedAt: row.received_at !== null ? new Date(row.received_at) : base.sentAt,
-  };
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

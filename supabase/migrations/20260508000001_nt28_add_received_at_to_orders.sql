@@ -3,6 +3,11 @@
 -- After this migration, received_at holds the exact timestamp when the order
 -- transitioned to 'recibido'. The RPC returns it so route.ts can populate
 -- OrderRecibido.receivedAt correctly.
+--
+-- NOTE: The expiration clock is intentionally anchored to created_at (= sent_at),
+-- NOT to received_at. An order expires 10 min after it was sent, regardless of
+-- when (or whether) the store received it. received_at is metadata for the audit
+-- trail and state-machine reconstruction; it does not affect expiration logic.
 
 -- ---------------------------------------------------------------------------
 -- 1. Add received_at column (nullable — NULL for orders never received)
@@ -12,9 +17,13 @@ alter table public.orders
 
 -- ---------------------------------------------------------------------------
 -- 2. Backfill: use updated_at as best approximation for orders that have
---    definitively passed through 'recibido'. Conservative: 'cancelado' and
---    'expirado' are ambiguous (could have transitioned from 'enviado') so
---    they are left NULL rather than risk a wrong timestamp in the audit trail.
+--    definitively passed through 'recibido'. Only states whose path through
+--    the state machine MUST include 'recibido' are eligible:
+--      recibido → aceptado → en_camino → finalizado
+--      recibido → rechazado
+--    'cancelado' and 'expirado' are excluded because both are reachable
+--    directly from 'enviado' (never-received path), so setting received_at
+--    there would be incorrect for ~50% of those rows.
 -- ---------------------------------------------------------------------------
 update public.orders
 set    received_at = updated_at
