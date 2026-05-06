@@ -66,30 +66,30 @@ describe("fetchAuditLog", () => {
     vi.clearAllMocks();
   });
 
-  it("returns null for empty orderId", async () => {
+  it("returns not_found for empty orderId", async () => {
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("");
-    expect(result).toBeNull();
+    expect(result).toEqual({ status: "not_found" });
   });
 
-  it("returns null for whitespace-only orderId", async () => {
+  it("returns not_found for whitespace-only orderId", async () => {
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("   ");
-    expect(result).toBeNull();
+    expect(result).toEqual({ status: "not_found" });
   });
 
-  it("returns null when service throws (order not found)", async () => {
+  it("returns error when service throws", async () => {
     state.findShouldThrow = new Error("order not found");
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("order-test-uuid");
-    expect(result).toBeNull();
+    expect(result).toEqual({ status: "error", message: "order not found" });
   });
 
-  it("returns null when service returns no entries", async () => {
+  it("returns not_found when service returns no entries", async () => {
     state.domainEntries = [];
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("order-test-uuid");
-    expect(result).toBeNull();
+    expect(result).toEqual({ status: "not_found" });
   });
 
   it("maps domain entries to feature schema (toStatus → newStatus)", async () => {
@@ -97,10 +97,11 @@ describe("fetchAuditLog", () => {
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("order-test-uuid");
 
-    expect(result).not.toBeNull();
-    expect(result?.orderId).toBe("order-test-uuid");
-    expect(result?.entries).toHaveLength(1);
-    const entry = result?.entries[0];
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+    expect(result.data.orderId).toBe("order-test-uuid");
+    expect(result.data.entries).toHaveLength(1);
+    const entry = result.data.entries[0];
     expect(entry?.eventType).toBe(ORDER_EVENT.TIENDA_ACEPTA);
     expect(entry?.newStatus).toBe(ORDER_STATUS.ACEPTADO);
     expect(entry?.actor).toBe(ORDER_ACTOR.TIENDA);
@@ -123,8 +124,10 @@ describe("fetchAuditLog", () => {
     const { fetchAuditLog } = await import("./fetch-audit-log");
     const result = await fetchAuditLog("order-test-uuid");
 
-    expect(result?.entries).toHaveLength(2);
-    expect(result?.entries[0]?.newStatus).toBe(ORDER_STATUS.RECIBIDO);
-    expect(result?.entries[1]?.newStatus).toBe(ORDER_STATUS.ACEPTADO);
+    expect(result.status).toBe("ok");
+    if (result.status !== "ok") return;
+    expect(result.data.entries).toHaveLength(2);
+    expect(result.data.entries[0]?.newStatus).toBe(ORDER_STATUS.RECIBIDO);
+    expect(result.data.entries[1]?.newStatus).toBe(ORDER_STATUS.ACEPTADO);
   });
 });
