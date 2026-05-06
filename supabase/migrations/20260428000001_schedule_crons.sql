@@ -2,7 +2,7 @@
 -- Creates internal.call_cron_endpoint() and registers expire-orders / auto-close-orders.
 -- Depends on: B1.1 (pg_cron, pg_net enabled), B0.2 (CRON_SECRET in env schema).
 -- app.settings.cron_secret and app.settings.site_url are injected:
---   local dev → supabase/seed.sql (ALTER DATABASE)
+--   local dev → migration 20260507000001_alter_db_app_settings.sql (ALTER DATABASE)
 --   prod      → Supabase secrets dashboard (B14)
 
 create schema if not exists internal;

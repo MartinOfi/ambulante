@@ -10,10 +10,9 @@
 --
 -- Password for all dev accounts: Ambulante123!
 
--- app.settings.cron_secret and app.settings.site_url are intentionally NOT set here.
--- ALTER DATABASE SET requires superuser and is not supported in seeds or migrations
--- with this Supabase CLI version. internal.call_cron_endpoint() handles missing
--- settings gracefully via current_setting(..., true) (missing_ok = true).
+-- app.settings.cron_secret and app.settings.site_url are set in migration
+-- 20260507000001_alter_db_app_settings.sql (requires supabase_admin = superuser).
+-- Seed runs as postgres (non-superuser) — ALTER DATABASE is not allowed here.
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Auth users
