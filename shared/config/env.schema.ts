@@ -91,7 +91,19 @@ const serverEnvSchema = clientEnvSchema.merge(serverOnlyEnvSchema).superRefine((
   const clientKey = data.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const serverKey = data.VAPID_PUBLIC_KEY;
 
-  if (clientKey !== undefined || serverKey !== undefined) {
+  if (clientKey !== undefined && serverKey === undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "VAPID_PUBLIC_KEY es requerida cuando se configura NEXT_PUBLIC_VAPID_PUBLIC_KEY",
+      path: ["VAPID_PUBLIC_KEY"],
+    });
+  } else if (clientKey === undefined && serverKey !== undefined) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "NEXT_PUBLIC_VAPID_PUBLIC_KEY es requerida cuando se configura VAPID_PUBLIC_KEY",
+      path: ["NEXT_PUBLIC_VAPID_PUBLIC_KEY"],
+    });
+  } else if (clientKey !== undefined && serverKey !== undefined) {
     if (clientKey !== serverKey) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

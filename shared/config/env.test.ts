@@ -364,12 +364,24 @@ describe("parseServerEnv", () => {
     it("throws when NEXT_PUBLIC_VAPID_PUBLIC_KEY is set but VAPID_PUBLIC_KEY is not", () => {
       expect(() =>
         parseServerEnv({ ...validBase, NEXT_PUBLIC_VAPID_PUBLIC_KEY: publicKey }),
-      ).toThrowError(/VAPID/);
+      ).toThrowError(/VAPID_PUBLIC_KEY es requerida/);
+    });
+
+    it("single client-key error does not mention mismatch", () => {
+      expect(() =>
+        parseServerEnv({ ...validBase, NEXT_PUBLIC_VAPID_PUBLIC_KEY: publicKey }),
+      ).not.toThrowError(/iguales/);
     });
 
     it("throws when VAPID_PUBLIC_KEY is set but NEXT_PUBLIC_VAPID_PUBLIC_KEY is not", () => {
       expect(() => parseServerEnv({ ...validBase, VAPID_PUBLIC_KEY: publicKey })).toThrowError(
-        /VAPID/,
+        /NEXT_PUBLIC_VAPID_PUBLIC_KEY es requerida/,
+      );
+    });
+
+    it("single server-key error does not mention mismatch", () => {
+      expect(() => parseServerEnv({ ...validBase, VAPID_PUBLIC_KEY: publicKey })).not.toThrowError(
+        /iguales/,
       );
     });
 
