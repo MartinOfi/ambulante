@@ -56,7 +56,6 @@
 | [NT-43](#nt-43--fetchauditlog-devuelve-null-tanto-para-pedido-sin-entradas-como-para-errores-de-supabase) | `fetchAuditLog` devuelve null para not-found y para errores — admin no puede distinguir | backend / UX admin | M | admin reporta confusión al auditar pedidos |
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
-| [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
@@ -428,18 +427,6 @@ Mejorar mensajes de error de paridad VAPID cuando una sola clave está configura
 
 ---
 
-
-### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
-
-- **Categoría:** DX / types
-- **Contexto:** En el path donde el MIME del archivo no es redimensionable (ej. PDF), el helper retorna `originalDimensions: { width: 0, height: 0 }` y `outputDimensions: { width: 0, height: 0 }`. Eso es ambiguo — un caller no puede distinguir "imagen de tamaño 0" (imposible en la práctica) de "nunca decodificamos el archivo". El code reviewer (B5.3, MEDIUM 2) sugirió tipar `originalDimensions` y `outputDimensions` como `ImageDimensions | null` para hacer la distinción explícita en el tipo.
-- **Aceptación:** la interfaz `ResizeImageResult` expone `originalDimensions: ImageDimensions | null` y `outputDimensions: ImageDimensions | null`; los callers se actualizan; tests cubren ambos paths (`null` para MIME no redimensionable, valores reales para imágenes).
-- **Archivos afectados:** `shared/utils/image-upload.ts`, `shared/utils/image-upload.test.ts`, callers en `features/catalog/components/ProductImageUpload` (creado por B10.3).
-- **Estimación:** S
-- **Cuándo retomarlo:** al ejecutar **B10.3** (Swap catálogo CRUD + image upload) — si el componente consumidor termina necesitando esa distinción, se hace en el mismo PR. Si no, se puede dejar como-está y descartar este item.
-- **Dependencias:** B10.3 (consumer real del helper).
-- **Ticket:** —
-- **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
 
 ### NT-44 — Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example`
 
