@@ -54,7 +54,6 @@
 | [NT-24](#nt-24--app-nativa-ios-si-la-pwa-topa-límites) | App nativa iOS si la PWA topa límites | plataforma | XL | push en iOS sin PWA-install sigue sin estar disponible |
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
 | [NT-43](#nt-43--fetchauditlog-devuelve-null-tanto-para-pedido-sin-entradas-como-para-errores-de-supabase) | `fetchAuditLog` devuelve null para not-found y para errores — admin no puede distinguir | backend / UX admin | M | admin reporta confusión al auditar pedidos |
-| [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
@@ -390,16 +389,8 @@
 ### ~~NT-26~~ — ✅ resuelto (2026-05-06)
 Mejorar mensajes de error de paridad VAPID cuando una sola clave está configurada — superRefine refactorizado con 3 ramas explícitas en `shared/config/env.schema.ts`.
 
-### NT-27 — Mover `ALTER DATABASE SET` de seed.sql a una migración
-- **Categoría:** infra / DX
-- **Contexto:** `supabase/seed.sql` contiene dos `ALTER DATABASE postgres SET "app.settings.*"` agregados en B7.1. En Supabase CLI v2.95.5, el seed se aplica como el usuario `postgres` que carece del privilegio `ALTER DATABASE` (requiere superuser o `pg_alter_system`). Esto causa que `pnpm supabase:start` falle durante el seeding y deje los contenedores detenidos. Como workaround temporal en B6.1, las líneas están comentadas. Los ajustes deben vivir en una migración donde el CLI los aplica con el usuario `supabase_admin` (superuser).
-- **Aceptación:** `ALTER DATABASE postgres SET "app.settings.cron_secret"` y `"app.settings.site_url"` movidos a una migración (ej: `20260428000001_schedule_crons.sql` o una nueva). `pnpm supabase:start` completa sin errores de seeding.
-- **Archivos afectados:** `supabase/seed.sql`, `supabase/migrations/20260428000001_schedule_crons.sql`.
-- **Estimación:** S
-- **Cuándo retomarlo:** al reabrir el epic de cron jobs (B7.x) o cuando se necesite que la cron secret esté disponible en dev.
-- **Dependencias:** B7.1 ✅ (bug introducido ahí).
-- **Ticket:** —
-- **Notas:** Descubierto en B6.1. El pgTAP test de B7.1 ya usa `set_config()` transaction-scoped como workaround correcto para tests; la migración debería hacer lo mismo para el arranque.
+### ~~NT-27~~ — ✅ resuelto (2026-05-06)
+Migración `20260507000001_alter_db_app_settings.sql` creada con los dos `ALTER DATABASE postgres SET` para `app.settings.cron_secret` y `app.settings.site_url`. Seed limpiado.
 
 ### NT-28 — Agregar `received_at` a la tabla `orders`
 - **Categoría:** schema / backend
