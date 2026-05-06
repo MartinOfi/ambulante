@@ -13,6 +13,7 @@ import {
   editProductSchema,
   type EditProductValues,
 } from "@/features/catalog/schemas/catalog.schemas";
+import { ProductImageUploadContainer } from "@/features/catalog/components/ProductImageUpload";
 import { ProductForm } from "./ProductForm";
 
 interface EditProductFormContainerProps {
@@ -74,6 +75,8 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
     );
   }
 
+  const photoUrl = form.watch("photoUrl");
+
   return (
     <ProductForm
       form={form}
@@ -81,6 +84,12 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
       isLoading={updateMutation.isPending}
       serverError={serverError}
       submitLabel={t("submit")}
+      imageUploadSlot={
+        <ProductImageUploadContainer
+          currentUrl={photoUrl || null}
+          onUploaded={(url) => form.setValue("photoUrl", url, { shouldValidate: true })}
+        />
+      }
     />
   );
 }

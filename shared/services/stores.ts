@@ -10,4 +10,8 @@ export const storesService: StoresService = {
   findByOwnerId: (userId: string) => storeRepository.findByOwnerId(userId),
   updateLocation: (storeId: string, coords: Coordinates) =>
     storeRepository.update(storeId, { location: coords }).then(() => undefined),
+  updateAvailability: (storeId: string, available: boolean) =>
+    storeRepository
+      .update(storeId, { status: available ? "open" : "closed" })
+      .then(() => undefined),
 };

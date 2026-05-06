@@ -1,3 +1,4 @@
+import type React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type {
   CreateProductValues,
@@ -12,4 +13,5 @@ export interface ProductFormProps {
   readonly isLoading: boolean;
   readonly serverError: string | null;
   readonly submitLabel: string;
+  readonly imageUploadSlot: React.ReactNode;
 }

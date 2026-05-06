@@ -9,4 +9,5 @@ export interface StoresService {
   findById(id: string): Promise<Store | null>;
   findByOwnerId(userId: string): Promise<Store | null>;
   updateLocation(storeId: string, coords: Coordinates): Promise<void>;
+  updateAvailability(storeId: string, available: boolean): Promise<void>;
 }

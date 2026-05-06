@@ -12,6 +12,7 @@ import {
   type CreateProductValues,
 } from "@/features/catalog/schemas/catalog.schemas";
 import { useCreateProductMutation } from "@/features/catalog/hooks/useCreateProductMutation";
+import { ProductImageUploadContainer } from "@/features/catalog/components/ProductImageUpload";
 import { ProductForm } from "./ProductForm";
 
 export function CreateProductFormContainer() {
@@ -42,6 +43,8 @@ export function CreateProductFormContainer() {
     }
   }
 
+  const photoUrl = form.watch("photoUrl");
+
   return (
     <ProductForm
       form={form}
@@ -49,6 +52,12 @@ export function CreateProductFormContainer() {
       isLoading={createMutation.isPending}
       serverError={serverError}
       submitLabel={t("submit")}
+      imageUploadSlot={
+        <ProductImageUploadContainer
+          currentUrl={photoUrl || null}
+          onUploaded={(url) => form.setValue("photoUrl", url, { shouldValidate: true })}
+        />
+      }
     />
   );
 }

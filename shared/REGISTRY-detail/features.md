@@ -96,7 +96,7 @@
 | `StoreShellContainer` | `features/store-shell/components/StoreShell/StoreShell.container.tsx` | componente | Smart wrapper: conecta `useUIStore` + `useAvailability` |
 | `StoreNav` | `features/store-shell/components/StoreNav/StoreNav.tsx` | componente | Nav con 4 items: Dashboard, Pedidos, Catálogo, Perfil |
 | `AvailabilityToggle` | `features/store-shell/components/AvailabilityToggle/AvailabilityToggle.tsx` | componente | Switch accesible de disponibilidad |
-| `useAvailability` | `features/store-shell/hooks/useAvailability.ts` | hook | Estado local de disponibilidad: `{ isAvailable, toggle, setAvailable }` |
+| `useAvailability` | `features/store-shell/hooks/useAvailability.ts` | hook | Disponibilidad de la tienda: `{ isAvailable, isPending, toggle, setAvailable }`. Sincroniza estado Zustand con `status` del servidor vía `useCurrentStoreQuery`; toggle optimista con rollback |
 | `useLocationPublishing` | `features/store-shell/hooks/useLocationPublishing.ts` | hook | Publica la ubicación de la tienda al store; usa `useGeolocation` + `storesService.updateLocation` |
 
 #### Detalle de componentes
@@ -138,6 +138,16 @@
 | `useUpdateProductMutation` | `features/catalog/hooks/useUpdateProductMutation.ts` | hook | Mutación: actualiza producto; invalida `catalog.byId` + `catalog.byStore` |
 | `useDeleteProductMutation` | `features/catalog/hooks/useDeleteProductMutation.ts` | hook | Mutación: elimina producto; invalida `catalog.byStore` |
 | `catalogService` | `features/catalog/services/` | service | Interfaz `CatalogService` mock con in-memory state |
+| `ProductImageUpload` | `features/catalog/components/ProductImageUpload/ProductImageUpload.tsx` | componente dumb | Preview + botón de subida de imagen; muestra `role="alert"` en error |
+| `ProductImageUploadContainer` | `features/catalog/components/ProductImageUpload/ProductImageUpload.container.tsx` | componente smart | Valida MIME + tamaño (5 MB), redimensiona con `resizeImageForUpload`, sube a `STORAGE_BUCKETS.PRODUCTS`, llama `onUploaded(url)` |
+
+#### ProductImageUpload (B10-B)
+- **Archivos:** `ProductImageUpload.tsx` (dumb), `ProductImageUpload.container.tsx` (smart), `ProductImageUpload.types.ts`, `index.ts`
+- **API dumb:** `<ProductImageUpload currentUrl uploadState errorMessage onFileSelected />`
+- **API smart:** `<ProductImageUploadContainer currentUrl onUploaded />`
+- **Tipos exportados:** `UploadState` (`"idle" | "uploading" | "error"`), `ProductImageUploadProps`, `ProductImageUploadContainerProps`
+- **Usado en:** `CreateProductFormContainer`, `EditProductFormContainer` vía prop `imageUploadSlot` de `ProductForm`
+- **Validaciones:** MIME types de `STORAGE_ALLOWED_MIME_TYPES.PRODUCTS`, tamaño ≤ `STORAGE_SIZE_LIMITS.PRODUCTS` (5 MB)
 
 ---
 
