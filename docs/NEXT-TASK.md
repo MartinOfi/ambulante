@@ -60,9 +60,7 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
-| [NT-30](#nt-30--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar B11-B (audit log e2e) o cualquier tarea de webhooks |
 | [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
-| [NT-32](#nt-32--vitest-9-tests-fallan-en-13-archivos-pre-existente) | Vitest: 9 tests fallan en 13 archivos (pre-existente) | testing / DX | M | antes de que el rojo se normalice y la suite pierda valor como gate |
 | [NT-33](#nt-33--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
@@ -72,6 +70,8 @@
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 | [NT-41](#nt-41--authsupabasetouser-devuelve-authuid-en-vez-de-publicuserspublic_id) | `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id` | backend / arquitectura | S | antes de B10-B (location publishing real) |
 | [NT-42](#nt-42--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
+| [NT-44](#nt-44--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar cualquier tarea de webhooks o DB hooks |
+| [NT-45](#nt-45--compatibilidad-node-24-al-cargar-nextconfigts) | Compatibilidad Node 24 al cargar `next.config.ts` | infra / DX | S | antes de habilitar CI con E2E o si el equipo migra a Node 24 |
 
 ---
 
