@@ -69,7 +69,6 @@
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 | [NT-42](#nt-42--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
 | [NT-44](#nt-44--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar cualquier tarea de webhooks o DB hooks |
-| [NT-45](#nt-45--compatibilidad-node-24-al-cargar-nextconfigts) | Compatibilidad Node 24 al cargar `next.config.ts` | infra / DX | S | antes de habilitar CI con E2E o si el equipo migra a Node 24 |
 
 ---
 
@@ -496,20 +495,6 @@
 - **Ticket:** —
 - **Notas:** descubierto por B14.1 al inventariar variables. No se arregló ahí porque el entregable de B14.1 es estrictamente `prod-setup.md`; tocar `.env.example` era scope creep.
 
-### NT-45 — Compatibilidad Node 24 al cargar `next.config.ts`
-
-- **Categoría:** infra / DX
-- **Contexto:** En Node 24.12.0 + Next 15.5.15, el `next-config-ts/require-hook.js` evalúa `next.config.ts` antes de aplicar el shim de `server-only`. Como `next.config.ts` importa `./shared/config/env.runtime` (que tiene `import "server-only";`), el `dev` falla con `Error: This module cannot be imported from a Client Component module.` antes de levantar. Bloquea `pnpm dev` y `pnpm test:e2e` en ese Node. Descubierto al correr `e2e/push-delivery.spec.ts` (B8.4); afecta a TODAS las specs E2E existentes.
-- **Aceptación:** `pnpm dev` y `pnpm test:e2e` arrancan sin errores en Node 24.x. Soluciones posibles: (a) inline el `parseEnv` directo en `next.config.ts` sin pasar por `env.runtime` (que mantiene su `server-only`); (b) sacar `import "server-only";` de `env.runtime.ts` y dejar la guarda solo en consumers; (c) pinear `engines.node` a 20.x en `package.json` y agregar `.nvmrc`.
-- **Archivos afectados:** `next.config.ts`, `shared/config/env.runtime.ts`, `package.json`, `.nvmrc` (a crear).
-- **Estimación:** S
-- **Cuándo retomarlo:** antes de habilitar CI con E2E o si el equipo crece a Node 24 como default. Hasta entonces, los devs siguen en Node 20.x.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** descubierto por B8.4. Los unit tests de la infra de captura (`push.test-capture.test.ts`, `wiring.e2e.test.ts`, `__e2e/*/route.test.ts`) cubren la lógica al margen de este blocker — el spec E2E fue verificado por typecheck + lint + 22 unit tests, no por ejecución contra dev server.
-
----
-
 ### NT-34 — Paginación real en listado admin de usuarios
 
 - **Categoría:** backend / perf
@@ -636,3 +621,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
 | 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |
 | 2026-05-06 | NT-41 eliminado — resuelto (`resolvePublicId()` con cache in-memory; `toUser/toSession` ahora exponen `public.users.public_id`). |
+| 2026-05-06 | NT-45 eliminado — resuelto. `next.config.ts` ya no importa `env.runtime` (import chain roto en refactor previo); `.nvmrc` + `engines.node` agregados para documentar Node 24 como runtime activo. |
