@@ -1,9 +1,9 @@
 "use client";
 
 import { usePushSubscribe } from "@/shared/hooks/usePushSubscribe";
-import { PushOptInToggle } from "./PushOptInToggle";
+import { NotificationOptIn } from "./NotificationOptIn";
 
-export function PushOptInToggleContainer() {
+export function NotificationOptInContainer() {
   const { isSubscribed, permission, isPending, isSupported, subscribe, unsubscribe } =
     usePushSubscribe();
 
@@ -16,7 +16,7 @@ export function PushOptInToggleContainer() {
   };
 
   return (
-    <PushOptInToggle
+    <NotificationOptIn
       isSubscribed={isSubscribed}
       permission={permission}
       isPending={isPending}

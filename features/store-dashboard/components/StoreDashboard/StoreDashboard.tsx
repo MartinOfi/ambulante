@@ -21,6 +21,7 @@ export function StoreDashboard({
   incomingOrders,
   isLoadingOrders,
   onToggleAvailability,
+  notificationOptInSlot,
 }: StoreDashboardProps) {
   const activeOrders = incomingOrders.filter((o) => ACTIVE_STATUSES.has(o.status));
 
@@ -89,6 +90,18 @@ export function StoreDashboard({
           ))}
         </nav>
       </section>
+
+      {notificationOptInSlot && (
+        <section aria-labelledby="notifications-heading">
+          <h2
+            id="notifications-heading"
+            className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
+          >
+            Notificaciones
+          </h2>
+          <div className="rounded-xl border bg-card p-4 shadow-sm">{notificationOptInSlot}</div>
+        </section>
+      )}
     </main>
   );
 }

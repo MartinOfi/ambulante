@@ -157,6 +157,7 @@
 | StoreDetailSheet / StoreDetailSheetContainer | feature-component | `features/map/components/StoreDetailSheet/` | features.md §13 |
 | StoreAnalyticsDashboard / StoreAnalyticsDashboardContainer | feature-component | `features/store-analytics/components/StoreAnalyticsDashboard/` | features.md §13 |
 | StoreDashboard / StoreDashboardContainer | feature-component | `features/store-dashboard/components/StoreDashboard/` | features.md §13 |
+| NotificationOptIn / NotificationOptInContainer | feature-component | `features/store-dashboard/components/NotificationOptIn/` | features.md §13 |
 | StoreProfilePage / StoreProfileForm | feature-component | `features/store-profile/components/` | features.md §13 |
 | StoreShell / StoreShellContainer / StoreNav / AvailabilityToggle | feature-component | `features/store-shell/components/` | features.md §13 |
 | StoreValidationQueue / StoreValidationQueueContainer | feature-component | `features/store-validation/components/StoreValidationQueue/` | features.md §13 |
@@ -195,6 +196,7 @@
 | useCartStore | store | `shared/stores/cart.ts` | infra.md §10 |
 | useCatalogQuery | hook | `features/catalog/hooks/useCatalogQuery.ts` | features.md §13 |
 | useFocusTrap / UseFocusTrapOptions | hook | `shared/hooks/useFocusTrap.ts` | infra.md §11 |
+| usePushSubscribe | hook | `shared/hooks/usePushSubscribe.ts` | infra.md §11 |
 | useServiceWorkerUpdate / UseServiceWorkerUpdateResult | hook | `shared/hooks/useServiceWorkerUpdate.ts` | infra.md §11 |
 | useServiceWorkerControllerReload | hook | `shared/hooks/useServiceWorkerControllerReload.ts` | infra.md §11 |
 | SW_MESSAGE_TYPE / SW_UPDATE_STATUS / SW_UPDATE_CHECK_INTERVAL_MS / SwUpdateStatus / SwMessageType | constant | `shared/constants/service-worker.ts` | domain.md §8 |
