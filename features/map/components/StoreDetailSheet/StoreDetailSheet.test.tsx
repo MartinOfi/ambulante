@@ -173,6 +173,35 @@ describe("StoreDetailSheet", () => {
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
+  it("uses placeholder image when photoUrl is absent", () => {
+    const { photoUrl: _photo, ...withoutPhoto } = MOCK_STORE;
+    render(
+      <StoreDetailSheet
+        store={withoutPhoto}
+        products={[]}
+        isLoadingProducts={false}
+        onDismiss={vi.fn()}
+      />,
+    );
+
+    const img = screen.getByRole("img", { name: "Empanadas Don Pedro" });
+    expect(img).toHaveAttribute("src", expect.stringContaining("placeholder"));
+  });
+
+  it("does not render tagline element when tagline is absent", () => {
+    const { tagline: _tagline, ...withoutTagline } = MOCK_STORE;
+    render(
+      <StoreDetailSheet
+        store={withoutTagline}
+        products={[]}
+        isLoadingProducts={false}
+        onDismiss={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Las mejores empanadas del barrio")).not.toBeInTheDocument();
+  });
+
   it("has role=dialog with aria-modal=true and accessible label", () => {
     render(
       <StoreDetailSheet

@@ -16,16 +16,14 @@ export const storeSchema = z
       .string({ required_error: "El nombre es obligatorio" })
       .min(1, "El nombre no puede estar vacío"),
     kind: storeKindSchema,
-    photoUrl: z.string().url("La URL de la foto no es válida"),
+    photoUrl: z.string().url("La URL de la foto no es válida").optional(),
     location: coordinatesSchema,
     distanceMeters: z
       .number({ required_error: "La distancia es obligatoria" })
       .min(0, "La distancia no puede ser negativa"),
     status: storeStatusSchema,
-    priceFromArs: z
-      .number({ required_error: "El precio es obligatorio" })
-      .min(0, "El precio no puede ser negativo"),
-    tagline: z.string({ required_error: "El tagline es obligatorio" }),
+    priceFromArs: z.number().min(0, "El precio no puede ser negativo").optional(),
+    tagline: z.string().optional(),
     ownerId: z
       .string({ required_error: "El ID del dueño es obligatorio" })
       .uuid("El ID del dueño debe ser un UUID válido"),

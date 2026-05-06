@@ -154,6 +154,17 @@ describe("submitStoreOnboarding", () => {
     expect(result).toEqual({ success: true, storeId: STORE_ID });
   });
 
+  it("does not pass placeholder values for optional fields (photoUrl, tagline, priceFromArs)", async () => {
+    const { deps, createdInputs } = createDeps();
+
+    await submitStoreOnboarding(VALID_DATA, deps);
+
+    const created = createdInputs[0] as Record<string, unknown>;
+    expect(created.photoUrl).toBeUndefined();
+    expect(created.tagline).toBeUndefined();
+    expect(created.priceFromArs).toBeUndefined();
+  });
+
   it("returns a user-friendly error when createStore rejects", async () => {
     const { deps } = createDeps({
       createStore: vi.fn().mockRejectedValue(new Error("PG error: unique violation")),

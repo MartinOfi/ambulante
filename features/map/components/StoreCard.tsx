@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import type { Store } from "@/shared/types/store";
 import { formatDistance, formatPrice } from "@/shared/utils/format";
+import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
 import { Text } from "@/shared/components/typography";
 
 interface StoreCardProps {
@@ -19,16 +20,24 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
       className="group flex w-full items-center gap-3 rounded-card bg-surface-elevated p-3 text-left shadow-sheet ring-1 ring-border transition-transform duration-200 active:scale-[0.98]"
     >
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-border">
-        <Image src={store.photoUrl} alt={store.name} fill sizes="80px" className="object-cover" />
+        <Image
+          src={store.photoUrl ?? PLACEHOLDER_STORE_PHOTO_URL}
+          alt={store.name}
+          fill
+          sizes="80px"
+          className="object-cover"
+        />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <Text variant="heading-sm" className="truncate leading-tight text-foreground">
           {store.name}
         </Text>
-        <Text variant="caption" as="p" className="truncate text-muted">
-          {store.tagline}
-        </Text>
+        {store.tagline !== undefined && (
+          <Text variant="caption" as="p" className="truncate text-muted">
+            {store.tagline}
+          </Text>
+        )}
 
         <div className="mt-1 flex items-center gap-2">
           {store.status === "open" && (
@@ -40,9 +49,11 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
           <span className="tabular text-xs-tight font-semibold text-muted">
             {formatDistance(store.distanceMeters)}
           </span>
-          <span className="tabular text-xs-tight font-semibold text-brand">
-            desde {formatPrice(store.priceFromArs)}
-          </span>
+          {store.priceFromArs !== undefined && (
+            <span className="tabular text-xs-tight font-semibold text-brand">
+              desde {formatPrice(store.priceFromArs)}
+            </span>
+          )}
         </div>
       </div>
 
