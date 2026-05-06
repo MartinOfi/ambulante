@@ -53,7 +53,6 @@
 | [NT-23](#nt-23--modo-offline-completo-con-sincronización-diferida) | Modo offline completo con sincronización diferida | PWA / perf | XL | >30% de usuarios en zonas de conectividad mala |
 | [NT-24](#nt-24--app-nativa-ios-si-la-pwa-topa-límites) | App nativa iOS si la PWA topa límites | plataforma | XL | push en iOS sin PWA-install sigue sin estar disponible |
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
-| [NT-43](#nt-43--fetchauditlog-devuelve-null-tanto-para-pedido-sin-entradas-como-para-errores-de-supabase) | `fetchAuditLog` devuelve null para not-found y para errores — admin no puede distinguir | backend / UX admin | M | admin reporta confusión al auditar pedidos |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
@@ -509,19 +508,6 @@ Migración `20260507000001_alter_db_app_settings.sql` creada con los dos `ALTER 
 - **Ticket:** —
 - **Notas:** Pre-existente en la implementación de `create()`. Descubierto por code-reviewer durante cierre de B10-A.
 
-### NT-43 — `fetchAuditLog` devuelve `null` tanto para "pedido sin entradas" como para errores de Supabase
-
-- **Categoría:** backend / UX admin
-- **Contexto:** `features/admin-audit-log/actions/fetch-audit-log.ts` colapsa tres salidas distintas a `null`: (a) validación de input fallida, (b) orden sin entradas en audit_log, (c) excepción de Supabase. La UI muestra "no se encontraron transiciones" en los tres casos. Para un admin investigando un incidente, un error de red o de BD se ve igual que un pedido genuinamente sin entradas. Detectado durante code review de cierre B11-B.
-- **Aceptación:** El tipo de retorno de `fetchAuditLog` pasa de `AuditLogResult | null` a un tipo discriminado (`{ status: "ok", data: AuditLogResult } | { status: "not_found" } | { status: "error", message: string }`). El container/hook consumen el nuevo tipo y muestran un estado de error distinto al de "no encontrado".
-- **Archivos afectados:** `features/admin-audit-log/actions/fetch-audit-log.ts`, `features/admin-audit-log/hooks/useAuditLogQuery.ts`, `features/admin-audit-log/components/OrderAuditLog/OrderAuditLog.container.tsx`, `features/admin-audit-log/types/audit-log.types.ts`.
-- **Estimación:** M
-- **Cuándo retomarlo:** cuando el admin reporte confusión al auditar pedidos (no sabe si el log está vacío o si hubo un error de conexión).
-- **Dependencias:** B11-B ✅.
-- **Ticket:** —
-- **Notas:** Descubierto por code-reviewer durante cierre de B11-B.
-
----
 
 ## Cómo se alimenta este doc durante la ejecución del epic
 
@@ -544,6 +530,7 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-39 agregado — defer E2E happy path cliente hasta seed completo + VAPID en local. |
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
 | 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |
+| 2026-05-06 | NT-43 eliminado — `fetchAuditLog` discriminated union ya implementado y mergeado en main (commits 5d3b1da2, 0d524e84). |
 | 2026-05-06 | NT-41 eliminado — resuelto (`resolvePublicId()` con cache in-memory; `toUser/toSession` ahora exponen `public.users.public_id`). |
 | 2026-05-06 | NT-36 eliminado — resuelto (`scripts/check-migration-timestamps.sh` + job `check-migration-timestamps` en CI). |
 | 2026-05-06 | NT-45 eliminado — resuelto. `next.config.ts` ya no importa `env.runtime` (import chain roto en refactor previo); `.nvmrc` + `engines.node` agregados para documentar Node 24 como runtime activo. |
