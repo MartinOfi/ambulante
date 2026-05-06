@@ -31,7 +31,6 @@
 | ID | Título | Categoría | Estimación | Disparador |
 |---|---|---|---|---|
 | [NT-01](#nt-01--mejorar-la-ui-bloque-abierto-a-detallar) | Mejorar la UI (bloque abierto — a detallar) | UX | TBD | a definir por usuario |
-| [NT-03](#nt-03--precarga-de-theme-evitar-flash-blanco--dark) | Precarga de theme (evitar flash blanco → dark) | UX / perf frontend | M | quejas de usuarios sobre flash visual |
 | [NT-04](#nt-04--apple-oauth-sign-in-with-apple) | Apple OAuth (Sign in with Apple) | auth / backend | M | >20% de usuarios en iOS instalando PWA |
 | [NT-05](#nt-05--avatar-de-usuario--bucket--ui) | Avatar de usuario + bucket + UI | storage / UX | M | feature de perfil cliente prioritaria |
 | [NT-06](#nt-06--entorno-staging-supabase) | Entorno staging (Supabase Cloud) | infra | M | >1 dev en el equipo |
@@ -91,7 +90,7 @@
 
 ---
 
-### NT-03 — Precarga de theme (evitar flash blanco → dark)
+### ~~NT-03~~ — ✅ resuelto (2026-05-06)
 - **Categoría:** UX / perf frontend
 - **Contexto:** En producción, la primera carga de cualquier página arranca con fondo blanco y conmuta a dark cuando el `ThemeProvider` hidrata. Es un FOUC (flash of unstyled content) visible especialmente en mobile donde es lo primero que ve el usuario. Problema clásico de SSR + client-side theme — hay que inyectar la paleta inicial en el HTML del server para que el primer paint ya sea el correcto.
 - **Aceptación:** Lighthouse muestra 0 CLS inducido por cambio de theme. La primera pintura de `/` en dark mode no pasa por blanco. Funciona con `prefers-color-scheme` sin tocar localStorage de primera. Lighthouse Perf ≥ 90 se mantiene.
@@ -572,3 +571,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-05-06 | NT-45 eliminado — resuelto. `next.config.ts` ya no importa `env.runtime` (import chain roto en refactor previo); `.nvmrc` + `engines.node` agregados para documentar Node 24 como runtime activo. |
 | 2026-05-06 | NT-44 eliminado — resuelto (bloque `SUPABASE_WEBHOOK_SECRET` agregado a `.env.example` con instrucción de generación y nota de uso). |
 | 2026-05-06 | NT-31 eliminado — resuelto (rutas push usan `SupabasePushSubscriptionRepository`; elimina `rpc("current_user_id")` y acceso directo a `push_subscriptions`). |
+| 2026-05-06 | NT-03 eliminado — resuelto (script inline render-blocking en `<head>` + `data-theme` en lugar de `.dark` class; elimina FOUC en dark mode). NT-02 eliminado — resuelto (componente `ProductImagePreview` + preview blob inmediato en `ProductImageUpload`). |
