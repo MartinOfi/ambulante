@@ -4,23 +4,30 @@ import { NextRequest } from "next/server";
 
 vi.mock("server-only", () => ({}));
 
-function makeDeleteBuilder(result: { data?: unknown[] | null; error?: unknown }) {
+const mockFindByEndpoint = vi.fn();
+const mockDelete = vi.fn();
+
+vi.mock("@/shared/repositories/supabase/push-subscriptions.supabase", () => ({
+  SupabasePushSubscriptionRepository: vi.fn(function () {
+    return { findByEndpoint: mockFindByEndpoint, delete: mockDelete };
+  }),
+}));
+
+function makeUsersQueryBuilder(result: { data?: unknown; error?: unknown }) {
   const builder: Record<string, unknown> = {};
-  builder.delete = vi.fn().mockReturnValue(builder);
+  builder.select = vi.fn().mockReturnValue(builder);
   builder.eq = vi.fn().mockReturnValue(builder);
-  builder.select = vi.fn().mockResolvedValue(result);
+  builder.single = vi.fn().mockResolvedValue(result);
   return builder;
 }
 
 const mockGetUser = vi.fn();
-const mockRpc = vi.fn();
 const mockFrom = vi.fn();
 
 vi.mock("@/shared/repositories/supabase/client", () => ({
   createRouteHandlerClient: vi.fn(() =>
     Promise.resolve({
       auth: { getUser: mockGetUser },
-      rpc: mockRpc,
       from: mockFrom,
     }),
   ),
@@ -71,7 +78,9 @@ describe("DELETE /api/push/unsubscribe", () => {
 
   it("returns 404 when user has no public.users row", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: null, error: null });
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: null, error: { message: "not found" } }),
+    );
     const { DELETE } = await import("./route");
     const response = await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
     expect(response.status).toBe(404);
@@ -79,8 +88,25 @@ describe("DELETE /api/push/unsubscribe", () => {
 
   it("returns 404 when subscription does not exist", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
-    mockFrom.mockReturnValue(makeDeleteBuilder({ data: [], error: null }));
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockFindByEndpoint.mockResolvedValue(null);
+    const { DELETE } = await import("./route");
+    const response = await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
+    expect(response.status).toBe(404);
+  });
+
+  it("returns 404 when subscription belongs to a different user", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockFindByEndpoint.mockResolvedValue({
+      id: "99",
+      userId: "other-user-uuid",
+      endpoint: "https://push.example.com/sub/abc",
+    });
     const { DELETE } = await import("./route");
     const response = await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
     expect(response.status).toBe(404);
@@ -88,30 +114,44 @@ describe("DELETE /api/push/unsubscribe", () => {
 
   it("returns 204 when subscription is successfully deleted", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
-    mockFrom.mockReturnValue(makeDeleteBuilder({ data: [{ id: 1 }], error: null }));
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockFindByEndpoint.mockResolvedValue({
+      id: "99",
+      userId: "pub-uuid-123",
+      endpoint: "https://push.example.com/sub/abc",
+    });
+    mockDelete.mockResolvedValue(undefined);
     const { DELETE } = await import("./route");
     const response = await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
     expect(response.status).toBe(204);
   });
 
-  it("returns 500 when database delete fails", async () => {
+  it("returns 500 when repo throws during findByEndpoint", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
-    mockFrom.mockReturnValue(makeDeleteBuilder({ data: null, error: { message: "db error" } }));
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockFindByEndpoint.mockRejectedValue(new Error("db error"));
     const { DELETE } = await import("./route");
     const response = await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
     expect(response.status).toBe(500);
   });
 
-  it("deletes by endpoint and user_id for ownership enforcement", async () => {
+  it("calls delete with sub.id for ownership enforcement", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
-    const builder = makeDeleteBuilder({ data: [{ id: 1 }], error: null });
-    mockFrom.mockReturnValue(builder);
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockFindByEndpoint.mockResolvedValue({
+      id: "99",
+      userId: "pub-uuid-123",
+      endpoint: "https://push.example.com/sub/abc",
+    });
+    mockDelete.mockResolvedValue(undefined);
     const { DELETE } = await import("./route");
     await DELETE(makeRequest({ endpoint: "https://push.example.com/sub/abc" }));
-    expect(builder.eq).toHaveBeenCalledWith("endpoint", "https://push.example.com/sub/abc");
-    expect(builder.eq).toHaveBeenCalledWith("user_id", 42);
+    expect(mockDelete).toHaveBeenCalledWith("99");
   });
 });

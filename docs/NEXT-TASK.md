@@ -59,7 +59,6 @@
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
-| [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
@@ -586,3 +585,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-05-06 | NT-36 eliminado — resuelto (`scripts/check-migration-timestamps.sh` + job `check-migration-timestamps` en CI). |
 | 2026-05-06 | NT-45 eliminado — resuelto. `next.config.ts` ya no importa `env.runtime` (import chain roto en refactor previo); `.nvmrc` + `engines.node` agregados para documentar Node 24 como runtime activo. |
 | 2026-05-06 | NT-44 eliminado — resuelto (bloque `SUPABASE_WEBHOOK_SECRET` agregado a `.env.example` con instrucción de generación y nota de uso). |
+| 2026-05-06 | NT-31 eliminado — resuelto (rutas push usan `SupabasePushSubscriptionRepository`; elimina `rpc("current_user_id")` y acceso directo a `push_subscriptions`). |

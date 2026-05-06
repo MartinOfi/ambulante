@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
+import { SupabasePushSubscriptionRepository } from "@/shared/repositories/supabase/push-subscriptions.supabase";
 
 const subscribeSchema = z.object({
   endpoint: z.string().url(),
@@ -34,30 +35,28 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
   }
 
-  const { data: userId, error: userError } = await supabase.rpc("current_user_id");
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("public_id")
+    .eq("auth_user_id", user.id)
+    .single();
 
-  if (userError || userId === null || userId === undefined) {
+  if (userError || !userData) {
     return NextResponse.json({ error: "Usuario no encontrado." }, { status: 404 });
   }
 
-  const { data, error } = await supabase
-    .from("push_subscriptions")
-    .upsert(
-      {
-        user_id: userId,
-        endpoint,
-        p256dh: keys.p256dh,
-        auth_key: keys.auth,
-        user_agent: userAgent ?? null,
-      },
-      { onConflict: "endpoint" },
-    )
-    .select("id, endpoint, created_at, updated_at")
-    .single();
+  const repo = new SupabasePushSubscriptionRepository(supabase);
 
-  if (error) {
+  try {
+    const subscription = await repo.upsertByEndpoint({
+      userId: (userData as { public_id: string }).public_id,
+      endpoint,
+      p256dh: keys.p256dh,
+      authKey: keys.auth,
+      userAgent,
+    });
+    return NextResponse.json(subscription, { status: 201 });
+  } catch {
     return NextResponse.json({ error: "No se pudo guardar la suscripción." }, { status: 500 });
   }
-
-  return NextResponse.json(data, { status: 201 });
 }

@@ -4,23 +4,29 @@ import { NextRequest } from "next/server";
 
 vi.mock("server-only", () => ({}));
 
-function makeQueryBuilder(result: { data?: unknown; error?: unknown }) {
+const mockUpsertByEndpoint = vi.fn();
+
+vi.mock("@/shared/repositories/supabase/push-subscriptions.supabase", () => ({
+  SupabasePushSubscriptionRepository: vi.fn(function () {
+    return { upsertByEndpoint: mockUpsertByEndpoint };
+  }),
+}));
+
+function makeUsersQueryBuilder(result: { data?: unknown; error?: unknown }) {
   const builder: Record<string, unknown> = {};
-  builder.upsert = vi.fn().mockReturnValue(builder);
   builder.select = vi.fn().mockReturnValue(builder);
+  builder.eq = vi.fn().mockReturnValue(builder);
   builder.single = vi.fn().mockResolvedValue(result);
   return builder;
 }
 
-const mockRpc = vi.fn();
-const mockFrom = vi.fn();
 const mockGetUser = vi.fn();
+const mockFrom = vi.fn();
 
 vi.mock("@/shared/repositories/supabase/client", () => ({
   createRouteHandlerClient: vi.fn(() =>
     Promise.resolve({
       auth: { getUser: mockGetUser },
-      rpc: mockRpc,
       from: mockFrom,
     }),
   ),
@@ -84,7 +90,9 @@ describe("POST /api/push/subscribe", () => {
 
   it("returns 404 when user has no public.users row", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: null, error: null });
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: null, error: { message: "not found" } }),
+    );
     const { POST } = await import("./route");
     const response = await POST(
       makeRequest({
@@ -97,14 +105,16 @@ describe("POST /api/push/subscribe", () => {
 
   it("returns 201 with subscription data on success", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
     const subscriptionRow = {
-      id: 1,
+      id: "1",
       endpoint: "https://push.example.com/sub/abc",
-      created_at: "2026-04-28T00:00:00Z",
-      updated_at: "2026-04-28T00:00:00Z",
+      createdAt: "2026-04-28T00:00:00Z",
+      updatedAt: "2026-04-28T00:00:00Z",
     };
-    mockFrom.mockReturnValue(makeQueryBuilder({ data: subscriptionRow, error: null }));
+    mockUpsertByEndpoint.mockResolvedValue(subscriptionRow);
     const { POST } = await import("./route");
     const response = await POST(
       makeRequest({
@@ -118,12 +128,12 @@ describe("POST /api/push/subscribe", () => {
     expect(json).toEqual(subscriptionRow);
   });
 
-  it("returns 500 when database upsert fails", async () => {
+  it("returns 500 when repo throws", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
     mockFrom.mockReturnValue(
-      makeQueryBuilder({ data: null, error: { code: "23505", message: "duplicate" } }),
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
     );
+    mockUpsertByEndpoint.mockRejectedValue(new Error("db error"));
     const { POST } = await import("./route");
     const response = await POST(
       makeRequest({
@@ -134,14 +144,15 @@ describe("POST /api/push/subscribe", () => {
     expect(response.status).toBe(500);
   });
 
-  it("passes userAgent as null when not provided", async () => {
+  it("passes userId as UUID string from users row", async () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
-    mockRpc.mockResolvedValue({ data: 42, error: null });
-    const builder = makeQueryBuilder({
-      data: { id: 1, endpoint: "https://push.example.com/sub/abc", created_at: "", updated_at: "" },
-      error: null,
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockUpsertByEndpoint.mockResolvedValue({
+      id: "1",
+      endpoint: "https://push.example.com/sub/abc",
     });
-    mockFrom.mockReturnValue(builder);
     const { POST } = await import("./route");
     await POST(
       makeRequest({
@@ -149,9 +160,29 @@ describe("POST /api/push/subscribe", () => {
         keys: { p256dh: "p256dh-key", auth: "auth-key" },
       }),
     );
-    expect(builder.upsert).toHaveBeenCalledWith(
-      expect.objectContaining({ user_agent: null }),
-      expect.any(Object),
+    expect(mockUpsertByEndpoint).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "pub-uuid-123" }),
+    );
+  });
+
+  it("passes userAgent as undefined when not provided", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: "auth-uuid" } }, error: null });
+    mockFrom.mockReturnValue(
+      makeUsersQueryBuilder({ data: { public_id: "pub-uuid-123" }, error: null }),
+    );
+    mockUpsertByEndpoint.mockResolvedValue({
+      id: "1",
+      endpoint: "https://push.example.com/sub/abc",
+    });
+    const { POST } = await import("./route");
+    await POST(
+      makeRequest({
+        endpoint: "https://push.example.com/sub/abc",
+        keys: { p256dh: "p256dh-key", auth: "auth-key" },
+      }),
+    );
+    expect(mockUpsertByEndpoint).toHaveBeenCalledWith(
+      expect.objectContaining({ userAgent: undefined }),
     );
   });
 });
