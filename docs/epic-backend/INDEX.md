@@ -32,7 +32,7 @@
 | B11 | Swap admin (features Admin consumen backend real) | 3 | 1/3 | 🟡 |
 | B12 | Observability backend | 3 | 3/3 | ✅ |
 | B13 | Hardening (rate limiting real, seed data, runbooks) | 2 | 2/2 | ✅ |
-| B14 | Deploy producción | 4 | 2/4 | 🟡 |
+| B14 | Deploy producción | 4 | 3/4 | 🟡 |
 
 ## Tareas pendientes (🟢 ready / ⚪ pending / 🔴 blocked)
 
@@ -42,7 +42,6 @@
 | B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
 | B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ⚪ | B3.1, B5.4 | XL | `query-composite-indexes`, `data-pagination` | `features.md`. |
 | B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
-| B14.2 | Pipeline CI: preview DB por PR (Supabase branching opcional) → approval → prod | ⚪ | B14.1, B0.4 | L | — | — |
 | B14.4 | Go-live checklist + disaster recovery baseline | ⚪ | B14.2, B13-B | M | — | — |
 
 ## Tareas done (compactas)
@@ -93,6 +92,7 @@
 | B13-A | Hardening: rate limiting in-DB + security smoke tests | ✅ |
 | B13-B | Hardening: seed data + runbooks (rollback + incident) | ✅ |
 | B14.1 | Crear proyecto Supabase Cloud + inyectar secrets | ✅ |
+| B14.2 | Pipeline CI: preview DB por PR (Supabase branching opcional) → approval → prod | ✅ |
 | B14.3 | Release-please integration | ✅ |
 | B3.4 | CI check: no hay imports rotos | ✅ |
 | B9-A | Cliente: onboarding + descubrimiento (auth + map + store detail) | ✅ |
