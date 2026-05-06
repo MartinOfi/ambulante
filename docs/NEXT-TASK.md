@@ -67,7 +67,6 @@
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
 | [NT-38](#nt-38--borrar-features-orders-services-orders-mock-tras-cierre-de-b10-c) | Borrar `features/orders/services/orders.mock.ts` tras cierre de B10-C | refactor / cleanup | S | al cerrar B10-C (manejo de pedidos lado tienda) |
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
-| [NT-41](#nt-41--authsupabasetouser-devuelve-authuid-en-vez-de-publicuserspublic_id) | `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id` | backend / arquitectura | S | antes de B10-B (location publishing real) |
 | [NT-42](#nt-42--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
 | [NT-44](#nt-44--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar cualquier tarea de webhooks o DB hooks |
 | [NT-45](#nt-45--compatibilidad-node-24-al-cargar-nextconfigts) | Compatibilidad Node 24 al cargar `next.config.ts` | infra / DX | S | antes de habilitar CI con E2E o si el equipo migra a Node 24 |
@@ -575,20 +574,6 @@
 
 ---
 
-### NT-41 — `auth.supabase.ts.toUser()` devuelve `auth.uid()` en vez de `public.users.public_id`
-
-- **Categoría:** backend / arquitectura
-- **Contexto:** `shared/services/auth.supabase.ts:37-46` mapea el user de Supabase a nuestro tipo `User` con `id: sbUser.id`, pero `sbUser.id` es el `auth.users.id` (UUID emitido por Supabase Auth), mientras que **todos los repositories** consultan por `public.users.public_id` (otro UUID, generado vía `gen_random_uuid()` en el trigger `handle_new_auth_user`). Son IDs **distintos** linkeados por el FK `public.users.auth_user_id`. Hoy el bug está enmascarado porque `useLocationPublishing`, `useStoreProfileQuery` y demás hooks aún corren contra mocks (los mocks usan el mismo UUID en ambos lados via `SEED_USER_IDS`). Cuando los hooks se conecten a Supabase real, queries como `storeRepository.findByOwnerId(session.user.id)` no van a matchear nunca. El Server Action de B10-A.2a (descubridor) ya lo resuelve internamente con un lookup adicional a `public.users where auth_user_id = ?`, pero ese workaround no escala — hay que arreglarlo en la capa de auth.
-- **Aceptación:** `authService.getSession()` y `getUser()` devuelven `User.id === public.users.public_id` (no `auth.uid()`). Tests unitarios prueban: signin → session.user.id === public_id consultando la DB. `useLocationPublishing.test.ts` y similares siguen verde. Hooks reales matchean rows en la DB.
-- **Archivos afectados:** `shared/services/auth.supabase.ts` (toUser, toSession), posiblemente `shared/utils/auth-helpers.ts` (extractRole), tests unitarios de auth.supabase.test.ts. Considerar añadir cache de la lookup auth→public_id por sesión para no pegar contra `users` en cada `getSession()`.
-- **Estimación:** S
-- **Cuándo retomarlo:** **antes de B10-B** (la fase de location publishing real depende de que `findByOwnerId` matchee). Idealmente como su propio PR pequeño post-merge de B10-A.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** descubierto por B10-A.2a. Hoy el code path mock en `shared/services/auth.ts` (mock de auth) no tiene el bug porque sus seeds usan `SEED_USER_IDS.store` directo como `user.id`. Sólo pega cuando se sale del mock.
-
----
-
 ### NT-42 — Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales
 
 - **Categoría:** backend / types
@@ -650,3 +635,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-39 agregado — defer E2E happy path cliente hasta seed completo + VAPID en local. |
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
 | 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |
+| 2026-05-06 | NT-41 eliminado — resuelto (`resolvePublicId()` con cache in-memory; `toUser/toSession` ahora exponen `public.users.public_id`). |
