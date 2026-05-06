@@ -16,18 +16,18 @@ alter table public.orders
   add column if not exists received_at timestamptz;
 
 -- ---------------------------------------------------------------------------
--- 2. Backfill: use updated_at as best approximation for orders that have
---    definitively passed through 'recibido'. Only states whose path through
---    the state machine MUST include 'recibido' are eligible:
---      recibido → aceptado → en_camino → finalizado
---      recibido → rechazado
---    'cancelado' and 'expirado' are excluded because both are reachable
---    directly from 'enviado' (never-received path), so setting received_at
---    there would be incorrect for ~50% of those rows.
+-- 2. Backfill: only rows currently in 'recibido' — the one status where
+--    updated_at is a valid approximation of when the order was received.
+--    For rows that advanced further (aceptado, en_camino, finalizado,
+--    rechazado), updated_at reflects the latest transition, not the
+--    recibido one, so those rows are left NULL to avoid planting wrong
+--    timestamps. NULL is handled gracefully in the expiration route
+--    (falls back to sent_at) and in future consumers ("unknown" is safer
+--    than a silently incorrect value).
 -- ---------------------------------------------------------------------------
 update public.orders
 set    received_at = updated_at
-where  status::text in ('recibido', 'aceptado', 'en_camino', 'finalizado', 'rechazado')
+where  status::text = 'recibido'
   and  received_at is null;
 
 -- ---------------------------------------------------------------------------
