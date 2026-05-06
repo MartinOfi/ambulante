@@ -56,15 +56,23 @@ interface ClaimRow {
   client_public_id: string;
   store_public_id: string;
   sent_at: string;
+  received_at: string | null;
 }
 
-function makeRow(oldStatus: "enviado" | "recibido" = "enviado"): ClaimRow {
+function makeRow(
+  oldStatus: "enviado" | "recibido" = "enviado",
+  receivedAt?: string | null,
+): ClaimRow {
+  const sentAt = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+  const defaultReceivedAt =
+    oldStatus === "recibido" ? new Date(Date.now() - 12 * 60 * 1000).toISOString() : null;
   return {
     order_public_id: crypto.randomUUID(),
     old_status: oldStatus,
     client_public_id: crypto.randomUUID(),
     store_public_id: crypto.randomUUID(),
-    sent_at: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    sent_at: sentAt,
+    received_at: receivedAt !== undefined ? receivedAt : defaultReceivedAt,
   };
 }
 
@@ -137,6 +145,30 @@ describe("POST /api/cron/expire-orders", () => {
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ count: 1, auditFailures: 0 });
       expect(mockPublish.mock.calls[0][0].type).toBe("ORDER_EXPIRED");
+    });
+
+    it("processes RECIBIDO order with received_at distinct from sent_at without error", async () => {
+      const receivedAt = new Date(Date.now() - 12 * 60 * 1000).toISOString();
+      const row = makeRow("recibido", receivedAt);
+      mockRpc.mockResolvedValue({ data: [row], error: null });
+
+      const res = await POST(makeRequest(VALID_TOKEN));
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ count: 1, auditFailures: 0 });
+      expect(mockPublish).toHaveBeenCalledOnce();
+    });
+
+    it("falls back to sent_at when received_at is null for a RECIBIDO order", async () => {
+      const row = makeRow("recibido", null);
+      mockRpc.mockResolvedValue({ data: [row], error: null });
+
+      const res = await POST(makeRequest(VALID_TOKEN));
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ count: 1, auditFailures: 0 });
+      expect(mockPublish).toHaveBeenCalledOnce();
+      const event = mockPublish.mock.calls[0][0];
+      expect(event.type).toBe("ORDER_EXPIRED");
+      expect(event.sentAt).toEqual(new Date(row.sent_at));
     });
 
     it("appends one audit log entry per expired order", async () => {
