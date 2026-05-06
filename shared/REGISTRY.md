@@ -43,6 +43,7 @@
 | storage_buckets migration (products / store-logos / validation-docs) + RLS policies | sql-migration | `supabase/migrations/20260428000006_storage_buckets.sql` | domain.md §17 |
 | Badge | ui-component | `shared/components/ui/badge.tsx` | ui.md §1 |
 | Button | ui-component | `shared/components/ui/button.tsx` | ui.md §1 |
+| Dialog / DialogContent / DialogHeader / DialogFooter / DialogTitle / DialogDescription / DialogClose | ui-component | `shared/components/ui/dialog.tsx` | ui.md §1 |
 | Card | ui-component | `shared/components/ui/card.tsx` | ui.md §1 |
 | CACHE_REVALIDATION_SECONDS / CACHE_TAGS / HTTP_CACHE_CONTROL / CacheTag | constant | `shared/config/cache-config.ts` | infra.md §9b |
 | cn | util | `shared/utils/cn.ts` | infra.md §5 |

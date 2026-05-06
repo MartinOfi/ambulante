@@ -41,6 +41,23 @@ describe("RejectStoreDialog", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
+  it("calls onCancel when Escape is pressed", () => {
+    const onCancel = vi.fn();
+
+    render(
+      <RejectStoreDialog
+        open={true}
+        isSubmitting={false}
+        onConfirm={vi.fn()}
+        onCancel={onCancel}
+      />,
+    );
+
+    fireEvent.keyDown(document.body, { key: "Escape" });
+
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   it("shows a validation error when submitting with a short reason", async () => {
     render(
       <RejectStoreDialog open={true} isSubmitting={false} onConfirm={vi.fn()} onCancel={vi.fn()} />,
@@ -89,5 +106,16 @@ describe("RejectStoreDialog", () => {
     );
 
     expect(screen.getByRole("button", { name: /cancelar/i })).toBeDisabled();
+  });
+
+  it("moves focus into the dialog when opened", async () => {
+    render(
+      <RejectStoreDialog open={true} isSubmitting={false} onConfirm={vi.fn()} onCancel={vi.fn()} />,
+    );
+
+    await waitFor(() => {
+      expect(document.activeElement).not.toBe(document.body);
+    });
+    expect(screen.getByRole("dialog")).toContainElement(document.activeElement as HTMLElement);
   });
 });
