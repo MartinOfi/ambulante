@@ -93,14 +93,14 @@ describe("SupabaseStoreRepository", () => {
       distanceMeters: 0,
     };
 
-    it("resolves owner id, inserts store, and re-fetches from view", async () => {
-      queryMock.single
-        .mockResolvedValueOnce({ data: { id: 5 }, error: null }) // owner lookup
-        .mockResolvedValueOnce({ data: { public_id: "store-uuid", owner_id: 5 }, error: null }); // insert + select
-      queryMock.maybeSingle.mockResolvedValue({ data: makeDbRow(), error: null });
+    it("resolves owner id, inserts store, and returns Store built from input", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 5 }, error: null }); // owner lookup
+      queryMock.insert.mockResolvedValueOnce({ data: null, error: null }); // store insert
 
       const store = await repo.create(createInput);
       expect(store.id).toBe("store-uuid");
+      expect(store.ownerId).toBe("owner-uuid");
+      expect(store.name).toBe("El Pibe");
       expect(queryMock.insert).toHaveBeenCalledWith(expect.objectContaining({ owner_id: 5 }));
     });
 
@@ -109,13 +109,13 @@ describe("SupabaseStoreRepository", () => {
       await expect(repo.create(createInput)).rejects.toThrow("owner not found");
     });
 
-    it("throws when re-fetch after insert returns null", async () => {
-      queryMock.single
-        .mockResolvedValueOnce({ data: { id: 5 }, error: null })
-        .mockResolvedValueOnce({ data: { public_id: "store-uuid", owner_id: 5 }, error: null });
-      queryMock.maybeSingle.mockResolvedValue({ data: null, error: null });
-
-      await expect(repo.create(createInput)).rejects.toThrow("could not re-fetch");
+    it("throws when insert fails", async () => {
+      queryMock.single.mockResolvedValueOnce({ data: { id: 5 }, error: null });
+      queryMock.insert.mockResolvedValueOnce({
+        data: null,
+        error: { message: "unique violation" },
+      });
+      await expect(repo.create(createInput)).rejects.toThrow("unique violation");
     });
   });
 

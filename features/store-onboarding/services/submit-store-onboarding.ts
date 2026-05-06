@@ -20,6 +20,7 @@ const ERROR_MESSAGES = {
 
 export interface SubmitStoreOnboardingDeps {
   readonly getCurrentUser: () => Promise<User | null>;
+  readonly findExistingStore: (ownerId: string) => Promise<Store | null>;
   readonly createStore: (input: CreateStoreInput) => Promise<Store>;
   readonly generateStoreId: () => string;
 }
@@ -48,6 +49,11 @@ export async function submitStoreOnboarding(
   const parsed = storeOnboardingSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: ERROR_MESSAGES.invalid };
+  }
+
+  const existing = await deps.findExistingStore(user.id);
+  if (existing !== null) {
+    return { success: true, storeId: existing.id };
   }
 
   const storeId = deps.generateStoreId();

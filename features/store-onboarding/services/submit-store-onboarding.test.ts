@@ -31,6 +31,7 @@ function createDeps(overrides: Partial<SubmitStoreOnboardingDeps> = {}): {
   const createdInputs: unknown[] = [];
   const deps: SubmitStoreOnboardingDeps = {
     getCurrentUser: vi.fn().mockResolvedValue(STORE_USER),
+    findExistingStore: vi.fn().mockResolvedValue(null),
     createStore: vi.fn(async (input) => {
       createdInputs.push(input);
       return input as unknown as Store;
@@ -163,6 +164,18 @@ describe("submitStoreOnboarding", () => {
     expect(created.photoUrl).toBeUndefined();
     expect(created.tagline).toBeUndefined();
     expect(created.priceFromArs).toBeUndefined();
+  });
+
+  it("returns existing storeId without calling createStore when store already exists for owner", async () => {
+    const existingStore = { id: "existing-store-id" } as Store;
+    const { deps } = createDeps({
+      findExistingStore: vi.fn().mockResolvedValue(existingStore),
+    });
+
+    const result = await submitStoreOnboarding(VALID_DATA, deps);
+
+    expect(result).toEqual({ success: true, storeId: "existing-store-id" });
+    expect(deps.createStore).not.toHaveBeenCalled();
   });
 
   it("returns a user-friendly error when createStore rejects", async () => {

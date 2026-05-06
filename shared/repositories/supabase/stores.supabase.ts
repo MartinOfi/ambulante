@@ -88,31 +88,37 @@ export class SupabaseStoreRepository implements StoreRepository {
       );
     }
 
-    const { data, error } = await this.client
-      .from("stores")
-      .insert({
-        public_id: input.id,
-        owner_id: ownerId,
-        name: input.name,
-        description: input.description ?? null,
-        category: input.kind,
-        available: input.status === "open",
-        photo_url: input.photoUrl ?? null,
-        tagline: input.tagline ?? null,
-        price_from_ars: input.priceFromArs ?? null,
-        hours: input.hours ?? null,
-        cuit: input.cuit ?? null,
-      })
-      .select("public_id, owner_id")
-      .single();
+    const { error } = await this.client.from("stores").insert({
+      public_id: input.id,
+      owner_id: ownerId,
+      name: input.name,
+      description: input.description ?? null,
+      category: input.kind,
+      available: input.status === "open",
+      photo_url: input.photoUrl ?? null,
+      tagline: input.tagline ?? null,
+      price_from_ars: input.priceFromArs ?? null,
+      hours: input.hours ?? null,
+      cuit: input.cuit ?? null,
+    });
 
     if (error !== null) throw new Error(`SupabaseStoreRepository.create: ${error.message}`);
 
-    // Re-fetch from view to get owner_public_id and computed lat/lng
-    const created = await this.findById(data.public_id);
-    if (created === null)
-      throw new Error("SupabaseStoreRepository.create: could not re-fetch created store");
-    return created;
+    return {
+      id: input.id,
+      ownerId: input.ownerId,
+      name: input.name,
+      kind: input.kind,
+      status: input.status,
+      location: input.location,
+      distanceMeters: input.distanceMeters,
+      description: input.description,
+      hours: input.hours,
+      cuit: input.cuit,
+      photoUrl: input.photoUrl,
+      tagline: input.tagline,
+      priceFromArs: input.priceFromArs,
+    };
   }
 
   async update(id: string, input: UpdateStoreInput): Promise<Store> {
