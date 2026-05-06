@@ -23,6 +23,7 @@ interface ClaimRow {
   readonly client_public_id: string;
   readonly store_public_id: string;
   readonly sent_at: string;
+  readonly received_at: string | null;
 }
 
 function buildOrderForTransition(row: ClaimRow): OrderEnviado | OrderRecibido {
@@ -37,9 +38,11 @@ function buildOrderForTransition(row: ClaimRow): OrderEnviado | OrderRecibido {
   if (domainStatus === ORDER_STATUS.ENVIADO) {
     return { ...base, status: ORDER_STATUS.ENVIADO };
   }
-  // DB lacks a received_at column; sentAt is used as a placeholder.
-  // SISTEMA_EXPIRA apply() only reads id/clientId/storeId/sentAt — receivedAt is not accessed.
-  return { ...base, status: ORDER_STATUS.RECIBIDO, receivedAt: base.sentAt };
+  return {
+    ...base,
+    status: ORDER_STATUS.RECIBIDO,
+    receivedAt: row.received_at !== null ? new Date(row.received_at) : base.sentAt,
+  };
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
