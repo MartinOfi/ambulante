@@ -10,6 +10,7 @@ import { NearbyBottomSheet } from "./NearbyBottomSheet";
 import { RecenterFAB } from "./RecenterFAB";
 import { LocationDenied } from "./LocationDenied";
 import { StoreDetailSheetContainer } from "./StoreDetailSheet";
+import { CartSummaryBar } from "@/features/cart/components/CartSummaryBar";
 
 // maplibre-gl accesses browser APIs (window, WebGL) at module evaluation time;
 // dynamic + ssr:false ensures the module is never loaded on the server
@@ -24,6 +25,8 @@ export interface MapScreenProps {
   readonly geo: GeoState;
   readonly isRecentering: boolean;
   readonly selectedStoreId: string | null;
+  readonly cartItemCount: number;
+  readonly cartTotal: number;
   readonly onRadiusChange: (next: RadiusValue) => void;
   readonly onExpandRadius: () => void;
   readonly onRecenter: () => void;
@@ -31,6 +34,7 @@ export interface MapScreenProps {
   readonly onManualSearch: () => void;
   readonly onSelectStore: (id: string) => void;
   readonly onDismissStoreDetail: () => void;
+  readonly onCheckout: () => void;
 }
 
 export function MapScreen({
@@ -39,6 +43,8 @@ export function MapScreen({
   geo,
   isRecentering,
   selectedStoreId,
+  cartItemCount,
+  cartTotal,
   onRadiusChange,
   onExpandRadius,
   onRecenter,
@@ -46,6 +52,7 @@ export function MapScreen({
   onManualSearch,
   onSelectStore,
   onDismissStoreDetail,
+  onCheckout,
 }: MapScreenProps) {
   const hasLocation = geo.status === "granted";
   const isDenied = geo.status === "denied";
@@ -68,12 +75,15 @@ export function MapScreen({
       {selectedStoreId ? (
         <StoreDetailSheetContainer storeId={selectedStoreId} onDismiss={onDismissStoreDetail} />
       ) : (
-        <NearbyBottomSheet
-          stores={stores}
-          radius={radius}
-          onExpandRadius={onExpandRadius}
-          onSelectStore={onSelectStore}
-        />
+        <>
+          <NearbyBottomSheet
+            stores={stores}
+            radius={radius}
+            onExpandRadius={onExpandRadius}
+            onSelectStore={onSelectStore}
+          />
+          <CartSummaryBar itemCount={cartItemCount} total={cartTotal} onCheckout={onCheckout} />
+        </>
       )}
 
       {isDenied && <LocationDenied onRetry={onRetryGeolocation} onManualSearch={onManualSearch} />}

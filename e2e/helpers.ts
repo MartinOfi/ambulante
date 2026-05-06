@@ -1,4 +1,4 @@
-import type { BrowserContext } from "@playwright/test";
+import type { BrowserContext, Page } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 
 export function makeSessionCookie(role: "client" | "store", userId: string): string {
@@ -28,4 +28,13 @@ export async function setSessionCookie(
       path: "/",
     },
   ]);
+}
+
+/** Performs real Supabase authentication via the login page with seed credentials. */
+export async function loginAsClient(page: Page): Promise<void> {
+  await page.goto("/login");
+  await page.getByLabel(/correo electrónico/i).fill("cliente@dev.ambulante.local");
+  await page.getByLabel(/contraseña/i).fill("Ambulante123!");
+  await page.getByRole("button", { name: /iniciar sesión/i }).click();
+  await page.waitForURL("**/map**", { timeout: 15_000 });
 }
