@@ -37,6 +37,13 @@ Todas viven en `shared/components/ui/`. Se añaden con `pnpm dlx shadcn@latest a
 - **Ruta:** `shared/components/ui/navigation-menu.tsx`
 - **Descripción:** Menú de navegación radix-ui con sublistas y viewport.
 
+### Dialog
+- **Ruta:** `shared/components/ui/dialog.tsx`
+- **Descripción:** Modal accesible basado en `@radix-ui/react-dialog`. Provee focus trap, Escape dismiss, scroll lock, y ARIA (`role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`) automáticamente. Usar para cualquier modal confirmatorio o de formulario del admin.
+- **Sub-exports:** `Dialog`, `DialogContent`, `DialogHeader`, `DialogFooter`, `DialogTitle`, `DialogDescription`, `DialogClose`, `DialogTrigger`, `DialogOverlay`, `DialogPortal`
+- **API:** `<Dialog open={boolean} onOpenChange={fn}><DialogContent>...</DialogContent></Dialog>`
+- **Nota:** `DialogContent` sin descripción asociada debe pasar `aria-describedby={undefined}` para suprimir el warning de Radix.
+
 ### Popover
 - **Ruta:** `shared/components/ui/popover.tsx`
 - **Sub-exports:** `Popover`, `PopoverTrigger`, `PopoverContent`
