@@ -18,7 +18,12 @@ import { ProductImageUploadContainer } from "./ProductImageUpload.container";
 const MOCK_URL = "https://mock-storage.ambulante.local/products/abc.jpg";
 
 function makeFile(type = "image/jpeg", size = 1024): File {
-  return new File(["x".repeat(size)], "photo.jpg", { type });
+  const file = new File(["x"], "photo.jpg", { type });
+  if (size !== 1) {
+    // Stub size to avoid allocating large buffers in jsdom
+    Object.defineProperty(file, "size", { value: size });
+  }
+  return file;
 }
 
 describe("ProductImageUploadContainer", () => {
@@ -101,7 +106,84 @@ describe("ProductImageUploadContainer", () => {
     fireEvent.change(input, { target: { files: [makeFile()] } });
 
     await waitFor(() => {
-      expect(screen.getByRole("button")).toBeDisabled();
+      expect(screen.getByRole("button", { name: /subiendo/i })).toBeDisabled();
     });
+  });
+
+  it("shows immediate blob preview when file is selected", async () => {
+    const objectUrl = "blob:http://localhost/abc-123";
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn(() => objectUrl),
+      revokeObjectURL: vi.fn(),
+    });
+    vi.mocked(storageService.upload).mockReturnValue(new Promise(() => {}));
+
+    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [makeFile()] } });
+
+    await waitFor(() => {
+      expect(screen.getByAltText(/vista previa/i)).toHaveAttribute("src", objectUrl);
+    });
+
+    vi.unstubAllGlobals();
+  });
+
+  it("replaces blob preview with storage URL after successful upload", async () => {
+    const objectUrl = "blob:http://localhost/abc-123";
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn(() => objectUrl),
+      revokeObjectURL: vi.fn(),
+    });
+
+    const onUploaded = vi.fn();
+    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { files: [makeFile()] } });
+
+    await waitFor(() => expect(onUploaded).toHaveBeenCalledWith(MOCK_URL));
+
+    expect(screen.getByAltText(/vista previa/i)).toHaveAttribute("src", MOCK_URL);
+
+    vi.unstubAllGlobals();
+  });
+
+  it("sets preview and calls onUploaded when URL is committed via Enter", () => {
+    const onUploaded = vi.fn();
+    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+
+    const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
+    fireEvent.change(urlInput, { target: { value: "https://example.com/photo.jpg" } });
+    fireEvent.keyDown(urlInput, { key: "Enter" });
+
+    expect(onUploaded).toHaveBeenCalledWith("https://example.com/photo.jpg");
+    expect(screen.getByAltText(/vista previa/i)).toHaveAttribute(
+      "src",
+      "https://example.com/photo.jpg",
+    );
+  });
+
+  it("sets preview and calls onUploaded when URL input loses focus", () => {
+    const onUploaded = vi.fn();
+    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+
+    const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
+    fireEvent.change(urlInput, { target: { value: "https://example.com/photo.jpg" } });
+    fireEvent.blur(urlInput);
+
+    expect(onUploaded).toHaveBeenCalledWith("https://example.com/photo.jpg");
+  });
+
+  it("ignores empty URL on commit", () => {
+    const onUploaded = vi.fn();
+    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+
+    const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
+    fireEvent.change(urlInput, { target: { value: "   " } });
+    fireEvent.blur(urlInput);
+
+    expect(onUploaded).not.toHaveBeenCalled();
   });
 });

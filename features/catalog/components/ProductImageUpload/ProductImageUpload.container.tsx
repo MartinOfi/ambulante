@@ -27,6 +27,7 @@ export function ProductImageUploadContainer({
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentUrl);
+  const [urlDraft, setUrlDraft] = useState("");
 
   async function handleFileSelected(file: File): Promise<void> {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -40,6 +41,9 @@ export function ProductImageUploadContainer({
       return;
     }
 
+    // Show an immediate preview before the upload completes
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
     setUploadState("uploading");
     setErrorMessage(null);
 
@@ -57,21 +61,44 @@ export function ProductImageUploadContainer({
         throw new Error(result.error);
       }
 
+      URL.revokeObjectURL(objectUrl);
       setPreviewUrl(result.data.url);
       setUploadState("idle");
       onUploaded(result.data.url);
     } catch {
+      URL.revokeObjectURL(objectUrl);
+      setPreviewUrl(currentUrl);
       setUploadState("error");
       setErrorMessage("No se pudo subir la imagen. Intentá de nuevo.");
     }
   }
 
+  function handleUrlInputCommit(value: string): void {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setPreviewUrl(trimmed);
+    onUploaded(trimmed);
+  }
+
+  function handlePreviewError(): void {
+    // Only clear when the broken URL came from the URL input (not a blob or confirmed storage URL)
+    if (previewUrl && !previewUrl.startsWith("blob:") && previewUrl !== currentUrl) {
+      setPreviewUrl(null);
+      setUrlDraft("");
+      onUploaded("");
+    }
+  }
+
   return (
     <ProductImageUpload
-      currentUrl={previewUrl}
+      previewUrl={previewUrl}
       uploadState={uploadState}
       errorMessage={errorMessage}
+      urlInputValue={urlDraft}
       onFileSelected={handleFileSelected}
+      onUrlInputChange={setUrlDraft}
+      onUrlInputCommit={handleUrlInputCommit}
+      onPreviewError={handlePreviewError}
     />
   );
 }
