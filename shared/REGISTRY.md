@@ -104,6 +104,8 @@
 | Product | type | `shared/types/product.ts` | domain.md §7 |
 | productSchema | schema | `shared/schemas/product.ts` | domain.md §7b |
 | ProductSnapshot / snapshot | domain | `shared/domain/product-snapshot.ts` | domain.md §7c |
+| ProductImageUpload / ProductImageUploadContainer | feature-component | `features/catalog/components/ProductImageUpload/` | features.md §13 |
+| ProductImageUploadProps / ProductImageUploadContainerProps / UploadState | type | `features/catalog/components/ProductImageUpload/ProductImageUpload.types.ts` | features.md §13 |
 | productsService | service | `shared/services/products.ts` | data.md §4 |
 | POST /api/push/subscribe | route-handler | `app/api/push/subscribe/route.ts` | infra.md §13 |
 | DELETE /api/push/unsubscribe | route-handler | `app/api/push/unsubscribe/route.ts` | infra.md §13 |

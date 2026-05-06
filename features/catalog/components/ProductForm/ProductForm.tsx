@@ -19,6 +19,7 @@ export function ProductForm({
   isLoading,
   serverError,
   submitLabel,
+  imageUploadSlot,
 }: ProductFormProps) {
   const t = useTranslations("Catalog.ProductForm");
 
@@ -82,19 +83,11 @@ export function ProductForm({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="photoUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("photoUrlLabel")}</FormLabel>
-              <FormControl>
-                <Input type="url" placeholder="https://…" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormItem>
+          <FormLabel>{t("photoUrlLabel")}</FormLabel>
+          {imageUploadSlot}
+          <FormMessage>{form.formState.errors.photoUrl?.message}</FormMessage>
+        </FormItem>
 
         <FormField
           control={form.control}

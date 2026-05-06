@@ -81,6 +81,7 @@ function mockGeoError(): void {
 function setAvailable(isAvailable: boolean): void {
   vi.mocked(useAvailability).mockReturnValue({
     isAvailable,
+    isPending: false,
     toggle: vi.fn(),
     setAvailable: vi.fn(),
   });
