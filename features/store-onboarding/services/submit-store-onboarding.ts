@@ -4,19 +4,11 @@ import type {
   OnboardingDay,
 } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 import { USER_ROLES } from "@/shared/constants/user";
-import { PLACEHOLDER_STORE_PHOTO_URL, STORE_STATUS } from "@/shared/constants/store";
+import { STORE_STATUS } from "@/shared/constants/store";
 import type { Store } from "@/shared/schemas/store";
 import type { CreateStoreInput } from "@/shared/repositories/store";
 import type { User } from "@/shared/types/user";
 import { logger } from "@/shared/utils/logger";
-
-// New stores start without a logo, tagline, price floor, or live coordinates.
-// The owner fills these in through the profile editor (B10-A.3) once approved.
-const PENDING_STORE_PLACEHOLDER = {
-  priceFromArs: 0,
-  location: { lat: 0, lng: 0 },
-  distanceMeters: 0,
-} as const;
 
 const ERROR_MESSAGES = {
   unauthenticated: "Iniciá sesión para registrar tu tienda.",
@@ -66,13 +58,10 @@ export async function submitStoreOnboarding(
     kind: parsed.data.kind,
     cuit: parsed.data.cuit,
     description: buildDescription(parsed.data.neighborhood, parsed.data.coverageNotes),
-    tagline: parsed.data.businessName,
     hours: formatHours(parsed.data.days, parsed.data.openTime, parsed.data.closeTime),
     status: STORE_STATUS.closed,
-    photoUrl: PLACEHOLDER_STORE_PHOTO_URL,
-    priceFromArs: PENDING_STORE_PLACEHOLDER.priceFromArs,
-    location: PENDING_STORE_PLACEHOLDER.location,
-    distanceMeters: PENDING_STORE_PLACEHOLDER.distanceMeters,
+    location: { lat: 0, lng: 0 },
+    distanceMeters: 0,
   };
 
   try {

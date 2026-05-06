@@ -7,6 +7,7 @@ import type { StoreDetailSheetProps } from "./StoreDetailSheet.types";
 import type { Product } from "@/shared/schemas/product";
 import { formatPrice } from "@/shared/utils/format";
 import { useFocusTrap } from "@/shared/hooks/useFocusTrap";
+import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
 
 function ProductRow({ product }: { readonly product: Product }) {
   return (
@@ -48,7 +49,13 @@ export function StoreDetailSheet({
       aria-label={store.name}
     >
       <div className="relative h-40 w-full shrink-0 bg-muted/20">
-        <Image src={store.photoUrl} alt={store.name} fill className="object-cover" sizes="100vw" />
+        <Image
+          src={store.photoUrl ?? PLACEHOLDER_STORE_PHOTO_URL}
+          alt={store.name}
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
         <button
           type="button"
           aria-label="Cerrar detalle"
@@ -63,7 +70,7 @@ export function StoreDetailSheet({
         <h2 className="font-display text-2xl font-bold leading-tight text-foreground">
           {store.name}
         </h2>
-        <p className="mt-1 text-sm text-muted">{store.tagline}</p>
+        {store.tagline !== undefined && <p className="mt-1 text-sm text-muted">{store.tagline}</p>}
 
         {store.description && (
           <p className="mt-3 text-sm text-foreground/80 leading-relaxed">{store.description}</p>

@@ -97,9 +97,9 @@ export class SupabaseStoreRepository implements StoreRepository {
         description: input.description ?? null,
         category: input.kind,
         available: input.status === "open",
-        photo_url: input.photoUrl,
-        tagline: input.tagline,
-        price_from_ars: input.priceFromArs,
+        photo_url: input.photoUrl ?? null,
+        tagline: input.tagline ?? null,
+        price_from_ars: input.priceFromArs ?? null,
         hours: input.hours ?? null,
         cuit: input.cuit ?? null,
       })

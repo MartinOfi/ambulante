@@ -69,4 +69,19 @@ describe("storeSchema", () => {
     const result = storeSchema.safeParse(withoutId);
     expect(result.success).toBe(false);
   });
+
+  it("accepts store without optional photoUrl", () => {
+    const { photoUrl: _photoUrl, ...withoutPhoto } = validStore;
+    expect(storeSchema.safeParse(withoutPhoto).success).toBe(true);
+  });
+
+  it("accepts store without optional tagline", () => {
+    const { tagline: _tagline, ...withoutTagline } = validStore;
+    expect(storeSchema.safeParse(withoutTagline).success).toBe(true);
+  });
+
+  it("accepts store without optional priceFromArs", () => {
+    const { priceFromArs: _price, ...withoutPrice } = validStore;
+    expect(storeSchema.safeParse(withoutPrice).success).toBe(true);
+  });
 });

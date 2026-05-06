@@ -127,6 +127,37 @@ describe("StoreDetailPanel", () => {
     expect(img).toBeInTheDocument();
   });
 
+  it("does not render tagline element when tagline is absent", () => {
+    const { tagline: _tagline, ...withoutTagline } = PENDING_STORE;
+    render(
+      <StoreDetailPanel
+        store={withoutTagline}
+        isApproving={false}
+        isRejecting={false}
+        onApprove={vi.fn()}
+        onReject={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText("Los mejores tacos")).not.toBeInTheDocument();
+  });
+
+  it("uses placeholder image when photoUrl is absent", () => {
+    const { photoUrl: _photo, ...withoutPhoto } = PENDING_STORE;
+    render(
+      <StoreDetailPanel
+        store={withoutPhoto}
+        isApproving={false}
+        isRejecting={false}
+        onApprove={vi.fn()}
+        onReject={vi.fn()}
+      />,
+    );
+
+    const img = screen.getByRole("img", { name: /taco loco/i });
+    expect(img).toHaveAttribute("src", expect.stringContaining("placeholder"));
+  });
+
   it("does not render the validation docs section when slot is not provided", () => {
     render(
       <StoreDetailPanel
