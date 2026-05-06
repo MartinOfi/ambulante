@@ -38,7 +38,6 @@
 
 | ID | Título | Estado | Depends on | Estim. | Skill rules | REGISTRY |
 |---|---|---|---|---|---|---|
-| B10-B | Tienda: operación (availability + location + catálogo CRUD) | ⚪ | B3.1, B5.3, B10-A | XL | `data-batch-inserts` | `features.md`. |
 | B10-D | Tienda: analytics + push | ⚪ | B3.1, B8.1, B10-A | L | `query-composite-indexes` | `features.md`. |
 | B11-A | Admin: dashboard KPIs + moderación (validación tiendas + content) | ⚪ | B3.1, B5.4 | XL | `query-composite-indexes`, `data-pagination` | `features.md`. |
 | B11-B | Admin: audit log e-2-e (trigger + reader + writers) | ⚪ | B1.2, B3.1, B9-B, B10-C, B11-A, B11-C | L | `data-pagination` | `domain.md`, `features.md`. |
@@ -48,6 +47,7 @@
 
 | ID | Título | Estado |
 |---|---|---|
+| B10-B | Tienda: operación (availability + location + catálogo CRUD) | ✅ |
 | B0.1 | Supabase CLI + scripts pnpm + Docker baseline | ✅ |
 | B0.2 | Env schema: URLs separadas (pooler vs directo) + secretos de backend | ✅ |
 | B0.3 | Template de migraciones + convention doc | ✅ |
