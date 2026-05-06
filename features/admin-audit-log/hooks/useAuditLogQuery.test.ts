@@ -5,10 +5,16 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import React from "react";
 import { useAuditLogQuery } from "./useAuditLogQuery";
-import * as auditLogMockModule from "@/features/admin-audit-log/services/audit-log.mock";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { ORDER_ACTOR } from "@/shared/domain/order-state-machine";
 import type { AuditLogResult } from "@/features/admin-audit-log/types/audit-log.types";
+
+vi.mock("@/features/admin-audit-log/actions/fetch-audit-log", () => ({
+  fetchAuditLog: vi.fn(),
+}));
+
+import { fetchAuditLog } from "@/features/admin-audit-log/actions/fetch-audit-log";
+const fetchAuditLogMock = vi.mocked(fetchAuditLog);
 
 const mockResult: AuditLogResult = {
   orderId: "order-test-123",
@@ -32,7 +38,7 @@ function buildWrapper() {
 
 describe("useAuditLogQuery", () => {
   beforeEach(() => {
-    vi.spyOn(auditLogMockModule.auditLogService, "findByOrderId").mockResolvedValue(mockResult);
+    fetchAuditLogMock.mockResolvedValue(mockResult);
   });
 
   afterEach(() => {
@@ -68,8 +74,8 @@ describe("useAuditLogQuery", () => {
     expect(result.current.data).toEqual(mockResult);
   });
 
-  it("returns null when service finds no order", async () => {
-    vi.spyOn(auditLogMockModule.auditLogService, "findByOrderId").mockResolvedValue(null);
+  it("returns null when action returns null (no order found)", async () => {
+    fetchAuditLogMock.mockResolvedValue(null);
 
     const { result } = renderHook(() => useAuditLogQuery("order-unknown"), {
       wrapper: buildWrapper(),

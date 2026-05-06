@@ -3,10 +3,16 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithProviders } from "@/shared/test-utils/render";
 import { OrderAuditLogContainer } from "./OrderAuditLog.container";
-import * as auditLogMockModule from "@/features/admin-audit-log/services/audit-log.mock";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { ORDER_ACTOR } from "@/shared/domain/order-state-machine";
 import type { AuditLogResult } from "@/features/admin-audit-log/types/audit-log.types";
+
+vi.mock("@/features/admin-audit-log/actions/fetch-audit-log", () => ({
+  fetchAuditLog: vi.fn(),
+}));
+
+import { fetchAuditLog } from "@/features/admin-audit-log/actions/fetch-audit-log";
+const fetchAuditLogMock = vi.mocked(fetchAuditLog);
 
 const mockResult: AuditLogResult = {
   orderId: "order-demo-completed",
@@ -22,7 +28,7 @@ const mockResult: AuditLogResult = {
 
 describe("OrderAuditLogContainer", () => {
   beforeEach(() => {
-    vi.spyOn(auditLogMockModule.auditLogService, "findByOrderId").mockResolvedValue(mockResult);
+    fetchAuditLogMock.mockResolvedValue(mockResult);
   });
 
   afterEach(() => {
@@ -55,13 +61,11 @@ describe("OrderAuditLogContainer", () => {
       expect(screen.getByText(/order-demo-completed/i)).toBeInTheDocument();
     });
 
-    expect(auditLogMockModule.auditLogService.findByOrderId).toHaveBeenCalledWith(
-      "order-demo-completed",
-    );
+    expect(fetchAuditLogMock).toHaveBeenCalledWith("order-demo-completed");
   });
 
-  it("shows not-found message when service returns null", async () => {
-    vi.spyOn(auditLogMockModule.auditLogService, "findByOrderId").mockResolvedValue(null);
+  it("shows not-found message when action returns null", async () => {
+    fetchAuditLogMock.mockResolvedValue(null);
     const user = userEvent.setup();
     renderWithProviders(<OrderAuditLogContainer />);
 
@@ -73,10 +77,8 @@ describe("OrderAuditLogContainer", () => {
     });
   });
 
-  it("shows error message when service throws", async () => {
-    vi.spyOn(auditLogMockModule.auditLogService, "findByOrderId").mockRejectedValue(
-      new Error("Network failure"),
-    );
+  it("shows error message when action throws", async () => {
+    fetchAuditLogMock.mockRejectedValue(new Error("Network failure"));
     const user = userEvent.setup();
     renderWithProviders(<OrderAuditLogContainer />);
 
