@@ -56,7 +56,6 @@
 | [NT-24](#nt-24--app-nativa-ios-si-la-pwa-topa-límites) | App nativa iOS si la PWA topa límites | plataforma | XL | push en iOS sin PWA-install sigue sin estar disponible |
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
 | [NT-43](#nt-43--fetchauditlog-devuelve-null-tanto-para-pedido-sin-entradas-como-para-errores-de-supabase) | `fetchAuditLog` devuelve null para not-found y para errores — admin no puede distinguir | backend / UX admin | M | admin reporta confusión al auditar pedidos |
-| [NT-26](#nt-26--mejorar-mensajes-de-error-de-paridad-vapid-cuando-una-sola-clave-está-configurada) | Mejorar mensajes de error de paridad VAPID | backend / DX | S | activar VAPID en prod |
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
@@ -409,16 +408,8 @@
 - **Ticket:** —
 - **Notas:** OpenTelemetry en Vercel serverless es estable desde 2024; el cliente de OTel SDK ya está maduro. Costo del backend es la variable principal.
 
-### NT-26 — Mejorar mensajes de error de paridad VAPID cuando una sola clave está configurada
-- **Categoría:** backend / DX
-- **Contexto:** Cuando solo `NEXT_PUBLIC_VAPID_PUBLIC_KEY` o solo `VAPID_PUBLIC_KEY` está presente, el `superRefine` en `serverEnvSchema` emite dos errores (mismatch + private key faltante) en lugar de uno solo y claro. No es un bug de seguridad pero degrada la DX al arrancar con config incompleta.
-- **Aceptación:** superRefine reformulado con 3 ramas explícitas: (a) solo client key → error "falta VAPID_PUBLIC_KEY", (b) solo server key → error "falta NEXT_PUBLIC_VAPID_PUBLIC_KEY", (c) ambas presentes y distintas → error de mismatch + VAPID_PRIVATE_KEY si falta.
-- **Archivos afectados:** `shared/config/env.schema.ts`, `shared/config/env.test.ts`.
-- **Estimación:** S
-- **Cuándo retomarlo:** cuando se active VAPID en producción y se reporten errores de startup confusos.
-- **Dependencias:** B0.2 ✅ (descubierto en code review de B0.2).
-- **Ticket:** —
-- **Notas:** Descubierto por B0.2 code review pass #3; ver `shared/config/env.schema.ts` línea 79.
+### ~~NT-26~~ — ✅ resuelto (2026-05-06)
+Mejorar mensajes de error de paridad VAPID cuando una sola clave está configurada — superRefine refactorizado con 3 ramas explícitas en `shared/config/env.schema.ts`.
 
 ### NT-27 — Mover `ALTER DATABASE SET` de seed.sql a una migración
 - **Categoría:** infra / DX
