@@ -428,17 +428,17 @@ Mejorar mensajes de error de paridad VAPID cuando una sola clave está configura
 ---
 
 
-### NT-44 — Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example`
+### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
 
-- **Categoría:** DX / docs
-- **Contexto:** El schema `shared/config/env.schema.ts` declara `SUPABASE_WEBHOOK_SECRET` (`z.string().min(16).optional()`), pero la variable **no aparece** en `.env.example`. Resultado: un dev que clona el repo no se entera de que existe hasta que ejecuta el código que la lee. `prod-setup.md` (B14.1) sí la documenta, pero `.env.example` es la fuente de verdad para la copia local.
-- **Aceptación:** `.env.example` incluye un bloque comentado para `SUPABASE_WEBHOOK_SECRET` con instrucción de generación (`openssl rand -hex 32`) y nota de uso (Database Webhooks de Supabase → endpoints de la app).
-- **Archivos afectados:** `.env.example`.
+- **Categoría:** DX / types
+- **Contexto:** En el path donde el MIME del archivo no es redimensionable (ej. PDF), el helper retorna `originalDimensions: { width: 0, height: 0 }` y `outputDimensions: { width: 0, height: 0 }`. Eso es ambiguo — un caller no puede distinguir "imagen de tamaño 0" (imposible en la práctica) de "nunca decodificamos el archivo". El code reviewer (B5.3, MEDIUM 2) sugirió tipar `originalDimensions` y `outputDimensions` como `ImageDimensions | null` para hacer la distinción explícita en el tipo.
+- **Aceptación:** la interfaz `ResizeImageResult` expone `originalDimensions: ImageDimensions | null` y `outputDimensions: ImageDimensions | null`; los callers se actualizan; tests cubren ambos paths (`null` para MIME no redimensionable, valores reales para imágenes).
+- **Archivos afectados:** `shared/utils/image-upload.ts`, `shared/utils/image-upload.test.ts`, callers en `features/catalog/components/ProductImageUpload` (creado por B10.3).
 - **Estimación:** S
-- **Cuándo retomarlo:** cuando se ejecute **B11-B** (audit log e2e) — ahí es cuando los Database Webhooks empiezan a usarse de verdad y el dev local va a necesitar el secret. Se puede hacer antes si surge otra tarea que toque webhooks.
-- **Dependencias:** —
+- **Cuándo retomarlo:** al ejecutar **B10.3** (Swap catálogo CRUD + image upload) — si el componente consumidor termina necesitando esa distinción, se hace en el mismo PR. Si no, se puede dejar como-está y descartar este item.
+- **Dependencias:** B10.3 (consumer real del helper).
 - **Ticket:** —
-- **Notas:** descubierto por B14.1 al inventariar variables. No se arregló ahí porque el entregable de B14.1 es estrictamente `prod-setup.md`; tocar `.env.example` era scope creep.
+- **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
 
 ### NT-34 — Paginación real en listado admin de usuarios
 
