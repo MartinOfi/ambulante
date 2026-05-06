@@ -5,6 +5,9 @@ import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale } from "next-intl/server";
 import "./globals.css";
+
+// Static string — no user input, no interpolation. Safe by construction.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('ambulante-theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.theme=t==='dark'||(!t&&p)?'dark':'light';}catch(e){}})();`;
 import { ThemeProvider } from "@/shared/components/theme/ThemeProvider";
 import { Toaster } from "@/shared/components/ui/toaster";
 import { NuqsProvider } from "@/shared/providers/NuqsProvider";
@@ -133,13 +136,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${spaceGrotesk.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
+      {/* Render-blocking theme init: must live in <head> before any body paint.
+          dangerouslySetInnerHTML is safe here — THEME_INIT_SCRIPT is a hardcoded
+          string literal with zero user input or interpolation. */}
+      <head>
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
-        {/* Blocking init — runs before React hydrates to prevent flash of wrong theme.
-            Content is a static string literal with no interpolation, so there is no
-            injection surface. */}
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var t=localStorage.getItem('ambulante-theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`}
-        </Script>
         {/* JSON-LD structured data. Content is JSON.stringify of static literal
             objects defined above with zero user input — safe by construction.
             This is the official Next.js pattern for schema.org markup. */}

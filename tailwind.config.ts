@@ -19,7 +19,7 @@ import {
 } from "./shared/styles/tokens";
 
 const config: Config = {
-  darkMode: "class",
+  darkMode: ["selector", "[data-theme='dark']"],
   content: ["./app/**/*.{ts,tsx}", "./features/**/*.{ts,tsx}", "./shared/**/*.{ts,tsx}"],
   theme: {
     extend: {
