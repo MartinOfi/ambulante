@@ -31,6 +31,31 @@ describe("MockUserRepository", () => {
       expect(clients).toHaveLength(1);
       expect(clients[0].role).toBe("client");
     });
+
+    it("paginates with limit", async () => {
+      for (let i = 0; i < 5; i++) {
+        await repository.create(makeUser({ id: `u-${i}`, email: `u${i}@example.com` }));
+      }
+      const page = await repository.findAll({ limit: 2 });
+      expect(page).toHaveLength(2);
+    });
+
+    it("paginates with limit and offset", async () => {
+      for (let i = 0; i < 5; i++) {
+        await repository.create(makeUser({ id: `u-${i}`, email: `u${i}@example.com` }));
+      }
+      const page2 = await repository.findAll({ limit: 2, offset: 2 });
+      expect(page2).toHaveLength(2);
+      expect(page2[0].id).toBe("u-2");
+    });
+
+    it("returns remaining items when offset+limit exceeds total", async () => {
+      for (let i = 0; i < 3; i++) {
+        await repository.create(makeUser({ id: `u-${i}`, email: `u${i}@example.com` }));
+      }
+      const page = await repository.findAll({ limit: 10, offset: 2 });
+      expect(page).toHaveLength(1);
+    });
   });
 
   describe("findById", () => {

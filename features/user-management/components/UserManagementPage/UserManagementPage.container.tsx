@@ -6,6 +6,7 @@ import { useUsersQuery } from "@/features/user-management/hooks/useUsersQuery";
 import { useSuspendUserMutation } from "@/features/user-management/hooks/useSuspendUserMutation";
 import { useReactivateUserMutation } from "@/features/user-management/hooks/useReactivateUserMutation";
 import { useUserManagementFilters } from "@/features/user-management/hooks/useUserManagementFilters";
+import { USERS_PAGE_SIZE } from "@/features/user-management/constants";
 import { UserManagementPage } from "./UserManagementPage";
 
 interface PendingSuspension {
@@ -32,6 +33,7 @@ export function UserManagementPageContainer() {
   const usersQuery = useUsersQuery({
     role: filters.role ?? undefined,
     status: filters.status ?? undefined,
+    page: filters.page,
   });
 
   const suspendMutation = useSuspendUserMutation({
@@ -98,6 +100,8 @@ export function UserManagementPageContainer() {
   const queryError =
     usersQuery.error instanceof Error ? "No se pudieron cargar los usuarios." : null;
 
+  const hasNextPage = (usersQuery.data?.length ?? 0) >= USERS_PAGE_SIZE;
+
   return (
     <UserManagementPage
       users={visibleUsers}
@@ -120,6 +124,9 @@ export function UserManagementPageContainer() {
       onSuspendReasonChange={setSuspendReason}
       onReactivate={handleReactivate}
       onView={handleView}
+      currentPage={filters.page}
+      hasNextPage={hasNextPage}
+      onPageChange={filters.setPage}
     />
   );
 }

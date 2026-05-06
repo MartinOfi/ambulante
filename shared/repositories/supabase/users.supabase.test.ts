@@ -29,7 +29,7 @@ describe("SupabaseUserRepository", () => {
         makeDbRow(),
         makeDbRow({ public_id: "u2", role: "tienda", email: "t@test.com" }),
       ];
-      queryMock.limit.mockResolvedValue({ data: rows, error: null });
+      queryMock.range.mockResolvedValue({ data: rows, error: null });
 
       const users = await repo.findAll();
       expect(users).toHaveLength(2);
@@ -39,25 +39,37 @@ describe("SupabaseUserRepository", () => {
 
     it("applies role filter", async () => {
       const rows = [makeDbRow()];
-      queryMock.limit.mockResolvedValue({ data: rows, error: null });
+      queryMock.range.mockResolvedValue({ data: rows, error: null });
       await repo.findAll({ role: "client" });
       expect(queryMock.eq).toHaveBeenCalledWith("role", "cliente");
     });
 
     it("applies suspended filter", async () => {
-      queryMock.limit.mockResolvedValue({ data: [], error: null });
+      queryMock.range.mockResolvedValue({ data: [], error: null });
       await repo.findAll({ suspended: true });
       expect(queryMock.eq).toHaveBeenCalledWith("suspended", true);
     });
 
-    it("applies a defensive row cap", async () => {
-      queryMock.limit.mockResolvedValue({ data: [], error: null });
+    it("applies a defensive row cap via range when no pagination given", async () => {
+      queryMock.range.mockResolvedValue({ data: [], error: null });
       await repo.findAll();
-      expect(queryMock.limit).toHaveBeenCalledWith(500);
+      expect(queryMock.range).toHaveBeenCalledWith(0, 499);
+    });
+
+    it("uses explicit offset and limit when provided", async () => {
+      queryMock.range.mockResolvedValue({ data: [], error: null });
+      await repo.findAll({ limit: 50, offset: 50 });
+      expect(queryMock.range).toHaveBeenCalledWith(50, 99);
+    });
+
+    it("defaults offset to 0 when only limit is given", async () => {
+      queryMock.range.mockResolvedValue({ data: [], error: null });
+      await repo.findAll({ limit: 50 });
+      expect(queryMock.range).toHaveBeenCalledWith(0, 49);
     });
 
     it("throws on Supabase error", async () => {
-      queryMock.limit.mockResolvedValue({
+      queryMock.range.mockResolvedValue({
         data: null,
         error: { message: "DB error" },
       });

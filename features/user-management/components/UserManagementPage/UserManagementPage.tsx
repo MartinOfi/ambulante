@@ -24,6 +24,9 @@ export function UserManagementPage({
   onSuspendReasonChange,
   onReactivate,
   onView,
+  currentPage,
+  hasNextPage,
+  onPageChange,
 }: UserManagementPageProps) {
   return (
     <div className="space-y-6">
@@ -72,6 +75,27 @@ export function UserManagementPage({
           onView={onView}
         />
       )}
+
+      <nav
+        aria-label="Paginación"
+        className="flex items-center justify-between border-t border-[hsl(var(--border))] pt-4"
+      >
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--surface))] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Anterior
+        </button>
+        <span className="text-sm text-[hsl(var(--muted))]">Página {currentPage}</span>
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={!hasNextPage}
+          className="rounded-md px-3 py-1.5 text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--surface))] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Siguiente
+        </button>
+      </nav>
 
       <SuspendConfirmDialog
         isOpen={suspendDialogEmail !== null}

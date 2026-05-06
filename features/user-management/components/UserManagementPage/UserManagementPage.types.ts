@@ -25,4 +25,7 @@ export interface UserManagementPageProps {
   readonly onSuspendReasonChange: (reason: string) => void;
   readonly onReactivate: (userId: string) => void;
   readonly onView: (userId: string) => void;
+  readonly currentPage: number;
+  readonly hasNextPage: boolean;
+  readonly onPageChange: (page: number) => void;
 }

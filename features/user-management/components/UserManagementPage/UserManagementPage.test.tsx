@@ -46,6 +46,9 @@ const DEFAULT_PROPS = {
   onSuspendReasonChange: vi.fn(),
   onReactivate: vi.fn(),
   onView: vi.fn(),
+  currentPage: 1,
+  hasNextPage: false,
+  onPageChange: vi.fn(),
 };
 
 describe("UserManagementPage", () => {
@@ -164,5 +167,51 @@ describe("UserManagementPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /sí, suspender/i }));
 
     expect(onSuspendConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders Anterior button disabled on page 1", () => {
+    render(<UserManagementPage {...DEFAULT_PROPS} currentPage={1} />);
+    expect(screen.getByRole("button", { name: /anterior/i })).toBeDisabled();
+  });
+
+  it("renders Siguiente button disabled when hasNextPage is false", () => {
+    render(<UserManagementPage {...DEFAULT_PROPS} hasNextPage={false} />);
+    expect(screen.getByRole("button", { name: /siguiente/i })).toBeDisabled();
+  });
+
+  it("renders Siguiente button enabled when hasNextPage is true", () => {
+    render(<UserManagementPage {...DEFAULT_PROPS} hasNextPage={true} />);
+    expect(screen.getByRole("button", { name: /siguiente/i })).not.toBeDisabled();
+  });
+
+  it("renders Anterior button enabled on page 2", () => {
+    render(<UserManagementPage {...DEFAULT_PROPS} currentPage={2} />);
+    expect(screen.getByRole("button", { name: /anterior/i })).not.toBeDisabled();
+  });
+
+  it("calls onPageChange with next page when Siguiente is clicked", () => {
+    const onPageChange = vi.fn();
+    render(
+      <UserManagementPage
+        {...DEFAULT_PROPS}
+        currentPage={2}
+        hasNextPage={true}
+        onPageChange={onPageChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
+    expect(onPageChange).toHaveBeenCalledWith(3);
+  });
+
+  it("calls onPageChange with previous page when Anterior is clicked", () => {
+    const onPageChange = vi.fn();
+    render(<UserManagementPage {...DEFAULT_PROPS} currentPage={3} onPageChange={onPageChange} />);
+    fireEvent.click(screen.getByRole("button", { name: /anterior/i }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
+  });
+
+  it("displays current page number", () => {
+    render(<UserManagementPage {...DEFAULT_PROPS} currentPage={4} />);
+    expect(screen.getByText(/página 4/i)).toBeInTheDocument();
   });
 });

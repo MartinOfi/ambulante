@@ -22,7 +22,12 @@ export class MockUserRepository implements UserRepository {
   private users: User[] = [];
 
   async findAll(filters?: UserFilters): Promise<readonly User[]> {
-    return applyFilters(this.users, filters);
+    const filtered = applyFilters(this.users, filters);
+    const { limit, offset = 0 } = filters ?? {};
+    if (limit !== undefined) {
+      return filtered.slice(offset, offset + limit);
+    }
+    return filtered;
   }
 
   async findById(id: string): Promise<User | null> {
