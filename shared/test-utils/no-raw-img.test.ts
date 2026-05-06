@@ -18,7 +18,13 @@ function collectComponentFiles(dir: string): string[] {
 
     if (stat.isDirectory()) {
       results.push(...collectComponentFiles(fullPath));
-    } else if (COMPONENT_EXTENSIONS.has(extname(entry))) {
+    } else if (
+      COMPONENT_EXTENSIONS.has(extname(entry)) &&
+      !entry.endsWith(".test.tsx") &&
+      !entry.endsWith(".test.jsx") &&
+      !entry.endsWith(".spec.tsx") &&
+      !entry.endsWith(".spec.jsx")
+    ) {
       results.push(fullPath);
     }
   }
