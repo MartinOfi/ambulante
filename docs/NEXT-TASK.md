@@ -55,6 +55,7 @@
 | [NT-23](#nt-23--modo-offline-completo-con-sincronización-diferida) | Modo offline completo con sincronización diferida | PWA / perf | XL | >30% de usuarios en zonas de conectividad mala |
 | [NT-24](#nt-24--app-nativa-ios-si-la-pwa-topa-límites) | App nativa iOS si la PWA topa límites | plataforma | XL | push en iOS sin PWA-install sigue sin estar disponible |
 | [NT-25](#nt-25--observabilidad-avanzada-opentelemetry) | Observabilidad avanzada (OpenTelemetry) | infra / obs | L | incidentes requieren trace distribuido |
+| [NT-43](#nt-43--fetchauditlog-devuelve-null-tanto-para-pedido-sin-entradas-como-para-errores-de-supabase) | `fetchAuditLog` devuelve null para not-found y para errores — admin no puede distinguir | backend / UX admin | M | admin reporta confusión al auditar pedidos |
 | [NT-26](#nt-26--mejorar-mensajes-de-error-de-paridad-vapid-cuando-una-sola-clave-está-configurada) | Mejorar mensajes de error de paridad VAPID | backend / DX | S | activar VAPID en prod |
 | [NT-27](#nt-27--mover-alter-database-set-de-seedsql-a-una-migración) | Mover `ALTER DATABASE SET` de seed.sql a migración | infra / DX | S | al reabrir el epic de cron jobs (B7.x) |
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
@@ -659,6 +660,18 @@
 - **Dependencias:** —
 - **Ticket:** —
 - **Notas:** Pre-existente en la implementación de `create()`. Descubierto por code-reviewer durante cierre de B10-A.
+
+### NT-43 — `fetchAuditLog` devuelve `null` tanto para "pedido sin entradas" como para errores de Supabase
+
+- **Categoría:** backend / UX admin
+- **Contexto:** `features/admin-audit-log/actions/fetch-audit-log.ts` colapsa tres salidas distintas a `null`: (a) validación de input fallida, (b) orden sin entradas en audit_log, (c) excepción de Supabase. La UI muestra "no se encontraron transiciones" en los tres casos. Para un admin investigando un incidente, un error de red o de BD se ve igual que un pedido genuinamente sin entradas. Detectado durante code review de cierre B11-B.
+- **Aceptación:** El tipo de retorno de `fetchAuditLog` pasa de `AuditLogResult | null` a un tipo discriminado (`{ status: "ok", data: AuditLogResult } | { status: "not_found" } | { status: "error", message: string }`). El container/hook consumen el nuevo tipo y muestran un estado de error distinto al de "no encontrado".
+- **Archivos afectados:** `features/admin-audit-log/actions/fetch-audit-log.ts`, `features/admin-audit-log/hooks/useAuditLogQuery.ts`, `features/admin-audit-log/components/OrderAuditLog/OrderAuditLog.container.tsx`, `features/admin-audit-log/types/audit-log.types.ts`.
+- **Estimación:** M
+- **Cuándo retomarlo:** cuando el admin reporte confusión al auditar pedidos (no sabe si el log está vacío o si hubo un error de conexión).
+- **Dependencias:** B11-B ✅.
+- **Ticket:** —
+- **Notas:** Descubierto por code-reviewer durante cierre de B11-B.
 
 ---
 

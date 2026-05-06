@@ -14,7 +14,7 @@ function buildQueryKey(orderId: string): readonly [AuditLogQueryKey] {
 
 export function useAuditLogQuery(orderId: string | null) {
   return useQuery({
-    queryKey: orderId ? buildQueryKey(orderId) : [AUDIT_LOG_QUERY_KEY_PREFIX, null],
+    queryKey: buildQueryKey(orderId ?? ""),
     queryFn: () => fetchAuditLog(orderId ?? ""),
     enabled: orderId !== null && orderId.trim().length > 0,
     staleTime: 30_000,

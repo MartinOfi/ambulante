@@ -9,10 +9,11 @@
 -- (trigger body is a single RAISE, no I/O).
 
 -- ── Trigger function ──────────────────────────────────────────────────────────
--- No search_path needed: only references TG_OP and OLD.id (system vars).
 create or replace function public.audit_log_deny_mutations()
 returns trigger
 language plpgsql
+security definer
+set search_path = ''
 as $$
 begin
   raise exception
