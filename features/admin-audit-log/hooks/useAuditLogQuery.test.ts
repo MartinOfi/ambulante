@@ -7,7 +7,10 @@ import React from "react";
 import { useAuditLogQuery } from "./useAuditLogQuery";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { ORDER_ACTOR } from "@/shared/domain/order-state-machine";
-import type { AuditLogResult } from "@/features/admin-audit-log/types/audit-log.types";
+import type {
+  AuditLogResult,
+  FetchAuditLogResult,
+} from "@/features/admin-audit-log/types/audit-log.types";
 
 vi.mock("@/features/admin-audit-log/actions/fetch-audit-log", () => ({
   fetchAuditLog: vi.fn(),
@@ -16,7 +19,7 @@ vi.mock("@/features/admin-audit-log/actions/fetch-audit-log", () => ({
 import { fetchAuditLog } from "@/features/admin-audit-log/actions/fetch-audit-log";
 const fetchAuditLogMock = vi.mocked(fetchAuditLog);
 
-const mockResult: AuditLogResult = {
+const mockAuditLogResult: AuditLogResult = {
   orderId: "order-test-123",
   entries: [
     {
@@ -27,6 +30,8 @@ const mockResult: AuditLogResult = {
     },
   ],
 };
+
+const mockResult: FetchAuditLogResult = { status: "ok", data: mockAuditLogResult };
 
 function buildWrapper() {
   const queryClient = createTestQueryClient();
@@ -74,8 +79,8 @@ describe("useAuditLogQuery", () => {
     expect(result.current.data).toEqual(mockResult);
   });
 
-  it("returns null when action returns null (no order found)", async () => {
-    fetchAuditLogMock.mockResolvedValue(null);
+  it("returns not_found when action returns not_found", async () => {
+    fetchAuditLogMock.mockResolvedValue({ status: "not_found" });
 
     const { result } = renderHook(() => useAuditLogQuery("order-unknown"), {
       wrapper: buildWrapper(),
@@ -85,6 +90,26 @@ describe("useAuditLogQuery", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(result.current.data).toBeNull();
+    expect(result.current.data).toEqual({ status: "not_found" });
+  });
+
+  it("returns error status when action returns error", async () => {
+    fetchAuditLogMock.mockResolvedValue({
+      status: "error",
+      message: "Supabase unavailable",
+    });
+
+    const { result } = renderHook(() => useAuditLogQuery("order-error-case"), {
+      wrapper: buildWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data).toEqual({
+      status: "error",
+      message: "Supabase unavailable",
+    });
   });
 });

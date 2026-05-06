@@ -12,10 +12,12 @@ export function OrderAuditLogContainer() {
 
   const errorMessage = isError
     ? (extractErrorMessage(error) ?? "Error al buscar el pedido. Intentá de nuevo.")
-    : null;
+    : data?.status === "error"
+      ? data.message
+      : null;
 
-  // undefined = idle (never fetched); null = fetched but order not found
-  const result = data;
+  const result =
+    data?.status === "ok" ? data.data : data?.status === "not_found" ? null : undefined;
 
   return (
     <OrderAuditLog
