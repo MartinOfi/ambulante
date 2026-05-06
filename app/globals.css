@@ -34,7 +34,7 @@
     --font-sans: "Inter", system-ui, sans-serif;
   }
 
-  .dark {
+  html[data-theme="dark"] {
     /* Dark mode — brand needs to be lighter to pass WCAG AA on dark surfaces */
     /* Lightness 55% gives 6.6:1 on dark surface #070A12 */
     --brand-primary: 21 90% 55%; /* #F3762A */
