@@ -46,6 +46,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -60,6 +61,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -74,6 +76,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -90,6 +93,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={MOCK_PRODUCTS}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -106,6 +110,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={true}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -119,6 +124,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={MOCK_PRODUCTS}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -133,6 +139,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={onDismiss}
       />,
     );
@@ -147,6 +154,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -162,6 +170,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={onDismiss}
       />,
     );
@@ -180,6 +189,7 @@ describe("StoreDetailSheet", () => {
         store={withoutPhoto}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -195,6 +205,7 @@ describe("StoreDetailSheet", () => {
         store={withoutTagline}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );
@@ -208,6 +219,7 @@ describe("StoreDetailSheet", () => {
         store={MOCK_STORE}
         products={[]}
         isLoadingProducts={false}
+        onAddToCart={vi.fn()}
         onDismiss={vi.fn()}
       />,
     );

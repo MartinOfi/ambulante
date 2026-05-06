@@ -6,4 +6,5 @@ export interface StoreDetailSheetProps {
   readonly products: readonly Product[];
   readonly isLoadingProducts: boolean;
   readonly onDismiss: () => void;
+  readonly onAddToCart: (product: Product) => void;
 }

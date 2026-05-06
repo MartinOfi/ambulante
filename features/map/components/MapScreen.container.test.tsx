@@ -14,9 +14,14 @@ import type { MapScreenProps } from "./MapScreen";
 import { MapScreen } from "./MapScreen";
 import { MapScreenContainer } from "./MapScreen.container";
 
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 vi.mock("@/shared/hooks/useGeolocation");
 vi.mock("@/features/map/hooks/useRadiusParam");
 vi.mock("@/features/map/hooks/useStoresNearbyQuery");
+vi.mock("@/features/map/hooks/useStoresAvailabilityRealtime", () => ({
+  useStoresAvailabilityRealtime: vi.fn(),
+}));
+vi.mock("@/features/order-flow/actions", () => ({ submitOrder: vi.fn() }));
 vi.mock("./MapScreen");
 
 function makeGeo(overrides: Partial<UseGeolocationResult> = {}): UseGeolocationResult {
