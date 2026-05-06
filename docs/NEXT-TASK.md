@@ -472,22 +472,6 @@
 
 ---
 
-### NT-30 — Resolver pares de migraciones con timestamp prefijo duplicado
-
-- **Categoría:** infra / migraciones
-- **Contexto:** En `supabase/migrations/` hay dos pares con el mismo prefijo numérico:
-  - `20260428000004_claim_expirable_orders_rpc.sql` y `20260428000004_store_profile_extras.sql`
-  - `20260428000007_claim_auto_closeable_orders_rpc.sql` y `20260428000007_get_top_slow_queries_fn.sql`
-  Resultado: `pnpm supabase db reset` aborta al insertar en `supabase_migrations.schema_migrations` (PK `(version)` viola unique). El estado local de la DB se mantiene aplicando migraciones individualmente. Producción todavía no fue afectada porque B14.1 aún no corrió.
-- **Aceptación:** `pnpm supabase db reset` corre limpio end-to-end; cada migración tiene un prefijo único; `supabase_migrations.schema_migrations` puede repoblar sin conflictos.
-- **Archivos afectados:** las cuatro migraciones listadas — renombrar las dos "segundas" a un timestamp posterior (p.ej. `20260428000008_*.sql` y `20260428000009_*.sql`) preservando el orden lógico.
-- **Estimación:** S
-- **Cuándo retomarlo:** **antes de B14.1** (crear proyecto Supabase Cloud) — si producción se inicializa con estos prefijos duplicados, el primer push falla con el mismo error.
-- **Dependencias:** ninguna; cambio puramente de archivos.
-- **Ticket:** —
-- **Notas:** descubierto por **B12-A** al intentar `db reset` para validar la migración `20260429000000_observability_alerts.sql`. Se usó psql directo como workaround.
-
----
 
 ### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
 
@@ -501,7 +485,7 @@
 - **Ticket:** —
 - **Notas:** descubierto por B5.3; cambio API-breaking — vale la pena agruparlo con la integración real para no tocar el helper dos veces.
 
-### NT-30 — Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example`
+### NT-44 — Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example`
 
 - **Categoría:** DX / docs
 - **Contexto:** El schema `shared/config/env.schema.ts` declara `SUPABASE_WEBHOOK_SECRET` (`z.string().min(16).optional()`), pero la variable **no aparece** en `.env.example`. Resultado: un dev que clona el repo no se entera de que existe hasta que ejecuta el código que la lee. `prod-setup.md` (B14.1) sí la documenta, pero `.env.example` es la fuente de verdad para la copia local.
@@ -513,24 +497,7 @@
 - **Ticket:** —
 - **Notas:** descubierto por B14.1 al inventariar variables. No se arregló ahí porque el entregable de B14.1 es estrictamente `prod-setup.md`; tocar `.env.example` era scope creep.
 
-### NT-32 — Vitest: 9 tests fallan en 13 archivos (pre-existente)
-
-- **Categoría:** testing / DX
-- **Contexto:** Detectado durante el cierre de B14.3 (2026-04-29). Al correr `pnpm vitest run` en el worktree de B14.3, vitest reporta `Test Files 13 failed | 179 passed (192)` y `Tests 9 failed | 1629 passed (1638)`. El diff de B14.3 toca solo `release-please-config.json`, `commitlint.config.cjs` y un markdown — vitest no carga ninguno de los tres, por lo que las fallas son **preexistentes en main** (no introducidas por B14.3). Probable origen: alguno de los merges recientes (`feat(b5.3)`, `feat(b7.3)`, `feat(b12.1)`) dejó tests rotos sin gate de CI que los rebote, o cambió un fixture compartido que rompe múltiples archivos.
-- **Aceptación:**
-  - `pnpm vitest run` retorna exit 0 con 0 tests fallados.
-  - Si alguna de las 9 fallas corresponde a un test obsoleto (covering código removido), borrar el test con commit explícito; no parchearlo.
-  - CI bloquea PRs con tests rojos (verificar que el workflow `ci.yml` corre vitest y falla en rojo — si no, agregarlo como sub-tarea).
-- **Archivos afectados:** desconocido — primer paso es correr `pnpm vitest run --reporter=default 2>&1 | tee /tmp/vitest.log` desde main y triagear el listado.
-- **Estimación:** M (depende de si es 1 root cause común o 9 bugs separados — triage primero, fix después).
-- **Cuándo retomarlo:** **Antes** de que se normalice el rojo y la suite pierda valor como gate de regresión. Idealmente la próxima sesión que abra worktree limpio sobre main.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** Descubierto por B14.3 — el cierre de B14.3 mergeó sobre rojo preexistente sabiendo que el diff es config-only y no podía haberlo causado. Anotado acá para que no se naturalice.
-
----
-
-### NT-30 — Compatibilidad Node 24 al cargar `next.config.ts`
+### NT-45 — Compatibilidad Node 24 al cargar `next.config.ts`
 
 - **Categoría:** infra / DX
 - **Contexto:** En Node 24.12.0 + Next 15.5.15, el `next-config-ts/require-hook.js` evalúa `next.config.ts` antes de aplicar el shim de `server-only`. Como `next.config.ts` importa `./shared/config/env.runtime` (que tiene `import "server-only";`), el `dev` falla con `Error: This module cannot be imported from a Client Component module.` antes de levantar. Bloquea `pnpm dev` y `pnpm test:e2e` en ese Node. Descubierto al correr `e2e/push-delivery.spec.ts` (B8.4); afecta a TODAS las specs E2E existentes.
@@ -682,3 +649,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-38 agregado — defer de borrado total `orders.mock.ts` hasta cierre de B10-C. |
 | 2026-04-30 | NT-39 agregado — defer E2E happy path cliente hasta seed completo + VAPID en local. |
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
+| 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |

@@ -33,31 +33,6 @@ Igual que en el epic backend: **una Wave NO es un lote que termina antes de la s
 
 ---
 
-## Estado inicial — items ya resueltos (marcar ✅ en NEXT-TASK.md)
-
-Antes de ejecutar cualquier fase, actualizar `docs/NEXT-TASK.md` para reflejar que estos dos items ya están hechos:
-
-| Item | Estado real | Evidencia |
-|---|---|---|
-| NT-30 "Resolver pares con timestamp duplicado" | ✅ **ya resuelto** en B12-A | `supabase/migrations/` usa timestamps únicos `0008`/`0009` — `pnpm supabase db reset` pasa limpio |
-| NT-32 "Vitest: 9 tests fallan" | ✅ **ya resuelto** | `pnpm vitest run` retorna 1997 tests pasando, 0 fallos (verificado 2026-05-06) |
-
----
-
-## Errores de documentación en NEXT-TASK.md
-
-`NT-30` aparece **tres veces** en el cuerpo del doc con contenido diferente. Son tres items distintos colapsados en el mismo ID:
-
-| ID real | Título | Estado |
-|---|---|---|
-| NT-30 (original) | Resolver timestamps duplicados en migrations | ✅ **ya hecho** |
-| NT-30b | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | ⬜ pendiente |
-| NT-30c | Compatibilidad Node 24 al cargar `next.config.ts` | ⬜ pendiente |
-
-En este plan se usan los sufijos `b` y `c` para distinguirlos. Al ejecutar, usá `/start NT-30b` o `/start NT-30c` con el texto del item.
-
----
-
 ## Items accionables (ejecutar en Fases 0–5)
 
 | ID | Título | Cat | Estim | Tier | Fase |
@@ -65,8 +40,8 @@ En este plan se usan los sufijos `b` y `c` para distinguirlos. Al ejecutar, usá
 | NT-41 | `toUser()` devuelve `auth.uid()` en vez de `public_id` | backend | S | 1 | 0 |
 | NT-37 | Tests fallan sin env vars de Supabase | testing/DX | S | 1 | 0 |
 | NT-38 | Borrar `orders.mock.ts` (B10-C ya ✅) | refactor | S | 1 | 1 |
-| NT-30b | `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX | S | 1 | 1 |
-| NT-30c | Compatibilidad Node 24 en `next.config.ts` | infra/DX | S | 1 | 1 |
+| NT-44 | `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX | S | 1 | 1 |
+| NT-45 | Compatibilidad Node 24 en `next.config.ts` | infra/DX | S | 1 | 1 |
 | NT-29 | `resizeImageForUpload`: tipar dimensions como nullable | types/DX | S | 1 | 1 |
 | NT-26 | VAPID: mejorar mensajes de error de paridad | backend/DX | S | 1 | 1 |
 | NT-31 | Push routes → `SupabasePushSubscriptionRepository` | backend/arch | S | 1 | 1 |
@@ -154,8 +129,8 @@ En este plan se usan los sufijos `b` y `c` para distinguirlos. Al ejecutar, usá
 | Chat | Item | Archivos clave | Tier | Notas |
 |---|---|---|---|---|
 | 1 | `NT-38` | `features/orders/services/orders.mock.ts`, `features/orders/services/index.ts`, tests de tienda | 1 | Grep `orders.mock` → 0 imports → borrar. `pnpm typecheck` + suite verde. |
-| 2 | `NT-30b` | `.env.example` | 1 | 1 archivo. Agregar bloque comentado con instrucción `openssl rand -hex 32`. |
-| 3 | `NT-30c` | `next.config.ts`, `shared/config/env.runtime.ts`, `package.json`, `.nvmrc` | 1 | Opción (a): inline `parseEnv` en `next.config.ts` sin pasar por `env.runtime`. Opción (c): pinear a Node 20 en `engines` + `.nvmrc`. |
+| 2 | `NT-44` | `.env.example` | 1 | 1 archivo. Agregar bloque comentado con instrucción `openssl rand -hex 32`. |
+| 3 | `NT-45` | `next.config.ts`, `shared/config/env.runtime.ts`, `package.json`, `.nvmrc` | 1 | Opción (a): inline `parseEnv` en `next.config.ts` sin pasar por `env.runtime`. Opción (c): pinear a Node 20 en `engines` + `.nvmrc`. |
 | 4 | `NT-29` | `shared/utils/image-upload.ts`, `shared/utils/image-upload.test.ts` | 1 | `ResizeImageResult.originalDimensions` y `outputDimensions` → `ImageDimensions \| null`. Callers en `features/catalog/` si existen. |
 | 5 | `NT-26` | `shared/config/env.schema.ts`, `shared/config/env.test.ts` | 1 | `superRefine` con 3 ramas explícitas: solo client key / solo server key / mismatch. |
 | 6 | `NT-31` | `app/api/push/subscribe/route.ts`, `route.test.ts`, `app/api/push/unsubscribe/route.ts`, `route.test.ts`, `shared/repositories/supabase/push-subscriptions.supabase.ts` | 1 | Instanciar `SupabasePushSubscriptionRepository` en ambas rutas. Alinear mecanismo de resolución de user. |
@@ -163,8 +138,8 @@ En este plan se usan los sufijos `b` y `c` para distinguirlos. Al ejecutar, usá
 | 8 | `NT-36` | `.github/workflows/ci.yml`, `scripts/check-migration-timestamps.sh` (nuevo) | 1 | Script que extrae prefijos de 14 chars, falla si hay duplicados. Agrega step al job `db-migrations`. |
 
 > ⚠️ **Conflicts potenciales:**
-> - Chat 3 (NT-30c) toca `package.json` — coordinar merge si hay otro chat activo que también edite `package.json`. En este grupo no hay otro.
-> - Chat 5 (NT-26) toca `env.schema.ts`; Chat 3 (NT-30c) toca `env.runtime.ts`. **Archivos distintos** — sin conflicto.
+> - Chat 3 (NT-45) toca `package.json` — coordinar merge si hay otro chat activo que también edite `package.json`. En este grupo no hay otro.
+> - Chat 5 (NT-26) toca `env.schema.ts`; Chat 3 (NT-45) toca `env.runtime.ts`. **Archivos distintos** — sin conflicto.
 > - Chat 6 (NT-31) toca `push-subscriptions.supabase.ts` — sin conflicto con los demás.
 
 **Cierre de Fase 1:** 8 items ✅. Destraba Fase 5 junto con Fase 0.
@@ -384,3 +359,4 @@ Solo una instancia de Supabase CLI puede correr en la máquina (puertos fijos 54
 | Fecha | Cambio |
 |---|---|
 | 2026-05-06 | Creación del plan. 19 chats accionables en 5 fases, pico real ~5-6 paralelos, 24 items trigger-deferred. |
+| 2026-05-06 | NT-30b → NT-44, NT-30c → NT-45 (colisión triple resuelta en NEXT-TASK.md). Eliminadas secciones "Estado inicial" y "Errores de documentación" (ya corregidos). |
