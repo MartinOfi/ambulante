@@ -31,7 +31,6 @@
 | ID | Título | Categoría | Estimación | Disparador |
 |---|---|---|---|---|
 | [NT-01](#nt-01--mejorar-la-ui-bloque-abierto-a-detallar) | Mejorar la UI (bloque abierto — a detallar) | UX | TBD | a definir por usuario |
-| [NT-02](#nt-02--previsualizador-de-imagen-al-crear-o-editar-producto) | Previsualizador de imagen al crear/editar producto | UX / catálogo | S | uso real del CRUD de catálogo |
 | [NT-03](#nt-03--precarga-de-theme-evitar-flash-blanco--dark) | Precarga de theme (evitar flash blanco → dark) | UX / perf frontend | M | quejas de usuarios sobre flash visual |
 | [NT-04](#nt-04--apple-oauth-sign-in-with-apple) | Apple OAuth (Sign in with Apple) | auth / backend | M | >20% de usuarios en iOS instalando PWA |
 | [NT-05](#nt-05--avatar-de-usuario--bucket--ui) | Avatar de usuario + bucket + UI | storage / UX | M | feature de perfil cliente prioritaria |
@@ -89,19 +88,6 @@
   > - Transiciones entre rutas.
   > - Consistencia de tipografía (jerarquía h1-h6, labels, captions).
   > - Feedback visual en formularios (error, success, warning).
-
----
-
-### NT-02 — Previsualizador de imagen al crear o editar producto
-- **Categoría:** UX / catálogo
-- **Contexto:** En el CRUD de productos (features/catalog), al pegar una URL de imagen o subir un archivo, la UI no muestra preview hasta que se guarda el registro. Friction para la tienda que necesita verificar que la imagen cargó bien y se ve derecha antes de publicar.
-- **Aceptación:** Al pegar URL o al seleccionar archivo para upload, se renderiza un thumbnail inmediato (client-side si es upload; via `<img>` directo si es URL) con tamaños de crop que coinciden con los de display real. Error visible si la imagen no carga (URL rota, 404, mime inválido).
-- **Archivos afectados:** `features/catalog/components/ProductForm/`, `features/catalog/components/ProductImagePreview/` (nuevo).
-- **Estimación:** S
-- **Cuándo retomarlo:** después de B10.3 (Swap catálogo CRUD) — una vez que storage real esté conectado, este preview complementa la UX del upload.
-- **Dependencias:** B10.3 ✅ o antes si se quiere como mejora pura de UI sobre el mock.
-- **Ticket:** —
-- **Notas:** Considerar también validación de aspect ratio (forzar 4:3 o 1:1 para consistencia de feed) con crop tool simple.
 
 ---
 
