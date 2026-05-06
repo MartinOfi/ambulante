@@ -1,5 +1,20 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+vi.mock("next/image", () => ({
+  default: ({
+    src,
+    alt,
+    onLoad,
+    onError,
+  }: {
+    src: string;
+    alt: string;
+    onLoad?: React.ReactEventHandler<HTMLImageElement>;
+    onError?: React.ReactEventHandler<HTMLImageElement>;
+    [key: string]: unknown;
+  }) => <img src={src} alt={alt} onLoad={onLoad} onError={onError} />, // eslint-disable-line @next/next/no-img-element
+}));
 
 vi.mock("@/shared/services/storage", () => ({
   storageService: {
@@ -27,6 +42,10 @@ function makeFile(type = "image/jpeg", size = 1024): File {
 }
 
 describe("ProductImageUploadContainer", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(resizeImageForUpload).mockResolvedValue({

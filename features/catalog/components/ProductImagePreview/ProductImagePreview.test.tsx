@@ -1,5 +1,21 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+
+vi.mock("next/image", () => ({
+  default: ({
+    src,
+    alt,
+    onLoad,
+    onError,
+  }: {
+    src: string;
+    alt: string;
+    onLoad?: React.ReactEventHandler<HTMLImageElement>;
+    onError?: React.ReactEventHandler<HTMLImageElement>;
+    [key: string]: unknown;
+  }) => <img src={src} alt={alt} onLoad={onLoad} onError={onError} />, // eslint-disable-line @next/next/no-img-element
+}));
+
 import { ProductImagePreview } from "./ProductImagePreview";
 
 const SRC = "https://example.com/photo.jpg";
