@@ -64,6 +64,11 @@ export async function submitStoreOnboardingAction(
       };
     },
 
+    async findExistingStore(ownerId: string) {
+      const repo = new SupabaseStoreRepository(serviceClient);
+      return repo.findByOwnerId(ownerId);
+    },
+
     async createStore(input) {
       const repo = new SupabaseStoreRepository(serviceClient);
       return repo.create(input);
