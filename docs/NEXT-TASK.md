@@ -61,7 +61,6 @@
 | [NT-28](#nt-28--agregar-received_at-a-la-tabla-orders) | Agregar `received_at` a la tabla `orders` | schema / backend | S | cuando `expiredAt` en audit trail requiera timestamp exacto de recepción |
 | [NT-29](#nt-29--resizeimageforupload-tipar-dimensions-como-nullable-en-el-no-op-path) | `resizeImageForUpload`: tipar dimensions como nullable en el no-op path | DX / types | S | al integrar el helper en B10.3 (Swap catálogo CRUD + image upload) |
 | [NT-31](#nt-31--refactorizar-rutas-push-para-usar-supabasepushsubscriptionrepository) | Refactorizar rutas push para usar `SupabasePushSubscriptionRepository` | backend / arquitectura | S | al tocar capa de push en cualquier tarea futura |
-| [NT-33](#nt-33--robustez-de-cleanup--types-fuertes-en-concurrent-fixtures-cron-tests) | Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests) | testing / DX | S | al tocar otro cron test o agregar un tercer cron |
 | [NT-34](#nt-34--paginación-real-en-listado-admin-de-usuarios) | Paginación real en listado admin de usuarios | backend / perf | M | tabla `users` > 500 filas en prod |
 | [NT-35](#nt-35--focus-trap--escape-en-suspendconfirmdialog-y-otros-modales-admin) | Focus trap + Escape en `SuspendConfirmDialog` y otros modales admin | a11y / UX | M | auditoría de a11y o feedback de usuarios con teclado |
 | [NT-36](#nt-36--guard-en-ci-contra-timestamps-duplicados-de-migrations) | Guard en CI contra timestamps duplicados de migrations | infra / DevEx | S | próxima ronda de CI / antes de B14.2 |
@@ -69,7 +68,6 @@
 | [NT-39](#nt-39--e2e-happy-path-cliente-cart--submit--tracking--cancel--history) | E2E happy path cliente (cart → submit → tracking → cancel → history) | testing / E2E | M | Supabase local con seed completo + VAPID keys + SW registrado |
 | [NT-42](#nt-42--relajar-store-zod-schema-photourl--tagline--pricefromars-deben-ser-opcionales) | Relajar `Store` Zod schema: `photoUrl` / `tagline` / `priceFromArs` deben ser opcionales | backend / types | M | junto con B10-A.3 (perfil) o cuando profile editor esté listo |
 | [NT-44](#nt-44--documentar-supabase_webhook_secret-en-envexample) | Documentar `SUPABASE_WEBHOOK_SECRET` en `.env.example` | DX / docs | S | al ejecutar cualquier tarea de webhooks o DB hooks |
-| [NT-45](#nt-45--compatibilidad-node-24-al-cargar-nextconfigts) | Compatibilidad Node 24 al cargar `next.config.ts` | infra / DX | S | antes de habilitar CI con E2E o si el equipo migra a Node 24 |
 
 ---
 
@@ -457,20 +455,6 @@
 
 ---
 
-### NT-33 — Robustez de cleanup + types fuertes en `concurrent-fixtures` (cron tests)
-
-- **Categoría:** testing / DX
-- **Contexto:** En `app/api/cron/_test-helpers/concurrent-fixtures.ts` el code review de B7-A flagueó dos cosas que no son CRITICAL/HIGH y se difieren: (a) `cleanupIdentity` ignora errores de los 4 deletes secuenciales — si la subquery de `audit_log` falla, el fallback `?? []` produce un `.in("row_id", [])` silencioso; en una re-run con leftovers de un run previo el siguiente `beforeEach` siembra encima sin advertir. Las aserciones filtran por `store_id` así que no genera false-positives, pero es robustez. (b) `seedOrders` y `cleanupIdentity` usan `as string` / `as number` sobre las columnas devueltas por PostgREST en lugar de type-guards — viola CLAUDE.md §6.1. Ambos puntos son test-only, low blast radius.
-- **Aceptación:** `cleanupIdentity` lanza explícitamente si cualquier paso falla (con mensaje contextualizado); las lecturas de PostgREST en el helper se validan con un Zod schema local en lugar de `as` casts; tests siguen verdes.
-- **Archivos afectados:** `app/api/cron/_test-helpers/concurrent-fixtures.ts`.
-- **Estimación:** S
-- **Cuándo retomarlo:** la próxima vez que se toque un cron test (ej. al agregar B7.5 si llegase a aparecer, o al introducir un tercer cron). No urgente; el código actual funciona y los tests son determinísticos.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** descubierto por code review de B7-A.
-
----
-
 
 ### NT-29 — `resizeImageForUpload`: tipar dimensions como nullable en el no-op path
 
@@ -495,20 +479,6 @@
 - **Dependencias:** —
 - **Ticket:** —
 - **Notas:** descubierto por B14.1 al inventariar variables. No se arregló ahí porque el entregable de B14.1 es estrictamente `prod-setup.md`; tocar `.env.example` era scope creep.
-
-### NT-45 — Compatibilidad Node 24 al cargar `next.config.ts`
-
-- **Categoría:** infra / DX
-- **Contexto:** En Node 24.12.0 + Next 15.5.15, el `next-config-ts/require-hook.js` evalúa `next.config.ts` antes de aplicar el shim de `server-only`. Como `next.config.ts` importa `./shared/config/env.runtime` (que tiene `import "server-only";`), el `dev` falla con `Error: This module cannot be imported from a Client Component module.` antes de levantar. Bloquea `pnpm dev` y `pnpm test:e2e` en ese Node. Descubierto al correr `e2e/push-delivery.spec.ts` (B8.4); afecta a TODAS las specs E2E existentes.
-- **Aceptación:** `pnpm dev` y `pnpm test:e2e` arrancan sin errores en Node 24.x. Soluciones posibles: (a) inline el `parseEnv` directo en `next.config.ts` sin pasar por `env.runtime` (que mantiene su `server-only`); (b) sacar `import "server-only";` de `env.runtime.ts` y dejar la guarda solo en consumers; (c) pinear `engines.node` a 20.x en `package.json` y agregar `.nvmrc`.
-- **Archivos afectados:** `next.config.ts`, `shared/config/env.runtime.ts`, `package.json`, `.nvmrc` (a crear).
-- **Estimación:** S
-- **Cuándo retomarlo:** antes de habilitar CI con E2E o si el equipo crece a Node 24 como default. Hasta entonces, los devs siguen en Node 20.x.
-- **Dependencias:** —
-- **Ticket:** —
-- **Notas:** descubierto por B8.4. Los unit tests de la infra de captura (`push.test-capture.test.ts`, `wiring.e2e.test.ts`, `__e2e/*/route.test.ts`) cubren la lógica al margen de este blocker — el spec E2E fue verificado por typecheck + lint + 22 unit tests, no por ejecución contra dev server.
-
----
 
 ### NT-34 — Paginación real en listado admin de usuarios
 
@@ -636,3 +606,4 @@ Cuando un chat que toma una tarea del EPIC-BACKEND descubre algo fuera de scope:
 | 2026-04-30 | NT-40 + NT-41 + NT-42 agregados — 3-round-trips sin TX en `create()`, bug `auth.uid` vs `public_id`, rigidez de `Store` schema (todos descubiertos durante cierre de B10-A). |
 | 2026-05-06 | NT-30 (timestamps duplicados) eliminado — resuelto en B12-A. NT-32 (vitest fails) eliminado — resuelto (1997 tests pasan). NT-30 (SUPABASE_WEBHOOK_SECRET) renombrado a NT-44; NT-30 (Node 24) renombrado a NT-45 — elimina colisión triple de IDs. |
 | 2026-05-06 | NT-41 eliminado — resuelto (`resolvePublicId()` con cache in-memory; `toUser/toSession` ahora exponen `public.users.public_id`). |
+| 2026-05-06 | NT-45 eliminado — resuelto. `next.config.ts` ya no importa `env.runtime` (import chain roto en refactor previo); `.nvmrc` + `engines.node` agregados para documentar Node 24 como runtime activo. |
