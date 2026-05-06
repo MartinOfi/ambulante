@@ -105,6 +105,8 @@ describe("resizeImageForUpload — no-op paths", () => {
 
     expect(result.didResize).toBe(false);
     expect(result.file).toBe(file);
+    expect(result.originalDimensions).toBeNull();
+    expect(result.outputDimensions).toBeNull();
     expect(harness.deps.createImageBitmap).not.toHaveBeenCalled();
   });
 });

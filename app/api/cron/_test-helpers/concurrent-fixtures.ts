@@ -3,6 +3,7 @@
 // Imported only from *.test.ts files; never bundled into runtime.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { z } from "zod";
 
 // Local Supabase defaults — published JWTs from `supabase start`. Safe to commit:
 // only valid against a CLI-managed local instance, never against any cloud project.
@@ -38,6 +39,11 @@ export async function isLocalSupabaseReachable(): Promise<boolean> {
     clearTimeout(timer);
   }
 }
+
+// Zod schemas for PostgREST response shapes — eliminates `as` casts per CLAUDE.md §6.1.
+const orderRowSchema = z.object({ id: z.number(), public_id: z.string() });
+const orderIdRowSchema = z.object({ id: z.number() });
+const orderStatusRowSchema = z.object({ status: z.string() });
 
 interface SeededIdentity {
   readonly userId: number; // bigint, surfaced as number from PostgREST
@@ -120,30 +126,63 @@ export async function seedOrders({
     throw new Error(`seedOrders: insert failed — ${error?.message ?? "no rows"}`);
   }
 
+  const parsed = z.array(orderRowSchema).parse(data);
   return {
-    publicIds: data.map((r) => r.public_id as string),
-    internalIds: data.map((r) => r.id as number),
+    publicIds: parsed.map((r) => r.public_id),
+    internalIds: parsed.map((r) => r.id),
   };
 }
 
 // Clean every row owned by the test identity. Order matters: orders → store → user.
+// Each step throws explicitly on failure so partial cleanup is visible in CI
+// rather than silently leaving leftover rows for the next run.
 export async function cleanupIdentity(
   client: ConcurrentTestClient,
   identity: SeededIdentity,
 ): Promise<void> {
-  await client
-    .from("audit_log")
-    .delete()
-    .eq("table_name", "orders")
-    .in(
-      "row_id",
-      (await client.from("orders").select("id").eq("store_id", identity.storeId)).data?.map(
-        (r) => r.id as number,
-      ) ?? [],
+  const { data: orderRows, error: orderFetchErr } = await client
+    .from("orders")
+    .select("id")
+    .eq("store_id", identity.storeId);
+  if (orderFetchErr !== null || orderRows === null) {
+    throw new Error(
+      `cleanupIdentity: fetch orders for audit_log failed — ${orderFetchErr?.message ?? "no data"}`,
     );
-  await client.from("orders").delete().eq("store_id", identity.storeId);
-  await client.from("stores").delete().eq("id", identity.storeId);
-  await client.from("users").delete().eq("id", identity.userId);
+  }
+
+  const orderIds = z
+    .array(orderIdRowSchema)
+    .parse(orderRows)
+    .map((r) => r.id);
+
+  if (orderIds.length > 0) {
+    const { error: auditErr } = await client
+      .from("audit_log")
+      .delete()
+      .eq("table_name", "orders")
+      .in("row_id", orderIds);
+    if (auditErr !== null) {
+      throw new Error(`cleanupIdentity: delete audit_log failed — ${auditErr.message}`);
+    }
+  }
+
+  const { error: ordersErr } = await client
+    .from("orders")
+    .delete()
+    .eq("store_id", identity.storeId);
+  if (ordersErr !== null) {
+    throw new Error(`cleanupIdentity: delete orders failed — ${ordersErr.message}`);
+  }
+
+  const { error: storesErr } = await client.from("stores").delete().eq("id", identity.storeId);
+  if (storesErr !== null) {
+    throw new Error(`cleanupIdentity: delete store failed — ${storesErr.message}`);
+  }
+
+  const { error: usersErr } = await client.from("users").delete().eq("id", identity.userId);
+  if (usersErr !== null) {
+    throw new Error(`cleanupIdentity: delete user failed — ${usersErr.message}`);
+  }
 }
 
 // Read final status of the test's own orders — used to assert post-conditions.
@@ -159,5 +198,8 @@ export async function readOrderStatuses(
   if (error !== null || data === null) {
     throw new Error(`readOrderStatuses: select failed — ${error?.message ?? "no rows"}`);
   }
-  return data.map((r) => r.status as string);
+  return z
+    .array(orderStatusRowSchema)
+    .parse(data)
+    .map((r) => r.status);
 }

@@ -51,8 +51,8 @@ export interface ResizeImageOptions {
 export interface ResizeImageResult {
   readonly file: File;
   readonly didResize: boolean;
-  readonly originalDimensions: ImageDimensions;
-  readonly outputDimensions: ImageDimensions;
+  readonly originalDimensions: ImageDimensions | null;
+  readonly outputDimensions: ImageDimensions | null;
 }
 
 const clamp = (value: number, min: number, max: number): number =>
@@ -157,8 +157,8 @@ export const resizeImageForUpload = async (
     return {
       file,
       didResize: false,
-      originalDimensions: { width: 0, height: 0 },
-      outputDimensions: { width: 0, height: 0 },
+      originalDimensions: null,
+      outputDimensions: null,
     };
   }
 
