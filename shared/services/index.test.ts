@@ -108,11 +108,11 @@ describe("services/index factory", () => {
       expect(typeof unsubscribe).toBe("function");
     });
 
-    it("pushService.subscribe throws a TODO error", async () => {
+    it("pushService.subscribe throws a not-implemented error", async () => {
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
       vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
       const { pushService } = await import("./index");
-      await expect(pushService.subscribe()).rejects.toThrow("TODO");
+      await expect(pushService.subscribe()).rejects.toThrow("Push B6: not implemented");
     });
 
     it("storageService.upload returns StorageResult (does not throw)", async () => {

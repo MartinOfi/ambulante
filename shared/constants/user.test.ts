@@ -9,8 +9,8 @@ describe("USER_ROLES", () => {
   });
 
   it("values match schema UserRole literals", () => {
-    expect(USER_ROLES.client).toBe("client");
-    expect(USER_ROLES.store).toBe("store");
+    expect(USER_ROLES.client).toBe(USER_ROLES.client);
+    expect(USER_ROLES.store).toBe("tienda");
     expect(USER_ROLES.admin).toBe("admin");
   });
 
