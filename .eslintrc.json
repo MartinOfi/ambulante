@@ -132,6 +132,7 @@
     "*.config.mjs",
     "*.config.cjs",
     "*.config.ts",
-    "load-tests/"
+    "load-tests/",
+    "e2e/"
   ]
 }
