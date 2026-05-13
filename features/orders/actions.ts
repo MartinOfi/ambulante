@@ -3,7 +3,10 @@
 import "server-only";
 
 import { z } from "zod";
-import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
+import {
+  createRouteHandlerClient,
+  createServerClient,
+} from "@/shared/repositories/supabase/client";
 import { SupabaseOrderRepository } from "@/shared/repositories";
 import { ORDER_STATUS, type OrderStatus } from "@/shared/constants/order";
 import { dbStatusToDomain } from "@/shared/repositories/supabase/mappers";
@@ -27,6 +30,7 @@ import {
   ACCEPT_ORDER_ERROR_MESSAGE,
   REJECT_ORDER_ERROR_MESSAGE,
   FINALIZE_ORDER_ERROR_MESSAGE,
+  RECEIVE_ORDER_ERROR_MESSAGE,
 } from "@/features/orders/store-transitions.constants";
 
 export type CancelOrderResult =
@@ -372,6 +376,86 @@ export async function rejectOrder(input: StoreOrderTransitionInput): Promise<Rej
   } catch (error) {
     serverLogger.error("rejectOrder failed", { publicId, error });
     return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR, REJECT_ORDER_ERROR_MESSAGE);
+  }
+}
+
+export type ReceiveOrderResult =
+  | { readonly ok: true; readonly publicId: string; readonly status: typeof ORDER_STATUS.RECIBIDO }
+  | {
+      readonly ok: false;
+      readonly errorCode: StoreOrderTransitionErrorCode;
+      readonly message: string;
+    };
+
+async function publishReceivedEvent(
+  client: Awaited<ReturnType<typeof createServerClient>>,
+  publicId: string,
+): Promise<void> {
+  try {
+    const order = await new SupabaseOrderRepository(client).findById(publicId);
+    if (order === null) return;
+    // `updatedAt` reflects the moment of the ENVIADO→RECIBIDO transition (set by the RPC).
+    // The Order mapper does not yet expose the `received_at` DB column directly (DT-01).
+    // Note: publishAcceptedEvent / publishRejectedEvent use `createdAt` as `receivedAt`,
+    // which is less accurate — tracked for alignment in DT-01.
+    const receivedAt = new Date(order.updatedAt);
+    eventBus.publish({
+      type: ORDER_DOMAIN_EVENT.ORDER_RECEIVED,
+      orderId: order.id,
+      clientId: order.clientId,
+      storeId: order.storeId,
+      occurredAt: receivedAt,
+      sentAt: new Date(order.createdAt),
+      receivedAt,
+    });
+  } catch (error) {
+    serverLogger.warn("receiveOrder: publishReceivedEvent failed (non-fatal)", { publicId, error });
+  }
+}
+
+// Called automatically from the store order detail Server Component (RSC render context).
+// Uses createServerClient (read-only cookies) — not createRouteHandlerClient.
+export async function receiveOrder(input: StoreOrderTransitionInput): Promise<ReceiveOrderResult> {
+  const parsed = storeOrderTransitionInputSchema.safeParse(input);
+  if (parsed.success === false) {
+    const message = parsed.error.issues[0]?.message ?? RECEIVE_ORDER_ERROR_MESSAGE.VALIDATION_ERROR;
+    return { ok: false, errorCode: STORE_ORDER_TRANSITION_ERROR_CODE.VALIDATION_ERROR, message };
+  }
+  const { publicId } = parsed.data;
+  try {
+    const client = await createServerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null)
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED,
+        RECEIVE_ORDER_ERROR_MESSAGE,
+      );
+    const { data, error } = await client.rpc("receive_order_by_store", { p_public_id: publicId });
+    if (error !== null) {
+      serverLogger.error("receiveOrder: RPC failed", { publicId, error });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        RECEIVE_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const parseResult = storeRpcResultSchema.safeParse(data);
+    if (!parseResult.success) {
+      serverLogger.error("receiveOrder: unexpected RPC shape", { publicId, data });
+      return failStore(
+        STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR,
+        RECEIVE_ORDER_ERROR_MESSAGE,
+      );
+    }
+    const payload = parseResult.data;
+    if (!payload.ok) return mapStoreRpcError(payload, RECEIVE_ORDER_ERROR_MESSAGE);
+    await publishReceivedEvent(client, publicId);
+    return { ok: true, publicId, status: ORDER_STATUS.RECIBIDO };
+  } catch (error) {
+    serverLogger.error("receiveOrder failed", { publicId, error });
+    return failStore(STORE_ORDER_TRANSITION_ERROR_CODE.INTERNAL_ERROR, RECEIVE_ORDER_ERROR_MESSAGE);
   }
 }
 

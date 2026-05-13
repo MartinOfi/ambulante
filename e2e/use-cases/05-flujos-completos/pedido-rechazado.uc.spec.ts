@@ -6,6 +6,7 @@ import { MapPage } from "../page-objects/MapPage";
 import { CartDrawer } from "../page-objects/CartDrawer";
 import { OrderTrackingPage } from "../page-objects/OrderTrackingPage";
 import { StoreOrdersPage } from "../page-objects/StoreOrdersPage";
+import { StoreOrderDetailPage } from "../page-objects/StoreOrderDetailPage";
 
 /**
  * UC-FLOW-02: Pedido rechazado por la tienda
@@ -42,7 +43,7 @@ test.describe("UC-FLOW-02 — pedido rechazado por la tienda", () => {
       const clientTracking = new OrderTrackingPage(clientPage);
       await expect(clientTracking.statusStep("ENVIADO")).toBeVisible({ timeout: 8_000 });
 
-      // Tienda: login y rechazar pedido
+      // Tienda: login, abrir detalle y rechazar pedido
       await storePage.goto("/login");
       await storePage.getByLabel(/correo electrónico/i).fill(E2E_USERS.store.email);
       await storePage.getByLabel(/contraseña/i).fill(E2E_USERS.store.password);
@@ -50,11 +51,17 @@ test.describe("UC-FLOW-02 — pedido rechazado por la tienda", () => {
       await storePage.waitForURL("**/store/**", { timeout: 15_000 });
 
       const storeOrders = new StoreOrdersPage(storePage);
+      const storeDetail = new StoreOrderDetailPage(storePage);
       await storeOrders.goto();
-      await expect(storeOrders.firstRejectButton).toBeVisible({
+      await expect(storeOrders.firstOrderCard).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
-      await storeOrders.firstRejectButton.click();
+      await storeOrders.clickFirstOrder();
+      await expect(storeDetail.rejectButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await storeDetail.rejectButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
 
       // Cliente: ve RECHAZADO
       await expect(clientTracking.statusStep("RECHAZADO")).toBeVisible({

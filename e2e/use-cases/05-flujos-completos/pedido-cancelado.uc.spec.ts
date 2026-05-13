@@ -6,6 +6,7 @@ import { MapPage } from "../page-objects/MapPage";
 import { CartDrawer } from "../page-objects/CartDrawer";
 import { OrderTrackingPage } from "../page-objects/OrderTrackingPage";
 import { StoreOrdersPage } from "../page-objects/StoreOrdersPage";
+import { StoreOrderDetailPage } from "../page-objects/StoreOrderDetailPage";
 
 /**
  * UC-FLOW-03: Pedido cancelado por el cliente antes de ser aceptado
@@ -81,7 +82,7 @@ test.describe("UC-FLOW-04 — cliente no puede cancelar pedido ACEPTADO", () => 
       await cart.submitOrder();
       await clientPage.waitForURL("**/orders/**", { timeout: 20_000 });
 
-      // Tienda: aceptar pedido
+      // Tienda: aceptar pedido desde detalle
       await storePage.goto("/login");
       await storePage.getByLabel(/correo electrónico/i).fill(E2E_USERS.store.email);
       await storePage.getByLabel(/contraseña/i).fill(E2E_USERS.store.password);
@@ -89,11 +90,17 @@ test.describe("UC-FLOW-04 — cliente no puede cancelar pedido ACEPTADO", () => 
       await storePage.waitForURL("**/store/**", { timeout: 15_000 });
 
       const storeOrders = new StoreOrdersPage(storePage);
+      const storeDetail = new StoreOrderDetailPage(storePage);
       await storeOrders.goto();
-      await expect(storeOrders.firstAcceptButton).toBeVisible({
+      await expect(storeOrders.firstOrderCard).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
-      await storeOrders.firstAcceptButton.click();
+      await storeOrders.clickFirstOrder();
+      await expect(storeDetail.acceptButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await storeDetail.acceptButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
 
       // Cliente: botón cancelar debe desaparecer
       const tracking = new OrderTrackingPage(clientPage);

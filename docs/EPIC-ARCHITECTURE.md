@@ -1699,6 +1699,7 @@ Items diferidos intencionalmente durante la implementación. Cada uno tiene un l
 
 | ID | Descripción | Origen | Dónde resolver |
 |---|---|---|---|
+| DT-2 | **`receivedAt` en domain events de pedido usa proxy incorrecto.** `publishAcceptedEvent` y `publishRejectedEvent` usan `order.createdAt` como `receivedAt`, que es semánticamente incorrecto (debería ser el timestamp de la transición a RECIBIDO). `publishReceivedEvent` usa `order.updatedAt` (mejor proxy). Fix real: agregar `received_at` al `Order` mapper desde `public.orders`. | order-detail-recibido (2026-05-13) | Al migrar el `SupabaseOrderRepository` mapper en la próxima tarea que lo toque |
 | DT-1 | **`BroadcastUpdatePlugin` — listener React pendiente.** ~~Plugin agregado en `sw.ts`~~ ✅ El SW ya emite mensajes via `BroadcastChannel("serwist-broadcast-update")` cuando el cache de `/orders/**` se actualiza en background. Falta la otra mitad: en el hook de historial de órdenes, suscribirse al canal y llamar `queryClient.invalidateQueries({ queryKey: ["orders"] })` para refrescar la UI automáticamente. | F6.2 (2026-04-20) | Al implementar el hook `useOrderHistory` en la feature `order-flow` |
 
 ---

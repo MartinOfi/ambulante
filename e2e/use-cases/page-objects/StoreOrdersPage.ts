@@ -22,36 +22,15 @@ export class StoreOrdersPage {
       .or(this.page.getByRole("article").filter({ hasText: orderId }));
   }
 
-  /** Botón de aceptar en el primer pedido visible */
-  get firstAcceptButton(): Locator {
-    return this.page.getByRole("button", { name: /aceptar/i }).first();
+  /** First order card link in the inbox list */
+  get firstOrderCard(): Locator {
+    return this.page.getByRole("listitem").first().getByRole("link");
   }
 
-  /** Botón de rechazar en el primer pedido visible */
-  get firstRejectButton(): Locator {
-    return this.page.getByRole("button", { name: /rechazar/i }).first();
-  }
-
-  /** Botón de finalizar en el primer pedido visible */
-  get firstFinalizeButton(): Locator {
-    return this.page.getByRole("button", { name: /finalizar/i }).first();
-  }
-
-  /** Botón de cancelar en el primer pedido visible */
-  get firstCancelButton(): Locator {
-    return this.page.getByRole("button", { name: /cancelar/i }).first();
-  }
-
-  acceptButton(orderCard: Locator): Locator {
-    return orderCard.getByRole("button", { name: /aceptar/i });
-  }
-
-  rejectButton(orderCard: Locator): Locator {
-    return orderCard.getByRole("button", { name: /rechazar/i });
-  }
-
-  finalizeButton(orderCard: Locator): Locator {
-    return orderCard.getByRole("button", { name: /finalizar/i });
+  /** Navigate to the first order's detail page */
+  async clickFirstOrder() {
+    await this.firstOrderCard.click();
+    await this.page.waitForLoadState("networkidle");
   }
 
   orderStatusBadge(status: string): Locator {

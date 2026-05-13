@@ -35,3 +35,12 @@ export const FINALIZE_ORDER_ERROR_MESSAGE: Readonly<Record<StoreOrderTransitionE
     INVALID_TRANSITION: "Solo podés finalizar pedidos en estado En camino.",
     INTERNAL_ERROR: "No se pudo finalizar el pedido. Reintentá en unos segundos.",
   });
+
+export const RECEIVE_ORDER_ERROR_MESSAGE: Readonly<Record<StoreOrderTransitionErrorCode, string>> =
+  Object.freeze({
+    UNAUTHENTICATED: "Sesión no válida. Iniciá sesión nuevamente.",
+    VALIDATION_ERROR: "Datos inválidos para recibir el pedido.",
+    ORDER_NOT_FOUND: "El pedido no existe o no es de tu tienda.",
+    INVALID_TRANSITION: "El pedido ya fue procesado.",
+    INTERNAL_ERROR: "No se pudo marcar el pedido como recibido. Reintentá en unos segundos.",
+  });
