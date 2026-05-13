@@ -50,47 +50,62 @@ export function useLocationPublishing(): UseLocationPublishingReturn {
 
   const publishOnce = useCallback(
     (storeId: string) => {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          if (pos.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
-            if (staleTimerRef.current !== null) {
-              clearTimeout(staleTimerRef.current);
-              staleTimerRef.current = null;
-            }
-            logger.warn("useLocationPublishing: GPS accuracy too low", {
+      const handleSuccess = (pos: GeolocationPosition) => {
+        if (pos.coords.accuracy > MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR) {
+          if (staleTimerRef.current !== null) {
+            clearTimeout(staleTimerRef.current);
+            staleTimerRef.current = null;
+          }
+          logger.warn("useLocationPublishing: GPS accuracy too low", {
+            storeId,
+            accuracy: pos.coords.accuracy,
+            threshold: MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR,
+          });
+          setLocationStatus("error");
+          return;
+        }
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        void storesService
+          .updateLocation(storeId, coords)
+          .then(() => {
+            setLocationStatus("publishing");
+            resetStaleTimer();
+          })
+          .catch((err: unknown) => {
+            logger.error("useLocationPublishing: updateLocation failed", {
               storeId,
-              accuracy: pos.coords.accuracy,
-              threshold: MIN_ACCURACY_METERS * POOR_ACCURACY_FACTOR,
+              error: err instanceof Error ? err.message : String(err),
             });
+            setLocationStatus("error");
+          });
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        handleSuccess,
+        (geoErr: GeolocationPositionError) => {
+          if (geoErr.code === geoErr.PERMISSION_DENIED) {
+            // User explicitly denied — stop the interval, no point retrying
+            clearTimers();
             setLocationStatus("error");
             return;
           }
-          const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          void storesService
-            .updateLocation(storeId, coords)
-            .then(() => {
-              setLocationStatus("publishing");
-              resetStaleTimer();
-            })
-            .catch((err: unknown) => {
-              logger.error("useLocationPublishing: updateLocation failed", {
-                storeId,
-                error: err instanceof Error ? err.message : String(err),
+          // POSITION_UNAVAILABLE or TIMEOUT are transient; retry with Wi-Fi/network location
+          navigator.geolocation.getCurrentPosition(
+            handleSuccess,
+            (fallbackErr: GeolocationPositionError) => {
+              logger.warn("useLocationPublishing: geolocation failed", {
+                code: fallbackErr.code,
+                message: fallbackErr.message,
               });
               setLocationStatus("error");
-            });
-        },
-        (geoErr: GeolocationPositionError) => {
-          logger.warn("useLocationPublishing: geolocation failed", {
-            code: geoErr.code,
-            message: geoErr.message,
-          });
-          setLocationStatus("error");
+            },
+            { enableHighAccuracy: false, timeout: GEO_TIMEOUT_MS, maximumAge: GEO_MAX_AGE_MS },
+          );
         },
         { enableHighAccuracy: true, timeout: GEO_TIMEOUT_MS, maximumAge: GEO_MAX_AGE_MS },
       );
     },
-    [resetStaleTimer],
+    [resetStaleTimer, clearTimers],
   );
 
   useEffect(() => {

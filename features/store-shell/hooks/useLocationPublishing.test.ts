@@ -271,6 +271,76 @@ describe("useLocationPublishing", () => {
     expect(result.current.locationStatus).toBe("error");
   });
 
+  it("stops retrying when permission is denied", async () => {
+    setAvailable(true);
+    setAuthenticated(MOCK_USER_ID);
+
+    // Use queueMicrotask to match real browser async behavior — if onError fires
+    // synchronously, clearTimers() runs before setInterval, so the interval is never cleared.
+    const getCurrentPosition = vi.fn(
+      (_onSuccess: PositionCallback, onError: PositionErrorCallback) => {
+        queueMicrotask(() =>
+          onError({
+            code: 1,
+            message: "User denied Geolocation",
+            PERMISSION_DENIED: 1,
+            POSITION_UNAVAILABLE: 2,
+            TIMEOUT: 3,
+          } as GeolocationPositionError),
+        );
+      },
+    );
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+
+    const { result } = renderHook(() => useLocationPublishing());
+    await flushPromises();
+
+    expect(result.current.locationStatus).toBe("error");
+
+    const callCount = getCurrentPosition.mock.calls.length;
+    // Interval must be cleared — advancing past refresh period produces no additional geo calls
+    await act(() => vi.advanceTimersByTimeAsync(STORE_LOCATION_REFRESH_MS * 3));
+    expect(getCurrentPosition.mock.calls.length).toBe(callCount);
+  });
+
+  it("publishes via low-accuracy fallback when high-accuracy is unavailable", async () => {
+    setAvailable(true);
+    setAuthenticated(MOCK_USER_ID);
+
+    const getCurrentPosition = vi
+      .fn()
+      .mockImplementationOnce((_onSuccess: PositionCallback, onError: PositionErrorCallback) => {
+        onError({
+          code: 2,
+          message: "Position unavailable",
+          PERMISSION_DENIED: 1,
+          POSITION_UNAVAILABLE: 2,
+          TIMEOUT: 3,
+        } as GeolocationPositionError);
+      })
+      .mockImplementation((onSuccess: PositionCallback) => {
+        onSuccess({
+          coords: {
+            latitude: MOCK_COORDS.lat,
+            longitude: MOCK_COORDS.lng,
+            accuracy: 30,
+            altitude: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null,
+          },
+          timestamp: Date.now(),
+        } as GeolocationPosition);
+      });
+    vi.stubGlobal("navigator", { ...navigator, geolocation: { getCurrentPosition } });
+
+    const { result } = renderHook(() => useLocationPublishing());
+    await flushPromises();
+
+    expect(result.current.locationStatus).toBe("publishing");
+    expect(storesService.updateLocation).toHaveBeenCalledWith(MOCK_STORE_ID, MOCK_COORDS);
+  });
+
   it("transitions to error when findByOwnerId rejects", async () => {
     setAvailable(true);
     setAuthenticated(MOCK_USER_ID);
