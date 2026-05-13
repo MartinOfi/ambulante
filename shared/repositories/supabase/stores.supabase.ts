@@ -131,6 +131,12 @@ export class SupabaseStoreRepository implements StoreRepository {
     if (input.tagline !== undefined) patch.tagline = input.tagline;
     if (input.priceFromArs !== undefined) patch.price_from_ars = input.priceFromArs;
     if (input.hours !== undefined) patch.hours = input.hours;
+    if (input.location !== undefined) {
+      patch.current_location =
+        input.location !== null
+          ? `SRID=4326;POINT(${input.location.lng} ${input.location.lat})`
+          : null;
+    }
 
     const { error } = await this.client.from("stores").update(patch).eq("public_id", id);
 
