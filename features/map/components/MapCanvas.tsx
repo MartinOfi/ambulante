@@ -88,7 +88,7 @@ export function MapCanvas({
   );
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0" role="region" aria-label="Mapa">
       <Map
         ref={mapRef}
         {...viewState}

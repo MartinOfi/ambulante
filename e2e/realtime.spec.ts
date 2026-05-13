@@ -8,6 +8,11 @@ const DEMO_STORE_ID = "store-demo-1";
 const REALTIME_SLA_MS = 5_000;
 const AVAILABILITY_SLA_MS = 2_000;
 
+test.skip(
+  true,
+  "Requiere Supabase Realtime activo — activar en staging contra entorno con seed real",
+);
+
 test("store accepting an order reflects in client view within 5 s (PRD §7.2)", async ({
   browser,
 }) => {

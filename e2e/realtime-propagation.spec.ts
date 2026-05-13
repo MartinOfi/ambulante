@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import { setSessionCookie } from "./helpers";
 import { USER_ROLES } from "@/shared/constants/user";
 
+test.skip(
+  true,
+  "Requiere Supabase Realtime activo — activar en staging contra entorno con seed real",
+);
+
 // Uses store-demo-2 seed (orders.mock.ts) to avoid state conflicts with realtime.spec.ts
 // which consumes the store-demo-1 RECIBIDO order.
 const DEMO_CLIENT_ID = "demo-client-1";

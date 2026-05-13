@@ -10,7 +10,7 @@ import { NearbyBottomSheet } from "./NearbyBottomSheet";
 import { RecenterFAB } from "./RecenterFAB";
 import { LocationDenied } from "./LocationDenied";
 import { StoreDetailSheetContainer } from "./StoreDetailSheet";
-import { CartSummaryBar } from "@/features/cart/components/CartSummaryBar";
+import { CartDrawerContainer } from "@/features/cart/components/CartDrawer";
 
 // maplibre-gl accesses browser APIs (window, WebGL) at module evaluation time;
 // dynamic + ssr:false ensures the module is never loaded on the server
@@ -26,8 +26,6 @@ export interface MapScreenProps {
   readonly isRecentering: boolean;
   readonly recenterSignal: number;
   readonly selectedStoreId: string | null;
-  readonly cartItemCount: number;
-  readonly cartTotal: number;
   readonly isCheckingOut: boolean;
   readonly onRadiusChange: (next: RadiusValue) => void;
   readonly onExpandRadius: () => void;
@@ -46,8 +44,6 @@ export function MapScreen({
   isRecentering,
   recenterSignal,
   selectedStoreId,
-  cartItemCount,
-  cartTotal,
   isCheckingOut,
   onRadiusChange,
   onExpandRadius,
@@ -87,12 +83,7 @@ export function MapScreen({
             onExpandRadius={onExpandRadius}
             onSelectStore={onSelectStore}
           />
-          <CartSummaryBar
-            itemCount={cartItemCount}
-            total={cartTotal}
-            isLoading={isCheckingOut}
-            onCheckout={onCheckout}
-          />
+          <CartDrawerContainer isLoading={isCheckingOut} onCheckout={onCheckout} />
         </>
       )}
 

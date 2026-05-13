@@ -32,7 +32,7 @@ export function OrderTracking({
 
   if (terminalLabel !== undefined) {
     return (
-      <div>
+      <div data-testid={`step-${status}`}>
         <p>{terminalLabel}</p>
       </div>
     );

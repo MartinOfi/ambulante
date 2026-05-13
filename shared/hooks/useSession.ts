@@ -25,10 +25,16 @@ export function useSession(service: AuthService = defaultAuthService): UseSessio
   useEffect(() => {
     let active = true;
 
-    service.getSession().then((session) => {
-      if (!active) return;
-      setState(session ? { status: "authenticated", session } : { status: "unauthenticated" });
-    });
+    service
+      .getSession()
+      .then((session) => {
+        if (!active) return;
+        setState(session ? { status: "authenticated", session } : { status: "unauthenticated" });
+      })
+      .catch(() => {
+        if (!active) return;
+        setState({ status: "unauthenticated" });
+      });
 
     const unsubscribe = service.onAuthStateChange((session) => {
       if (!active) return;

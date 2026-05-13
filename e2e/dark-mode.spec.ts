@@ -17,6 +17,10 @@ async function visitInDark(context: BrowserContext, route: string): Promise<Page
   const darkPage = await context.newPage();
   await darkPage.goto(route);
   await darkPage.waitForLoadState("networkidle");
+  // next-themes applies .dark after JS hydration — wait for it explicitly
+  await darkPage.waitForFunction(() => document.documentElement.classList.contains("dark"), {
+    timeout: 5_000,
+  });
   return darkPage;
 }
 

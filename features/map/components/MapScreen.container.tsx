@@ -28,9 +28,6 @@ export function MapScreenContainer() {
   const activeStoreId = useCartStore((s) => s.activeStoreId);
   const clearCart = useCartStore((s) => s.clearCart);
 
-  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = items.reduce((sum, item) => sum + item.productPriceArs * item.quantity, 0);
-
   const handleExpandRadius = useCallback(() => {
     setRadius(MAX_EXPAND_RADIUS);
   }, [setRadius]);
@@ -88,8 +85,6 @@ export function MapScreenContainer() {
       isRecentering={geo.status === "loading"}
       recenterSignal={recenterSignal}
       selectedStoreId={selectedStoreId}
-      cartItemCount={cartItemCount}
-      cartTotal={cartTotal}
       isCheckingOut={isCheckingOut}
       onRadiusChange={setRadius}
       onExpandRadius={handleExpandRadius}

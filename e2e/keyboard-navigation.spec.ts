@@ -1,31 +1,8 @@
-import { expect, test, type BrowserContext } from "@playwright/test";
-import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
-import { USER_ROLES } from "@/shared/constants/user";
+import { expect, test } from "@playwright/test";
 
 const ARIA_LABEL_CLOSE_DETAIL = "Cerrar detalle";
 const ARIA_LABEL_EXPAND_SHEET = "Expandir o colapsar hoja";
 const ARIA_LABEL_NEARBY = "Tiendas cercanas";
-
-function makeClientSessionCookie(): string {
-  const session = {
-    accessToken: "mock-access-client",
-    refreshToken: "mock-refresh-client",
-    expiresAt: Math.floor(Date.now() / 1000) + 3600,
-    user: { id: "client-user-id", email: "client@test.com", role: USER_ROLES.client },
-  };
-  return btoa(JSON.stringify(session));
-}
-
-async function setClientSession(context: BrowserContext): Promise<void> {
-  await context.addCookies([
-    {
-      name: SESSION_COOKIE_NAME,
-      value: makeClientSessionCookie(),
-      domain: "localhost",
-      path: "/",
-    },
-  ]);
-}
 
 test.describe("keyboard navigation — landing page", () => {
   test("all interactive elements are reachable via Tab", async ({ page }) => {
@@ -71,9 +48,7 @@ test.describe("keyboard navigation — landing page", () => {
 });
 
 test.describe("keyboard navigation — client nav", () => {
-  test.beforeEach(async ({ context }) => {
-    await setClientSession(context);
-  });
+  test.use({ storageState: "e2e/.auth/client.json" });
 
   test("bottom nav links are keyboard accessible on /map", async ({ page }) => {
     await page.goto("/map");
@@ -105,9 +80,7 @@ test.describe("keyboard navigation — client nav", () => {
 });
 
 test.describe("keyboard navigation — NearbyBottomSheet", () => {
-  test.beforeEach(async ({ context }) => {
-    await setClientSession(context);
-  });
+  test.use({ storageState: "e2e/.auth/client.json" });
 
   test("sheet handle button is focusable and has aria-expanded", async ({ page }) => {
     await page.goto("/map");
@@ -142,9 +115,7 @@ test.describe("keyboard navigation — NearbyBottomSheet", () => {
 });
 
 test.describe("keyboard navigation — StoreDetailSheet", () => {
-  test.beforeEach(async ({ context }) => {
-    await setClientSession(context);
-  });
+  test.use({ storageState: "e2e/.auth/client.json" });
 
   test("close button is focused when sheet opens", async ({ page }) => {
     await page.goto("/map");

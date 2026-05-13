@@ -48,7 +48,7 @@ export function AvailabilityToggle({
             )}
           />
         </button>
-        <span className="text-sm font-medium" aria-hidden="true">
+        <span className="text-sm font-medium" aria-hidden="true" data-testid="availability-status">
           {isAvailable ? t("available") : t("unavailable")}
         </span>
       </div>

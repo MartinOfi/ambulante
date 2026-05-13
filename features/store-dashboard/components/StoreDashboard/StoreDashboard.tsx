@@ -7,8 +7,8 @@ import { OrderCard } from "@/features/orders/components/OrderCard";
 import type { StoreDashboardProps } from "./StoreDashboard.types";
 
 const QUICK_LINKS = [
-  { href: "/store/catalog", label: "Catálogo", icon: BookOpen },
-  { href: "/store/inbox", label: "Pedidos", icon: Inbox },
+  { href: "/store/catalog", label: "Ver catálogo", icon: BookOpen },
+  { href: "/store/inbox", label: "Ver pedidos", icon: Inbox },
   { href: "/store/profile", label: "Perfil", icon: User },
   { href: "/store/analytics", label: "Métricas", icon: BarChart2 },
 ] as const;

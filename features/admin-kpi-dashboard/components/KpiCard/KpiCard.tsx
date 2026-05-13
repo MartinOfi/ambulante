@@ -21,9 +21,9 @@ const STATUS_VARIANT: Record<KpiStatus, "default" | "secondary" | "destructive">
   baseline: "secondary",
 };
 
-export function KpiCard({ label, value, target, status }: KpiCardProps) {
+export function KpiCard({ label, value, target, status, testId }: KpiCardProps) {
   return (
-    <Card className={cn("flex flex-col gap-2")}>
+    <Card data-testid={testId} className={cn("flex flex-col gap-2")}>
       <CardHeader className="pb-2">
         <CardDescription>{label}</CardDescription>
         <CardTitle className="text-3xl font-bold tabular-nums">{value}</CardTitle>

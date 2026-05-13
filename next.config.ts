@@ -11,6 +11,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // pino spawns pino-pretty in a thread-stream worker; Next.js bundling corrupts
+  // the worker path to /ROOT/... — keeping these external lets Node resolve them natively.
+  serverExternalPackages: ["pino", "pino-pretty"],
   // react-map-gl and maplibre-gl are ESM-only; Next.js needs to transpile them
   // for webpack bundling, and maplibre-gl requires ssr:false at usage sites (F11.3)
   transpilePackages: ["react-map-gl", "maplibre-gl"],

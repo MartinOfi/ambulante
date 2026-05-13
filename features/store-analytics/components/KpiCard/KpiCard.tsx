@@ -16,9 +16,9 @@ const STATUS_LABELS: Record<KpiStatus, string> = {
   [KPI_STATUS.NEUTRAL]: "—",
 };
 
-export function KpiCard({ label, value, description, status, target }: KpiCardProps) {
+export function KpiCard({ label, value, description, status, target, testId }: KpiCardProps) {
   return (
-    <Card>
+    <Card data-testid={testId}>
       <CardHeader className="pb-1">
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
       </CardHeader>

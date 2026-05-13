@@ -36,35 +36,41 @@ export function buildKpiCards(snapshot: KpiSnapshot): readonly KpiCardProps[] {
       label: "Pedidos / día",
       value: String(snapshot.ordersPerDay),
       status: "baseline",
+      testId: "kpi-orders-per-day",
     },
     {
       label: "Tasa de aceptación",
       value: formatRate(snapshot.acceptanceRate),
       target: "objetivo: ≥ 60%",
       status: rateStatus(snapshot.acceptanceRate, KPI_TARGETS.ACCEPTANCE_RATE_MIN),
+      testId: "kpi-acceptance-rate",
     },
     {
       label: "Tasa de finalización",
       value: formatRate(snapshot.completionRate),
       target: "objetivo: ≥ 70%",
       status: rateStatus(snapshot.completionRate, KPI_TARGETS.COMPLETION_RATE_MIN),
+      testId: "kpi-completion-rate",
     },
     {
       label: "Tiempo de respuesta",
       value: formatResponseTime(snapshot.avgResponseTimeMs),
       target: "objetivo: < 3 min",
       status: timeStatus(snapshot.avgResponseTimeMs, KPI_TARGETS.AVG_RESPONSE_TIME_MAX_MS),
+      testId: "kpi-response-time",
     },
     {
       label: "Tasa de expiración",
       value: formatRate(snapshot.expirationRate),
       target: "objetivo: < 15%",
       status: invertedRateStatus(snapshot.expirationRate, KPI_TARGETS.EXPIRATION_RATE_MAX),
+      testId: "kpi-expiration-rate",
     },
     {
       label: "Tiendas activas",
       value: String(snapshot.activeStoresConcurrent),
       status: "baseline",
+      testId: "kpi-active-stores",
     },
   ] as const;
 }

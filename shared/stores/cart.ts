@@ -17,6 +17,8 @@ interface CartState {
 
 interface CartActions {
   addItem: (product: Product, storeId: string) => void;
+  incrementItem: (productId: string) => void;
+  decrementItem: (productId: string) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
   totalItems: () => number;
@@ -83,11 +85,39 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeItem: (productId: string) => {
+      incrementItem: (productId: string) => {
         set((state) => ({
           ...state,
-          items: state.items.filter((item) => item.productId !== productId),
+          items: state.items.map((item) =>
+            item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item,
+          ),
         }));
+      },
+
+      decrementItem: (productId: string) => {
+        set((state) => {
+          const nextItems = state.items
+            .map((item) =>
+              item.productId === productId ? { ...item, quantity: item.quantity - 1 } : item,
+            )
+            .filter((item) => item.quantity > 0);
+          return {
+            ...state,
+            activeStoreId: nextItems.length === 0 ? null : state.activeStoreId,
+            items: nextItems,
+          };
+        });
+      },
+
+      removeItem: (productId: string) => {
+        set((state) => {
+          const nextItems = state.items.filter((item) => item.productId !== productId);
+          return {
+            ...state,
+            activeStoreId: nextItems.length === 0 ? null : state.activeStoreId,
+            items: nextItems,
+          };
+        });
       },
 
       clearCart: () => {

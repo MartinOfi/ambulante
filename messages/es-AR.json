@@ -344,14 +344,14 @@
       "createError": "No se pudo crear el producto. Intentá de nuevo."
     },
     "EditForm": {
-      "submit": "Guardar cambios",
+      "submit": "Guardar producto",
       "loading": "Cargando producto…",
       "notFound": "Producto no encontrado.",
       "sessionExpired": "Sesión expirada. Volvé a iniciar sesión.",
       "updateError": "No se pudo actualizar el producto. Intentá de nuevo."
     },
     "List": {
-      "empty": "Todavía no tenés productos. Agregá el primero.",
+      "empty": "No hay productos. Agregá el primero.",
       "loading": "Cargando catálogo…",
       "loadError": "No se pudo cargar el catálogo. Intentá de nuevo más tarde."
     }
@@ -413,6 +413,8 @@
       "storeKindLabel": "Tipo de tienda",
       "neighborhoodLabel": "Barrio operativo",
       "neighborhoodPlaceholder": "Palermo",
+      "taglineLabel": "Descripción corta",
+      "taglinePlaceholder": "El mejor sabor de la ciudad",
       "coverageNotesLabel": "Notas de cobertura (opcional)",
       "coverageNotesPlaceholder": "Zona SoHo y Hollywood",
       "daysLabel": "Días de operación",

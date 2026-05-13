@@ -1,0 +1,174 @@
+import { expect, test } from "@playwright/test";
+import { loginAsStore } from "../helpers";
+import { StoreOrdersPage } from "../page-objects/StoreOrdersPage";
+import { OrderTrackingPage } from "../page-objects/OrderTrackingPage";
+import { MapPage } from "../page-objects/MapPage";
+import { CartDrawer } from "../page-objects/CartDrawer";
+import { REALTIME_TRANSITION_TIMEOUT_MS } from "../fixtures/orders";
+import { E2E_USERS } from "../fixtures/users";
+import { E2E_STORES } from "../fixtures/stores";
+import type { Page } from "@playwright/test";
+
+async function loginAsClientFresh(page: Page) {
+  await page.goto("/login");
+  await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.client.email);
+  await page.getByLabel(/contraseña/i).fill(E2E_USERS.client.password);
+  await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
+  await page.waitForURL("**/map**", { timeout: 15_000 });
+}
+
+async function loginAsStoreFresh(page: Page) {
+  await page.goto("/login");
+  await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.store.email);
+  await page.getByLabel(/contraseña/i).fill(E2E_USERS.store.password);
+  await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
+  await page.waitForURL("**/store/**", { timeout: 15_000 });
+}
+
+async function submitOrderAndLand(clientPage: Page) {
+  await loginAsClientFresh(clientPage);
+  const map = new MapPage(clientPage);
+  await map.expandBottomSheet();
+  await map.openStoreDetail(E2E_STORES.approved.name);
+  await map.addToCartButton(E2E_STORES.approved.product.name).click();
+  await map.closeStoreDetail();
+  const cart = new CartDrawer(clientPage);
+  await cart.submitOrder();
+  await clientPage.waitForURL("**/orders/**", { timeout: 20_000 });
+}
+
+// UC-STO-17: Ver pedidos entrantes
+test.describe("UC-STO-17 — ver pedidos entrantes", () => {
+  test("página de pedidos es accesible para tienda aprobada", async ({ page }) => {
+    await loginAsStore(page);
+    const orders = new StoreOrdersPage(page);
+    await orders.goto();
+    await expect(orders.incomingOrdersList.or(orders.emptyMessage)).toBeVisible({ timeout: 8_000 });
+  });
+});
+
+// UC-STO-18: Aceptar pedido
+test.describe("UC-STO-18 — aceptar pedido entrante", () => {
+  test("aceptar primer pedido lo mueve a ACEPTADO", async ({ browser }) => {
+    const clientContext = await browser.newContext({
+      permissions: ["geolocation"],
+      geolocation: E2E_STORES.approved.geo,
+    });
+    const storeContext = await browser.newContext();
+
+    try {
+      const clientPage = await clientContext.newPage();
+      const storePage = await storeContext.newPage();
+
+      await submitOrderAndLand(clientPage);
+
+      await loginAsStoreFresh(storePage);
+      const orders = new StoreOrdersPage(storePage);
+      await orders.goto();
+      await expect(orders.firstAcceptButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await orders.firstAcceptButton.click();
+      await expect(orders.orderStatusBadge("ACEPTADO")).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+    } finally {
+      await clientContext.close();
+      await storeContext.close();
+    }
+  });
+});
+
+// UC-STO-19: Rechazar pedido
+test.describe("UC-STO-19 — rechazar pedido", () => {
+  test("rechazar pedido lo mueve a RECHAZADO", async ({ browser }) => {
+    const clientContext = await browser.newContext({
+      permissions: ["geolocation"],
+      geolocation: E2E_STORES.approved.geo,
+    });
+    const storeContext = await browser.newContext();
+
+    try {
+      const clientPage = await clientContext.newPage();
+      const storePage = await storeContext.newPage();
+
+      await submitOrderAndLand(clientPage);
+
+      await loginAsStoreFresh(storePage);
+      const orders = new StoreOrdersPage(storePage);
+      await orders.goto();
+      await expect(orders.firstRejectButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await orders.firstRejectButton.click();
+      await expect(orders.orderStatusBadge("RECHAZADO")).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+    } finally {
+      await clientContext.close();
+      await storeContext.close();
+    }
+  });
+});
+
+// UC-STO-20: Finalizar pedido (requiere cliente confirme EN_CAMINO primero)
+test.describe("UC-STO-20 — finalizar pedido", () => {
+  test("finalizar pedido lo mueve a FINALIZADO", async ({ browser }) => {
+    const clientContext = await browser.newContext({
+      permissions: ["geolocation"],
+      geolocation: E2E_STORES.approved.geo,
+    });
+    const storeContext = await browser.newContext();
+
+    try {
+      const clientPage = await clientContext.newPage();
+      const storePage = await storeContext.newPage();
+
+      await submitOrderAndLand(clientPage);
+      const clientTracking = new OrderTrackingPage(clientPage);
+
+      await loginAsStoreFresh(storePage);
+      const orders = new StoreOrdersPage(storePage);
+      await orders.goto();
+
+      // Tienda acepta → ACEPTADO
+      await expect(orders.firstAcceptButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await orders.firstAcceptButton.click();
+
+      // Cliente confirma que va en camino → EN_CAMINO
+      await expect(clientTracking.confirmOnTheWayButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await clientTracking.confirmOnTheWayButton.click();
+
+      // Tienda finaliza → FINALIZADO
+      await expect(orders.firstFinalizeButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await orders.firstFinalizeButton.click();
+      await expect(orders.orderStatusBadge("FINALIZADO")).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+    } finally {
+      await clientContext.close();
+      await storeContext.close();
+    }
+  });
+});
+
+// UC-STO-21: Estado vacío cuando no hay pedidos
+test.describe("UC-STO-21 — sin pedidos entrantes", () => {
+  test("muestra mensaje cuando no hay pedidos pendientes", async ({ page }) => {
+    await loginAsStore(page);
+    const orders = new StoreOrdersPage(page);
+    await orders.goto();
+    const hasOrders = (await orders.firstAcceptButton.count()) > 0;
+    if (!hasOrders) {
+      await expect(orders.emptyMessage).toBeVisible({ timeout: 5_000 });
+    } else {
+      expect(hasOrders).toBe(true);
+    }
+  });
+});

@@ -18,6 +18,7 @@ const CLOSE_AFTER_OPEN_PATH = ["closeTime"];
 
 const profileBaseSchema = z.object({
   storeId: z.string().min(1, "El ID de la tienda es obligatorio"),
+  tagline: z.string().max(200, "La descripción no puede superar los 200 caracteres").optional(),
   businessName: z
     .string({ required_error: "El nombre del negocio es obligatorio" })
     .min(1, "El nombre del negocio no puede estar vacío")

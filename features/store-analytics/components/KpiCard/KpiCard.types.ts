@@ -13,4 +13,5 @@ export interface KpiCardProps {
   readonly description: string;
   readonly status: KpiStatus;
   readonly target?: string;
+  readonly testId?: string;
 }

@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { ROUTES } from "@/shared/constants/routes";
 import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { useCatalogQuery } from "@/features/catalog/hooks/useCatalogQuery";
+import { toast } from "sonner";
 import { useUpdateProductMutation } from "@/features/catalog/hooks/useUpdateProductMutation";
 import {
   editProductSchema,
@@ -57,6 +58,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
     setServerError(null);
     try {
       await updateMutation.mutateAsync({ storeId, productId, values });
+      toast.success("Producto guardado");
       push(ROUTES.store.catalog);
     } catch {
       setServerError(t("updateError"));

@@ -32,7 +32,7 @@ export function ProductImageUpload({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-testid="product-image-upload">
       {previewUrl && <ProductImagePreview src={previewUrl} onError={onPreviewError} />}
 
       <input

@@ -2,6 +2,8 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
 import { setSessionCookie } from "./helpers";
 import { USER_ROLES } from "@/shared/constants/user";
 
+test.skip(true, "Requiere Push Service activo y endpoints /api/__e2e/* — activar en staging");
+
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
 const PUSH_DELIVERY_SLA_MS = 5_000;

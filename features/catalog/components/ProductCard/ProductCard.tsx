@@ -8,7 +8,7 @@ import type { ProductCardProps } from "./ProductCard.types";
 
 export function ProductCard({ product, onEdit, onDelete, isDeleting = false }: ProductCardProps) {
   return (
-    <Card className="flex flex-col">
+    <Card role="article" className="flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base">{product.name}</CardTitle>

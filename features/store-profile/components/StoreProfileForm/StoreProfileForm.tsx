@@ -41,6 +41,20 @@ export function StoreProfileForm({ defaultValues, onSubmit, isPending }: StorePr
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
+          name="tagline"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("taglineLabel")}</FormLabel>
+              <FormControl>
+                <Input placeholder={t("taglinePlaceholder")} {...field} value={field.value ?? ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="businessName"
           render={({ field }) => (
             <FormItem>

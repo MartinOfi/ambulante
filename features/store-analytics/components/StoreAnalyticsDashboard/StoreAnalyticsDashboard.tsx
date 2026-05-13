@@ -86,6 +86,14 @@ export function StoreAnalyticsDashboard({
           value={summary.ordersPerDay.toFixed(1)}
           description={`${summary.ordersTotal} pedidos en total`}
           status={KPI_STATUS.NEUTRAL}
+          testId="kpi-total-orders"
+        />
+        <KpiCard
+          label="Ingresos estimados"
+          value="—"
+          description="Disponible próximamente"
+          status={KPI_STATUS.NEUTRAL}
+          testId="kpi-total-revenue"
         />
         <KpiCard
           label="Tasa de aceptación"

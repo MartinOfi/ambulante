@@ -11,6 +11,7 @@ import {
   createProductSchema,
   type CreateProductValues,
 } from "@/features/catalog/schemas/catalog.schemas";
+import { toast } from "sonner";
 import { useCreateProductMutation } from "@/features/catalog/hooks/useCreateProductMutation";
 import { ProductImageUploadContainer } from "@/features/catalog/components/ProductImageUpload";
 import { ProductForm } from "./ProductForm";
@@ -37,6 +38,7 @@ export function CreateProductFormContainer() {
     setServerError(null);
     try {
       await createMutation.mutateAsync({ storeId, values });
+      toast.success("Producto creado");
       push(ROUTES.store.catalog);
     } catch {
       setServerError(t("createError"));

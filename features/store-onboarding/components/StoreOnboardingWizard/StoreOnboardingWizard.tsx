@@ -25,16 +25,17 @@ export function StoreOnboardingWizard({
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">{t("stepIndicator", { step })}</p>
         <h2 className="text-lg font-semibold">{t(`stepTitles.${step}`)}</h2>
-        <div className="flex gap-1" aria-hidden="true">
+        <nav aria-label="Progreso del registro" className="flex gap-1">
           {([1, 2, 3] as const).map((n) => (
             <div
               key={n}
+              aria-hidden="true"
               className={`h-1 flex-1 rounded-full transition-colors ${
                 n <= step ? "bg-brand" : "bg-muted"
               }`}
             />
           ))}
-        </div>
+        </nav>
       </div>
 
       {step === 1 && <StepFiscal defaultValues={fiscalDraft} onNext={onFiscalNext} />}

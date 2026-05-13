@@ -3,10 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { buildHref, ROUTES } from "@/shared/constants/routes";
 import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { useCatalogQuery } from "@/features/catalog/hooks/useCatalogQuery";
 import { useDeleteProductMutation } from "@/features/catalog/hooks/useDeleteProductMutation";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { CatalogList } from "./CatalogList";
 
 export function CatalogListContainer() {
@@ -18,18 +28,32 @@ export function CatalogListContainer() {
   const { data: products = [], isLoading, isError } = useCatalogQuery(storeId);
   const deleteMutation = useDeleteProductMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   function handleEdit(productId: string) {
     push(buildHref(ROUTES.store.catalogEdit, { productId }));
   }
 
-  async function handleDelete(productId: string) {
+  function handleDeleteRequest(productId: string) {
     if (!storeId) {
       push(ROUTES.public.home);
       return;
     }
-    setDeletingId(productId);
-    deleteMutation.mutate({ storeId, productId }, { onSettled: () => setDeletingId(null) });
+    setPendingDeleteId(productId);
+  }
+
+  function handleConfirmDelete() {
+    if (!pendingDeleteId || !storeId) return;
+    const id = pendingDeleteId;
+    setPendingDeleteId(null);
+    setDeletingId(id);
+    deleteMutation.mutate(
+      { storeId, productId: id },
+      {
+        onSuccess: () => toast.success("Producto eliminado"),
+        onSettled: () => setDeletingId(null),
+      },
+    );
   }
 
   if (isLoading) {
@@ -45,11 +69,30 @@ export function CatalogListContainer() {
   }
 
   return (
-    <CatalogList
-      products={products}
-      onEdit={handleEdit}
-      onDelete={handleDelete}
-      deletingId={deletingId}
-    />
+    <>
+      <CatalogList
+        products={products}
+        onEdit={handleEdit}
+        onDelete={handleDeleteRequest}
+        deletingId={deletingId}
+      />
+
+      <Dialog open={pendingDeleteId !== null} onOpenChange={() => setPendingDeleteId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar producto</DialogTitle>
+            <DialogDescription>Esta acción no se puede deshacer.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingDeleteId(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Confirmar eliminación
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

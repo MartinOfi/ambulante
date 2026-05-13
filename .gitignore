@@ -22,6 +22,7 @@ coverage/
 /playwright-report/
 /playwright/.cache/
 /blob-report/
+e2e/.auth/
 
 # misc
 .DS_Store
