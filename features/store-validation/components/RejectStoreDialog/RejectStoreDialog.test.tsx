@@ -67,7 +67,7 @@ describe("RejectStoreDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: /confirmar rechazo/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/al menos/i)).toBeInTheDocument();
+      expect(screen.getByText(/mínimo/i)).toBeInTheDocument();
     });
   });
 

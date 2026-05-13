@@ -1,19 +1,28 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { buildHref, ROUTES } from "@/shared/constants/routes";
-import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
+import { useState } from "react";
+
+import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
+import { useStoresByStatusQuery } from "@/features/store-validation/hooks/useStoresByStatusQuery";
+import type { ValidationStatus } from "@/features/store-validation/types/store-validation.types";
 import { StoreValidationQueue } from "./StoreValidationQueue";
 
 export function StoreValidationQueueContainer() {
-  const { push } = useRouter();
-  const { data: stores = [], isLoading } = useStoreValidationQueueQuery();
+  const [activeStatus, setActiveStatus] = useState<ValidationStatus>(
+    STORE_VALIDATION_STATUS.pending,
+  );
+  const [searchQuery, setSearchQuery] = useState("");
 
-  function handleSelectStore(storeId: string) {
-    push(buildHref(ROUTES.admin.storeDetail, { storeId }));
-  }
+  const { data: stores = [], isLoading } = useStoresByStatusQuery(activeStatus);
 
   return (
-    <StoreValidationQueue stores={stores} isLoading={isLoading} onSelectStore={handleSelectStore} />
+    <StoreValidationQueue
+      stores={stores}
+      isLoading={isLoading}
+      activeStatus={activeStatus}
+      searchQuery={searchQuery}
+      onStatusChange={setActiveStatus}
+      onSearchChange={setSearchQuery}
+    />
   );
 }

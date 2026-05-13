@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { ROUTES } from "@/shared/constants/routes";
 import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
 import { useApproveStoreMutation } from "@/features/store-validation/hooks/useApproveStoreMutation";
@@ -41,7 +42,10 @@ export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainer
 
   function handleApprove() {
     approveMutation.mutate(storeId, {
-      onSuccess: () => push(ROUTES.admin.stores),
+      onSuccess: () => {
+        toast.success("Tienda aprobada");
+        push(ROUTES.admin.stores);
+      },
     });
   }
 
@@ -51,6 +55,7 @@ export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainer
       {
         onSuccess: () => {
           setIsRejectDialogOpen(false);
+          toast.success("Tienda rechazada");
           push(ROUTES.admin.stores);
         },
       },

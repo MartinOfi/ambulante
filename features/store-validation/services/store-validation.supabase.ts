@@ -35,13 +35,17 @@ export class SupabaseStoreValidationService implements StoreValidationService {
   constructor(private readonly client: SupabaseClient) {}
 
   async getPendingStores(): Promise<readonly PendingStore[]> {
+    return this.getStoresByStatus(STORE_VALIDATION_STATUS.pending);
+  }
+
+  async getStoresByStatus(status: ValidationStatus): Promise<readonly PendingStore[]> {
     const { data, error } = await this.client
       .from("stores_view")
       .select(VALIDATION_SELECT)
-      .eq("validation_status", STORE_VALIDATION_STATUS.pending)
+      .eq("validation_status", status)
       .order("created_at", { ascending: true });
 
-    if (error !== null) throw new Error(`getPendingStores: ${error.message}`);
+    if (error !== null) throw new Error(`getStoresByStatus: ${error.message}`);
     return (data as unknown as DbValidationStoreRow[]).map(mapValidationRow);
   }
 

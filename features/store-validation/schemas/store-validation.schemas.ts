@@ -9,7 +9,7 @@ export const rejectStoreSchema = z.object({
     .string({ required_error: "El motivo de rechazo es obligatorio" })
     .min(
       REJECTION_REASON_MIN_LENGTH,
-      `El motivo debe tener al menos ${REJECTION_REASON_MIN_LENGTH} caracteres`,
+      `El motivo debe tener mínimo ${REJECTION_REASON_MIN_LENGTH} caracteres`,
     )
     .max(
       REJECTION_REASON_MAX_LENGTH,
