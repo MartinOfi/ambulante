@@ -24,6 +24,7 @@ export interface MapScreenProps {
   readonly radius: RadiusValue;
   readonly geo: GeoState;
   readonly isRecentering: boolean;
+  readonly recenterSignal: number;
   readonly selectedStoreId: string | null;
   readonly cartItemCount: number;
   readonly cartTotal: number;
@@ -43,6 +44,7 @@ export function MapScreen({
   radius,
   geo,
   isRecentering,
+  recenterSignal,
   selectedStoreId,
   cartItemCount,
   cartTotal,
@@ -67,6 +69,7 @@ export function MapScreen({
         hasUserLocation={hasLocation}
         userCoords={userCoords}
         selectedStoreId={selectedStoreId}
+        recenterSignal={recenterSignal}
         onSelectStore={onSelectStore}
       />
 

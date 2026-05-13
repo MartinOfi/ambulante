@@ -48,11 +48,18 @@ const withSerwistConfig = withSerwist({
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
+const intlSerwistConfig = withNextIntl(withSerwistConfig(nextConfig));
+
+// Sentry instrumentation adds significant module-graph overhead during dev
+// compilation (source-map injection for every module). Skip it in dev so
+// Turbopack's incremental cache isn't invalidated on every HMR cycle.
 export default withBundleAnalyzer(
-  withSentryConfig(withNextIntl(withSerwistConfig(nextConfig)), {
-    silent: true,
-    disableLogger: true,
-    widenClientFileUpload: true,
-    automaticVercelMonitors: false,
-  }),
+  process.env.NODE_ENV === "development"
+    ? intlSerwistConfig
+    : withSentryConfig(intlSerwistConfig, {
+        silent: true,
+        disableLogger: true,
+        widenClientFileUpload: true,
+        automaticVercelMonitors: false,
+      }),
 );

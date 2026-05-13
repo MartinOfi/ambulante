@@ -18,6 +18,7 @@ export function MapScreenContainer() {
   const { push } = useRouter();
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [recenterSignal, setRecenterSignal] = useState(0);
 
   const coords = geo.status === "granted" ? geo.coords : null;
   const { data: stores = [] } = useStoresNearbyQuery({ coords, radius });
@@ -37,6 +38,7 @@ export function MapScreenContainer() {
   const geoRequest = geo.request;
   const handleRecenter = useCallback(() => {
     geoRequest();
+    setRecenterSignal((prev) => prev + 1);
   }, [geoRequest]);
 
   const handleManualSearch = useCallback(() => {}, []);
@@ -84,6 +86,7 @@ export function MapScreenContainer() {
       radius={radius}
       geo={geo}
       isRecentering={geo.status === "loading"}
+      recenterSignal={recenterSignal}
       selectedStoreId={selectedStoreId}
       cartItemCount={cartItemCount}
       cartTotal={cartTotal}

@@ -74,6 +74,7 @@ function buildProps(overrides: Partial<MapScreenProps> = {}): MapScreenProps {
     radius: DEFAULT_RADIUS,
     geo: { status: "idle" },
     isRecentering: false,
+    recenterSignal: 0,
     selectedStoreId: null,
     onRadiusChange: vi.fn(),
     onExpandRadius: vi.fn(),

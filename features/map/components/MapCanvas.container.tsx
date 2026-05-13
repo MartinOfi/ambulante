@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { RefObject } from "react";
 import type { MapRef, ViewState } from "react-map-gl/maplibre";
 import type { BBox } from "geojson";
@@ -14,6 +14,7 @@ export interface MapCanvasContainerProps {
   readonly hasUserLocation: boolean;
   readonly userCoords?: Coordinates;
   readonly selectedStoreId?: string | null;
+  readonly recenterSignal?: number;
   readonly onSelectStore?: (id: string) => void;
 }
 
@@ -56,6 +57,25 @@ export function MapCanvasContainer(props: MapCanvasContainerProps) {
   const [bounds, setBounds] = useState<BBox>(() =>
     approximateBbox(buildInitialViewState(props.userCoords)),
   );
+
+  useEffect(() => {
+    if (!props.recenterSignal || !props.userCoords) return;
+    if (mapRef.current) {
+      mapRef.current.flyTo({
+        center: [props.userCoords.lng, props.userCoords.lat],
+        zoom: MAP_DEFAULTS.ZOOM,
+        duration: 800,
+      });
+    } else {
+      setViewState((prev) => ({
+        ...prev,
+        longitude: props.userCoords!.lng,
+        latitude: props.userCoords!.lat,
+        zoom: MAP_DEFAULTS.ZOOM,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.recenterSignal]);
 
   const handleMove = useCallback((evt: { viewState: ViewState }) => {
     setViewState(evt.viewState);
