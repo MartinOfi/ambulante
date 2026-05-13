@@ -13,7 +13,7 @@ export function ReportCard({
   const isActing = isRemoving || isDismissing;
 
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm">
+    <article className="rounded-lg border bg-card p-4 shadow-sm">
       <div className="mb-2">
         <p className="font-medium">{report.productName}</p>
         <p className="text-sm text-muted-foreground">{report.storeName}</p>
@@ -38,6 +38,6 @@ export function ReportCard({
           </Button>
         </div>
       )}
-    </div>
+    </article>
   );
 }
