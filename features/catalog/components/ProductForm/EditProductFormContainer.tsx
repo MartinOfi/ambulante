@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ROUTES } from "@/shared/constants/routes";
-import { useSession } from "@/shared/hooks/useSession";
+import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { useCatalogQuery } from "@/features/catalog/hooks/useCatalogQuery";
 import { useUpdateProductMutation } from "@/features/catalog/hooks/useUpdateProductMutation";
 import {
@@ -22,9 +22,9 @@ interface EditProductFormContainerProps {
 
 export function EditProductFormContainer({ productId }: EditProductFormContainerProps) {
   const t = useTranslations("Catalog.EditForm");
-  const router = useRouter();
-  const sessionState = useSession();
-  const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : "";
+  const { push } = useRouter();
+  const storeQuery = useCurrentStoreQuery();
+  const storeId = storeQuery.data?.id ?? "";
 
   const { data: products, isLoading } = useCatalogQuery(storeId);
   const updateMutation = useUpdateProductMutation();
@@ -57,7 +57,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
     setServerError(null);
     try {
       await updateMutation.mutateAsync({ storeId, productId, values });
-      router.push(ROUTES.store.catalog);
+      push(ROUTES.store.catalog);
     } catch {
       setServerError(t("updateError"));
     }
@@ -86,6 +86,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
       submitLabel={t("submit")}
       imageUploadSlot={
         <ProductImageUploadContainer
+          storeId={storeId}
           currentUrl={photoUrl || null}
           onUploaded={(url) => form.setValue("photoUrl", url, { shouldValidate: true })}
         />

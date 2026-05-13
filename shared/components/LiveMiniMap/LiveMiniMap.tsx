@@ -17,14 +17,14 @@ export function LiveMiniMap() {
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand/20 blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-brand/20 blur-3xl"
       />
 
       <div className="relative z-10 mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
+          <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-brand amb-live-blink" />
+            <span className="relative inline-flex size-2 rounded-full bg-brand amb-live-blink" />
           </span>
           <span className="font-display text-xs-tight font-bold uppercase tracking-wider text-brand">
             En vivo

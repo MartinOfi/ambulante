@@ -13,20 +13,22 @@ const TERMINAL_STATUS_CLASSES: Record<string, string> = {
   EXPIRADO: "border-[hsl(var(--muted))] bg-[hsl(var(--muted)/0.08)]",
 };
 
+const TIMESTAMP_FORMAT = new Intl.DateTimeFormat("es-AR", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+});
+
 function formatTimestamp(date: Date): string {
-  return new Intl.DateTimeFormat("es-AR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).format(date);
+  return TIMESTAMP_FORMAT.format(date);
 }
 
 function sortEntriesAscending(entries: readonly AuditLogEntry[]): readonly AuditLogEntry[] {
-  return [...entries].sort(
+  return entries.toSorted(
     (first, second) => first.occurredAt.getTime() - second.occurredAt.getTime(),
   );
 }
@@ -71,8 +73,8 @@ export function TransitionTimeline({ entries }: TransitionTimelineProps) {
 
   return (
     <ol role="list" aria-label="Línea de tiempo de transiciones" className="flex flex-col gap-2">
-      {sortedEntries.map((entry, index) => (
-        <TimelineEntry key={`${entry.newStatus}-${index}`} entry={entry} />
+      {sortedEntries.map((entry) => (
+        <TimelineEntry key={`${entry.newStatus}-${entry.occurredAt.getTime()}`} entry={entry} />
       ))}
     </ol>
   );

@@ -22,7 +22,7 @@ const VALIDATION_DOCS_TO_REVIEW = [
 ] as const;
 
 export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainerProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
 
   const { data: stores = [] } = useStoreValidationQueueQuery();
@@ -41,7 +41,7 @@ export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainer
 
   function handleApprove() {
     approveMutation.mutate(storeId, {
-      onSuccess: () => router.push(ROUTES.admin.stores),
+      onSuccess: () => push(ROUTES.admin.stores),
     });
   }
 
@@ -51,7 +51,7 @@ export function StoreDetailPanelContainer({ storeId }: StoreDetailPanelContainer
       {
         onSuccess: () => {
           setIsRejectDialogOpen(false);
-          router.push(ROUTES.admin.stores);
+          push(ROUTES.admin.stores);
         },
       },
     );

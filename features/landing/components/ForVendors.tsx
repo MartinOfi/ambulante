@@ -43,7 +43,7 @@ export function ForVendors() {
           <span className="font-display text-xs font-bold uppercase tracking-eyebrow text-brand">
             Para tiendas ambulantes
           </span>
-          <h2 className="mt-3 font-display text-display-hero font-bold uppercase leading-display tracking-display text-foreground">
+          <h2 className="mt-3 font-display text-display-hero font-semibold uppercase leading-display tracking-display text-foreground">
             Tu puesto,
             <br />
             <span className="text-brand">visible</span> cuando importa.
@@ -57,7 +57,7 @@ export function ForVendors() {
             className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-ink px-7 font-display text-sm font-bold uppercase tracking-wide text-white shadow-pin transition-colors hover:bg-ink/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             Registrá tu puesto
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
 
@@ -67,11 +67,11 @@ export function ForVendors() {
               key={title}
               className="flex items-start gap-4 rounded-card border-2 border-foreground bg-surface-elevated p-5 shadow-card-brutal transition-transform hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-card-brutal-hover"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
-                <Icon className="h-5 w-5" aria-hidden="true" />
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white">
+                <Icon className="size-5" aria-hidden="true" />
               </div>
               <div>
-                <h3 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
+                <h3 className="font-display text-lg font-semibold uppercase tracking-tight text-foreground">
                   {title}
                 </h3>
                 <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>

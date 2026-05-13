@@ -7,6 +7,7 @@ import type { Store } from "@/shared/schemas/store";
 import type { User } from "@/shared/schemas/user";
 import { MAX_ITEMS_PER_ORDER, MAX_QUANTITY_PER_ITEM } from "@/features/order-flow/constants";
 import type { SubmitOrderInput } from "@/features/order-flow/schemas";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const AUTH_USER_ID = "auth-user-uuid";
 const CUSTOMER_PUBLIC_ID = "11111111-1111-4111-8111-111111111111";
@@ -89,7 +90,7 @@ function makeUser(overrides: Partial<User> = {}): User {
   return {
     id: CUSTOMER_PUBLIC_ID,
     email: "cliente@example.com",
-    role: "client",
+    role: USER_ROLES.client,
     displayName: "Cliente Test",
     suspended: false,
     ...overrides,

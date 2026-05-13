@@ -50,7 +50,7 @@ export function LandingFooter() {
               className="inline-flex items-center gap-2 font-display text-lg font-bold uppercase tracking-tight text-foreground transition-colors hover:text-brand"
               aria-label="Ambulante — inicio"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-brand text-white shadow-pin">
+              <span className="grid size-8 place-items-center rounded-full bg-brand text-white shadow-pin">
                 <MapPin size={16} aria-hidden="true" />
               </span>
               Ambulante

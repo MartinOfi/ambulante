@@ -8,9 +8,10 @@
 alter table public.stores
   add column if not exists cuit varchar(11) null;
 
--- 2. Update stores_view to expose cuit and validation_status
---    (security_invoker = true, security_barrier = true preserved from original).
-create or replace view public.stores_view
+-- 2. Update stores_view to expose cuit and validation_status.
+--    DROP + CREATE required: CREATE OR REPLACE VIEW cannot reorder existing columns.
+drop view if exists public.stores_view;
+create view public.stores_view
   with (security_invoker = true, security_barrier = true)
 as
 select

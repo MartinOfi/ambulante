@@ -27,9 +27,9 @@ export function VendorMarker({ vendor }: VendorMarkerProps) {
         } gap-1.5`}
       >
         <span
-          className={`relative flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white shadow-lg shadow-brand/40 ring-2 ring-surface ${STATE_CLASS[state]}`}
+          className={`relative flex size-7 items-center justify-center rounded-full bg-brand text-white shadow-lg shadow-brand/40 ring-2 ring-surface ${STATE_CLASS[state]}`}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <Icon className="size-3.5" />
           {state === "pulsing" && (
             <span className="absolute inset-0 animate-ping rounded-full bg-brand/60" />
           )}

@@ -567,7 +567,7 @@ No hay archivos compartidos entre ellos (salvo `shared/` de solo lectura). F2.8 
 ### F2.2 — Modelo de User + roles
 - **Estado:** ✅ done
 - **Por qué:** Necesitamos el tipo canónico antes de tocar session.
-- **Entregable:** `shared/types/user.ts` con `User`, `UserRole = "client" | "store" | "admin"`, `Session`. Schemas Zod en `shared/schemas/user.ts`.
+- **Entregable:** `shared/types/user.ts` con `User`, `UserRole = USER_ROLES.client | USER_ROLES.store | "admin"`, `Session`. Schemas Zod en `shared/schemas/user.ts`.
 - **Archivos:** `shared/types/user.ts`, `shared/schemas/user.ts`.
 - **Notas:** `sessionSchema` añadido a `shared/schemas/user.ts`. `USER_ROLES` en `shared/constants/user.ts` corregido (valores español→inglés, eliminado re-export duplicado de `UserRole`). 15/15 tests en schemas, 4/4 en constants. 0 errores typecheck.
 - **Depends on:** F2.1, F3.1

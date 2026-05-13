@@ -12,6 +12,7 @@ export interface ProductImageUploadProps {
 }
 
 export interface ProductImageUploadContainerProps {
+  readonly storeId: string;
   readonly currentUrl: string | null;
   readonly onUploaded: (url: string) => void;
 }

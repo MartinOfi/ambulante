@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+
+export const metadata: Metadata = {
+  title: "Seguimiento de pedido",
+  robots: { index: false },
+};
 
 import { OrderTrackingContainer } from "@/features/orders/components/OrderTracking";
 

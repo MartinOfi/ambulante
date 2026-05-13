@@ -14,14 +14,14 @@ export function LocationDenied({ onRetry, onManualSearch }: Props) {
       aria-labelledby="loc-denied-title"
       className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-6 bg-surface/95 px-6 text-center backdrop-blur-sm"
     >
-      <div className="grid h-20 w-20 place-items-center rounded-full bg-surface-elevated shadow-sheet ring-1 ring-border">
-        <MapPinOff className="h-10 w-10 text-brand" strokeWidth={2} />
+      <div className="grid size-20 place-items-center rounded-full bg-surface-elevated shadow-sheet ring-1 ring-border">
+        <MapPinOff className="size-10 text-brand" strokeWidth={2} />
       </div>
 
       <div className="flex max-w-content-md flex-col gap-2">
         <h1
           id="loc-denied-title"
-          className="font-display text-2xl font-bold leading-tight text-foreground"
+          className="font-display text-2xl font-semibold leading-tight text-foreground"
         >
           Necesitamos saber dónde estás
         </h1>

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { User } from "@/shared/schemas/user";
 import type { UpdateProfileInput } from "@/features/profile/profile.schemas";
 import { MAX_DISPLAY_NAME_LENGTH } from "@/features/profile/profile.constants";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const AUTH_USER_ID = "auth-uuid";
 const USER_PUBLIC_ID = "11111111-1111-4111-8111-111111111111";
@@ -57,7 +58,7 @@ function makeUser(overrides: Partial<User> = {}): User {
   return {
     id: USER_PUBLIC_ID,
     email: "cliente@example.com",
-    role: "client",
+    role: USER_ROLES.client,
     displayName: "Nombre Original",
     avatarUrl: undefined,
     suspended: false,

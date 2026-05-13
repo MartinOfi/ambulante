@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { logger } from "@/shared/utils/logger";
 import { extractErrorMessage } from "@/shared/utils/errorMessage";
+import { NonRetryableError } from "@/shared/utils/errors";
 
 const STALE_TIME_MS = 30_000;
 const GC_TIME_MS = 5 * 60_000;
@@ -37,6 +38,7 @@ export function computeRetryDelay(attemptIndex: number): number {
 
 export function shouldRetry(failureCount: number, error: unknown): boolean {
   if (isClientError(error)) return false;
+  if (error instanceof NonRetryableError) return false;
   return failureCount < MAX_RETRY_COUNT;
 }
 

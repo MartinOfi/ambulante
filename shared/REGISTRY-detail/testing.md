@@ -43,7 +43,7 @@ Producen entidades de dominio válidas con valores por defecto sensatos. Usar en
 | Nombre | Firma | Descripción |
 |---|---|---|
 | `createOrder` | `(overrides?: Partial<Order>) => Order` | Default: estado `ENVIADO`, incluye 1 item |
-| `createUser` | `(overrides?: Partial<User>) => User` | Default: `role: "client"` |
+| `createUser` | `(overrides?: Partial<User>) => User` | Default: `role: USER_ROLES.client` |
 | `createStore` | `(overrides?: Partial<Store>) => Store` | Default: `status: "open"`, `kind: "food-truck"`, coordenadas CABA |
 | `createOrderItem` | `(overrides?: Partial<OrderItem>) => OrderItem` | Default: `quantity: 1`, incluye snapshot de producto |
 

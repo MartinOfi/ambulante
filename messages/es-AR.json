@@ -340,6 +340,7 @@
     "CreateForm": {
       "submit": "Crear producto",
       "sessionExpired": "Sesión expirada. Volvé a iniciar sesión.",
+      "noStore": "Tu tienda no está registrada aún. Completá el registro primero.",
       "createError": "No se pudo crear el producto. Intentá de nuevo."
     },
     "EditForm": {
@@ -546,6 +547,12 @@
     "PendingApproval": {
       "title": "Tu solicitud está en revisión",
       "description": "Recibimos los datos de tu tienda. Un administrador los revisará y te notificará cuando tu cuenta esté habilitada para operar.",
+      "needHelp": "¿Necesitás ayuda?",
+      "backToLogin": "Volvé al inicio de sesión"
+    },
+    "StoreRejected": {
+      "title": "Tu solicitud fue rechazada",
+      "description": "Lamentablemente no pudimos aprobar el registro de tu tienda. Revisá los datos ingresados o contactá a soporte para más información.",
       "needHelp": "¿Necesitás ayuda?",
       "backToLogin": "Volvé al inicio de sesión"
     },

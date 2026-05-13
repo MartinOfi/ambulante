@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/shared/constants/routes";
 import { CreateProductFormContainer } from "@/features/catalog/components/ProductForm";
+
+export const metadata: Metadata = {
+  title: "Nuevo producto",
+  robots: { index: false },
+};
 
 // Route is protected by middleware (role: store). When Supabase is integrated, add
 // server-side ownership verification: ensure session.user.id matches a real Store record.

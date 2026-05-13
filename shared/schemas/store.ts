@@ -9,6 +9,10 @@ export const storeStatusSchema = z.enum(["open", "closed", "stale"], {
   errorMap: () => ({ message: "Estado de tienda no válido" }),
 });
 
+export const storeValidationStatusSchema = z.enum(["pending", "approved", "rejected"], {
+  errorMap: () => ({ message: "Estado de validación no válido" }),
+});
+
 export const storeSchema = z
   .object({
     id: z.string({ required_error: "El ID es obligatorio" }).min(1, "El ID no puede estar vacío"),
@@ -17,7 +21,7 @@ export const storeSchema = z
       .min(1, "El nombre no puede estar vacío"),
     kind: storeKindSchema,
     photoUrl: z.string().url("La URL de la foto no es válida").optional(),
-    location: coordinatesSchema,
+    location: coordinatesSchema.nullable(),
     distanceMeters: z
       .number({ required_error: "La distancia es obligatoria" })
       .min(0, "La distancia no puede ser negativa"),
@@ -36,9 +40,11 @@ export const storeSchema = z
       .string()
       .regex(/^\d{11}$/)
       .optional(),
+    validationStatus: storeValidationStatusSchema.optional(),
   })
   .strict();
 
 export type StoreKind = z.infer<typeof storeKindSchema>;
 export type StoreStatus = z.infer<typeof storeStatusSchema>;
+export type StoreValidationStatus = z.infer<typeof storeValidationStatusSchema>;
 export type Store = z.infer<typeof storeSchema>;

@@ -4,6 +4,7 @@ import { orderItemSchema, orderSchema } from "@/shared/schemas/order";
 import { storeSchema } from "@/shared/schemas/store";
 import { userSchema } from "@/shared/schemas/user";
 import { createOrder, createOrderItem, createStore, createUser } from "./factories";
+import { USER_ROLES } from "@/shared/constants/user";
 
 describe("createUser", () => {
   it("returns a valid User by default", () => {
@@ -12,8 +13,8 @@ describe("createUser", () => {
   });
 
   it("applies overrides", () => {
-    const user = createUser({ role: "store", email: "store@test.com" });
-    expect(user.role).toBe("store");
+    const user = createUser({ role: "tienda", email: "store@test.com" });
+    expect(user.role).toBe("tienda");
     expect(user.email).toBe("store@test.com");
   });
 
@@ -24,7 +25,7 @@ describe("createUser", () => {
   });
 
   it("uses client role by default", () => {
-    expect(createUser().role).toBe("client");
+    expect(createUser().role).toBe(USER_ROLES.client);
   });
 });
 

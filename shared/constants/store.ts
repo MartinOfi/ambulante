@@ -1,7 +1,7 @@
 import type { StoreKind, StoreStatus } from "@/shared/schemas/store";
 
 // Fallback used when a store has no photo yet (pending admin approval or profile incomplete).
-export const PLACEHOLDER_STORE_PHOTO_URL = "https://ambulante.app/placeholder-store.png";
+export const PLACEHOLDER_STORE_PHOTO_URL = "/placeholder-store.svg";
 
 export const STORE_KIND = Object.freeze({
   foodTruck: "food-truck",

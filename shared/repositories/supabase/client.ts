@@ -1,26 +1,18 @@
-import {
-  createBrowserClient as createSupabaseBrowserClient,
-  createServerClient as createSupabaseServerClient,
-} from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
+
+// Browser-safe exports (no next/headers dependency) — re-exported for callers
+// that import everything from this file. Client Components must import directly
+// from ./client.browser to avoid next/headers contamination.
+export type { SupabaseClient } from "./client.browser";
+export { createBrowserClient, createServiceRoleClient } from "./client.browser";
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (!value?.trim()) throw new Error(`${name} is not set`);
   return value.trim();
 }
-
-export function createBrowserClient() {
-  return createSupabaseBrowserClient(
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
-  );
-}
-
-// Repositories accept any Supabase client variant (browser, server, route handler).
-export type SupabaseClient = ReturnType<typeof createBrowserClient>;
 
 // Server Components: cookies() is read-only — setAll wraps in try/catch so
 // getUser() doesn't throw. Middleware handles session refresh on the next request.
@@ -74,17 +66,6 @@ export async function createRouteHandlerClient() {
       },
     },
   );
-}
-
-// Cron route handlers use service role to bypass RLS. Never pass this client to
-// user-facing code — it has full DB access with no row-level restrictions.
-export function createServiceRoleClient(url: string, key: string): SupabaseClient {
-  if (!url.startsWith("https://") || key.trim().length === 0) {
-    throw new Error("createServiceRoleClient: invalid url or key");
-  }
-  return createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
 }
 
 // Used in middleware.ts — both request and response are needed to read and

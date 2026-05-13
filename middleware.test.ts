@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { middleware } from "./middleware";
+import { USER_ROLES } from "./shared/constants/user";
 
 function makeRequest(path: string, headers: Record<string, string> = {}): NextRequest {
   const url = `http://localhost${path}`;
@@ -130,7 +131,7 @@ describe("middleware — auth protection", () => {
   });
 
   it("redirects authenticated user with wrong role to /", async () => {
-    mockAuthenticatedAs("user-1", "store");
+    mockAuthenticatedAs("user-1", USER_ROLES.store);
     const response = await middleware(makeRequest("/map/nearby")); // requires 'client'
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toMatch(/^http:\/\/localhost\/$/);
@@ -144,13 +145,13 @@ describe("middleware — auth protection", () => {
   });
 
   it("passes through when user has correct role", async () => {
-    mockAuthenticatedAs("user-1", "client");
+    mockAuthenticatedAs("user-1", USER_ROLES.client);
     const response = await middleware(makeRequest("/map/nearby"));
     expect(response.status).toBe(200);
   });
 
   it("passes store user to /store routes", async () => {
-    mockAuthenticatedAs("user-2", "store");
+    mockAuthenticatedAs("user-2", USER_ROLES.store);
     const response = await middleware(makeRequest("/store/dashboard"));
     expect(response.status).toBe(200);
   });

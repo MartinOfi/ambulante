@@ -34,7 +34,7 @@ export function ProductCard({ product, onEdit, onDelete, isDeleting = false }: P
           onClick={() => onEdit(product.id)}
           disabled={isDeleting}
         >
-          <Pencil className="mr-1 h-3 w-3" />
+          <Pencil className="mr-1 size-3" />
           Editar
         </Button>
         <Button
@@ -45,7 +45,7 @@ export function ProductCard({ product, onEdit, onDelete, isDeleting = false }: P
           onClick={() => onDelete(product.id)}
           disabled={isDeleting}
         >
-          <Trash2 className="mr-1 h-3 w-3" />
+          <Trash2 className="mr-1 size-3" />
           {isDeleting ? "Eliminando…" : "Eliminar"}
         </Button>
       </CardFooter>

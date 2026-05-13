@@ -11,6 +11,7 @@ import type {
   SignInInput,
   SignUpInput,
 } from "./auth.types";
+import { USER_ROLES } from "@/shared/constants/user";
 
 function createBrowserClient() {
   return _createBrowserClient(
@@ -38,25 +39,38 @@ type SupabaseSession = {
 
 // auth.users.id → public.users.public_id. Stable for the lifetime of the app.
 const publicIdCache = new Map<string, string>();
+// Deduplicates concurrent callers: stores the in-flight promise so parallel mounts
+// don't each fire a separate HTTP request before the first one fills the cache.
+const publicIdInFlight = new Map<string, Promise<string>>();
 
 async function resolvePublicId(client: BrowserClient, authUserId: string): Promise<string> {
   const cached = publicIdCache.get(authUserId);
   if (cached !== undefined) return cached;
 
-  const { data, error } = await client
-    .from("users")
-    .select("public_id")
-    .eq("auth_user_id", authUserId)
-    .maybeSingle();
+  const existing = publicIdInFlight.get(authUserId);
+  if (existing !== undefined) return existing;
 
-  if (error !== null || data === null) {
-    logger.error("resolvePublicId failed — falling back to auth.uid()", { authUserId, error });
-    return authUserId;
-  }
+  const promise: Promise<string> = (async () => {
+    const { data, error } = await client
+      .from("users")
+      .select("public_id")
+      .eq("auth_user_id", authUserId)
+      .maybeSingle();
 
-  const publicId = (data as { public_id: string }).public_id;
-  publicIdCache.set(authUserId, publicId);
-  return publicId;
+    publicIdInFlight.delete(authUserId);
+
+    if (error !== null || data === null) {
+      logger.error("resolvePublicId failed — falling back to auth.uid()", { authUserId, error });
+      return authUserId;
+    }
+
+    const publicId = (data as { public_id: string }).public_id;
+    publicIdCache.set(authUserId, publicId);
+    return publicId;
+  })();
+
+  publicIdInFlight.set(authUserId, promise);
+  return promise;
 }
 
 function toUser(publicId: string, sbUser: SupabaseUser): User {
@@ -88,6 +102,13 @@ export const supabaseAuthService: AuthService = {
     });
     if (error || !data.session) {
       logger.error("signIn failed", { error });
+      if (error && "code" in error && error.code === "email_not_confirmed") {
+        return {
+          success: false,
+          error:
+            "Tenés que confirmar tu email antes de iniciar sesión. Revisá tu bandeja de entrada.",
+        };
+      }
       return { success: false, error: "Credenciales inválidas" };
     }
     const publicId = await resolvePublicId(client, data.session.user.id);
@@ -99,7 +120,7 @@ export const supabaseAuthService: AuthService = {
     const { data, error } = await client.auth.signUp({
       email: input.email,
       password: input.password,
-      options: { data: { role: input.role ?? "client", displayName: input.displayName } },
+      options: { data: { role: input.role ?? USER_ROLES.client, displayName: input.displayName } },
     });
     if (error) {
       logger.error("signUp failed", { error });

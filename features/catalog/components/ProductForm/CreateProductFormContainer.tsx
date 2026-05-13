@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ROUTES } from "@/shared/constants/routes";
-import { useSession } from "@/shared/hooks/useSession";
+import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import {
   createProductSchema,
   type CreateProductValues,
@@ -17,9 +17,9 @@ import { ProductForm } from "./ProductForm";
 
 export function CreateProductFormContainer() {
   const t = useTranslations("Catalog.CreateForm");
-  const router = useRouter();
-  const sessionState = useSession();
-  const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : "";
+  const { push } = useRouter();
+  const storeQuery = useCurrentStoreQuery();
+  const storeId = storeQuery.data?.id ?? "";
 
   const createMutation = useCreateProductMutation();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -31,13 +31,13 @@ export function CreateProductFormContainer() {
 
   async function handleSubmit(values: CreateProductValues): Promise<void> {
     if (!storeId) {
-      setServerError(t("sessionExpired"));
+      setServerError(storeQuery.isSuccess ? t("noStore") : t("sessionExpired"));
       return;
     }
     setServerError(null);
     try {
       await createMutation.mutateAsync({ storeId, values });
-      router.push(ROUTES.store.catalog);
+      push(ROUTES.store.catalog);
     } catch {
       setServerError(t("createError"));
     }
@@ -49,11 +49,12 @@ export function CreateProductFormContainer() {
     <ProductForm
       form={form}
       onSubmit={handleSubmit}
-      isLoading={createMutation.isPending}
+      isLoading={createMutation.isPending || storeQuery.isPending}
       serverError={serverError}
       submitLabel={t("submit")}
       imageUploadSlot={
         <ProductImageUploadContainer
+          storeId={storeId}
           currentUrl={photoUrl || null}
           onUploaded={(url) => form.setValue("photoUrl", url, { shouldValidate: true })}
         />

@@ -15,7 +15,7 @@ function MobileNavLink({ link }: { readonly link: NavLink }) {
     return (
       <NavigationMenuLink
         href={link.href}
-        className="block rounded-lg px-2 py-2 text-sm font-medium text-foreground hover:bg-border/60"
+        className="block rounded-lg p-2 text-sm font-medium text-foreground hover:bg-border/60"
       >
         {link.label}
       </NavigationMenuLink>
@@ -32,7 +32,7 @@ function MobileNavLink({ link }: { readonly link: NavLink }) {
           <li key={item.label}>
             <NavigationMenuLink
               href={item.href}
-              className="block rounded-lg px-2 py-2 text-sm text-foreground hover:bg-border/60"
+              className="block rounded-lg p-2 text-sm text-foreground hover:bg-border/60"
             >
               {item.label}
             </NavigationMenuLink>

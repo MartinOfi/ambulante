@@ -27,7 +27,7 @@ export function OrderHistoryScreen({
     return (
       <div data-testid="orders-loading" className="flex flex-col gap-3 p-4">
         {[1, 2, 3].map((n) => (
-          <div key={n} className="h-20 animate-pulse rounded-xl bg-gray-100" />
+          <div key={n} className="h-20 animate-pulse rounded-xl bg-zinc-100" />
         ))}
       </div>
     );
@@ -48,7 +48,7 @@ export function OrderHistoryScreen({
               aria-pressed={isActive}
               onClick={() => onStatusChange(value)}
               className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                isActive ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                isActive ? "bg-amber-500 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
               }`}
             >
               {label}
@@ -59,7 +59,7 @@ export function OrderHistoryScreen({
 
       {orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-gray-500">
+          <p className="text-zinc-500">
             No tenés pedidos{activeStatus !== null ? " con ese estado" : ""}
           </p>
         </div>
@@ -79,7 +79,7 @@ export function OrderHistoryScreen({
             type="button"
             onClick={onLoadMore}
             disabled={isLoadingMore}
-            className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-60"
+            className="rounded-full bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200 disabled:opacity-60"
           >
             {isLoadingMore ? "Cargando…" : "Cargar más"}
           </button>

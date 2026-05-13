@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@/shared/repositories/supabase/client";
+import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
 import {
   MockStoreValidationService,
   storeValidationService as mockService,

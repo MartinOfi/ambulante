@@ -6,11 +6,11 @@ import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/
 import { StoreValidationQueue } from "./StoreValidationQueue";
 
 export function StoreValidationQueueContainer() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { data: stores = [], isLoading } = useStoreValidationQueueQuery();
 
   function handleSelectStore(storeId: string) {
-    router.push(buildHref(ROUTES.admin.storeDetail, { storeId }));
+    push(buildHref(ROUTES.admin.storeDetail, { storeId }));
   }
 
   return (

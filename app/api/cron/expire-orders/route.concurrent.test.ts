@@ -151,9 +151,12 @@ describe.skipIf(!supabaseAvailable)("POST /api/cron/expire-orders — concurrent
 
     // 4. Each of our orders fired exactly one ORDER_EXPIRED event — no
     //    duplicates means SKIP LOCKED truly partitioned the work.
-    const ourPublishedEvents = mockPublish.mock.calls
-      .map((args) => args[0] as { type: string; orderId: string })
-      .filter((event) => event.type === "ORDER_EXPIRED" && orderPublicIds.includes(event.orderId));
+    const ourPublishedEvents = mockPublish.mock.calls.flatMap((args) => {
+      const event = args[0] as { type: string; orderId: string };
+      return event.type === "ORDER_EXPIRED" && orderPublicIds.includes(event.orderId)
+        ? [event]
+        : [];
+    });
     expect(ourPublishedEvents).toHaveLength(TOTAL_ORDERS);
     const orderIdsPublished = new Set(ourPublishedEvents.map((e) => e.orderId));
     expect(orderIdsPublished.size).toBe(TOTAL_ORDERS);

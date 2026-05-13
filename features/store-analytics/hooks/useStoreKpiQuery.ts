@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { storeAnalyticsService } from "@/features/store-analytics/services/store-analytics.service";
 import type { AnalyticsPeriod } from "@/features/store-analytics/types/store-analytics.types";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const ANALYTICS_QUERY_KEYS = {
   byStore: (storeId: string, period: AnalyticsPeriod) =>
-    ["analytics", "store", storeId, period] as const,
+    ["analytics", USER_ROLES.store, storeId, period] as const,
 } as const;
 
 export function useStoreKpiQuery(storeId: string) {

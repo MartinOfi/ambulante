@@ -21,9 +21,38 @@ interface RegisterFormProps {
   readonly onSubmit: (values: RegisterValues) => Promise<void>;
   readonly isLoading: boolean;
   readonly serverError: string | null;
+  readonly isRegistered?: boolean;
 }
 
-export function RegisterForm({ form, onSubmit, isLoading, serverError }: RegisterFormProps) {
+export function RegisterForm({
+  form,
+  onSubmit,
+  isLoading,
+  serverError,
+  isRegistered,
+}: RegisterFormProps) {
+  if (isRegistered) {
+    return (
+      <div className="space-y-4 text-center">
+        <p className="text-sm font-medium text-foreground">¡Cuenta creada con éxito!</p>
+        <p className="text-xs text-muted-foreground">
+          Te enviamos un email de confirmación. Revisá tu bandeja de entrada y hacé clic en el
+          enlace para activar tu cuenta.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Una vez confirmado,{" "}
+          <Link
+            href={ROUTES.auth.login}
+            className="underline underline-offset-4 hover:text-foreground"
+          >
+            iniciá sesión
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

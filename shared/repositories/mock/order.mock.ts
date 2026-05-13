@@ -44,8 +44,11 @@ export class MockOrderRepository implements OrderRepository {
     // Suficiente para tests de UI sin Supabase. La paginación real se prueba
     // en SupabaseOrderRepository.test contra el query builder.
     const filtered = this.orders
-      .filter((order) => order.clientId === customerId)
-      .filter((order) => opts.status === undefined || order.status === opts.status)
+      .filter(
+        (order) =>
+          order.clientId === customerId &&
+          (opts.status === undefined || order.status === opts.status),
+      )
       .slice()
       .sort((a, b) => (b.createdAt > a.createdAt ? 1 : b.createdAt < a.createdAt ? -1 : 0));
     return { orders: filtered.slice(0, limit), nextCursor: null };

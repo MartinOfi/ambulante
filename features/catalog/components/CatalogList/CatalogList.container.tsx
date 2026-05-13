@@ -4,28 +4,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { buildHref, ROUTES } from "@/shared/constants/routes";
-import { useSession } from "@/shared/hooks/useSession";
+import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { useCatalogQuery } from "@/features/catalog/hooks/useCatalogQuery";
 import { useDeleteProductMutation } from "@/features/catalog/hooks/useDeleteProductMutation";
 import { CatalogList } from "./CatalogList";
 
 export function CatalogListContainer() {
   const t = useTranslations("Catalog.List");
-  const router = useRouter();
-  const sessionState = useSession();
-  const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : "";
+  const { push } = useRouter();
+  const storeQuery = useCurrentStoreQuery();
+  const storeId = storeQuery.data?.id ?? "";
 
   const { data: products = [], isLoading, isError } = useCatalogQuery(storeId);
   const deleteMutation = useDeleteProductMutation();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function handleEdit(productId: string) {
-    router.push(buildHref(ROUTES.store.catalogEdit, { productId }));
+    push(buildHref(ROUTES.store.catalogEdit, { productId }));
   }
 
   async function handleDelete(productId: string) {
     if (!storeId) {
-      router.push(ROUTES.public.home);
+      push(ROUTES.public.home);
       return;
     }
     setDeletingId(productId);

@@ -6,7 +6,7 @@ const STATUS_CLASSES: Record<KpiStatus, string> = {
   [KPI_STATUS.SUCCESS]: "bg-green-100 text-green-800",
   [KPI_STATUS.WARNING]: "bg-yellow-100 text-yellow-800",
   [KPI_STATUS.DANGER]: "bg-red-100 text-red-800",
-  [KPI_STATUS.NEUTRAL]: "bg-gray-100 text-gray-600",
+  [KPI_STATUS.NEUTRAL]: "bg-zinc-100 text-zinc-600",
 };
 
 const STATUS_LABELS: Record<KpiStatus, string> = {

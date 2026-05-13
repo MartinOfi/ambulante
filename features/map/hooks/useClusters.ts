@@ -2,7 +2,7 @@ import { useMemo, useCallback } from "react";
 import Supercluster from "supercluster";
 import type { BBox } from "geojson";
 import type { ViewState } from "react-map-gl/maplibre";
-import type { Store, StoreKind } from "@/shared/types/store";
+import type { Store, StoreKind, Coordinates } from "@/shared/types/store";
 import { CLUSTER_CONFIG } from "@/features/map/constants";
 
 export interface StorePointProperties {
@@ -41,19 +41,21 @@ function buildIndex(stores: readonly Store[]): Supercluster<StorePointProperties
     maxZoom: CLUSTER_CONFIG.MAX_ZOOM,
   });
 
-  const points = stores.map((store) => ({
-    type: "Feature" as const,
-    geometry: {
-      type: "Point" as const,
-      coordinates: [store.location.lng, store.location.lat] as [number, number],
-    },
-    properties: {
-      cluster: false as const,
-      storeId: store.id,
-      storeKind: store.kind,
-      storeName: store.name,
-    },
-  }));
+  const points = stores
+    .filter((store): store is Store & { location: Coordinates } => store.location !== null)
+    .map((store) => ({
+      type: "Feature" as const,
+      geometry: {
+        type: "Point" as const,
+        coordinates: [store.location.lng, store.location.lat] as [number, number],
+      },
+      properties: {
+        cluster: false as const,
+        storeId: store.id,
+        storeKind: store.kind,
+        storeName: store.name,
+      },
+    }));
 
   index.load(points);
   return index;

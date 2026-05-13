@@ -117,7 +117,11 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const { data: appUser } = await supabase.from("users").select("role").eq("id", user.id).single();
+  const { data: appUser } = await supabase
+    .from("users")
+    .select("role")
+    .eq("auth_user_id", user.id)
+    .single();
 
   const roleResult = userRoleSchema.safeParse(appUser?.role);
   if (!roleResult.success || roleResult.data !== requiredRole) {

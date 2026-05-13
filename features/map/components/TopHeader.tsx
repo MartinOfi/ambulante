@@ -15,7 +15,7 @@ export function TopHeader({ radius, onRadiusChange, userInitial = "J" }: TopHead
       <div className="flex items-center justify-between gap-3 px-4 pt-3">
         <button
           type="button"
-          className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-surface-elevated font-display text-lg font-bold text-foreground shadow-sheet ring-1 ring-border"
+          className="pointer-events-auto grid size-11 place-items-center rounded-full bg-surface-elevated font-display text-lg font-bold text-foreground shadow-sheet ring-1 ring-border"
           aria-label="Tu perfil"
         >
           {userInitial}

@@ -16,7 +16,7 @@ vi.mock("next/image", () => ({
   }) => <img src={src} alt={alt} onLoad={onLoad} onError={onError} />, // eslint-disable-line @next/next/no-img-element
 }));
 
-vi.mock("@/shared/services/storage", () => ({
+vi.mock("@/shared/services", () => ({
   storageService: {
     upload: vi.fn(),
   },
@@ -26,11 +26,12 @@ vi.mock("@/shared/utils/image-upload", () => ({
   resizeImageForUpload: vi.fn(),
 }));
 
-import { storageService } from "@/shared/services/storage";
+import { storageService } from "@/shared/services";
 import { resizeImageForUpload } from "@/shared/utils/image-upload";
 import { ProductImageUploadContainer } from "./ProductImageUpload.container";
 
 const MOCK_URL = "https://mock-storage.ambulante.local/products/abc.jpg";
+const STORE_ID = "store-test-123";
 
 function makeFile(type = "image/jpeg", size = 1024): File {
   const file = new File(["x"], "photo.jpg", { type });
@@ -61,19 +62,25 @@ describe("ProductImageUploadContainer", () => {
   });
 
   it("renders upload button when no image", () => {
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
     expect(screen.getByRole("button", { name: /subir imagen/i })).toBeInTheDocument();
   });
 
   it("renders change button and preview when currentUrl provided", () => {
-    render(<ProductImageUploadContainer currentUrl={MOCK_URL} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={MOCK_URL} onUploaded={vi.fn()} />,
+    );
     expect(screen.getByRole("button", { name: /cambiar imagen/i })).toBeInTheDocument();
     expect(screen.getByAltText(/vista previa/i)).toBeInTheDocument();
   });
 
   it("calls onUploaded with the returned URL on success", async () => {
     const onUploaded = vi.fn();
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={onUploaded} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile()] } });
@@ -82,7 +89,9 @@ describe("ProductImageUploadContainer", () => {
   });
 
   it("shows error when file type is not allowed", async () => {
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile("application/pdf")] } });
@@ -92,7 +101,9 @@ describe("ProductImageUploadContainer", () => {
   });
 
   it("shows error when file exceeds 5 MB limit", async () => {
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
 
     const bigFile = makeFile("image/jpeg", 6 * 1024 * 1024);
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -108,7 +119,9 @@ describe("ProductImageUploadContainer", () => {
       error: "Server error",
     });
 
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile()] } });
@@ -119,7 +132,9 @@ describe("ProductImageUploadContainer", () => {
   it("disables button while uploading", async () => {
     vi.mocked(storageService.upload).mockReturnValue(new Promise(() => {}));
 
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile()] } });
@@ -137,7 +152,9 @@ describe("ProductImageUploadContainer", () => {
     });
     vi.mocked(storageService.upload).mockReturnValue(new Promise(() => {}));
 
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={vi.fn()} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={vi.fn()} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile()] } });
@@ -157,7 +174,9 @@ describe("ProductImageUploadContainer", () => {
     });
 
     const onUploaded = vi.fn();
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={onUploaded} />,
+    );
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement;
     fireEvent.change(input, { target: { files: [makeFile()] } });
@@ -171,7 +190,9 @@ describe("ProductImageUploadContainer", () => {
 
   it("sets preview and calls onUploaded when URL is committed via Enter", () => {
     const onUploaded = vi.fn();
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={onUploaded} />,
+    );
 
     const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
     fireEvent.change(urlInput, { target: { value: "https://example.com/photo.jpg" } });
@@ -186,7 +207,9 @@ describe("ProductImageUploadContainer", () => {
 
   it("sets preview and calls onUploaded when URL input loses focus", () => {
     const onUploaded = vi.fn();
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={onUploaded} />,
+    );
 
     const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
     fireEvent.change(urlInput, { target: { value: "https://example.com/photo.jpg" } });
@@ -197,7 +220,9 @@ describe("ProductImageUploadContainer", () => {
 
   it("ignores empty URL on commit", () => {
     const onUploaded = vi.fn();
-    render(<ProductImageUploadContainer currentUrl={null} onUploaded={onUploaded} />);
+    render(
+      <ProductImageUploadContainer storeId={STORE_ID} currentUrl={null} onUploaded={onUploaded} />,
+    );
 
     const urlInput = screen.getByRole("textbox", { name: /url de imagen/i });
     fireEvent.change(urlInput, { target: { value: "   " } });

@@ -18,7 +18,7 @@ export function StoreProfilePage({ profile, onSave, isSaving }: StoreProfilePage
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
+      <h1 className="mb-6 text-2xl font-semibold">{t("title")}</h1>
       <StoreProfileForm defaultValues={profile} onSubmit={onSave} isPending={isSaving} />
     </div>
   );

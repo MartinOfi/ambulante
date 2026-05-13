@@ -23,7 +23,7 @@ export function AvatarUpload({
 }: AvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleClick = () => inputRef.current?.click();
+  const openFilePicker = () => inputRef.current?.click();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,12 +50,12 @@ export function AvatarUpload({
         ) : (
           <div
             aria-hidden
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground"
+            className="flex size-16 items-center justify-center rounded-full bg-muted text-muted-foreground"
           >
             ?
           </div>
         )}
-        <Button type="button" onClick={handleClick} disabled={isPending}>
+        <Button type="button" onClick={openFilePicker} disabled={isPending}>
           {isPending ? PENDING_LABEL : SUBMIT_LABEL}
         </Button>
         <input

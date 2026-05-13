@@ -35,9 +35,13 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   minute: "2-digit",
 };
 
-function formatTotalArs(items: ReadonlyArray<{ productPriceArs: number; quantity: number }>): string {
+const TOTAL_ARS_FORMAT = new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" });
+
+function formatTotalArs(
+  items: ReadonlyArray<{ productPriceArs: number; quantity: number }>,
+): string {
   const total = items.reduce((sum, item) => sum + item.productPriceArs * item.quantity, 0);
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(total);
+  return TOTAL_ARS_FORMAT.format(total);
 }
 
 export function UserOrdersTable({ orders }: UserOrdersTableProps) {

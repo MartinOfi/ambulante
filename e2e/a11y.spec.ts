@@ -3,6 +3,7 @@ import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
 
 import { CLIENT_ROUTES, PUBLIC_ROUTES } from "./constants";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const CRITICAL_IMPACTS = ["critical", "serious"] as const;
 
@@ -17,7 +18,7 @@ function makeClientSessionCookie(): string {
     accessToken: "mock-access-client",
     refreshToken: "mock-refresh-client",
     expiresAt: Math.floor(Date.now() / 1000) + 3600,
-    user: { id: "client-user-id", email: "client@test.com", role: "client" },
+    user: { id: "client-user-id", email: "client@test.com", role: USER_ROLES.client },
   };
   return btoa(JSON.stringify(session));
 }

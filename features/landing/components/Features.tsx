@@ -46,8 +46,8 @@ export function Features() {
               key={title}
               className="flex flex-col rounded-card border border-border bg-surface p-6 transition-colors hover:border-brand"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
-                <Icon className="h-5 w-5" aria-hidden="true" />
+              <div className="flex size-11 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                <Icon className="size-5" aria-hidden="true" />
               </div>
               <Text variant="heading-sm" className="mt-5 uppercase tracking-tight text-foreground">
                 {title}

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { setSessionCookie } from "./helpers";
+import { USER_ROLES } from "@/shared/constants/user";
 
 // Uses store-demo-2 seed (orders.mock.ts) to avoid state conflicts with realtime.spec.ts
 // which consumes the store-demo-1 RECIBIDO order.
@@ -12,15 +13,21 @@ const REALTIME_SLA_MS = 5_000;
 test("order acceptance propagates to client view within 5 s (PRD §7.2 SLA)", async ({
   browser,
 }) => {
-  const clientContext = await browser.newContext();
-  const storeContext = await browser.newContext();
+  const [clientContext, storeContext] = await Promise.all([
+    browser.newContext(),
+    browser.newContext(),
+  ]);
 
   try {
-    await setSessionCookie(clientContext, "client", DEMO_CLIENT_ID);
-    await setSessionCookie(storeContext, "store", DEMO_STORE_ID);
+    await Promise.all([
+      setSessionCookie(clientContext, USER_ROLES.client, DEMO_CLIENT_ID),
+      setSessionCookie(storeContext, USER_ROLES.store, DEMO_STORE_ID),
+    ]);
 
-    const clientPage = await clientContext.newPage();
-    const storePage = await storeContext.newPage();
+    const [clientPage, storePage] = await Promise.all([
+      clientContext.newPage(),
+      storeContext.newPage(),
+    ]);
 
     // Client filters orders to RECIBIDO — capture current count (may be >1 if both
     // RECIBIDO seeds are still present when this spec runs before realtime.spec.ts).

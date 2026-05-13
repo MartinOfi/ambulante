@@ -7,7 +7,7 @@ import { StoreAnalyticsDashboard } from "./StoreAnalyticsDashboard";
 function LoadingState() {
   return (
     <main className="mx-auto max-w-2xl p-4">
-      <p className="text-sm text-muted-foreground">Cargando métricas...</p>
+      <p className="text-sm text-muted-foreground">Cargando métricas…</p>
     </main>
   );
 }

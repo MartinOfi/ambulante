@@ -1,7 +1,7 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
-
-function makeSessionCookie(role: "client" | "store" | "admin"): string {
+import { USER_ROLES } from "@/shared/constants/user";
+function makeSessionCookie(role: (typeof USER_ROLES)[keyof typeof USER_ROLES]): string {
   const session = {
     accessToken: `mock-access-${role}`,
     refreshToken: `mock-refresh-${role}`,
@@ -15,7 +15,10 @@ function makeSessionCookie(role: "client" | "store" | "admin"): string {
   return btoa(JSON.stringify(session));
 }
 
-async function setSessionCookie(context: BrowserContext, role: "client" | "store" | "admin") {
+async function setSessionCookie(
+  context: BrowserContext,
+  role: (typeof USER_ROLES)[keyof typeof USER_ROLES],
+) {
   await context.addCookies([
     {
       name: SESSION_COOKIE_NAME,
@@ -45,19 +48,19 @@ test.describe("middleware auth gating — unauthenticated redirects", () => {
 
 test.describe("middleware auth gating — authorized access", () => {
   test("client cookie passes /map", async ({ page, context }) => {
-    await setSessionCookie(context, "client");
+    await setSessionCookie(context, USER_ROLES.client);
     await page.goto("/map");
     expect(page.url()).toContain("/map");
   });
 
   test("store cookie passes /store/dashboard", async ({ page, context }) => {
-    await setSessionCookie(context, "store");
+    await setSessionCookie(context, USER_ROLES.store);
     await page.goto("/store/dashboard");
     expect(page.url()).toContain("/store");
   });
 
   test("admin cookie passes /admin/dashboard", async ({ page, context }) => {
-    await setSessionCookie(context, "admin");
+    await setSessionCookie(context, USER_ROLES.admin);
     await page.goto("/admin/dashboard");
     expect(page.url()).toContain("/admin");
   });
@@ -65,19 +68,19 @@ test.describe("middleware auth gating — authorized access", () => {
 
 test.describe("middleware auth gating — wrong role redirects", () => {
   test("client cookie is rejected on /store/dashboard", async ({ page, context }) => {
-    await setSessionCookie(context, "client");
+    await setSessionCookie(context, USER_ROLES.client);
     await page.goto("/store/dashboard");
     expect(page.url()).not.toContain("/store");
   });
 
   test("store cookie is rejected on /map", async ({ page, context }) => {
-    await setSessionCookie(context, "store");
+    await setSessionCookie(context, USER_ROLES.store);
     await page.goto("/map");
     expect(page.url()).not.toContain("/map");
   });
 
   test("client cookie is rejected on /admin/dashboard", async ({ page, context }) => {
-    await setSessionCookie(context, "client");
+    await setSessionCookie(context, USER_ROLES.client);
     await page.goto("/admin/dashboard");
     expect(page.url()).not.toContain("/admin");
   });

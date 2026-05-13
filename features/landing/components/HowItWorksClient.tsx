@@ -5,6 +5,7 @@ import { MapPinned, Radar, ShoppingBasket, Send, Handshake } from "lucide-react"
 import RadialOrbitalTimeline, {
   type TimelineItem,
 } from "@/shared/components/ui/radial-orbital-timeline";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const TIMELINE: TimelineItem[] = [
   {
@@ -12,7 +13,7 @@ const TIMELINE: TimelineItem[] = [
     title: "Activá ubicación",
     date: "Paso 01",
     content: "Abrimos el mapa centrado en vos. Sin registro obligatorio para explorar tu zona.",
-    category: "Cliente",
+    category: USER_ROLES.client,
     icon: MapPinned,
     relatedIds: [2],
     status: "completed",
@@ -24,7 +25,7 @@ const TIMELINE: TimelineItem[] = [
     date: "Paso 02",
     content:
       "Tiendas ambulantes activas dentro de tu radio configurable. Filtros por rubro y horario.",
-    category: "Cliente",
+    category: USER_ROLES.client,
     icon: Radar,
     relatedIds: [1, 3],
     status: "completed",
@@ -36,7 +37,7 @@ const TIMELINE: TimelineItem[] = [
     date: "Paso 03",
     content:
       "Elegís productos y cantidades del catálogo de la tienda. Snapshot de precios al momento de pedir.",
-    category: "Cliente",
+    category: USER_ROLES.client,
     icon: ShoppingBasket,
     relatedIds: [2, 4],
     status: "in-progress",

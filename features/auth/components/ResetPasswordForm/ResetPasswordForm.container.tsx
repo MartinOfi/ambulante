@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -12,10 +12,10 @@ import { ROUTES } from "@/shared/constants/routes";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export function ResetPasswordFormContainer() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? "";
-  const [isLoading, setIsLoading] = useState(false);
+  const { push } = useRouter();
+  const { get } = useSearchParams();
+  const token = get("token") ?? "";
+  const [isLoading, startTransition] = useTransition();
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -33,17 +33,16 @@ export function ResetPasswordFormContainer() {
   }
 
   async function handleSubmit(_values: ResetPasswordValues): Promise<void> {
-    setIsLoading(true);
     setServerError(null);
-    try {
-      await new Promise<void>((resolve) => setTimeout(resolve, 600));
-      setSubmitted(true);
-      router.push(ROUTES.auth.login);
-    } catch {
-      setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
-    } finally {
-      setIsLoading(false);
-    }
+    startTransition(async () => {
+      try {
+        await new Promise<void>((resolve) => setTimeout(resolve, 600));
+        setSubmitted(true);
+        push(ROUTES.auth.login);
+      } catch {
+        setServerError("Ocurrió un error inesperado. Intentá de nuevo.");
+      }
+    });
   }
 
   return (

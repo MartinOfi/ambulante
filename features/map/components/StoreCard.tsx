@@ -19,7 +19,7 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
       onClick={() => onClick?.(store.id)}
       className="group flex w-full items-center gap-3 rounded-card bg-surface-elevated p-3 text-left shadow-sheet ring-1 ring-border transition-transform duration-200 active:scale-[0.98]"
     >
-      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-border">
+      <div className="relative size-20 shrink-0 overflow-hidden rounded-2xl bg-border">
         <Image
           src={store.photoUrl ?? PLACEHOLDER_STORE_PHOTO_URL}
           alt={store.name}
@@ -42,7 +42,7 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
         <div className="mt-1 flex items-center gap-2">
           {store.status === "open" && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-xs-tight font-semibold text-success">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
+              <span className="size-1.5 animate-pulse rounded-full bg-success" />
               Abierto ahora
             </span>
           )}
@@ -57,7 +57,7 @@ export function StoreCard({ store, onClick }: StoreCardProps) {
         </div>
       </div>
 
-      <ChevronRight className="h-5 w-5 shrink-0 text-muted transition-transform group-hover:translate-x-0.5" />
+      <ChevronRight className="size-5 shrink-0 text-muted transition-transform group-hover:translate-x-0.5" />
     </button>
   );
 }

@@ -227,7 +227,7 @@ import { authService, realtimeService, pushService, storageService } from "@/sha
 - Implementa `AuthService` con llamadas reales a Supabase (B4.3).
 - Importa `createBrowserClient` de `@supabase/ssr`; instancia el cliente con env vars dentro de cada método (lazy, no module-level).
 - **Interface completa:** `signIn`, `signUp`, `signInWithMagicLink` (OTP), `signInWithGoogle` (OAuth — `skipBrowserRedirect: true`, devuelve `{ url }`), `signOut`, `getSession`, `getUser`, `onAuthStateChange`.
-- **Mapeo de roles:** `user_metadata.role` → fallback `app_metadata.role` → default `"client"`. Solo acepta `"store"` y `"admin"` como valores explícitos.
+- **Mapeo de roles:** `user_metadata.role` → fallback `app_metadata.role` → default `USER_ROLES.client`. Solo acepta `USER_ROLES.store` y `"admin"` como valores explícitos.
 
 ### `supabaseRealtimeService` — `shared/services/realtime.supabase.ts` ✅ B6.2
 - Implementa `RealtimeService` (misma interface que `realtime.ts`) usando Supabase Realtime broadcast.
@@ -325,7 +325,7 @@ Cuatro factories que wrappean `@supabase/ssr` con la configuración de cookies c
 
 ### Mappers — `shared/repositories/supabase/mappers.ts`
 Funciones puras de conversión DB ↔ dominio:
-- `dbRoleToDomain` / `domainRoleToDb` — `"cliente" ↔ "client"`, `"tienda" ↔ "store"`
+- `dbRoleToDomain` / `domainRoleToDb` — `USER_ROLES.client ↔ USER_ROLES.client`, `"tienda" ↔ USER_ROLES.store`
 - `dbStatusToDomain` / `domainStatusToDb` — `"aceptado" ↔ "ACEPTADO"` (uppercase en dominio)
 - `dbCategoryToKind` — category string → `StoreKind` (fallback `"food-truck"`)
 - `dbAvailableToStatus` — `boolean → "open" | "closed"`

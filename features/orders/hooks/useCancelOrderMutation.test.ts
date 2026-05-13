@@ -9,6 +9,7 @@ import { cancelOrder } from "@/features/orders/actions";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { queryKeys } from "@/shared/query/keys";
 import type { Order } from "@/shared/schemas/order";
+import { USER_ROLES } from "@/shared/constants/user";
 
 vi.mock("@/shared/services/auth", () => ({
   authService: { getSession: vi.fn() },
@@ -44,7 +45,7 @@ const STUB_ORDER_ENVIADO: Order = {
 };
 
 const STUB_SESSION_CLIENT = {
-  user: { id: "client-1", email: "client@test.com", role: "client" as const },
+  user: { id: "client-1", email: "client@test.com", role: USER_ROLES.client },
   accessToken: "token",
   refreshToken: "refresh",
   expiresAt: 9999999999,
@@ -81,7 +82,7 @@ describe("useCancelOrderMutation", () => {
   it("throws when role is store", async () => {
     mockGetSession.mockResolvedValueOnce({
       ...STUB_SESSION_CLIENT,
-      user: { ...STUB_SESSION_CLIENT.user, role: "store" as const },
+      user: { ...STUB_SESSION_CLIENT.user, role: "tienda" as const },
     });
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });

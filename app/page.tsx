@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   Faq,
   Features,
@@ -7,6 +8,12 @@ import {
   LandingFooter,
   LandingNav,
 } from "@/features/landing";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "Ambulante — Tiendas ambulantes cerca tuyo en tiempo real",
+  },
+};
 
 export const dynamic = "force-static";
 

@@ -15,7 +15,7 @@ import { MapScreen } from "./MapScreen";
 export function MapScreenContainer() {
   const [radius, setRadius] = useRadiusParam();
   const geo = useGeolocation();
-  const router = useRouter();
+  const { push } = useRouter();
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -65,7 +65,7 @@ export function MapScreenContainer() {
       });
       if (result.ok) {
         clearCart();
-        router.push(`/orders/${result.publicId}`);
+        push(`/orders/${result.publicId}`);
       } else {
         console.error("[checkout] submitOrder returned !ok", result);
         toast.error("No pudimos enviar tu pedido. Intentá de nuevo.");
@@ -76,7 +76,7 @@ export function MapScreenContainer() {
     } finally {
       setIsCheckingOut(false);
     }
-  }, [activeStoreId, items, clearCart, router]);
+  }, [activeStoreId, items, clearCart, push]);
 
   return (
     <MapScreen

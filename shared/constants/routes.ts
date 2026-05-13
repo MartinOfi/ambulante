@@ -40,6 +40,7 @@ export const ROUTES = {
     profile: "/store/profile",
     order: "/store/order/:orderId",
     pendingApproval: "/store/pending-approval",
+    rejected: "/store/rejected",
   },
   legal: {
     privacy: "/legal/privacy",

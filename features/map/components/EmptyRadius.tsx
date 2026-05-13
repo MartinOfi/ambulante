@@ -13,8 +13,8 @@ export function EmptyRadius({ radius, onExpandRadius }: EmptyRadiusProps) {
   const canExpand = radius < MAX_EXPAND_RADIUS;
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-10 text-center">
-      <div className="grid h-16 w-16 place-items-center rounded-full bg-surface ring-1 ring-border">
-        <PackageOpen className="h-8 w-8 text-muted" strokeWidth={2} />
+      <div className="grid size-16 place-items-center rounded-full bg-surface ring-1 ring-border">
+        <PackageOpen className="size-8 text-muted" strokeWidth={2} />
       </div>
       <div className="flex flex-col gap-1">
         <p className="font-display text-lg font-bold text-foreground">Nada por acá todavía</p>

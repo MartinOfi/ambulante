@@ -85,11 +85,16 @@ async function seedDemoOrders(): Promise<void> {
   }
 }
 
-seedDemoOrders().catch((err) => {
-  logger.error("seedDemoOrders failed", {
-    error: err instanceof Error ? err.message : String(err),
+const isMockMode =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (isMockMode) {
+  seedDemoOrders().catch((err) => {
+    logger.error("seedDemoOrders failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
   });
-});
+}
 
 function delay(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, MOCK_NETWORK_DELAY_MS));

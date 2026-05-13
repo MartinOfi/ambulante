@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { parseSessionCookie, serializeSessionCookie } from "./session-cookie";
 import type { Session } from "@/shared/types/user";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const VALID_SESSION: Session = {
   accessToken: "mock-access-token",
@@ -9,7 +10,7 @@ const VALID_SESSION: Session = {
   user: {
     id: "user-1",
     email: "client@test.com",
-    role: "client",
+    role: USER_ROLES.client,
   },
 };
 

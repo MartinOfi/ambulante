@@ -3,7 +3,7 @@ import type { KpiDashboardProps } from "./KpiDashboard.types";
 
 export function KpiDashboard({ cards, isLoading, error }: KpiDashboardProps) {
   if (isLoading) {
-    return <p className="text-muted-foreground text-sm py-8">Cargando métricas...</p>;
+    return <p className="text-muted-foreground text-sm py-8">Cargando métricas…</p>;
   }
 
   if (error) {

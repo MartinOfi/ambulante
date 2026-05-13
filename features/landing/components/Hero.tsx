@@ -28,17 +28,21 @@ const ACTIVE_VENDORS: readonly ActiveVendor[] = [
   { name: "Libros en la Plaza", icon: BookOpen, distance: "600m" },
 ];
 
+const MARQUEE_ITEMS = (["a", "b", "c"] as const).flatMap((prefix) =>
+  ACTIVE_VENDORS.map((vendor) => ({ ...vendor, uniqueKey: `${prefix}-${vendor.name}` })),
+);
+
 export function Hero() {
   return (
     <section className="relative w-full overflow-hidden bg-surface font-sans text-foreground">
       {/* Ambient brand glows — warm orange halos work on both cream and near-black */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-20 z-0 h-96 w-96 rounded-full bg-brand/20 blur-ambient"
+        className="pointer-events-none absolute -left-40 top-20 z-0 size-96 rounded-full bg-brand/20 blur-ambient"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-40 top-40 z-0 h-96 w-96 rounded-full bg-brand/10 blur-ambient"
+        className="pointer-events-none absolute -right-40 top-40 z-0 size-96 rounded-full bg-brand/10 blur-ambient"
       />
       {/* Dot pattern uses currentColor so it inverts with the theme */}
       <div
@@ -71,13 +75,13 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 md:pb-24 lg:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8">
-          <div className="flex flex-col justify-center space-y-8 lg:col-span-7">
+          <div className="flex flex-col justify-center gap-y-8 lg:col-span-7">
             <div className="amb-fade-in amb-delay-100">
               <div className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-foreground/10">
                 <LiveDot />
                 <span className="flex items-center gap-2 text-2xs font-semibold uppercase tracking-wider text-muted sm:text-xs">
                   Tiendas ambulantes en vivo
-                  <Sparkles className="h-3.5 w-3.5 fill-brand text-brand" aria-hidden="true" />
+                  <Sparkles className="size-3.5 fill-brand text-brand" aria-hidden="true" />
                 </span>
               </div>
             </div>
@@ -107,7 +111,7 @@ export function Hero() {
                 href="#tiendas"
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-white shadow-pin transition-all hover:scale-[1.02] hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
-                <Radio className="h-4 w-4" aria-hidden="true" />
+                <Radio className="size-4" aria-hidden="true" />
                 Registrá tu tienda · Gratis
               </Link>
 
@@ -117,7 +121,7 @@ export function Hero() {
               >
                 Ver quién está activo
                 <ArrowRight
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  className="size-4 transition-transform group-hover:translate-x-1"
                   aria-hidden="true"
                 />
               </Link>
@@ -142,12 +146,12 @@ export function Hero() {
                 }}
               >
                 <div className="amb-marquee flex gap-8 whitespace-nowrap px-4">
-                  {[...ACTIVE_VENDORS, ...ACTIVE_VENDORS, ...ACTIVE_VENDORS].map((vendor, i) => (
+                  {MARQUEE_ITEMS.map((vendor) => (
                     <div
-                      key={`${vendor.name}-${i}`}
+                      key={vendor.uniqueKey}
                       className="flex items-center gap-2.5 rounded-full border border-foreground/10 bg-foreground/5 px-4 py-2 transition-all hover:scale-105 hover:border-brand/40 hover:bg-brand/10"
                     >
-                      <vendor.icon className="h-4 w-4 text-brand" />
+                      <vendor.icon className="size-4 text-brand" />
                       <span className="text-sm font-semibold tracking-tight text-foreground">
                         {vendor.name}
                       </span>
@@ -166,9 +170,9 @@ export function Hero() {
 
 function LiveDot() {
   return (
-    <span aria-hidden="true" className="relative flex h-2 w-2">
+    <span aria-hidden="true" className="relative flex size-2">
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
-      <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
+      <span className="relative inline-flex size-2 rounded-full bg-brand" />
     </span>
   );
 }

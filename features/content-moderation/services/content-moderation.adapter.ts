@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@/shared/repositories/supabase/client";
+import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
 import { contentModerationService as mockService } from "./content-moderation.mock";
 import { createSupabaseContentModerationService } from "./content-moderation.supabase";
 import type { ContentModerationService } from "./content-moderation.service";

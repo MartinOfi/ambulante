@@ -10,8 +10,8 @@ function LoadingSkeleton() {
       aria-busy="true"
       aria-label="Cargando..."
     >
-      {[0, 1, 2].map((index) => (
-        <div key={index} className="h-16 animate-pulse rounded-lg bg-[hsl(var(--border))]" />
+      {["s0", "s1", "s2"].map((key) => (
+        <div key={key} className="h-16 animate-pulse rounded-lg bg-[hsl(var(--border))]" />
       ))}
     </div>
   );
@@ -48,7 +48,9 @@ export function OrderAuditLog({ result, isSearching, error, onSearch }: OrderAud
   return (
     <main className="flex flex-col gap-6 p-6 max-w-2xl">
       <header>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">Historial de pedidos</h1>
+        <h1 className="text-2xl font-semibold text-[hsl(var(--foreground))]">
+          Historial de pedidos
+        </h1>
         <p className="mt-1 text-sm text-[hsl(var(--muted))]">
           Buscá un pedido por ID para ver el timeline completo de transiciones.
         </p>

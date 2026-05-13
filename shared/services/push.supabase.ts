@@ -7,31 +7,7 @@ import { SupabasePushSubscriptionRepository } from "@/shared/repositories/supaba
 import { logger } from "@/shared/utils/logger";
 
 import type { PushNotificationPayload, ServerPushSender } from "./push.types";
-import type { PushService, PushPermissionStatus, PushSubscriptionData } from "./push.types";
 import type { PushSubscription, PushSubscriptionRepository } from "@/shared/repositories";
-
-// ── Browser-facing PushService stub (implemented in B6) ───────────────────────
-
-export const supabasePushService: PushService = {
-  getPermissionStatus(): PushPermissionStatus {
-    throw new Error("TODO — implementar en B6");
-  },
-  async requestPermission(): Promise<PushPermissionStatus> {
-    throw new Error("TODO — implementar en B6");
-  },
-  async subscribe(): Promise<PushSubscriptionData | null> {
-    throw new Error("TODO — implementar en B6");
-  },
-  async unsubscribe(): Promise<boolean> {
-    throw new Error("TODO — implementar en B6");
-  },
-  async getActiveSubscription(): Promise<PushSubscriptionData | null> {
-    throw new Error("TODO — implementar en B6");
-  },
-  async sendTestNotification(_title: string, _body: string): Promise<void> {
-    throw new Error("TODO — implementar en B6");
-  },
-};
 
 // ── Retry + dead subscription cleanup (B8.3) ──────────────────────────────────
 

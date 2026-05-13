@@ -10,7 +10,7 @@ export function ModerationQueue({
   onDismiss,
 }: ModerationQueueProps) {
   if (isLoading) {
-    return <p className="text-muted-foreground py-8 text-center">Cargando reportes...</p>;
+    return <p className="text-muted-foreground py-8 text-center">Cargando reportes…</p>;
   }
 
   if (reports.length === 0) {

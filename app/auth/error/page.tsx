@@ -57,7 +57,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
         </p>
 
         <div className="mb-6 flex justify-center">
-          <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 text-2xl">
+          <span className="inline-flex size-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 text-2xl">
             ✕
           </span>
         </div>

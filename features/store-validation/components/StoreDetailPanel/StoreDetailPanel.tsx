@@ -18,7 +18,7 @@ export function StoreDetailPanel({
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-start gap-4">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
+        <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-zinc-100">
           <Image
             src={store.photoUrl ?? PLACEHOLDER_STORE_PHOTO_URL}
             alt={store.name}

@@ -15,7 +15,7 @@ export interface UserDetailPageContainerProps {
 }
 
 export function UserDetailPageContainer({ userId }: UserDetailPageContainerProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const detailQuery = useUserDetailQuery({ userId });
 
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
@@ -36,7 +36,7 @@ export function UserDetailPageContainer({ userId }: UserDetailPageContainerProps
     onError: (message) => setMutationErrorMessage(message),
   });
 
-  const handleBack = useCallback(() => router.push("/admin/users"), [router]);
+  const handleBack = useCallback(() => push("/admin/users"), [push]);
 
   const handleSuspendRequest = useCallback(() => {
     setMutationErrorMessage(null);

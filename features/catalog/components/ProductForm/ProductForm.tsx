@@ -83,11 +83,17 @@ export function ProductForm({
           )}
         />
 
-        <FormItem>
-          <FormLabel>{t("photoUrlLabel")}</FormLabel>
-          {imageUploadSlot}
-          <FormMessage>{form.formState.errors.photoUrl?.message}</FormMessage>
-        </FormItem>
+        <FormField
+          control={form.control}
+          name="photoUrl"
+          render={() => (
+            <FormItem>
+              <FormLabel>{t("photoUrlLabel")}</FormLabel>
+              {imageUploadSlot}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -99,7 +105,7 @@ export function ProductForm({
                   type="checkbox"
                   checked={field.value}
                   onChange={field.onChange}
-                  className="h-4 w-4 rounded border-input accent-primary"
+                  className="size-4 rounded border-input accent-primary"
                 />
               </FormControl>
               <FormLabel className="!mt-0">{t("availableLabel")}</FormLabel>

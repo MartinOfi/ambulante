@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { SupabaseUserRepository } from "./users.supabase";
 import { createMockSupabaseClient } from "./test-helpers";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const makeDbRow = (overrides = {}) => ({
   public_id: "user-uuid",
-  role: "cliente",
+  role: USER_ROLES.client,
   display_name: "Ana",
   email: "ana@test.com",
   suspended: false,
@@ -33,15 +34,15 @@ describe("SupabaseUserRepository", () => {
 
       const users = await repo.findAll();
       expect(users).toHaveLength(2);
-      expect(users[0].role).toBe("client");
-      expect(users[1].role).toBe("store");
+      expect(users[0].role).toBe(USER_ROLES.client);
+      expect(users[1].role).toBe("tienda");
     });
 
     it("applies role filter", async () => {
       const rows = [makeDbRow()];
       queryMock.range.mockResolvedValue({ data: rows, error: null });
-      await repo.findAll({ role: "client" });
-      expect(queryMock.eq).toHaveBeenCalledWith("role", "cliente");
+      await repo.findAll({ role: USER_ROLES.client });
+      expect(queryMock.eq).toHaveBeenCalledWith("role", USER_ROLES.client);
     });
 
     it("applies suspended filter", async () => {
@@ -88,7 +89,7 @@ describe("SupabaseUserRepository", () => {
       queryMock.maybeSingle.mockResolvedValue({ data: makeDbRow(), error: null });
       const user = await repo.findById("user-uuid");
       expect(user?.id).toBe("user-uuid");
-      expect(user?.role).toBe("client");
+      expect(user?.role).toBe(USER_ROLES.client);
     });
   });
 
@@ -109,7 +110,11 @@ describe("SupabaseUserRepository", () => {
         data: makeDbRow({ public_id: "new-uuid" }),
         error: null,
       });
-      const user = await repo.create({ id: "new-uuid", email: "new@test.com", role: "client" });
+      const user = await repo.create({
+        id: "new-uuid",
+        email: "new@test.com",
+        role: USER_ROLES.client,
+      });
       expect(user.id).toBe("new-uuid");
       expect(fromMock).toHaveBeenCalledWith("users");
     });

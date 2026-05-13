@@ -1,29 +1,31 @@
 import type { User, UserRole } from "@/shared/schemas/user";
-import type { Store, StoreKind, StoreStatus } from "@/shared/schemas/store";
+import type { Store, StoreKind, StoreStatus, StoreValidationStatus } from "@/shared/schemas/store";
 import type { Product } from "@/shared/schemas/product";
 import type { Order, OrderItem } from "@/shared/schemas/order";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import type { OrderStatus } from "@/shared/constants/order";
 import type { PushSubscription } from "@/shared/repositories/push-subscriptions";
 import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
+import { USER_ROLES } from "@/shared/constants/user";
+import { NonRetryableError } from "@/shared/utils/errors";
 
 // ── User role mappings ─────────────────────────────────────────────────────────
 
 const DB_ROLE_TO_DOMAIN: Record<string, UserRole> = {
-  cliente: "client",
-  tienda: "store",
+  cliente: USER_ROLES.client,
+  tienda: "tienda",
   admin: "admin",
 };
 
 const DOMAIN_ROLE_TO_DB: Record<UserRole, string> = {
-  client: "cliente",
-  store: "tienda",
+  cliente: USER_ROLES.client,
+  tienda: "tienda",
   admin: "admin",
 };
 
 export function dbRoleToDomain(dbRole: string): UserRole {
   const mapped = DB_ROLE_TO_DOMAIN[dbRole];
-  if (mapped === undefined) throw new Error(`Unknown DB role: ${dbRole}`);
+  if (mapped === undefined) throw new NonRetryableError(`Unknown DB role: ${dbRole}`);
   return mapped;
 }
 
@@ -36,7 +38,7 @@ export function domainRoleToDb(role: UserRole): string {
 export function dbStatusToDomain(dbStatus: string): OrderStatus {
   const upper = dbStatus.toUpperCase();
   if (!(Object.values(ORDER_STATUS) as string[]).includes(upper)) {
-    throw new Error(`dbStatusToDomain: unknown DB status "${dbStatus}"`);
+    throw new NonRetryableError(`dbStatusToDomain: unknown DB status "${dbStatus}"`);
   }
   return upper as OrderStatus;
 }
@@ -52,11 +54,18 @@ export function dbCategoryToKind(category: string | null): StoreKind {
   const VALID_KINDS: readonly StoreKind[] = ["food-truck", "street-cart", "ice-cream"];
   // Cast required: StoreKind[].includes() only accepts StoreKind, but we're validating an untyped string
   if ((VALID_KINDS as string[]).includes(category)) return category as StoreKind;
-  throw new Error(`dbCategoryToKind: unknown category "${category}"`);
+  throw new NonRetryableError(`dbCategoryToKind: unknown category "${category}"`);
 }
 
 export function dbAvailableToStatus(available: boolean): StoreStatus {
   return available ? "open" : "closed";
+}
+
+export function dbValidationStatusToDomain(
+  raw: string | null | undefined,
+): StoreValidationStatus | undefined {
+  if (raw === "pending" || raw === "approved" || raw === "rejected") return raw;
+  return undefined;
 }
 
 // ── Row → domain mappers ───────────────────────────────────────────────────────
@@ -96,6 +105,7 @@ export interface DbStoreViewRow {
   lng: number | null;
   distance_meters?: number | null;
   cuit?: string | null;
+  validation_status?: string | null;
 }
 
 export function mapStoreRow(row: DbStoreViewRow): Store {
@@ -111,10 +121,8 @@ export function mapStoreRow(row: DbStoreViewRow): Store {
     priceFromArs: row.price_from_ars !== null ? Number(row.price_from_ars) : 0,
     hours: row.hours ?? undefined,
     cuit: row.cuit ?? undefined,
-    location: {
-      lat: row.lat ?? 0,
-      lng: row.lng ?? 0,
-    },
+    validationStatus: dbValidationStatusToDomain(row.validation_status),
+    location: row.lat !== null && row.lng !== null ? { lat: row.lat, lng: row.lng } : null,
     distanceMeters:
       row.distance_meters !== null && row.distance_meters !== undefined ? row.distance_meters : 0,
   };

@@ -11,7 +11,7 @@ export default async function PendingApprovalPage() {
     <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
       <div
         aria-hidden="true"
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-3xl"
+        className="flex size-16 items-center justify-center rounded-full bg-amber-100 text-3xl"
       >
         ⏳
       </div>

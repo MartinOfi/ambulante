@@ -97,7 +97,7 @@ function setAuthenticated(userId: string): void {
       user: {
         id: userId,
         email: "store@test.com",
-        role: "store",
+        role: "tienda",
         displayName: "Tienda Test",
       },
     },

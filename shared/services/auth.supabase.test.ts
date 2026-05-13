@@ -27,11 +27,12 @@ vi.mock("@supabase/ssr", () => ({
 }));
 
 import { supabaseAuthService } from "./auth.supabase";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const mockSupabaseUser = {
   id: "user-123",
   email: "test@example.com",
-  user_metadata: { role: "client", displayName: "Test User" },
+  user_metadata: { role: USER_ROLES.client, displayName: "Test User" },
   app_metadata: {},
 };
 
@@ -67,7 +68,7 @@ describe("supabaseAuthService.signIn", () => {
       expect(result.data.refreshToken).toBe("refresh-token-123");
       expect(result.data.user.id).toBe("public-user-123");
       expect(result.data.user.email).toBe("test@example.com");
-      expect(result.data.user.role).toBe("client");
+      expect(result.data.user.role).toBe(USER_ROLES.client);
       expect(result.data.user.displayName).toBe("Test User");
     }
   });
@@ -136,7 +137,7 @@ describe("supabaseAuthService.signUp", () => {
     const result = await supabaseAuthService.signUp({
       email: "new@example.com",
       password: "password123",
-      role: "client",
+      role: USER_ROLES.client,
     });
 
     expect(result.success).toBe(true);
@@ -186,14 +187,14 @@ describe("supabaseAuthService.signUp", () => {
     await supabaseAuthService.signUp({
       email: "new@example.com",
       password: "password123",
-      role: "store",
+      role: "tienda",
       displayName: "Mi Tienda",
     });
 
     expect(mockAuth.signUp).toHaveBeenCalledWith({
       email: "new@example.com",
       password: "password123",
-      options: { data: { role: "store", displayName: "Mi Tienda" } },
+      options: { data: { role: "tienda", displayName: "Mi Tienda" } },
     });
   });
 });
@@ -368,7 +369,7 @@ describe("supabaseAuthService.getUser", () => {
     expect(user).not.toBeNull();
     expect(user?.id).toBe("public-user-123");
     expect(user?.email).toBe("test@example.com");
-    expect(user?.role).toBe("client");
+    expect(user?.role).toBe(USER_ROLES.client);
     expect(user?.displayName).toBe("Test User");
   });
 
@@ -386,14 +387,14 @@ describe("supabaseAuthService.getUser", () => {
   it("uses app_metadata.role when user_metadata.role is absent", async () => {
     mockAuth.getUser.mockResolvedValue({
       data: {
-        user: { ...mockSupabaseUser, user_metadata: {}, app_metadata: { role: "store" } },
+        user: { ...mockSupabaseUser, user_metadata: {}, app_metadata: { role: "tienda" } },
       },
       error: null,
     });
 
     const user = await supabaseAuthService.getUser();
 
-    expect(user?.role).toBe("store");
+    expect(user?.role).toBe("tienda");
   });
 
   it("defaults to client role when no role metadata", async () => {
@@ -406,7 +407,7 @@ describe("supabaseAuthService.getUser", () => {
 
     const user = await supabaseAuthService.getUser();
 
-    expect(user?.role).toBe("client");
+    expect(user?.role).toBe(USER_ROLES.client);
   });
 
   it("returns null on error", async () => {

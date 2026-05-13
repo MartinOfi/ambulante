@@ -1,5 +1,6 @@
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { SESSION_COOKIE_NAME } from "@/shared/constants/auth";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const ARIA_LABEL_CLOSE_DETAIL = "Cerrar detalle";
 const ARIA_LABEL_EXPAND_SHEET = "Expandir o colapsar hoja";
@@ -10,7 +11,7 @@ function makeClientSessionCookie(): string {
     accessToken: "mock-access-client",
     refreshToken: "mock-refresh-client",
     expiresAt: Math.floor(Date.now() / 1000) + 3600,
-    user: { id: "client-user-id", email: "client@test.com", role: "client" },
+    user: { id: "client-user-id", email: "client@test.com", role: USER_ROLES.client },
   };
   return btoa(JSON.stringify(session));
 }

@@ -76,14 +76,14 @@ export function StoreDetailSheet({
           type="button"
           aria-label="Cerrar detalle"
           onClick={onDismiss}
-          className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white"
+          className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-black/40 text-white"
         >
           <X size={16} />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pt-4 pb-6">
-        <h2 className="font-display text-2xl font-bold leading-tight text-foreground">
+        <h2 className="font-display text-2xl font-semibold leading-tight text-foreground">
           {store.name}
         </h2>
         {store.tagline !== undefined && <p className="mt-1 text-sm text-muted">{store.tagline}</p>}
@@ -104,7 +104,7 @@ export function StoreDetailSheet({
 
           {isLoadingProducts ? (
             <div role="status" aria-label="Cargando productos" className="flex justify-center py-6">
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
+              <span className="size-5 animate-spin rounded-full border-2 border-brand-primary border-t-transparent" />
             </div>
           ) : (
             <ul className="divide-y divide-border">

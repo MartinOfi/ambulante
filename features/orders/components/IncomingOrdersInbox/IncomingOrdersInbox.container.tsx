@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useSession } from "@/shared/hooks/useSession";
+import { useCurrentStoreQuery } from "@/shared/hooks/useCurrentStoreQuery";
 import { useStoreOrdersQuery } from "@/features/orders/hooks/useStoreOrdersQuery";
 import { useNewOrderAlert } from "@/features/orders/hooks/useNewOrderAlert";
 import { useAcceptOrderMutation } from "@/features/orders/hooks/useAcceptOrderMutation";
@@ -10,9 +10,8 @@ import { useFinalizeOrderMutation } from "@/features/orders/hooks/useFinalizeOrd
 import { IncomingOrdersInbox } from "./IncomingOrdersInbox";
 
 export function IncomingOrdersInboxContainer() {
-  const sessionState = useSession();
-
-  const storeId = sessionState.status === "authenticated" ? sessionState.session.user.id : null;
+  const storeQuery = useCurrentStoreQuery();
+  const storeId = storeQuery.data?.id ?? null;
 
   const { data: orders = [], isLoading } = useStoreOrdersQuery({ storeId });
 

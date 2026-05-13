@@ -8,15 +8,15 @@ export function CartSummaryBar({ itemCount, total, isLoading, onCheckout }: Cart
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-zinc-200 px-4 py-3 flex items-center justify-between shadow-lg"
       role="region"
       aria-label="Resumen del carrito"
     >
       <div className="flex flex-col">
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-zinc-500">
           {itemCount} {itemCount === 1 ? "producto" : "productos"}
         </span>
-        <span className="text-lg font-semibold text-gray-900">{formatPrice(total)}</span>
+        <span className="text-lg font-semibold text-zinc-900">{formatPrice(total)}</span>
       </div>
 
       <button

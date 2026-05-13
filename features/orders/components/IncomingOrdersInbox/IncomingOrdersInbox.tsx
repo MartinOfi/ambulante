@@ -52,7 +52,7 @@ export function IncomingOrdersInbox({
   pendingOrderId,
 }: IncomingOrdersInboxProps) {
   if (isLoading) {
-    return <p className="text-sm text-gray-500">Cargando pedidos…</p>;
+    return <p className="text-sm text-zinc-500">Cargando pedidos…</p>;
   }
 
   return (
@@ -65,7 +65,7 @@ export function IncomingOrdersInbox({
       </div>
 
       {orders.length === 0 ? (
-        <p className="text-sm text-gray-400">No hay pedidos entrantes.</p>
+        <p className="text-sm text-zinc-400">No hay pedidos entrantes.</p>
       ) : (
         <ul className="flex flex-col gap-4">
           {orders.map((order) => (

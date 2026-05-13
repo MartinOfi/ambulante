@@ -1,13 +1,21 @@
 "use client";
 
-import { MOCK_STORE_ID } from "@/features/store-profile/services";
+import { useCurrentStoreIdQuery } from "@/features/store-profile/hooks/useCurrentStoreIdQuery";
 import { useStoreProfileQuery } from "@/features/store-profile/hooks/useStoreProfileQuery";
 import { useUpdateStoreProfileMutation } from "@/features/store-profile/hooks/useUpdateStoreProfileMutation";
 import { StoreProfilePage } from "./StoreProfilePage";
 
 export function StoreProfilePageContainer() {
-  const { data: profile, isLoading, isError } = useStoreProfileQuery(MOCK_STORE_ID);
-  const { mutate: saveProfile, isPending } = useUpdateStoreProfileMutation(MOCK_STORE_ID);
+  const { data: storeId, isLoading: isStoreLoading } = useCurrentStoreIdQuery();
+  const resolvedStoreId = storeId ?? null;
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    isError,
+  } = useStoreProfileQuery(resolvedStoreId);
+  const { mutate: saveProfile, isPending } = useUpdateStoreProfileMutation(resolvedStoreId ?? "");
+
+  const isLoading = isStoreLoading || isProfileLoading;
 
   if (isLoading) {
     return (

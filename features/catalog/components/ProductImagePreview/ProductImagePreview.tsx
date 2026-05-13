@@ -20,7 +20,7 @@ export function ProductImagePreview({
   if (status === "error") {
     return (
       <div
-        className="flex h-40 w-40 items-center justify-center rounded-lg border border-destructive bg-destructive/10"
+        className="flex size-40 items-center justify-center rounded-lg border border-destructive bg-destructive/10"
         role="alert"
         aria-label="No se pudo cargar la imagen"
       >
@@ -30,7 +30,7 @@ export function ProductImagePreview({
   }
 
   return (
-    <div className="relative h-40 w-40 overflow-hidden rounded-lg border bg-muted">
+    <div className="relative size-40 overflow-hidden rounded-lg border bg-muted">
       {status === "loading" && (
         <div className="absolute inset-0 animate-pulse bg-muted" aria-hidden />
       )}

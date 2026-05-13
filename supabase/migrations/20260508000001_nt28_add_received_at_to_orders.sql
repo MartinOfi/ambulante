@@ -32,9 +32,11 @@ where  status::text = 'recibido'
 
 -- ---------------------------------------------------------------------------
 -- 3. Replace claim_expirable_orders to return received_at.
+--    DROP required: CREATE OR REPLACE cannot change a function's return type.
 --    Rules applied: lock-skip-locked (FOR UPDATE SKIP LOCKED).
 -- ---------------------------------------------------------------------------
-create or replace function public.claim_expirable_orders(
+drop function if exists public.claim_expirable_orders(integer);
+create function public.claim_expirable_orders(
   p_expiration_minutes integer default 10
 )
 returns table (

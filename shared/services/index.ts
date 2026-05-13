@@ -5,7 +5,7 @@ import type { StorageService } from "./storage.types";
 import { authService as mockAuthService } from "./auth";
 import { supabaseAuthService } from "./auth.supabase";
 import { pushService as mockPushService } from "./push";
-import { supabasePushService } from "./push.supabase";
+import { supabasePushService } from "./push.browser-stub";
 import { realtimeService as mockRealtimeService } from "./realtime";
 import { supabaseRealtimeService } from "./realtime.supabase";
 import { storageService as mockStorageService } from "./storage";

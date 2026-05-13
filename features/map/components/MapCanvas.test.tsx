@@ -66,7 +66,7 @@ const STUB_VIEW_STATE: ViewState = {
 function makeStoreFeature(store: ReturnType<typeof createStore>): ClusterFeature {
   return {
     type: "Feature",
-    geometry: { type: "Point", coordinates: [store.location.lng, store.location.lat] },
+    geometry: { type: "Point", coordinates: [store.location!.lng, store.location!.lat] },
     properties: {
       cluster: false,
       storeId: store.id,
@@ -160,7 +160,7 @@ describe("MapCanvas", () => {
       features: [
         {
           layer: { id: MAP_LAYER_IDS.STORES_CIRCLE },
-          geometry: { type: "Point", coordinates: [store.location.lng, store.location.lat] },
+          geometry: { type: "Point", coordinates: [store.location!.lng, store.location!.lat] },
           properties: { storeId: store.id },
         },
       ],
@@ -186,7 +186,7 @@ describe("MapCanvas", () => {
       features: [
         {
           layer: { id: MAP_LAYER_IDS.STORES_ACTIVE },
-          geometry: { type: "Point", coordinates: [store.location.lng, store.location.lat] },
+          geometry: { type: "Point", coordinates: [store.location!.lng, store.location!.lat] },
           properties: { storeId: store.id },
         },
       ],

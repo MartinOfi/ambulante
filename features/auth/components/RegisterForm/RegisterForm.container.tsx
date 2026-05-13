@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useTransition, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -20,10 +20,12 @@ interface RegisterFormContainerProps {
 export function RegisterFormContainer({
   service = defaultAuthService,
 }: RegisterFormContainerProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const sessionState = useSession(service);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startSubmit] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [, startNavigation] = useTransition();
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -32,28 +34,32 @@ export function RegisterFormContainer({
 
   useEffect(() => {
     if (sessionState.status === "authenticated") {
-      router.push(getRoleRedirect(sessionState.session.user.role));
+      startNavigation(() => {
+        push(getRoleRedirect(sessionState.session.user.role));
+      });
     }
-  }, [sessionState, router]);
+  }, [sessionState, push, startNavigation]);
 
   async function handleSubmit(values: RegisterValues): Promise<void> {
-    setIsLoading(true);
     setServerError(null);
     const signUpPayload: SignUpInput = {
       email: values.email,
       password: values.password,
       role: values.role,
     };
-    try {
-      const result = await service.signUp(signUpPayload);
-      if (!result.success) {
-        setServerError(result.error);
+    startSubmit(async () => {
+      try {
+        const result = await service.signUp(signUpPayload);
+        if (!result.success) {
+          setServerError(result.error);
+        } else if (result.data === null) {
+          // Supabase email confirmation is enabled — no session yet.
+          setIsRegistered(true);
+        }
+      } catch {
+        setServerError(UNEXPECTED_ERROR_MESSAGE);
       }
-    } catch {
-      setServerError(UNEXPECTED_ERROR_MESSAGE);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   }
 
   return (
@@ -62,6 +68,7 @@ export function RegisterFormContainer({
       onSubmit={handleSubmit}
       isLoading={isLoading}
       serverError={serverError}
+      isRegistered={isRegistered}
     />
   );
 }

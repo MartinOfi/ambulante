@@ -13,17 +13,20 @@ import {
   mapOrderRow,
   mapPushSubscriptionRow,
 } from "./mappers";
+import { USER_ROLES } from "@/shared/constants/user";
 
 describe("dbRoleToDomain", () => {
-  it("maps cliente → client", () => expect(dbRoleToDomain("cliente")).toBe("client"));
-  it("maps tienda → store", () => expect(dbRoleToDomain("tienda")).toBe("store"));
+  it("maps cliente → cliente", () =>
+    expect(dbRoleToDomain(USER_ROLES.client)).toBe(USER_ROLES.client));
+  it("maps tienda → tienda", () => expect(dbRoleToDomain("tienda")).toBe("tienda"));
   it("maps admin → admin", () => expect(dbRoleToDomain("admin")).toBe("admin"));
   it("throws on unknown role", () => expect(() => dbRoleToDomain("unknown")).toThrow());
 });
 
 describe("domainRoleToDb", () => {
-  it("maps client → cliente", () => expect(domainRoleToDb("client")).toBe("cliente"));
-  it("maps store → tienda", () => expect(domainRoleToDb("store")).toBe("tienda"));
+  it("maps cliente → cliente", () =>
+    expect(domainRoleToDb(USER_ROLES.client)).toBe(USER_ROLES.client));
+  it("maps tienda → tienda", () => expect(domainRoleToDb("tienda")).toBe("tienda"));
   it("maps admin → admin", () => expect(domainRoleToDb("admin")).toBe("admin"));
 });
 
@@ -69,7 +72,7 @@ describe("mapUserRow", () => {
   it("maps all fields correctly", () => {
     const row = {
       public_id: "uuid-1",
-      role: "cliente",
+      role: USER_ROLES.client,
       display_name: "Maria",
       email: "m@test.com",
       suspended: false,
@@ -77,7 +80,7 @@ describe("mapUserRow", () => {
     const user = mapUserRow(row);
     expect(user).toEqual({
       id: "uuid-1",
-      role: "client",
+      role: USER_ROLES.client,
       displayName: "Maria",
       email: "m@test.com",
       suspended: false,
@@ -143,7 +146,7 @@ describe("mapStoreRow", () => {
     expect(store.tagline).toBe("");
     expect(store.priceFromArs).toBe(0);
     expect(store.hours).toBeUndefined();
-    expect(store.location).toEqual({ lat: 0, lng: 0 });
+    expect(store.location).toBeNull();
     expect(store.distanceMeters).toBe(0);
   });
 });

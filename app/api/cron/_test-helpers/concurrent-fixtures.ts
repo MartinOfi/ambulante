@@ -4,6 +4,7 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { USER_ROLES } from "@/shared/constants/user";
 
 // Local Supabase defaults — published JWTs from `supabase start`. Safe to commit:
 // only valid against a CLI-managed local instance, never against any cloud project.
@@ -62,7 +63,7 @@ export async function seedIdentity(client: ConcurrentTestClient): Promise<Seeded
     .from("users")
     .insert({
       auth_user_id: authUserId,
-      role: "cliente",
+      role: USER_ROLES.client,
       display_name: `concurrent-test-${testRunId}`,
     })
     .select("id")

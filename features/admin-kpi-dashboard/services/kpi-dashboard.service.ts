@@ -31,12 +31,27 @@ export function createKpiDashboardService(
         ordersPerDay = Math.round(total / spanDays);
       }
 
-      // ── rates ──────────────────────────────────────────────────────────────
-      const accepted = orders.filter((o) => o.status === ORDER_STATUS.ACEPTADO).length;
-      const rejected = orders.filter((o) => o.status === ORDER_STATUS.RECHAZADO).length;
-      const finalized = orders.filter((o) => o.status === ORDER_STATUS.FINALIZADO).length;
-      const expired = orders.filter((o) => o.status === ORDER_STATUS.EXPIRADO).length;
+      // ── rates + avgResponseTimeMs (single pass) ────────────────────────────
+      // Approximation: for ACEPTADO orders, updatedAt ≈ acceptance timestamp.
+      const stats = orders.reduce(
+        (acc, o) => {
+          if (o.status === ORDER_STATUS.ACEPTADO) {
+            acc.accepted += 1;
+            const ms = new Date(o.updatedAt).getTime() - new Date(o.createdAt).getTime();
+            acc.totalResponseTimeMs += Math.max(0, ms);
+          } else if (o.status === ORDER_STATUS.RECHAZADO) {
+            acc.rejected += 1;
+          } else if (o.status === ORDER_STATUS.FINALIZADO) {
+            acc.finalized += 1;
+          } else if (o.status === ORDER_STATUS.EXPIRADO) {
+            acc.expired += 1;
+          }
+          return acc;
+        },
+        { accepted: 0, rejected: 0, finalized: 0, expired: 0, totalResponseTimeMs: 0 },
+      );
 
+      const { accepted, rejected, finalized, expired } = stats;
       const decisionDenominator = accepted + rejected;
       const acceptanceRate = decisionDenominator > 0 ? accepted / decisionDenominator : 0;
 
@@ -46,18 +61,8 @@ export function createKpiDashboardService(
 
       const expirationRate = total > 0 ? expired / total : 0;
 
-      // ── avgResponseTimeMs ──────────────────────────────────────────────────
-      // Approximation: for ACEPTADO orders, updatedAt ≈ acceptance timestamp.
-      const acceptedOrders = orders.filter((o) => o.status === ORDER_STATUS.ACEPTADO);
-      let avgResponseTimeMs = 0;
-      if (acceptedOrders.length > 0) {
-        const totalMs = acceptedOrders.reduce((sum, o) => {
-          const created = new Date(o.createdAt).getTime();
-          const updated = new Date(o.updatedAt).getTime();
-          return sum + Math.max(0, updated - created);
-        }, 0);
-        avgResponseTimeMs = Math.round(totalMs / acceptedOrders.length);
-      }
+      const avgResponseTimeMs =
+        stats.accepted > 0 ? Math.round(stats.totalResponseTimeMs / stats.accepted) : 0;
 
       // ── activeStoresConcurrent ─────────────────────────────────────────────
       const activeStoresConcurrent = stores.filter((s) => s.status === "open").length;

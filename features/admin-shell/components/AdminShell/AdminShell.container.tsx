@@ -17,7 +17,7 @@ export function AdminShellContainer({ children }: AdminShellContainerProps) {
   if (sessionResult.status === "loading") {
     return (
       <div className="flex h-screen items-center justify-center bg-zinc-50">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-700" />
+        <div className="size-6 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-700" />
       </div>
     );
   }

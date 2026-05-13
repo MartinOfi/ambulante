@@ -70,9 +70,10 @@ export class SupabaseAuditLogService implements AuditLogService {
 
     if (error !== null) throw new Error(`SupabaseAuditLogService.findByOrderId: ${error.message}`);
 
-    return (data as DbAuditLogRow[])
-      .map(mapAuditRow)
-      .filter((entry): entry is AuditLogEntry => entry !== null);
+    return (data as DbAuditLogRow[]).flatMap((row) => {
+      const entry = mapAuditRow(row);
+      return entry !== null ? [entry] : [];
+    });
   }
 
   private async resolveOrderInternalId(publicId: string): Promise<number> {

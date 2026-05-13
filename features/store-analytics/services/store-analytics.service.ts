@@ -2,6 +2,7 @@ import type {
   StoreKpiSummary,
   StoreAnalyticsFilter,
 } from "@/features/store-analytics/types/store-analytics.types";
+import { supabaseStoreAnalyticsService } from "./store-analytics.supabase";
 
 export interface StoreAnalyticsService {
   getKpiSummary(filter: StoreAnalyticsFilter): Promise<StoreKpiSummary>;
@@ -51,4 +52,8 @@ export function createMockStoreAnalyticsService(): StoreAnalyticsService {
   };
 }
 
-export const storeAnalyticsService: StoreAnalyticsService = createMockStoreAnalyticsService();
+const isMock = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+export const storeAnalyticsService: StoreAnalyticsService = isMock
+  ? createMockStoreAnalyticsService()
+  : supabaseStoreAnalyticsService;

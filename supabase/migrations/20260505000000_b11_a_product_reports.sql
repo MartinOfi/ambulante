@@ -18,9 +18,11 @@ alter table public.stores
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2. Update stores_view (add rejection_reason; preserves all prior columns)
+--    DROP + CREATE required: CREATE OR REPLACE VIEW cannot reorder existing columns.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-create or replace view public.stores_view
+drop view if exists public.stores_view;
+create view public.stores_view
   with (security_invoker = true, security_barrier = true)
 as
 select
@@ -148,7 +150,7 @@ create policy "product_reports: client insert"
   to authenticated
   with check (
     reported_by = (select public.current_user_id())
-    and (select public.has_role('cliente'))
+    and (select public.has_role('cliente'::public.user_role))
   );
 
 -- Cliente: can read their own submitted reports

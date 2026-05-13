@@ -17,12 +17,12 @@ export function AuthCard({ title, children }: AuthCardProps) {
             <p className="font-display text-display-auth font-bold tracking-tight text-brand leading-none">
               Ambulante
             </p>
-            <p className="text-xs-tight font-medium tracking-tag uppercase text-slate-400 dark:text-slate-500 pt-2">
+            <p className="text-xs-tight font-medium tracking-tag uppercase text-zinc-400 dark:text-zinc-500 pt-2">
               Tu mercado en movimiento
             </p>
           </div>
 
-          <h1 className="mb-6 text-center text-lg font-semibold text-slate-700 dark:text-slate-200">
+          <h1 className="mb-6 text-center text-lg font-semibold text-zinc-700 dark:text-zinc-200">
             {title}
           </h1>
 

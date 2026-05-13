@@ -144,13 +144,13 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
           style={{ perspective: "1000px" }}
         >
           {/* Center sun — brand orange aura (fixed palette, works in both themes) */}
-          <div className="absolute w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 via-brand to-orange-700 animate-pulse flex items-center justify-center z-10">
-            <div className="absolute w-20 h-20 rounded-full border border-foreground/20 animate-ping opacity-70" />
+          <div className="absolute size-16 rounded-full bg-gradient-to-br from-orange-400 via-brand to-orange-700 animate-pulse flex items-center justify-center z-10">
+            <div className="absolute size-20 rounded-full border border-foreground/20 animate-ping opacity-70" />
             <div
-              className="absolute w-24 h-24 rounded-full border border-foreground/10 animate-ping opacity-50"
+              className="absolute size-24 rounded-full border border-foreground/10 animate-ping opacity-50"
               style={{ animationDelay: "0.5s" }}
             />
-            <div className="w-8 h-8 rounded-full bg-foreground/80 backdrop-blur-md" />
+            <div className="size-8 rounded-full bg-foreground/80 backdrop-blur-md" />
           </div>
 
           {/* Orbit ring */}
@@ -210,7 +210,7 @@ export default function RadialOrbitalTimeline({ timelineData }: RadialOrbitalTim
 
                   <div
                     className={`
-                    w-12 h-12 rounded-full flex items-center justify-center
+                    size-12 rounded-full flex items-center justify-center
                     ${
                       isExpanded
                         ? "bg-brand text-white"

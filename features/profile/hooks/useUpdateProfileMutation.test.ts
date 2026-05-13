@@ -7,6 +7,7 @@ import { logger } from "@/shared/utils/logger";
 import { updateProfile } from "@/features/profile/actions";
 import type { User } from "@/shared/schemas/user";
 import { useUpdateProfileMutation } from "./useUpdateProfileMutation";
+import { USER_ROLES } from "@/shared/constants/user";
 
 vi.mock("@/features/profile/actions", () => ({
   updateProfile: vi.fn(),
@@ -21,7 +22,7 @@ const updateProfileMock = vi.mocked(updateProfile);
 const MOCK_USER: User = {
   id: "11111111-1111-4111-8111-111111111111",
   email: "cliente@example.com",
-  role: "client",
+  role: USER_ROLES.client,
   displayName: "Nuevo",
   avatarUrl: undefined,
   suspended: false,

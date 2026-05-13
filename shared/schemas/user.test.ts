@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { userRoleSchema, userSchema, sessionSchema } from "./user";
+import { USER_ROLES } from "@/shared/constants/user";
 
 describe("userRoleSchema", () => {
   it("accepts valid roles", () => {
-    expect(userRoleSchema.safeParse("client").success).toBe(true);
-    expect(userRoleSchema.safeParse("store").success).toBe(true);
+    expect(userRoleSchema.safeParse(USER_ROLES.client).success).toBe(true);
+    expect(userRoleSchema.safeParse("tienda").success).toBe(true);
     expect(userRoleSchema.safeParse("admin").success).toBe(true);
   });
 
@@ -17,7 +18,7 @@ describe("userSchema", () => {
   const validUser = {
     id: "user-1",
     email: "cliente@example.com",
-    role: "client",
+    role: USER_ROLES.client,
     displayName: "Juan Pérez",
   };
 
@@ -52,7 +53,7 @@ describe("sessionSchema", () => {
   const validUser = {
     id: "user-1",
     email: "store@example.com",
-    role: "store",
+    role: "tienda",
   };
 
   const validSession = {
@@ -103,7 +104,7 @@ describe("sessionSchema", () => {
 
   it("infers Session type with correct shape", () => {
     const parsed = sessionSchema.parse(validSession);
-    expect(parsed.user.role).toBe("store");
+    expect(parsed.user.role).toBe("tienda");
     expect(typeof parsed.expiresAt).toBe("number");
   });
 });

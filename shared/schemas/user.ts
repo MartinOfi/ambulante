@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { USER_ROLES } from "@/shared/constants/user";
 
-export const userRoleSchema = z.enum(["client", "store", "admin"], {
+export const userRoleSchema = z.enum([USER_ROLES.client, "tienda", "admin"], {
   errorMap: () => ({ message: "Rol de usuario no válido" }),
 });
 

@@ -11,7 +11,7 @@ function truncate(text: string, maxLength: number): string {
 
 export function SlowQueriesPanel({ queries, isLoading, error }: SlowQueriesPanelProps) {
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Cargando queries lentas...</p>;
+    return <p className="text-sm text-muted-foreground">Cargando queries lentas…</p>;
   }
 
   if (error) {

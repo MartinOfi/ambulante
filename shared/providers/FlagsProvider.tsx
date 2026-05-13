@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import { type FlagKey } from "@/shared/constants/flags";
 
 const FlagsContext = createContext<Record<FlagKey, boolean> | null>(null);
@@ -15,7 +15,7 @@ export function FlagsProvider({ flags, children }: FlagsProviderProps) {
 }
 
 export function useFlagsContext(): Record<FlagKey, boolean> {
-  const context = useContext(FlagsContext);
+  const context = use(FlagsContext);
   if (context === null) {
     throw new Error("useFlagsContext must be used within FlagsProvider");
   }

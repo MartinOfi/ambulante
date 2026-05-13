@@ -19,6 +19,7 @@ vi.mock("@/features/orders/hooks/useStatusParam", () => ({
 
 import { useSession } from "@/shared/hooks/useSession";
 import { useOrderHistory } from "@/features/orders/hooks/useOrderHistory";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const mockUseSession = vi.mocked(useSession);
 const mockUseOrderHistory = vi.mocked(useOrderHistory);
@@ -27,7 +28,7 @@ const MOCK_SESSION = {
   accessToken: "tok",
   refreshToken: "ref",
   expiresAt: 9999999999,
-  user: { id: "user-1", email: "test@test.com", role: "client" as const },
+  user: { id: "user-1", email: "test@test.com", role: USER_ROLES.client },
 };
 
 function buildHookReturn(
@@ -86,9 +87,7 @@ describe("OrderHistoryScreenContainer", () => {
       signOut: vi.fn(),
     });
 
-    mockUseOrderHistory.mockReturnValue(
-      buildHookReturn({ data: undefined, isLoading: true }),
-    );
+    mockUseOrderHistory.mockReturnValue(buildHookReturn({ data: undefined, isLoading: true }));
 
     renderWithProviders(<OrderHistoryScreenContainer />);
 

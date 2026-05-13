@@ -20,9 +20,14 @@
 -- created automatically with role and display_name from raw_user_meta_data.
 -- ─────────────────────────────────────────────────────────────────────────────
 
+-- GoTrue requires token columns to be '' not NULL — omitting them causes a 500
+-- on login ("converting NULL to string is unsupported").
 insert into auth.users (
   id, instance_id, aud, role, email,
   encrypted_password, email_confirmed_at,
+  confirmation_token, recovery_token,
+  email_change, email_change_token_new, email_change_token_current,
+  phone_change_token, reauthentication_token,
   raw_user_meta_data, created_at, updated_at
 ) values
   (
@@ -32,6 +37,7 @@ insert into auth.users (
     'cliente@dev.ambulante.local',
     extensions.crypt('Ambulante123!', extensions.gen_salt('bf', 6)),
     now(),
+    '', '', '', '', '', '', '',
     '{"display_name": "Ana García", "role": "cliente"}'::jsonb,
     now(), now()
   ),
@@ -42,6 +48,7 @@ insert into auth.users (
     'tienda@dev.ambulante.local',
     extensions.crypt('Ambulante123!', extensions.gen_salt('bf', 6)),
     now(),
+    '', '', '', '', '', '', '',
     '{"display_name": "Carlos Méndez", "role": "tienda"}'::jsonb,
     now(), now()
   ),
@@ -52,6 +59,7 @@ insert into auth.users (
     'admin@dev.ambulante.local',
     extensions.crypt('Ambulante123!', extensions.gen_salt('bf', 6)),
     now(),
+    '', '', '', '', '', '', '',
     '{"display_name": "Sistema Admin", "role": "admin"}'::jsonb,
     now(), now()
   )
@@ -72,7 +80,7 @@ select
   id,
   'El Choripán de Pedro',
   'Los mejores choripanes de Palermo, con chimichurri casero y pan artesanal',
-  'Comida argentina',
+  'street-cart',
   '+5491155550001',
   true,
   'El clásico del barrio desde 2010',
@@ -92,7 +100,7 @@ select
   id,
   'Sushi Ambulante',
   'Sushi fresco preparado al momento en el corazón de San Telmo',
-  'Sushi',
+  'food-truck',
   '+5491155550002',
   true,
   'Fusión japonesa en la calle',
@@ -112,7 +120,7 @@ select
   id,
   'Helados Artesanales Nonna',
   'Helados artesanales con recetas de la nonna, en Recoleta',
-  'Helados',
+  'ice-cream',
   '+5491155550003',
   false,
   'Recetas de familia desde 1985',
@@ -132,7 +140,7 @@ select
   id,
   'Tacos & Burritos Express',
   'Comida mexicana auténtica con tortillas hechas a mano en Villa Crespo',
-  'Comida mexicana',
+  'food-truck',
   '+5491155550004',
   true,
   'Picante, sabroso y rápido',
@@ -152,7 +160,7 @@ select
   id,
   'Café en Ruedas',
   'Café de especialidad y medialunas recién horneadas en Caballito',
-  'Cafetería',
+  'food-truck',
   '+5491155550005',
   false,
   'Tu café de barrio sobre ruedas',

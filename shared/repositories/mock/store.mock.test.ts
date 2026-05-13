@@ -64,7 +64,7 @@ describe("MockStoreRepository", () => {
         radiusMeters: 5000,
       });
       const distances = nearby.map((store) => store.distanceMeters);
-      const sorted = [...distances].sort((a, b) => a - b);
+      const sorted = distances.toSorted((a, b) => a - b);
       expect(distances).toEqual(sorted);
     });
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { authService } from "./auth";
+import { USER_ROLES } from "@/shared/constants/user";
 
 beforeEach(async () => {
   await authService.signOut();
@@ -31,7 +32,7 @@ describe("authService.signIn", () => {
       expect(result.data.refreshToken).toBeTruthy();
       expect(result.data.expiresAt).toBeGreaterThan(0);
       expect(result.data.user.email).toBe("client@test.com");
-      expect(result.data.user.role).toBe("client");
+      expect(result.data.user.role).toBe(USER_ROLES.client);
     }
   });
 
@@ -61,7 +62,7 @@ describe("authService.signIn", () => {
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.user.role).toBe("store");
+      expect(result.data.user.role).toBe("tienda");
     }
   });
 
@@ -82,12 +83,12 @@ describe("authService.signUp", () => {
     const result = await authService.signUp({
       email: "new@test.com",
       password: "password",
-      role: "client",
+      role: USER_ROLES.client,
     });
     expect(result.success).toBe(true);
     if (result.success && result.data) {
       expect(result.data.user.email).toBe("new@test.com");
-      expect(result.data.user.role).toBe("client");
+      expect(result.data.user.role).toBe(USER_ROLES.client);
     }
   });
 
@@ -98,7 +99,7 @@ describe("authService.signUp", () => {
     });
     expect(result.success).toBe(true);
     if (result.success && result.data) {
-      expect(result.data.user.role).toBe("client");
+      expect(result.data.user.role).toBe(USER_ROLES.client);
     }
   });
 

@@ -14,10 +14,10 @@ export function RecenterFAB({ onClick, disabled }: Props) {
       onClick={onClick}
       disabled={disabled}
       aria-label="Recentrar en mi ubicación"
-      className="absolute right-4 z-10 grid h-14 w-14 place-items-center rounded-full bg-brand text-white shadow-fab ring-4 ring-surface transition-transform duration-200 active:scale-95 disabled:opacity-50"
+      className="absolute right-4 z-10 grid size-14 place-items-center rounded-full bg-brand text-white shadow-fab ring-4 ring-surface transition-transform duration-200 active:scale-95 disabled:opacity-50"
       style={{ bottom: "calc(45vh + 16px)" }}
     >
-      <LocateFixed className="h-6 w-6" strokeWidth={2.5} />
+      <LocateFixed className="size-6" strokeWidth={2.5} />
     </button>
   );
 }

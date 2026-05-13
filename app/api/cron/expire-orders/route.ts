@@ -86,51 +86,60 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const rows = (data ?? []) as ClaimRow[];
   const expiredAt = new Date();
+
+  const results = await Promise.all(
+    rows.map(
+      async (row): Promise<{ event: OrderExpiredDomainEvent; auditFailed: boolean } | null> => {
+        let order: ReturnType<typeof buildOrderForTransition>;
+        try {
+          order = buildOrderForTransition(row);
+        } catch (err) {
+          logger.error("expire-orders: unknown order status, skipping row", {
+            orderId: row.order_public_id,
+            status: row.old_status,
+            error: err,
+          });
+          return null;
+        }
+
+        const result = await transitionWithAudit({
+          order,
+          event: { type: ORDER_EVENT.SISTEMA_EXPIRA, occurredAt: expiredAt },
+          actor: ORDER_ACTOR.SISTEMA,
+          auditLog,
+        });
+
+        if (!result.ok) {
+          logger.error("expire-orders: unexpected transition failure", {
+            orderId: row.order_public_id,
+            error: result.error,
+          });
+          return null;
+        }
+
+        const expired = result.value as OrderExpirado;
+        return {
+          event: {
+            type: ORDER_DOMAIN_EVENT.ORDER_EXPIRED,
+            orderId: expired.id,
+            clientId: expired.clientId,
+            storeId: expired.storeId,
+            occurredAt: expiredAt,
+            sentAt: expired.sentAt,
+            expiredAt: expired.expiredAt,
+          },
+          auditFailed: result.auditFailed ?? false,
+        };
+      },
+    ),
+  );
+
   const domainEvents: OrderExpiredDomainEvent[] = [];
   let auditFailures = 0;
-
-  for (const row of rows) {
-    let order: ReturnType<typeof buildOrderForTransition>;
-    try {
-      order = buildOrderForTransition(row);
-    } catch (err) {
-      logger.error("expire-orders: unknown order status, skipping row", {
-        orderId: row.order_public_id,
-        status: row.old_status,
-        error: err,
-      });
-      continue;
-    }
-
-    const result = await transitionWithAudit({
-      order,
-      event: { type: ORDER_EVENT.SISTEMA_EXPIRA, occurredAt: expiredAt },
-      actor: ORDER_ACTOR.SISTEMA,
-      auditLog,
-    });
-
-    if (!result.ok) {
-      logger.error("expire-orders: unexpected transition failure", {
-        orderId: row.order_public_id,
-        error: result.error,
-      });
-      continue;
-    }
-
-    if (result.auditFailed) {
-      auditFailures += 1;
-    }
-
-    const expired = result.value as OrderExpirado;
-    domainEvents.push({
-      type: ORDER_DOMAIN_EVENT.ORDER_EXPIRED,
-      orderId: expired.id,
-      clientId: expired.clientId,
-      storeId: expired.storeId,
-      occurredAt: expiredAt,
-      sentAt: expired.sentAt,
-      expiredAt: expired.expiredAt,
-    });
+  for (const r of results) {
+    if (r === null) continue;
+    if (r.auditFailed) auditFailures += 1;
+    domainEvents.push(r.event);
   }
 
   for (const event of domainEvents) {

@@ -16,7 +16,7 @@ Viven en `shared/types/`. Son el contrato del dominio — **siempre derivar de s
 | `StoreKind` | `shared/types/store.ts` | Union type: `"food-truck" \| "street-cart" \| "ice-cream"` (et al.) |
 | `StoreStatus` | `shared/types/store.ts` | `"open" \| "closed" \| "stale"` |
 | `User` | `shared/types/user.ts` | Usuario autenticado; `displayName` opcional |
-| `UserRole` | `shared/types/user.ts` | `"client" \| "store" \| "admin"` |
+| `UserRole` | `shared/types/user.ts` | `USER_ROLES.client \| USER_ROLES.store \| "admin"` |
 | `Session` | `shared/types/user.ts` | Sesión de Supabase Auth: `accessToken`, `refreshToken`, `expiresAt` (Unix timestamp positivo), `user` |
 | `SlowQuery` | `shared/types/observability.ts` | Resumen de query lenta de `pg_stat_statements`: `calls`, `totalExecTimeMs`, `meanExecTimeMs`, `queryText` |
 
@@ -157,7 +157,7 @@ API: `ROUTES.auth.login`, `ROUTES.client.map`, `ROUTES.client.orders`, `ROUTES.s
 ### `shared/constants/user.ts`
 | Nombre | Descripción |
 |---|---|
-| `USER_ROLES` | `{ client: "client", store: "store", admin: "admin" }` frozen as const |
+| `USER_ROLES` | `{ client: USER_ROLES.client, store: USER_ROLES.store, admin: "admin" }` frozen as const |
 
 ### `shared/constants/storage.ts`
 | Nombre | Descripción |

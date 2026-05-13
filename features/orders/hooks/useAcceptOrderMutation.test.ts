@@ -9,6 +9,7 @@ import { acceptOrder } from "@/features/orders/actions";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import { queryKeys } from "@/shared/query/keys";
 import type { Order } from "@/shared/schemas/order";
+import { USER_ROLES } from "@/shared/constants/user";
 
 vi.mock("@/shared/services/auth", () => ({
   authService: { getSession: vi.fn() },
@@ -44,7 +45,7 @@ const STUB_ORDER_RECIBIDO: Order = {
 };
 
 const STUB_SESSION_STORE = {
-  user: { id: "store-1", email: "store@test.com", role: "store" as const },
+  user: { id: "store-1", email: "store@test.com", role: "tienda" as const },
   accessToken: "token",
   refreshToken: "refresh",
   expiresAt: 9999999999,
@@ -81,7 +82,7 @@ describe("useAcceptOrderMutation", () => {
   it("throws when role is client", async () => {
     mockGetSession.mockResolvedValueOnce({
       ...STUB_SESSION_STORE,
-      user: { ...STUB_SESSION_STORE.user, role: "client" as const },
+      user: { ...STUB_SESSION_STORE.user, role: USER_ROLES.client },
     });
 
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });

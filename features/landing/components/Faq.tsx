@@ -53,7 +53,7 @@ export function Faq() {
               <summary className="flex cursor-pointer items-center justify-between gap-4 font-display text-base font-bold uppercase tracking-tight text-foreground sm:text-lg">
                 {q}
                 <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-foreground text-xl leading-none transition-transform group-open:rotate-45"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-foreground text-xl leading-none transition-transform group-open:rotate-45"
                   aria-hidden="true"
                 >
                   +

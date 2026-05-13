@@ -59,11 +59,8 @@ export function UserManagementPage({
 
       {isLoading ? (
         <div className="space-y-3">
-          {Array.from({ length: 5 }, (_, index) => (
-            <div
-              key={`skeleton-${index}`}
-              className="h-14 animate-pulse rounded-lg bg-[hsl(var(--surface))]"
-            />
+          {["sk-0", "sk-1", "sk-2", "sk-3", "sk-4"].map((key) => (
+            <div key={key} className="h-14 animate-pulse rounded-lg bg-[hsl(var(--surface))]" />
           ))}
         </div>
       ) : (

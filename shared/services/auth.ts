@@ -118,7 +118,10 @@ async function seedDefaultUsers(): Promise<void> {
   await Promise.all(seeds.map(seedUser));
 }
 
-const seedPromise = seedDefaultUsers();
+// Only seed mock users when Supabase is not configured — avoids a fetch to
+// http://127.0.0.1:54321 at module load time when the real adapter is selected.
+const isMockMode = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+const seedPromise = isMockMode ? seedDefaultUsers() : Promise.resolve();
 
 export const authService: AuthService = {
   async signIn(input: SignInInput) {

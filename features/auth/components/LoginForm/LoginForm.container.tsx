@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useTransition, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -17,10 +17,11 @@ interface LoginFormContainerProps {
 }
 
 export function LoginFormContainer({ service = defaultAuthService }: LoginFormContainerProps) {
-  const router = useRouter();
+  const { push } = useRouter();
   const sessionState = useSession(service);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startSubmit] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [, startNavigation] = useTransition();
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -29,23 +30,24 @@ export function LoginFormContainer({ service = defaultAuthService }: LoginFormCo
 
   useEffect(() => {
     if (sessionState.status === "authenticated") {
-      router.push(getRoleRedirect(sessionState.session.user.role));
+      startNavigation(() => {
+        push(getRoleRedirect(sessionState.session.user.role));
+      });
     }
-  }, [sessionState, router]);
+  }, [sessionState, push, startNavigation]);
 
   async function handleSubmit(values: LoginValues): Promise<void> {
-    setIsLoading(true);
     setServerError(null);
-    try {
-      const result = await service.signIn(values);
-      if (!result.success) {
-        setServerError(result.error);
+    startSubmit(async () => {
+      try {
+        const result = await service.signIn(values);
+        if (!result.success) {
+          setServerError(result.error);
+        }
+      } catch {
+        setServerError(UNEXPECTED_ERROR_MESSAGE);
       }
-    } catch {
-      setServerError(UNEXPECTED_ERROR_MESSAGE);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   }
 
   return (

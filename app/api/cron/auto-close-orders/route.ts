@@ -133,11 +133,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
   const rows = parseResult.data;
   const closedAt = new Date();
+
+  const results = await Promise.all(rows.map((row) => processClaimRow(row, closedAt, auditLog)));
+
   const domainEvents: OrderFinishedDomainEvent[] = [];
   let auditFailures = 0;
-
-  for (const row of rows) {
-    const { event, auditFailed } = await processClaimRow(row, closedAt, auditLog);
+  for (const { event, auditFailed } of results) {
     if (auditFailed) auditFailures += 1;
     if (event !== null) domainEvents.push(event);
   }

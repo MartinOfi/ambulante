@@ -23,7 +23,7 @@ function matchesSearch(displayName: string | undefined, email: string, query: st
 }
 
 export function UserManagementPageContainer() {
-  const router = useRouter();
+  const { push } = useRouter();
   const filters = useUserManagementFilters();
 
   const [pendingSuspension, setPendingSuspension] = useState<PendingSuspension | null>(null);
@@ -86,9 +86,9 @@ export function UserManagementPageContainer() {
 
   const handleView = useCallback(
     (userId: string) => {
-      router.push(`/admin/users/${userId}`);
+      push(`/admin/users/${userId}`);
     },
-    [router],
+    [push],
   );
 
   const pendingUserId = suspendMutation.isPending

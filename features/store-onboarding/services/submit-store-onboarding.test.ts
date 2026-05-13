@@ -3,6 +3,7 @@ import { submitStoreOnboarding, type SubmitStoreOnboardingDeps } from "./submit-
 import type { StoreOnboardingData } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 import type { Store } from "@/shared/schemas/store";
 import type { User } from "@/shared/types/user";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const VALID_DATA: StoreOnboardingData = {
   businessName: "Pizzería del Barrio",
@@ -18,7 +19,7 @@ const VALID_DATA: StoreOnboardingData = {
 const STORE_USER: User = {
   id: "store-owner-public-id",
   email: "store@test.com",
-  role: "store",
+  role: "tienda",
   displayName: "Tienda Test",
 };
 
@@ -60,7 +61,7 @@ describe("submitStoreOnboarding", () => {
 
   it("returns error when authenticated user does not have 'store' role", async () => {
     const { deps } = createDeps({
-      getCurrentUser: vi.fn().mockResolvedValue({ ...STORE_USER, role: "client" }),
+      getCurrentUser: vi.fn().mockResolvedValue({ ...STORE_USER, role: USER_ROLES.client }),
     });
 
     const result = await submitStoreOnboarding(VALID_DATA, deps);

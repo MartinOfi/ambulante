@@ -36,8 +36,8 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
   if (chunkError) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10">
-          <RefreshCw className="h-6 w-6 text-brand" />
+        <div className="flex size-12 items-center justify-center rounded-full bg-brand/10">
+          <RefreshCw className="size-6 text-brand" />
         </div>
         <h1 className="text-2xl font-semibold text-foreground">{t("chunkTitle")}</h1>
         <p className="max-w-sm text-sm text-muted-foreground">{t("chunkDescription")}</p>

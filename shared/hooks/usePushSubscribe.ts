@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 
 import { pushService } from "@/shared/services";
 import { logger } from "@/shared/utils/logger";
@@ -11,16 +11,14 @@ export interface UsePushSubscribeReturn {
   readonly isSubscribed: boolean;
   readonly isPending: boolean;
   readonly isSupported: boolean;
-  readonly subscribe: () => Promise<void>;
-  readonly unsubscribe: () => Promise<void>;
+  readonly subscribe: () => void;
+  readonly unsubscribe: () => void;
 }
 
 export function usePushSubscribe(): UsePushSubscribeReturn {
-  const [permission, setPermission] = useState<PushPermissionStatus>(() =>
-    pushService.getPermissionStatus(),
-  );
+  const [permission, setPermission] = useState<PushPermissionStatus>("unavailable");
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   // El permiso del browser puede cambiar fuera de la app (ajustes del usuario).
   // Refrescamos al montar y cuando la pestaña vuelve a estar visible.
@@ -55,35 +53,33 @@ export function usePushSubscribe(): UsePushSubscribeReturn {
     };
   }, []);
 
-  const subscribe = useCallback(async () => {
-    setIsPending(true);
-    try {
-      const subscription = await pushService.subscribe();
-      setPermission(pushService.getPermissionStatus());
-      setIsSubscribed(subscription !== null);
-    } catch (error) {
-      logger.error("usePushSubscribe.subscribe failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      setIsSubscribed(false);
-    } finally {
-      setIsPending(false);
-    }
-  }, []);
+  const subscribe = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const subscription = await pushService.subscribe();
+        setPermission(pushService.getPermissionStatus());
+        setIsSubscribed(subscription !== null);
+      } catch (error) {
+        logger.error("usePushSubscribe.subscribe failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        setIsSubscribed(false);
+      }
+    });
+  }, [startTransition]);
 
-  const unsubscribe = useCallback(async () => {
-    setIsPending(true);
-    try {
-      const ok = await pushService.unsubscribe();
-      if (ok) setIsSubscribed(false);
-    } catch (error) {
-      logger.error("usePushSubscribe.unsubscribe failed", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setIsPending(false);
-    }
-  }, []);
+  const unsubscribe = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const ok = await pushService.unsubscribe();
+        if (ok) setIsSubscribed(false);
+      } catch (error) {
+        logger.error("usePushSubscribe.unsubscribe failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+  }, [startTransition]);
 
   return {
     permission,

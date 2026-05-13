@@ -15,6 +15,17 @@ export async function fetchAuditLog(orderId: string): Promise<FetchAuditLogResul
 
   try {
     const client = await createRouteHandlerClient();
+
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null) return { status: "error", message: "No autorizado." };
+
+    const { data: isAdmin, error: adminError } = await client.rpc("is_admin");
+    if (adminError !== null || isAdmin !== true)
+      return { status: "error", message: "No autorizado." };
+
     const service = new SupabaseAuditLogService(client);
     const domainEntries = await service.findByOrderId(parsed.data.orderId);
 

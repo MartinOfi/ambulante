@@ -3,6 +3,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { useSession } from "./useSession";
 import type { AuthService } from "@/shared/services/auth.types";
 import type { Session } from "@/shared/types/user";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const MOCK_SESSION: Session = {
   accessToken: "tok-access",
@@ -11,7 +12,7 @@ const MOCK_SESSION: Session = {
   user: {
     id: "user-1",
     email: "client@test.com",
-    role: "client",
+    role: USER_ROLES.client,
   },
 };
 

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { E2E_USER_IDS } from "./constants";
 import { setSessionCookie } from "./helpers";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
@@ -10,15 +11,21 @@ const AVAILABILITY_SLA_MS = 2_000;
 test("store accepting an order reflects in client view within 5 s (PRD §7.2)", async ({
   browser,
 }) => {
-  const clientContext = await browser.newContext();
-  const storeContext = await browser.newContext();
+  const [clientContext, storeContext] = await Promise.all([
+    browser.newContext(),
+    browser.newContext(),
+  ]);
 
   try {
-    await setSessionCookie(clientContext, "client", DEMO_CLIENT_ID);
-    await setSessionCookie(storeContext, "store", DEMO_STORE_ID);
+    await Promise.all([
+      setSessionCookie(clientContext, USER_ROLES.client, DEMO_CLIENT_ID),
+      setSessionCookie(storeContext, USER_ROLES.store, DEMO_STORE_ID),
+    ]);
 
-    const clientPage = await clientContext.newPage();
-    const storePage = await storeContext.newPage();
+    const [clientPage, storePage] = await Promise.all([
+      clientContext.newPage(),
+      storeContext.newPage(),
+    ]);
 
     // Load client orders and filter to RECIBIDO
     await clientPage.goto("/orders");
@@ -47,16 +54,22 @@ test("store accepting an order reflects in client view within 5 s (PRD §7.2)", 
 test("store toggles availability → client map reflects change within 2 s (B6.3)", async ({
   browser,
 }) => {
-  const clientContext = await browser.newContext();
-  const storeContext = await browser.newContext();
+  const [clientContext, storeContext] = await Promise.all([
+    browser.newContext(),
+    browser.newContext(),
+  ]);
 
   try {
     // Use seed IDs that map to real mock data (store = Doña Rosa, ownerId = E2E_USER_IDS.store)
-    await setSessionCookie(clientContext, "client", E2E_USER_IDS.client);
-    await setSessionCookie(storeContext, "store", E2E_USER_IDS.store);
+    await Promise.all([
+      setSessionCookie(clientContext, USER_ROLES.client, E2E_USER_IDS.client),
+      setSessionCookie(storeContext, USER_ROLES.store, E2E_USER_IDS.store),
+    ]);
 
-    const clientPage = await clientContext.newPage();
-    const storePage = await storeContext.newPage();
+    const [clientPage, storePage] = await Promise.all([
+      clientContext.newPage(),
+      storeContext.newPage(),
+    ]);
 
     // Client opens the map — NearbyBottomSheet renders store cards with "Abierto ahora" badges
     await clientPage.goto("/map");

@@ -51,7 +51,7 @@ export function StoreDashboard({
           Pedidos entrantes
         </h2>
 
-        {isLoadingOrders && <p className="text-sm text-muted-foreground">Cargando pedidos...</p>}
+        {isLoadingOrders && <p className="text-sm text-muted-foreground">Cargando pedidos…</p>}
 
         {!isLoadingOrders && activeOrders.length === 0 && (
           <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
@@ -84,7 +84,7 @@ export function StoreDashboard({
               href={href}
               className="flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-sm font-medium shadow-sm transition-colors hover:bg-accent"
             >
-              <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <Icon className="size-5 text-muted-foreground" aria-hidden="true" />
               {label}
             </Link>
           ))}

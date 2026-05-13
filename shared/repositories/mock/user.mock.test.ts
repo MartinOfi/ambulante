@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { MockUserRepository } from "./user.mock";
 import type { User } from "@/shared/schemas/user";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const makeUser = (overrides: Partial<User> = {}): User => ({
   id: "user-1",
   email: "test@example.com",
-  role: "client",
+  role: USER_ROLES.client,
   displayName: "Test User",
   ...overrides,
 });
@@ -24,12 +25,14 @@ describe("MockUserRepository", () => {
     });
 
     it("filters by role", async () => {
-      await repository.create(makeUser({ id: "c-1", role: "client" }));
-      await repository.create(makeUser({ id: "s-1", email: "store@example.com", role: "store" }));
+      await repository.create(makeUser({ id: "c-1", role: USER_ROLES.client }));
+      await repository.create(
+        makeUser({ id: "s-1", email: "store@example.com", role: USER_ROLES.store }),
+      );
 
-      const clients = await repository.findAll({ role: "client" });
+      const clients = await repository.findAll({ role: USER_ROLES.client });
       expect(clients).toHaveLength(1);
-      expect(clients[0].role).toBe("client");
+      expect(clients[0].role).toBe(USER_ROLES.client);
     });
 
     it("paginates with limit", async () => {

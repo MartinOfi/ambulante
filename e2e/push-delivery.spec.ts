@@ -1,5 +1,6 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 import { setSessionCookie } from "./helpers";
+import { USER_ROLES } from "@/shared/constants/user";
 
 const DEMO_CLIENT_ID = "demo-client-1";
 const DEMO_STORE_ID = "store-demo-1";
@@ -90,12 +91,16 @@ test("push delivery loop: store accept dispatches push to subscribed client", as
   const orderId = await createReceivedOrder(request, productName);
   const orderIdForDom = formatOrderIdForDom(orderId);
 
-  const clientContext = await browser.newContext();
-  const storeContext = await browser.newContext();
+  const [clientContext, storeContext] = await Promise.all([
+    browser.newContext(),
+    browser.newContext(),
+  ]);
 
   try {
-    await setSessionCookie(clientContext, "client", DEMO_CLIENT_ID);
-    await setSessionCookie(storeContext, "store", DEMO_STORE_ID);
+    await Promise.all([
+      setSessionCookie(clientContext, USER_ROLES.client, DEMO_CLIENT_ID),
+      setSessionCookie(storeContext, USER_ROLES.store, DEMO_STORE_ID),
+    ]);
 
     const storePage = await storeContext.newPage();
     await storePage.goto("/store/orders");

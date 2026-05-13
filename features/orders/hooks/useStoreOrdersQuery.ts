@@ -16,7 +16,7 @@ export interface UseStoreOrdersQueryInput {
 }
 
 function sortByCreatedAtDesc(orders: readonly Order[]): readonly Order[] {
-  return [...orders].sort(
+  return orders.toSorted(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 }

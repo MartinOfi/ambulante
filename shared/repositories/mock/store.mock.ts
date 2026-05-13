@@ -58,7 +58,7 @@ const SEED_STORES: readonly Store[] = Object.freeze([
 ]);
 
 function sortByDistance(stores: readonly Store[]): readonly Store[] {
-  return [...stores].sort((a, b) => a.distanceMeters - b.distanceMeters);
+  return stores.toSorted((a, b) => a.distanceMeters - b.distanceMeters);
 }
 
 function applyFilters(stores: readonly Store[], filters?: StoreFilters): readonly Store[] {

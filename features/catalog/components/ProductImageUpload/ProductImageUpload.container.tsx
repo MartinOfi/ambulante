@@ -7,7 +7,7 @@ import {
   STORAGE_SIZE_LIMITS,
   STORAGE_ALLOWED_MIME_TYPES,
 } from "@/shared/constants/storage";
-import { storageService } from "@/shared/services/storage";
+import { storageService } from "@/shared/services";
 import { resizeImageForUpload } from "@/shared/utils/image-upload";
 import { ProductImageUpload } from "./ProductImageUpload";
 import type { ProductImageUploadContainerProps, UploadState } from "./ProductImageUpload.types";
@@ -15,12 +15,13 @@ import type { ProductImageUploadContainerProps, UploadState } from "./ProductIma
 const SIZE_LIMIT = STORAGE_SIZE_LIMITS.PRODUCTS;
 const ALLOWED_TYPES = STORAGE_ALLOWED_MIME_TYPES.PRODUCTS as readonly string[];
 
-function buildStoragePath(file: File): string {
+function buildStoragePath(storeId: string, file: File): string {
   const ext = file.name.split(".").pop() ?? "jpg";
-  return `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  return `store-${storeId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 }
 
 export function ProductImageUploadContainer({
+  storeId,
   currentUrl,
   onUploaded,
 }: ProductImageUploadContainerProps) {
@@ -49,7 +50,7 @@ export function ProductImageUploadContainer({
 
     try {
       const { file: resized } = await resizeImageForUpload(file);
-      const path = buildStoragePath(resized);
+      const path = buildStoragePath(storeId, resized);
 
       const result = await storageService.upload({
         bucket: STORAGE_BUCKETS.PRODUCTS,

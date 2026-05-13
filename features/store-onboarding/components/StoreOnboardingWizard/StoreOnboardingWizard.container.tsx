@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
+import { queryKeys } from "@/shared/query/keys";
 import { storeOnboardingService as defaultService } from "@/features/store-onboarding/services/store-onboarding";
 import { storeOnboardingSchema } from "@/features/store-onboarding/schemas/store-onboarding.schemas";
 import type {
@@ -24,7 +26,8 @@ function prevStep(current: OnboardingStep): OnboardingStep {
 export function StoreOnboardingWizardContainer({
   service = defaultService,
 }: StoreOnboardingWizardContainerProps) {
-  const router = useRouter();
+  const { push } = useRouter();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState<OnboardingStep>(1);
   const [fiscalDraft, setFiscalDraft] = useState<Partial<StepFiscalValues>>({});
   const [zoneDraft, setZoneDraft] = useState<Partial<StepZoneValues>>({});
@@ -60,7 +63,8 @@ export function StoreOnboardingWizardContainer({
         setServerError(result.error ?? "Ocurrió un error. Intentá de nuevo.");
         return;
       }
-      router.push(ROUTES.store.pendingApproval);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.stores.all() });
+      push(ROUTES.store.pendingApproval);
     } catch {
       setServerError("Ocurrió un error de red. Intentá de nuevo.");
     } finally {

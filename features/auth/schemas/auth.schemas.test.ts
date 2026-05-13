@@ -5,6 +5,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
 } from "./auth.schemas";
+import { USER_ROLES } from "@/shared/constants/user";
 
 describe("loginSchema", () => {
   it("accepts valid credentials", () => {
@@ -33,7 +34,7 @@ describe("registerSchema", () => {
     email: "new@test.com",
     password: "securepass",
     confirmPassword: "securepass",
-    role: "client",
+    role: USER_ROLES.client,
   };
 
   it("accepts valid registration data", () => {
@@ -41,7 +42,7 @@ describe("registerSchema", () => {
   });
 
   it("accepts store role", () => {
-    expect(registerSchema.safeParse({ ...valid, role: "store" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...valid, role: "tienda" }).success).toBe(true);
   });
 
   it("rejects mismatched passwords", () => {
