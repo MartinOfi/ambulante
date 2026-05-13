@@ -1,24 +1,22 @@
 import { screen } from "@testing-library/react";
-import { renderWithProviders } from "@/shared/test-utils/render";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
 
+import { renderWithProviders } from "@/shared/test-utils/render";
 import { StoreValidationQueueContainer } from "./StoreValidationQueue.container";
 
-vi.mock("@/features/store-validation/hooks/useStoreValidationQueueQuery", () => ({
-  useStoreValidationQueueQuery: vi.fn(),
+vi.mock("@/features/store-validation/hooks/useStoresByStatusQuery", () => ({
+  useStoresByStatusQuery: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(),
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => "/admin/stores",
 }));
 
-import { useStoreValidationQueueQuery } from "@/features/store-validation/hooks/useStoreValidationQueueQuery";
-import { useRouter } from "next/navigation";
+import { useStoresByStatusQuery } from "@/features/store-validation/hooks/useStoresByStatusQuery";
 import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
-const mockUseStoreValidationQueueQuery = vi.mocked(useStoreValidationQueueQuery);
-const mockUseRouter = vi.mocked(useRouter);
+const mockUseStoresByStatusQuery = vi.mocked(useStoresByStatusQuery);
 
 const PENDING_STORE: PendingStore = {
   id: "store-1",
@@ -35,35 +33,30 @@ const PENDING_STORE: PendingStore = {
 };
 
 describe("StoreValidationQueueContainer", () => {
-  const mockPush = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseRouter.mockReturnValue({
-      push: mockPush,
-    } as unknown as ReturnType<typeof useRouter>);
   });
 
   it("renders loading skeleton while query is loading", () => {
-    mockUseStoreValidationQueueQuery.mockReturnValue({
+    mockUseStoresByStatusQuery.mockReturnValue({
       data: undefined,
       isLoading: true,
       isError: false,
       error: null,
-    } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
+    } as unknown as ReturnType<typeof useStoresByStatusQuery>);
 
     renderWithProviders(<StoreValidationQueueContainer />);
 
     expect(screen.getByTestId("queue-loading")).toBeInTheDocument();
   });
 
-  it("renders the list of stores when query succeeds", () => {
-    mockUseStoreValidationQueueQuery.mockReturnValue({
+  it("renders stores when query succeeds", () => {
+    mockUseStoresByStatusQuery.mockReturnValue({
       data: [PENDING_STORE],
       isLoading: false,
       isError: false,
       error: null,
-    } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
+    } as unknown as ReturnType<typeof useStoresByStatusQuery>);
 
     renderWithProviders(<StoreValidationQueueContainer />);
 
@@ -71,30 +64,43 @@ describe("StoreValidationQueueContainer", () => {
   });
 
   it("renders empty state when query returns empty array", () => {
-    mockUseStoreValidationQueueQuery.mockReturnValue({
+    mockUseStoresByStatusQuery.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       error: null,
-    } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
+    } as unknown as ReturnType<typeof useStoresByStatusQuery>);
 
     renderWithProviders(<StoreValidationQueueContainer />);
 
     expect(screen.getByTestId("queue-empty")).toBeInTheDocument();
   });
 
-  it("navigates to store detail when a store row is clicked", () => {
-    mockUseStoreValidationQueueQuery.mockReturnValue({
+  it("renders a Ver detalle link for each store", () => {
+    mockUseStoresByStatusQuery.mockReturnValue({
       data: [PENDING_STORE],
       isLoading: false,
       isError: false,
       error: null,
-    } as unknown as ReturnType<typeof useStoreValidationQueueQuery>);
+    } as unknown as ReturnType<typeof useStoresByStatusQuery>);
 
     renderWithProviders(<StoreValidationQueueContainer />);
 
-    screen.getByRole("button", { name: /taco loco/i }).click();
+    expect(screen.getByRole("link", { name: /ver detalle/i })).toBeInTheDocument();
+  });
 
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("store-1"));
+  it("renders all three status tabs", () => {
+    mockUseStoresByStatusQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      error: null,
+    } as unknown as ReturnType<typeof useStoresByStatusQuery>);
+
+    renderWithProviders(<StoreValidationQueueContainer />);
+
+    expect(screen.getByRole("tab", { name: /pendientes/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /aprobadas/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /rechazadas/i })).toBeInTheDocument();
   });
 });

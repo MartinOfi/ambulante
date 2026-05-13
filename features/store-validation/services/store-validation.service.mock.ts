@@ -61,6 +61,27 @@ const SEED_STORES: readonly PendingStore[] = [
       },
     },
   },
+  // E2E fixture stores — must match e2e/use-cases/fixtures/stores.ts
+  {
+    id: "e2e-pending-store",
+    name: "Empanadas La Porteña",
+    kind: "street-cart",
+    photoUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400",
+    location: { lat: -34.588, lng: -58.4 },
+    distanceMeters: 600,
+    status: "open",
+    priceFromArs: 900,
+    tagline: "Empanadas caseras de Palermo",
+    ownerId: "44444444-4444-4444-4444-444444444444",
+    validationStatus: STORE_VALIDATION_STATUS.pending,
+    documents: {
+      [VALIDATION_DOC_TYPES.ID_FRONT]: {
+        path: "store-e2e-pending-store/id_front.jpg",
+        mimeType: "image/jpeg",
+        filename: "dni-frente.jpg",
+      },
+    },
+  },
   {
     id: "approved-store-1",
     name: "Helados Tino",
@@ -73,6 +94,20 @@ const SEED_STORES: readonly PendingStore[] = [
     tagline: "Artesanales sin TACC",
     ownerId: "33333333-3333-3333-3333-333333333333",
     validationStatus: STORE_VALIDATION_STATUS.approved,
+  },
+  {
+    id: "e2e-rejected-store",
+    name: "Helados del Sur",
+    kind: "ice-cream",
+    photoUrl: "https://images.unsplash.com/photo-1567206563114-c179706b56b5?w=400",
+    location: { lat: -34.635, lng: -58.39 },
+    distanceMeters: 1500,
+    status: "open",
+    priceFromArs: 500,
+    tagline: "Sabores del sur",
+    ownerId: "55555555-5555-5555-5555-555555555555",
+    validationStatus: STORE_VALIDATION_STATUS.rejected,
+    rejectionReason: "Documentación incompleta: falta habilitación comercial",
   },
 ];
 
@@ -89,9 +124,11 @@ export class MockStoreValidationService implements StoreValidationService {
   }
 
   async getPendingStores(): Promise<readonly PendingStore[]> {
-    return this.stores.filter(
-      (store) => store.validationStatus === STORE_VALIDATION_STATUS.pending,
-    );
+    return this.getStoresByStatus(STORE_VALIDATION_STATUS.pending);
+  }
+
+  async getStoresByStatus(status: string): Promise<readonly PendingStore[]> {
+    return this.stores.filter((store) => store.validationStatus === status);
   }
 
   async getStoreById(id: string): Promise<PendingStore | null> {

@@ -11,6 +11,7 @@ export const queryKeys = {
     byOwner: (userId: string) => ["stores", "by-owner", userId] as const,
     pending: () => ["stores", "pending"] as const,
     pendingById: (id: string) => ["stores", "pending", id] as const,
+    byStatus: (status: string) => ["stores", "by-status", status] as const,
     validationDoc: (storeId: string, docType: string) =>
       ["stores", "validation-doc", storeId, docType] as const,
   },

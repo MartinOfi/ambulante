@@ -57,7 +57,7 @@ export function UserOrdersTable({ orders }: UserOrdersTableProps) {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-[hsl(var(--border))]">
-      <table className="w-full text-sm">
+      <table aria-label="Pedidos del usuario" className="w-full text-sm">
         <thead>
           <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]">
             <th scope="col" className="px-4 py-3 text-left font-medium text-[hsl(var(--muted))]">

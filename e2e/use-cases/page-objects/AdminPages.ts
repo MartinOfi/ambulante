@@ -103,7 +103,9 @@ export class AdminUsersPage {
 
   async goto() {
     await this.page.goto("/admin/users");
-    await this.page.waitForLoadState("networkidle");
+    await this.page
+      .getByRole("heading", { name: /gestión de usuarios/i })
+      .waitFor({ timeout: 15_000 });
   }
 
   async gotoUserDetail(userId: string) {
@@ -112,11 +114,11 @@ export class AdminUsersPage {
   }
 
   get searchInput(): Locator {
-    return this.page.getByRole("searchbox").or(this.page.getByPlaceholder(/buscar usuario/i));
+    return this.page.getByLabel(/buscar usuario/i);
   }
 
   get roleFilter(): Locator {
-    return this.page.getByRole("combobox", { name: /rol/i });
+    return this.page.getByLabel(/filtrar por rol/i);
   }
 
   userRow(userName: string): Locator {
@@ -124,7 +126,7 @@ export class AdminUsersPage {
   }
 
   get suspendButton(): Locator {
-    return this.page.getByRole("button", { name: /suspender usuario/i });
+    return this.page.getByRole("button", { name: /^suspender$/i });
   }
 
   get confirmSuspendButton(): Locator {
@@ -132,7 +134,7 @@ export class AdminUsersPage {
   }
 
   get reactivateButton(): Locator {
-    return this.page.getByRole("button", { name: /reactivar usuario/i });
+    return this.page.getByRole("button", { name: /^reactivar$/i });
   }
 
   get suspendedBadge(): Locator {

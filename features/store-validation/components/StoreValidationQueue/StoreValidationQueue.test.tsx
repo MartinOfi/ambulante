@@ -1,9 +1,17 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { StoreValidationQueue } from "./StoreValidationQueue";
-import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
-const PENDING_STORE_1: PendingStore = {
+import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
+import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
+import { StoreValidationQueue } from "./StoreValidationQueue";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => "/admin/stores",
+}));
+
+const STORE_1: PendingStore = {
   id: "store-1",
   name: "Taco Loco",
   kind: "food-truck",
@@ -17,10 +25,10 @@ const PENDING_STORE_1: PendingStore = {
   validationStatus: "pending",
 };
 
-const PENDING_STORE_2: PendingStore = {
+const STORE_2: PendingStore = {
   id: "store-2",
   name: "Empanadas Del Sur",
-  kind: "food-truck",
+  kind: "street-cart",
   photoUrl: "https://example.com/photo2.jpg",
   location: { lat: -34.61, lng: -58.39 },
   distanceMeters: 500,
@@ -31,54 +39,88 @@ const PENDING_STORE_2: PendingStore = {
   validationStatus: "pending",
 };
 
+const DEFAULT_PROPS = {
+  stores: [STORE_1, STORE_2],
+  isLoading: false,
+  activeStatus: STORE_VALIDATION_STATUS.pending,
+  searchQuery: "",
+  onStatusChange: vi.fn(),
+  onSearchChange: vi.fn(),
+} as const;
+
 describe("StoreValidationQueue", () => {
-  it("renders a list of pending stores", () => {
+  it("renders a tab for each validation status", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} />);
+
+    expect(screen.getByRole("tab", { name: /pendientes/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /aprobadas/i })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /rechazadas/i })).toBeInTheDocument();
+  });
+
+  it("marks the active tab as selected", () => {
     render(
-      <StoreValidationQueue
-        stores={[PENDING_STORE_1, PENDING_STORE_2]}
-        isLoading={false}
-        onSelectStore={vi.fn()}
-      />,
+      <StoreValidationQueue {...DEFAULT_PROPS} activeStatus={STORE_VALIDATION_STATUS.approved} />,
     );
 
-    expect(screen.getByText("Taco Loco")).toBeInTheDocument();
-    expect(screen.getByText("Empanadas Del Sur")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /aprobadas/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getByRole("tab", { name: /pendientes/i })).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
   });
 
-  it("shows a loading skeleton when isLoading is true", () => {
-    render(<StoreValidationQueue stores={[]} isLoading={true} onSelectStore={vi.fn()} />);
+  it("renders the search input", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} />);
+
+    expect(screen.getByRole("searchbox", { name: /buscar tienda/i })).toBeInTheDocument();
+  });
+
+  it("renders a table row per store with a Ver detalle link", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} />);
+
+    const links = screen.getAllByRole("link", { name: /ver detalle/i });
+    expect(links).toHaveLength(2);
+
+    const rows = screen.getAllByRole("row");
+    // 1 header row + 2 data rows
+    expect(rows).toHaveLength(3);
+  });
+
+  it("shows loading state when isLoading is true", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} stores={[]} isLoading={true} />);
 
     expect(screen.getByTestId("queue-loading")).toBeInTheDocument();
-    expect(screen.queryByText("Taco Loco")).not.toBeInTheDocument();
   });
 
-  it("shows an empty-state message when there are no stores", () => {
-    render(<StoreValidationQueue stores={[]} isLoading={false} onSelectStore={vi.fn()} />);
+  it("shows empty state when there are no stores", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} stores={[]} />);
 
     expect(screen.getByTestId("queue-empty")).toBeInTheDocument();
   });
 
-  it("calls onSelectStore with the store id when a store row is clicked", () => {
-    const onSelectStore = vi.fn();
+  it("calls onStatusChange with the correct status when a tab is clicked", async () => {
+    const onStatusChange = vi.fn();
+    render(<StoreValidationQueue {...DEFAULT_PROPS} onStatusChange={onStatusChange} />);
 
-    render(
-      <StoreValidationQueue
-        stores={[PENDING_STORE_1]}
-        isLoading={false}
-        onSelectStore={onSelectStore}
-      />,
-    );
+    await userEvent.click(screen.getByRole("tab", { name: /aprobadas/i }));
 
-    screen.getByRole("button", { name: /taco loco/i }).click();
-
-    expect(onSelectStore).toHaveBeenCalledWith("store-1");
+    expect(onStatusChange).toHaveBeenCalledWith(STORE_VALIDATION_STATUS.approved);
   });
 
-  it("displays the store tagline below the name", () => {
-    render(
-      <StoreValidationQueue stores={[PENDING_STORE_1]} isLoading={false} onSelectStore={vi.fn()} />,
-    );
+  it("filters rows client-side by searchQuery", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} searchQuery="Taco" />);
 
-    expect(screen.getByText("Los mejores tacos")).toBeInTheDocument();
+    expect(screen.getByText("Taco Loco")).toBeInTheDocument();
+    expect(screen.queryByText("Empanadas Del Sur")).not.toBeInTheDocument();
+  });
+
+  it("shows the store name and kind in each row", () => {
+    render(<StoreValidationQueue {...DEFAULT_PROPS} stores={[STORE_1]} />);
+
+    expect(screen.getByText("Taco Loco")).toBeInTheDocument();
+    expect(screen.getByText("food-truck")).toBeInTheDocument();
   });
 });
