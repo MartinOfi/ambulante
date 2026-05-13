@@ -6,6 +6,7 @@ import { MapPage } from "../page-objects/MapPage";
 import { CartDrawer } from "../page-objects/CartDrawer";
 import { OrderTrackingPage } from "../page-objects/OrderTrackingPage";
 import { StoreOrdersPage } from "../page-objects/StoreOrdersPage";
+import { StoreOrderDetailPage } from "../page-objects/StoreOrderDetailPage";
 
 /**
  * UC-FLOW-01: Happy path completo
@@ -50,7 +51,7 @@ test.describe("UC-FLOW-01 — happy path completo (cliente ↔ tienda)", () => {
       const clientTracking = new OrderTrackingPage(clientPage);
       await expect(clientTracking.statusStep("ENVIADO")).toBeVisible({ timeout: 8_000 });
 
-      // Tienda: login y aceptar pedido
+      // Tienda: login, abrir detalle y aceptar pedido
       await storePage.goto("/login");
       await storePage.getByLabel(/correo electrónico/i).fill(E2E_USERS.store.email);
       await storePage.getByLabel(/contraseña/i).fill(E2E_USERS.store.password);
@@ -58,11 +59,17 @@ test.describe("UC-FLOW-01 — happy path completo (cliente ↔ tienda)", () => {
       await storePage.waitForURL("**/store/**", { timeout: 15_000 });
 
       const storeOrders = new StoreOrdersPage(storePage);
+      const storeDetail = new StoreOrderDetailPage(storePage);
       await storeOrders.goto();
-      await expect(storeOrders.firstAcceptButton).toBeVisible({
+      await expect(storeOrders.firstOrderCard).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
-      await storeOrders.firstAcceptButton.click();
+      await storeOrders.clickFirstOrder();
+      await expect(storeDetail.acceptButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await storeDetail.acceptButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
 
       // Cliente: ve ACEPTADO
       await expect(clientTracking.statusStep("ACEPTADO")).toBeVisible({
@@ -76,11 +83,16 @@ test.describe("UC-FLOW-01 — happy path completo (cliente ↔ tienda)", () => {
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
 
-      // Tienda: finaliza el pedido
-      await expect(storeOrders.firstFinalizeButton).toBeVisible({
+      // Tienda: abrir detalle y finalizar el pedido
+      await expect(storeOrders.firstOrderCard).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
-      await storeOrders.firstFinalizeButton.click();
+      await storeOrders.clickFirstOrder();
+      await expect(storeDetail.finalizeButton).toBeVisible({
+        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
+      });
+      await storeDetail.finalizeButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
 
       // Cliente: ve FINALIZADO
       await expect(clientTracking.statusStep("FINALIZADO")).toBeVisible({

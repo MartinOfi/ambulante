@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import { renderWithProviders } from "@/shared/test-utils/render";
 import type { Order } from "@/shared/schemas/order";
@@ -24,118 +23,37 @@ const ORDER_ENVIADO = makeOrder("o1", ORDER_STATUS.ENVIADO, "2026-04-20T10:00:00
 const ORDER_RECIBIDO = makeOrder("o2", ORDER_STATUS.RECIBIDO, "2026-04-20T09:00:00.000Z");
 const ORDER_ACEPTADO = makeOrder("o3", ORDER_STATUS.ACEPTADO, "2026-04-20T08:00:00.000Z");
 
-const noop = vi.fn();
-
 describe("IncomingOrdersInbox", () => {
   it("renders empty state when no orders", () => {
-    renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[]}
-        isLoading={false}
-        onAccept={noop}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={null}
-      />,
-    );
-
+    renderWithProviders(<IncomingOrdersInbox orders={[]} isLoading={false} />);
     expect(screen.getByText(/no hay pedidos/i)).toBeInTheDocument();
   });
 
   it("renders loading state", () => {
-    renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[]}
-        isLoading={true}
-        onAccept={noop}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={null}
-      />,
-    );
-
+    renderWithProviders(<IncomingOrdersInbox orders={[]} isLoading={true} />);
     expect(screen.getByText(/cargando pedidos/i)).toBeInTheDocument();
   });
 
-  it("renders all orders", () => {
+  it("renders all orders as links", () => {
     renderWithProviders(
       <IncomingOrdersInbox
         orders={[ORDER_ENVIADO, ORDER_RECIBIDO, ORDER_ACEPTADO]}
         isLoading={false}
-        onAccept={noop}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={null}
       />,
     );
-
-    expect(screen.getAllByRole("article")).toHaveLength(3);
+    expect(screen.getAllByRole("link")).toHaveLength(3);
   });
 
-  it("calls onAccept with orderId when Aceptar is clicked on RECIBIDO order", async () => {
-    const onAccept = vi.fn();
-    renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[ORDER_RECIBIDO]}
-        isLoading={false}
-        onAccept={onAccept}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={null}
-      />,
-    );
-
-    await userEvent.click(screen.getByRole("button", { name: /aceptar/i }));
-
-    expect(onAccept).toHaveBeenCalledWith(ORDER_RECIBIDO.id);
-  });
-
-  it("calls onReject with orderId when Rechazar is clicked", async () => {
-    const onReject = vi.fn();
-    renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[ORDER_RECIBIDO]}
-        isLoading={false}
-        onAccept={noop}
-        onReject={onReject}
-        onFinalize={noop}
-        pendingOrderId={null}
-      />,
-    );
-
-    await userEvent.click(screen.getByRole("button", { name: /rechazar/i }));
-
-    expect(onReject).toHaveBeenCalledWith(ORDER_RECIBIDO.id);
+  it("links point to the order detail page", () => {
+    renderWithProviders(<IncomingOrdersInbox orders={[ORDER_RECIBIDO]} isLoading={false} />);
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", `/store/order/${ORDER_RECIBIDO.id}`);
   });
 
   it("shows order count badge", () => {
     renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[ORDER_ENVIADO, ORDER_RECIBIDO]}
-        isLoading={false}
-        onAccept={noop}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={null}
-      />,
+      <IncomingOrdersInbox orders={[ORDER_ENVIADO, ORDER_RECIBIDO]} isLoading={false} />,
     );
-
     expect(screen.getByText("2")).toBeInTheDocument();
-  });
-
-  it("disables buttons for the pending order", () => {
-    renderWithProviders(
-      <IncomingOrdersInbox
-        orders={[ORDER_RECIBIDO]}
-        isLoading={false}
-        onAccept={noop}
-        onReject={noop}
-        onFinalize={noop}
-        pendingOrderId={ORDER_RECIBIDO.id}
-      />,
-    );
-
-    expect(screen.getByRole("button", { name: /aceptar/i })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /rechazar/i })).toBeDisabled();
   });
 });

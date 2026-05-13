@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { loginAsStore } from "../helpers";
 import { StoreOrdersPage } from "../page-objects/StoreOrdersPage";
+import { StoreOrderDetailPage } from "../page-objects/StoreOrderDetailPage";
 import { OrderTrackingPage } from "../page-objects/OrderTrackingPage";
 import { MapPage } from "../page-objects/MapPage";
 import { CartDrawer } from "../page-objects/CartDrawer";
@@ -64,11 +65,13 @@ test.describe("UC-STO-18 — aceptar pedido entrante", () => {
 
       await loginAsStoreFresh(storePage);
       const orders = new StoreOrdersPage(storePage);
+      const detail = new StoreOrderDetailPage(storePage);
       await orders.goto();
-      await expect(orders.firstAcceptButton).toBeVisible({
-        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
-      });
-      await orders.firstAcceptButton.click();
+      await expect(orders.firstOrderCard).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await orders.clickFirstOrder();
+      await expect(detail.acceptButton).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await detail.acceptButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
       await expect(orders.orderStatusBadge("ACEPTADO")).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
@@ -96,11 +99,13 @@ test.describe("UC-STO-19 — rechazar pedido", () => {
 
       await loginAsStoreFresh(storePage);
       const orders = new StoreOrdersPage(storePage);
+      const detail = new StoreOrderDetailPage(storePage);
       await orders.goto();
-      await expect(orders.firstRejectButton).toBeVisible({
-        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
-      });
-      await orders.firstRejectButton.click();
+      await expect(orders.firstOrderCard).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await orders.clickFirstOrder();
+      await expect(detail.rejectButton).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await detail.rejectButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
       await expect(orders.orderStatusBadge("RECHAZADO")).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
@@ -129,13 +134,15 @@ test.describe("UC-STO-20 — finalizar pedido", () => {
 
       await loginAsStoreFresh(storePage);
       const orders = new StoreOrdersPage(storePage);
+      const detail = new StoreOrderDetailPage(storePage);
       await orders.goto();
 
-      // Tienda acepta → ACEPTADO
-      await expect(orders.firstAcceptButton).toBeVisible({
-        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
-      });
-      await orders.firstAcceptButton.click();
+      // Tienda abre detalle y acepta → ACEPTADO
+      await expect(orders.firstOrderCard).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await orders.clickFirstOrder();
+      await expect(detail.acceptButton).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await detail.acceptButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
 
       // Cliente confirma que va en camino → EN_CAMINO
       await expect(clientTracking.confirmOnTheWayButton).toBeVisible({
@@ -143,11 +150,12 @@ test.describe("UC-STO-20 — finalizar pedido", () => {
       });
       await clientTracking.confirmOnTheWayButton.click();
 
-      // Tienda finaliza → FINALIZADO
-      await expect(orders.firstFinalizeButton).toBeVisible({
-        timeout: REALTIME_TRANSITION_TIMEOUT_MS,
-      });
-      await orders.firstFinalizeButton.click();
+      // Tienda vuelve a abrir detalle y finaliza → FINALIZADO
+      await expect(orders.firstOrderCard).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await orders.clickFirstOrder();
+      await expect(detail.finalizeButton).toBeVisible({ timeout: REALTIME_TRANSITION_TIMEOUT_MS });
+      await detail.finalizeButton.click();
+      await storePage.waitForURL("**/store/orders**", { timeout: REALTIME_TRANSITION_TIMEOUT_MS });
       await expect(orders.orderStatusBadge("FINALIZADO")).toBeVisible({
         timeout: REALTIME_TRANSITION_TIMEOUT_MS,
       });
@@ -164,7 +172,7 @@ test.describe("UC-STO-21 — sin pedidos entrantes", () => {
     await loginAsStore(page);
     const orders = new StoreOrdersPage(page);
     await orders.goto();
-    const hasOrders = (await orders.firstAcceptButton.count()) > 0;
+    const hasOrders = (await orders.firstOrderCard.count()) > 0;
     if (!hasOrders) {
       await expect(orders.emptyMessage).toBeVisible({ timeout: 5_000 });
     } else {
