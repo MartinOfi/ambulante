@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { receiveOrder } from "@/features/orders/actions";
+import { STORE_ORDER_TRANSITION_ERROR_CODE } from "@/features/orders/store-transitions.constants";
 import { createServerClient } from "@/shared/repositories/supabase/client";
 import { SupabaseOrderRepository } from "@/shared/repositories";
 import { ROUTES } from "@/shared/constants/routes";
@@ -25,7 +26,13 @@ export default async function StoreOrderDetailPage({ params }: PageProps) {
   const publicId = parsed.data;
 
   // Transition ENVIADO→RECIBIDO (idempotent — safe on every render / back navigation).
-  await receiveOrder({ publicId });
+  const receiveResult = await receiveOrder({ publicId });
+  if (
+    !receiveResult.ok &&
+    receiveResult.errorCode === STORE_ORDER_TRANSITION_ERROR_CODE.UNAUTHENTICATED
+  ) {
+    redirect(ROUTES.auth.login);
+  }
 
   const client = await createServerClient();
   const order = await new SupabaseOrderRepository(client).findById(publicId);

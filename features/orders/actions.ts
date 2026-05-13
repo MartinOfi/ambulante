@@ -394,6 +394,10 @@ async function publishReceivedEvent(
   try {
     const order = await new SupabaseOrderRepository(client).findById(publicId);
     if (order === null) return;
+    // `updatedAt` reflects the moment of the ENVIADO→RECIBIDO transition (set by the RPC).
+    // The Order mapper does not yet expose the `received_at` DB column directly (DT-01).
+    // Note: publishAcceptedEvent / publishRejectedEvent use `createdAt` as `receivedAt`,
+    // which is less accurate — tracked for alignment in DT-01.
     const receivedAt = new Date(order.updatedAt);
     eventBus.publish({
       type: ORDER_DOMAIN_EVENT.ORDER_RECEIVED,
