@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 03 — Combo Pin Clásico
+  ============================================
+  Concept: Pin de geolocalización clásico + wordmark.
+           Lectura: "esta es una app de mapa".
+  Mood: Funcional, tech, claro.
+  Colors: Pin naranja (#F26B1F), texto charcoal (#1A1A1A).
+  Font: Inter Bold.
+  Use cases: App icon expandido, header web, materiales digitales.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&amp;display=swap');
+    .word { font-family: 'Inter', 'Helvetica Neue', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.25em; }
+  </style>
+
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Pin icon, left side -->
+  <g transform="translate(140, 280)">
+    <path d="M 90 0
+             C 40.3 0 0 40.3 0 90
+             C 0 140 45 180 90 260
+             C 135 180 180 140 180 90
+             C 180 40.3 139.7 0 90 0 Z"
+          fill="#F26B1F"/>
+    <circle cx="90" cy="85" r="32" fill="#FAF6EE"/>
+  </g>
+
+  <!-- Wordmark, right of pin -->
+  <text x="370" y="395"
+        class="word"
+        font-size="100"
+        fill="#1A1A1A"
+        dominant-baseline="middle">AMBULANTE</text>
+
+  <!-- Tagline below wordmark -->
+  <text x="370" y="465"
+        class="sub"
+        font-size="20"
+        fill="#1A1A1A">ROSARIO · 2026</text>
+</svg>

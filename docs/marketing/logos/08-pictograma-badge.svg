@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TuPuesto Logo · 08 — Pictograma Badge (texto circular alrededor) · v3
+  ============================================
+  Concept: Pictograma en el centro con sello rosarino rodeándolo.
+  Use cases: Día D, press kit, packaging premium, sticker conmemorativo.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap');
+    .label { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.3em; }
+  </style>
+
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Outer + inner ring -->
+  <circle cx="400" cy="400" r="350" fill="none" stroke="#1A1A1A" stroke-width="8"/>
+  <circle cx="400" cy="400" r="300" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+
+  <!-- Text paths -->
+  <defs>
+    <path id="topCurve" d="M 100 400 A 300 300 0 0 1 700 400" fill="none"/>
+    <path id="bottomCurve" d="M 700 400 A 300 300 0 0 1 100 400" fill="none"/>
+  </defs>
+
+  <text class="label" font-size="36" fill="#1A1A1A">
+    <textPath href="#topCurve" startOffset="50%" text-anchor="middle">TUPUESTO</textPath>
+  </text>
+  <text class="label" font-size="26" fill="#1A1A1A">
+    <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">ROSARIO · DESDE 2026</textPath>
+  </text>
+
+  <!-- Decorative orange dots -->
+  <circle cx="125" cy="400" r="8" fill="#F26B1F"/>
+  <circle cx="675" cy="400" r="8" fill="#F26B1F"/>
+
+  <!-- PICTOGRAMA central (con carrito naranja, igual que #04) -->
+  <g transform="translate(225, 215) scale(0.45)">
+    <!-- Carrito fondo naranja -->
+    <rect x="335" y="395" width="330" height="200" rx="6" fill="#F26B1F"/>
+    <!-- Persona -->
+    <g stroke="#1A1A1A" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <circle cx="200" cy="280" r="48"/>
+      <path d="M 200 328 L 200 355"/>
+      <path d="M 200 505 L 145 675"/>
+      <path d="M 220 505 L 280 675"/>
+    </g>
+    <!-- Delantal -->
+    <g fill="#FAF6EE" stroke="#1A1A1A" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 178 360 L 244 360 L 258 510 L 162 510 Z"/>
+      <path d="M 182 360 Q 210 330 240 360" fill="none"/>
+      <path d="M 192 440 L 232 440 L 232 470 L 192 470 Z" fill="none" stroke-width="24"/>
+    </g>
+    <!-- Brazos + Carrito detalles -->
+    <g stroke="#1A1A1A" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 245 400 L 345 400"/>
+      <rect x="335" y="395" width="330" height="200" rx="6"/>
+      <line x1="535" y1="395" x2="535" y2="595"/>
+      <path d="M 320 360 Q 500 180 680 360"/>
+      <path d="M 405 308 L 405 360"/>
+      <path d="M 500 270 L 500 360"/>
+      <path d="M 595 308 L 595 360"/>
+      <line x1="500" y1="270" x2="500" y2="395"/>
+    </g>
+    <!-- Productos -->
+    <g fill="#FAF6EE" stroke="#1A1A1A" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="385" cy="385" r="22"/>
+      <circle cx="440" cy="375" r="22"/>
+      <circle cx="565" cy="385" r="22"/>
+      <circle cx="615" cy="375" r="22"/>
+    </g>
+    <!-- 2 Ruedas -->
+    <g>
+      <circle cx="410" cy="625" r="50" fill="#FAF6EE" stroke="#1A1A1A" stroke-width="32"/>
+      <circle cx="410" cy="625" r="14" fill="#1A1A1A"/>
+      <circle cx="590" cy="625" r="50" fill="#FAF6EE" stroke="#1A1A1A" stroke-width="32"/>
+      <circle cx="590" cy="625" r="14" fill="#1A1A1A"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TuPuesto · 8 logos pictográficos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: #1A1A1A;
+      color: #FAF6EE;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 40px; }
+    h1 {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 64px;
+      letter-spacing: 0.02em;
+      color: #F26B1F;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #FAF6EE;
+      opacity: 0.7;
+    }
+    .pivot-note {
+      background: #2D2D2D;
+      border-left: 4px solid #F26B1F;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .pivot-note strong { color: #F26B1F; }
+    .legend {
+      background: #2D2D2D;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+    .legend code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 28px;
+    }
+    .card {
+      background: #FAF6EE;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-4px); }
+    .card-image {
+      width: 100%;
+      aspect-ratio: 1;
+      display: block;
+      padding: 8px;
+      background: #FAF6EE;
+    }
+    .card.wide .card-image { aspect-ratio: auto; }
+    .card-body {
+      background: #1A1A1A;
+      padding: 16px 20px;
+    }
+    .card-number {
+      display: inline-block;
+      background: #F26B1F;
+      color: #FAF6EE;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: #FAF6EE;
+    }
+    .card-concept {
+      font-size: 13px;
+      color: #FAF6EE;
+      opacity: 0.7;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 4px 8px;
+      background: #2D2D2D;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .featured { border: 3px solid #F26B1F; }
+    .featured .card-body { background: #F26B1F; color: #1A1A1A; }
+    .featured .card-title { color: #1A1A1A; }
+    .featured .card-concept { color: #1A1A1A; opacity: 0.85; }
+    .featured .card-number { background: #1A1A1A; color: #F26B1F; }
+    .featured .tag { background: rgba(0,0,0,0.2); color: #1A1A1A; }
+    .recommendation {
+      margin-top: 50px;
+      background: #2D2D2D;
+      border-left: 4px solid #F26B1F;
+      padding: 24px 28px;
+      border-radius: 8px;
+    }
+    .recommendation h2 {
+      color: #F26B1F;
+      margin-bottom: 10px;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .recommendation p {
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .recommendation p + p { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>TUPUESTO</h1>
+      <p class="subtitle">8 logos pictográficos · rosario · 2026</p>
+    </header>
+
+    <div class="pivot-note">
+      <p><strong>Iteración 2:</strong> reorientamos hacia un <strong>pictograma de persona empujando carrito</strong> como símbolo unificado. Más concreto, más legible, identificable inmediatamente por vendedores y clientes. Las 8 variantes comparten el mismo símbolo base con variaciones de aplicación (color, marco, composición, complejidad).</p>
+    </div>
+
+    <div class="legend">
+      <p>Cada logo es un archivo <strong>SVG editable</strong>. Podés abrirlos en Figma, Illustrator o Inkscape (gratis) para modificar cualquier detalle. Las tipografías son <strong>Inter</strong> (Google Fonts) — los SVG cargan la fuente automáticamente si tenés conexión.</p>
+      <p style="margin-top: 8px;"><strong>Paleta:</strong> Naranja TuPuesto <code>#F26B1F</code> · Charcoal <code>#1A1A1A</code> · Cream <code>#FAF6EE</code>.</p>
+    </div>
+
+    <div class="grid">
+      <!-- 01 -->
+      <div class="card">
+        <img src="01-pictograma-puro.svg" alt="Pictograma puro" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">01</span>
+          <h3 class="card-title">Pictograma puro</h3>
+          <p class="card-concept">Solo el símbolo, sin texto. Stroke charcoal sobre cream. Para uso compacto.</p>
+          <div class="card-tags">
+            <span class="tag">Solo símbolo</span>
+            <span class="tag">Logomark</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="card">
+        <img src="02-pictograma-wordmark-vertical.svg" alt="Pictograma + Wordmark Vertical" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">02</span>
+          <h3 class="card-title">Pictograma + Wordmark Vertical</h3>
+          <p class="card-concept">Símbolo arriba, texto debajo. Composición clásica equilibrada.</p>
+          <div class="card-tags">
+            <span class="tag">Combo</span>
+            <span class="tag">Versátil</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 (horizontal, wide layout) -->
+      <div class="card wide">
+        <img src="03-pictograma-wordmark-horizontal.svg" alt="Pictograma + Wordmark Horizontal" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">03</span>
+          <h3 class="card-title">Pictograma + Wordmark Horizontal</h3>
+          <p class="card-concept">Símbolo izquierda, texto derecha. Header-friendly, firma de email.</p>
+          <div class="card-tags">
+            <span class="tag">Header</span>
+            <span class="tag">Horizontal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 RECOMENDADO -->
+      <div class="card featured">
+        <img src="04-pictograma-color.svg" alt="Pictograma con color naranja" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">04 ★ RECOMENDADO</span>
+          <h3 class="card-title">Pictograma con color</h3>
+          <p class="card-concept">Carrito en naranja sólido + persona en charcoal stroke. Identidad visual reforzada — "esto es TuPuesto" en 1 vistazo.</p>
+          <div class="card-tags">
+            <span class="tag">Hero</span>
+            <span class="tag">Bold</span>
+            <span class="tag">Memorable</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 05 -->
+      <div class="card">
+        <img src="05-pictograma-circulo-naranja.svg" alt="Pictograma en círculo naranja" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">05</span>
+          <h3 class="card-title">Pictograma en círculo naranja</h3>
+          <p class="card-concept">El símbolo dentro de un círculo naranja sólido. Perfecto para avatar/badge.</p>
+          <div class="card-tags">
+            <span class="tag">Avatar</span>
+            <span class="tag">Badge</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 06 -->
+      <div class="card">
+        <img src="06-pictograma-app-icon.svg" alt="Pictograma App Icon" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">06</span>
+          <h3 class="card-title">App Icon (rounded square)</h3>
+          <p class="card-concept">Formato app icon listo: cuadrado redondeado naranja, pictograma cream. iOS/Android/PWA ready.</p>
+          <div class="card-tags">
+            <span class="tag">App icon</span>
+            <span class="tag">PWA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 07 -->
+      <div class="card">
+        <img src="07-pictograma-minimal.svg" alt="Pictograma minimalista" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">07</span>
+          <h3 class="card-title">Pictograma minimalista</h3>
+          <p class="card-concept">Versión simplificada — sin productos ni franjas. Escala perfecto hasta favicon 16x16.</p>
+          <div class="card-tags">
+            <span class="tag">Mínimo</span>
+            <span class="tag">Favicon</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 08 -->
+      <div class="card">
+        <img src="08-pictograma-badge.svg" alt="Pictograma Badge circular" class="card-image" />
+        <div class="card-body">
+          <span class="card-number">08</span>
+          <h3 class="card-title">Pictograma Badge</h3>
+          <p class="card-concept">Sello con texto "TUPUESTO · ROSARIO" rodeando el pictograma. Ceremonial.</p>
+          <div class="card-tags">
+            <span class="tag">Día D</span>
+            <span class="tag">Press</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendation">
+      <h2>Mi recomendación</h2>
+      <p>El <strong>#04 — Pictograma con color (carrito naranja)</strong> es la apuesta más fuerte como logo primario: mantiene el pictograma claro pero suma identidad de marca con el naranja TuPuesto en el carrito. Es lo más memorable y lo más fácilmente reconocible una vez que la gente lo vea 2-3 veces.</p>
+      <p>El <strong>#06 — App Icon</strong> es el complemento natural — formato cuadrado naranja para iOS/Android/PWA. Las dos versiones (logo grande #04 + app icon #06) cubren el 95% de casos de uso.</p>
+      <p>El <strong>#08 — Badge circular</strong> queda como variante ceremonial para el día D y press kit, no para uso cotidiano.</p>
+    </div>
+  </div>
+</body>
+</html>

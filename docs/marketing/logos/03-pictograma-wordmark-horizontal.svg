@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TuPuesto Logo · 03 — Pictograma + Wordmark horizontal · v3
+  ============================================
+  Concept: Pictograma a la izquierda, TUPUESTO a la derecha.
+  Use cases: Header de la app/web, firma de email, ads horizontales.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="1200" height="500">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&amp;display=swap');
+    .word { font-family: 'Inter', 'Helvetica Neue', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.3em; }
+  </style>
+
+  <rect width="1200" height="500" fill="#FAF6EE"/>
+
+  <!-- PICTOGRAMA (izquierda) -->
+  <g transform="translate(60, 0) scale(0.55)">
+    <g stroke="#1A1A1A" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <circle cx="200" cy="280" r="48"/>
+      <path d="M 200 328 L 200 355"/>
+      <path d="M 200 505 L 145 675"/>
+      <path d="M 220 505 L 280 675"/>
+    </g>
+    <g fill="#FAF6EE" stroke="#1A1A1A" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 178 360 L 244 360 L 258 510 L 162 510 Z"/>
+      <path d="M 182 360 Q 210 330 240 360" fill="none"/>
+      <path d="M 192 440 L 232 440 L 232 470 L 192 470 Z" fill="none" stroke-width="22"/>
+    </g>
+    <g stroke="#1A1A1A" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 245 400 L 345 400"/>
+      <rect x="335" y="395" width="330" height="200" rx="6"/>
+      <line x1="535" y1="395" x2="535" y2="595"/>
+      <path d="M 320 360 Q 500 180 680 360"/>
+      <path d="M 405 308 L 405 360"/>
+      <path d="M 500 270 L 500 360"/>
+      <path d="M 595 308 L 595 360"/>
+      <line x1="500" y1="270" x2="500" y2="395"/>
+    </g>
+    <g fill="#FAF6EE" stroke="#1A1A1A" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="385" cy="385" r="22"/>
+      <circle cx="440" cy="375" r="22"/>
+      <circle cx="565" cy="385" r="22"/>
+      <circle cx="615" cy="375" r="22"/>
+    </g>
+    <g>
+      <circle cx="410" cy="625" r="50" fill="#FAF6EE" stroke="#1A1A1A" stroke-width="30"/>
+      <circle cx="410" cy="625" r="14" fill="#1A1A1A"/>
+      <circle cx="590" cy="625" r="50" fill="#FAF6EE" stroke="#1A1A1A" stroke-width="30"/>
+      <circle cx="590" cy="625" r="14" fill="#1A1A1A"/>
+    </g>
+  </g>
+
+  <!-- Wordmark a la derecha -->
+  <text x="540" y="245" class="word" font-size="120" fill="#1A1A1A" dominant-baseline="middle">TUPUESTO</text>
+  <text x="540" y="320" class="sub" font-size="24" fill="#1A1A1A" dominant-baseline="middle">ENCONTRAME EN EL MAPA</text>
+</svg>

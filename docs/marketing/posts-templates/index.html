@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TuPuesto · Plantillas de posts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: #1A1A1A;
+      color: #FAF6EE;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 40px; }
+    h1 {
+      font-family: 'Anton', Impact, sans-serif;
+      font-size: 64px;
+      letter-spacing: 0.02em;
+      color: #F26B1F;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #FAF6EE;
+      opacity: 0.7;
+    }
+    .info {
+      background: #2D2D2D;
+      border-left: 4px solid #F26B1F;
+      padding: 24px 28px;
+      border-radius: 8px;
+      margin-bottom: 40px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .info h2 {
+      color: #F26B1F;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .info p + p { margin-top: 10px; }
+    .info code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 30px;
+    }
+    .card {
+      background: #2D2D2D;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    .card-image {
+      background: #444;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-image img {
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+      border-radius: 12px;
+    }
+    .card-body {
+      padding: 20px 24px;
+      background: #1A1A1A;
+    }
+    .card-tag {
+      display: inline-block;
+      background: #F26B1F;
+      color: #FAF6EE;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+    }
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    .card-usage {
+      font-size: 13px;
+      opacity: 0.75;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .card-when {
+      font-size: 12px;
+      color: #F26B1F;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PLANTILLAS</h1>
+      <p class="subtitle">5 plantillas reutilizables · instagram 1080x1080</p>
+    </header>
+
+    <div class="info">
+      <h2>Cómo usar las plantillas</h2>
+      <p><strong>1.</strong> Abrí el archivo <code>.svg</code> en Figma, Illustrator, Inkscape o cualquier editor vectorial (todos tienen versión gratis).</p>
+      <p><strong>2.</strong> Reemplazá los rectángulos grises (placeholders de foto) con la foto real que querés usar.</p>
+      <p><strong>3.</strong> Editá los textos (nombre del pionero, número de días, quote, etc.) directamente.</p>
+      <p><strong>4.</strong> Exportá a <code>PNG</code> o <code>JPG</code> y subí a Instagram.</p>
+      <p><strong>Nota:</strong> los textos usan Anton e Inter (Google Fonts). Si no tenés las fuentes instaladas, Figma las descarga automáticamente cuando abrís el archivo.</p>
+    </div>
+
+    <div class="grid">
+      <!-- 01 -->
+      <div class="card">
+        <div class="card-image">
+          <img src="01-retrato-pionero.svg" alt="Retrato de Pionero" />
+        </div>
+        <div class="card-body">
+          <span class="card-tag">01 · RETRATO DE PIONERO</span>
+          <h3 class="card-title">Presentar un vendedor nuevo</h3>
+          <p class="card-usage">Para cada onboarding, presentar al pionero al feed de TuPuesto. Foto del vendedor + nombre + lo que vende + zona + antigüedad.</p>
+          <p class="card-when">Usar 6-8 veces (uno por cada pionero)</p>
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="card">
+        <div class="card-image">
+          <img src="02-countdown.svg" alt="Countdown" />
+        </div>
+        <div class="card-body">
+          <span class="card-tag">02 · COUNTDOWN</span>
+          <h3 class="card-title">Cuenta regresiva al 20J</h3>
+          <p class="card-usage">Posts grandes con el número de días restantes. Para los hitos -30, -14, -7, -2, 0.</p>
+          <p class="card-when">5 veces (días -30, -14, -7, -2, 0)</p>
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="card">
+        <div class="card-image">
+          <img src="03-behind-scenes.svg" alt="Behind the Scenes" />
+        </div>
+        <div class="card-body">
+          <span class="card-tag">03 · BEHIND THE SCENES</span>
+          <h3 class="card-title">Detrás de cámara del fundador</h3>
+          <p class="card-usage">Para posts narrativos del día — charlas en la calle, observaciones, quotes textuales de vendedores que aún no firmaron.</p>
+          <p class="card-when">3-5 veces durante el pre-launch</p>
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="card">
+        <div class="card-image">
+          <img src="04-cta-waitlist.svg" alt="CTA Waitlist" />
+        </div>
+        <div class="card-body">
+          <span class="card-tag">04 · CTA WAITLIST</span>
+          <h3 class="card-title">Llamado a la acción puro</h3>
+          <p class="card-usage">Posts tipográficos sin foto para empujar el waitlist cuando no tenés contenido visual del día. Naranja sólido, alto impacto.</p>
+          <p class="card-when">3-4 veces durante el pre-launch</p>
+        </div>
+      </div>
+
+      <!-- 05 -->
+      <div class="card">
+        <div class="card-image">
+          <img src="05-testimonio-postlaunch.svg" alt="Testimonio Post-launch" />
+        </div>
+        <div class="card-body">
+          <span class="card-tag">05 · TESTIMONIO POST-LAUNCH</span>
+          <h3 class="card-title">Quote de un pionero</h3>
+          <p class="card-usage">Para semanas 6-7 después del lanzamiento. Foto circular del vendedor + quote textual + atribución. Prueba social fuerte.</p>
+          <p class="card-when">5-7 veces post-launch (uno por pionero)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info" style="margin-top: 40px;">
+      <h2>Tip de productividad</h2>
+      <p>En la sesión de "batching" semanal (recomendada los domingos 2-3hs), abrís estas plantillas, generás los 5-7 posts de la semana siguiente, y los dejás programados en Instagram. No tenés que pensar cada día qué postear.</p>
+      <p>Herramientas para programar gratis: <code>Meta Business Suite</code> (Instagram + Facebook nativo), <code>Buffer</code>, <code>Later</code>.</p>
+    </div>
+  </div>
+</body>
+</html>

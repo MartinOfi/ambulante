@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TuPuesto Logo · 06 — Pictograma App Icon · v3
+  ============================================
+  Concept: Pictograma en cuadrado redondeado naranja (formato app icon).
+  Use cases: PWA, iOS/Android icon, App Store/Play Store.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <!-- Background app icon (rounded square naranja) -->
+  <rect x="0" y="0" width="800" height="800" fill="#F26B1F" rx="160"/>
+
+  <!-- PICTOGRAMA en cream -->
+  <g transform="translate(120, 100) scale(0.7)">
+    <g stroke="#FAF6EE" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <circle cx="200" cy="280" r="48"/>
+      <path d="M 200 328 L 200 355"/>
+      <path d="M 200 505 L 145 675"/>
+      <path d="M 220 505 L 280 675"/>
+    </g>
+    <g fill="#F26B1F" stroke="#FAF6EE" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 178 360 L 244 360 L 258 510 L 162 510 Z"/>
+      <path d="M 182 360 Q 210 330 240 360" fill="none"/>
+      <path d="M 192 440 L 232 440 L 232 470 L 192 470 Z" fill="none" stroke-width="20"/>
+    </g>
+    <g stroke="#FAF6EE" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 245 400 L 345 400"/>
+      <rect x="335" y="395" width="330" height="200" rx="6"/>
+      <line x1="535" y1="395" x2="535" y2="595"/>
+      <path d="M 320 360 Q 500 180 680 360"/>
+      <path d="M 405 308 L 405 360"/>
+      <path d="M 500 270 L 500 360"/>
+      <path d="M 595 308 L 595 360"/>
+      <line x1="500" y1="270" x2="500" y2="395"/>
+    </g>
+    <g fill="#F26B1F" stroke="#FAF6EE" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="385" cy="385" r="22"/>
+      <circle cx="440" cy="375" r="22"/>
+      <circle cx="565" cy="385" r="22"/>
+      <circle cx="615" cy="375" r="22"/>
+    </g>
+    <g>
+      <circle cx="410" cy="625" r="50" fill="#F26B1F" stroke="#FAF6EE" stroke-width="28"/>
+      <circle cx="410" cy="625" r="14" fill="#FAF6EE"/>
+      <circle cx="590" cy="625" r="50" fill="#F26B1F" stroke="#FAF6EE" stroke-width="28"/>
+      <circle cx="590" cy="625" r="14" fill="#FAF6EE"/>
+    </g>
+  </g>
+</svg>

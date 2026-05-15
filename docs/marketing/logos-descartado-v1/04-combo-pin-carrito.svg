@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 04 — Combo Pin con Carrito (concepto fuerte)
+  ============================================
+  Concept: El pin de mapa contiene la silueta de un carrito ambulante adentro.
+           Lectura: "el carrito EN el mapa" — comunica el producto en 1 imagen.
+  Mood: Inteligente, único, memorable.
+  Colors: Pin naranja sólido (#F26B1F), carrito como negativo cream.
+  Font: Inter Black.
+  Use cases: Logo HERO de la marca — la apuesta principal.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&amp;display=swap');
+    .word { font-family: 'Inter', 'Helvetica Neue', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.3em; }
+  </style>
+
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Pin shape (the bubble) — orange -->
+  <g transform="translate(280, 120)">
+    <path d="M 120 0
+             C 53.7 0 0 53.7 0 120
+             C 0 195 70 250 120 350
+             C 170 250 240 195 240 120
+             C 240 53.7 186.3 0 120 0 Z"
+          fill="#F26B1F"/>
+
+    <!-- Food cart silhouette as negative space (cream) -->
+    <!-- Cart body -->
+    <rect x="50" y="100" width="140" height="60" fill="#FAF6EE" rx="4"/>
+    <!-- Canopy (triangular roof) -->
+    <path d="M 40 100 L 200 100 L 180 75 L 60 75 Z" fill="#FAF6EE"/>
+    <!-- Roof peak -->
+    <rect x="115" y="62" width="10" height="15" fill="#FAF6EE"/>
+    <!-- Wheels -->
+    <circle cx="75" cy="175" r="12" fill="#FAF6EE"/>
+    <circle cx="165" cy="175" r="12" fill="#FAF6EE"/>
+    <!-- Wheel inner (orange dots to suggest wheel detail) -->
+    <circle cx="75" cy="175" r="4" fill="#F26B1F"/>
+    <circle cx="165" cy="175" r="4" fill="#F26B1F"/>
+  </g>
+
+  <!-- Wordmark below pin -->
+  <text x="400" y="570"
+        class="word"
+        font-size="90"
+        fill="#1A1A1A"
+        text-anchor="middle"
+        dominant-baseline="middle">AMBULANTE</text>
+
+  <!-- Tagline -->
+  <text x="400" y="630"
+        class="sub"
+        font-size="18"
+        fill="#1A1A1A"
+        text-anchor="middle">ENCONTRAME EN EL MAPA</text>
+</svg>

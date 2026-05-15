@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 07 — Monograma "A" (Logomark)
+  ============================================
+  Concept: Una "A" estilizada que también es un pin de geolocalización.
+           Símbolo standalone, sin wordmark. Para uso compacto.
+  Mood: Iconográfico, escalable, app-icon ready.
+  Colors: Naranja sólido (#F26B1F).
+  Use cases: Favicon, app icon, PWA icon, redes sociales avatar, watermark.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Background rounded square (app-icon style) -->
+  <rect x="100" y="100" width="600" height="600" fill="#F26B1F" rx="120"/>
+
+  <!-- Stylized "A" / pin shape — white negative space in the orange tile -->
+  <!-- The A is constructed as two angled bars + a horizontal crossbar + a pin-point at bottom -->
+  <g fill="#FAF6EE">
+    <!-- Left diagonal of A -->
+    <path d="M 400 200
+             L 290 540
+             L 360 540
+             L 400 410
+             Z"/>
+    <!-- Right diagonal of A -->
+    <path d="M 400 200
+             L 510 540
+             L 440 540
+             L 400 410
+             Z"/>
+    <!-- Horizontal crossbar (the hole of A also reads as pin dot) -->
+    <rect x="335" y="380" width="130" height="35" rx="4"/>
+    <!-- Pin point (extends downward like a map pin) -->
+    <path d="M 365 540
+             L 400 620
+             L 435 540
+             Z"/>
+  </g>
+
+  <!-- Pin "dot" circle in the upper triangle of the A -->
+  <circle cx="400" cy="335" r="32" fill="#F26B1F"/>
+</svg>

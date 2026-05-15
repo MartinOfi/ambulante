@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 01 — Wordmark Condensed
+  ============================================
+  Concept: Tipografía pura, sin símbolo. Condensed bold callejero.
+  Mood: Fuerte, directo, sin adornos.
+  Colors: Naranja Ambulante (#F26B1F), Charcoal (#1A1A1A), Cream fondo (#FAF6EE).
+  Font: Anton (Google Fonts) primary, Impact / Arial Black como fallback.
+  Use cases: Header de la app, packaging, sticker primario, header de redes.
+  Notes: Si querés que se vea exactamente como diseñado, instalá Anton:
+         https://fonts.google.com/specimen/Anton
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;700&amp;display=swap');
+    .wordmark { font-family: 'Anton', Impact, 'Arial Black', sans-serif; font-weight: 400; letter-spacing: 0.02em; }
+    .tagline { font-family: 'Inter', 'Helvetica Neue', sans-serif; font-weight: 400; letter-spacing: 0.4em; }
+  </style>
+
+  <!-- Background (remove for transparent use) -->
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Main wordmark "AMBULANTE" -->
+  <text x="400" y="420"
+        class="wordmark"
+        font-size="135"
+        fill="#F26B1F"
+        text-anchor="middle"
+        dominant-baseline="middle">AMBULANTE</text>
+
+  <!-- Underline accent bar -->
+  <rect x="270" y="455" width="260" height="6" fill="#1A1A1A"/>
+
+  <!-- Tagline -->
+  <text x="400" y="510"
+        class="tagline"
+        font-size="22"
+        fill="#1A1A1A"
+        text-anchor="middle"
+        dominant-baseline="middle">ROSARIO · 2026</text>
+</svg>

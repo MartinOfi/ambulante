@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 02 — Wordmark con A-pin
+  ============================================
+  Concept: La "A" del wordmark es también un pin de geolocalización.
+           Doble lectura instantánea: letra + ubicación.
+  Mood: Inteligente, moderno, conceptual.
+  Colors: La A-pin es naranja (#F26B1F), el resto charcoal (#1A1A1A).
+  Font: Inter Black para el wordmark.
+  Use cases: Logo primario, header web, branding institucional.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&amp;display=swap');
+    .word { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .tagline { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.3em; }
+  </style>
+
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Custom A-pin shape (teardrop pin pointing down with circle cutout) -->
+  <!-- Positioned to align with the text baseline -->
+  <g transform="translate(195, 320)">
+    <path d="M 60 0
+             C 26.86 0 0 26.86 0 60
+             C 0 95 30 120 60 175
+             C 90 120 120 95 120 60
+             C 120 26.86 93.14 0 60 0 Z"
+          fill="#F26B1F"/>
+    <!-- The "hole" of the A — also reads as pin's circle -->
+    <circle cx="60" cy="58" r="22" fill="#FAF6EE"/>
+  </g>
+
+  <!-- "MBULANTE" — A is replaced by the pin above -->
+  <text x="335" y="450"
+        class="word"
+        font-size="140"
+        fill="#1A1A1A"
+        dominant-baseline="middle">MBULANTE</text>
+
+  <!-- Tagline -->
+  <text x="400" y="540"
+        class="tagline"
+        font-size="20"
+        fill="#1A1A1A"
+        text-anchor="middle">ENCONTRAME EN EL MAPA</text>
+</svg>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ambulante Logo · 05 — Combo Carrito Silueta
+  ============================================
+  Concept: Silueta limpia de un carrito ambulante visto de costado.
+           Mostramos el OBJETO real (carrito) en vez del concepto (pin).
+  Mood: Cálido, concreto, identificable inmediatamente.
+  Colors: Carrito naranja sólido (#F26B1F), wordmark charcoal.
+  Font: Inter Black.
+  Use cases: Branding institucional, comunicación con vendedores (ellos se ven en el logo).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&amp;display=swap');
+    .word { font-family: 'Inter', 'Helvetica Neue', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.25em; }
+  </style>
+
+  <rect width="800" height="800" fill="#FAF6EE"/>
+
+  <!-- Food cart silhouette, centered -->
+  <g transform="translate(180, 240)">
+    <!-- Canopy / awning (curved top) -->
+    <path d="M 20 80 Q 220 30 420 80 L 420 100 L 20 100 Z" fill="#F26B1F"/>
+    <!-- Awning stripes (alternating cream stripes for visual texture) -->
+    <path d="M 60 80 Q 100 70 140 75 L 140 100 L 60 100 Z" fill="#FAF6EE" opacity="0.3"/>
+    <path d="M 220 75 Q 260 68 300 72 L 300 100 L 220 100 Z" fill="#FAF6EE" opacity="0.3"/>
+    <path d="M 380 80 Q 400 76 420 80 L 420 100 L 380 100 Z" fill="#FAF6EE" opacity="0.3"/>
+
+    <!-- Roof support pole -->
+    <rect x="215" y="40" width="10" height="40" fill="#1A1A1A"/>
+    <circle cx="220" cy="32" r="8" fill="#F26B1F"/>
+
+    <!-- Cart body (main rectangle) -->
+    <rect x="40" y="100" width="360" height="160" fill="#F26B1F" rx="6"/>
+
+    <!-- Counter line detail -->
+    <rect x="40" y="160" width="360" height="6" fill="#1A1A1A" opacity="0.85"/>
+
+    <!-- Window / serving area -->
+    <rect x="80" y="115" width="280" height="40" fill="#FAF6EE" rx="3"/>
+
+    <!-- Wheels -->
+    <circle cx="100" cy="280" r="30" fill="#1A1A1A"/>
+    <circle cx="100" cy="280" r="14" fill="#F26B1F"/>
+    <circle cx="100" cy="280" r="6" fill="#1A1A1A"/>
+
+    <circle cx="340" cy="280" r="30" fill="#1A1A1A"/>
+    <circle cx="340" cy="280" r="14" fill="#F26B1F"/>
+    <circle cx="340" cy="280" r="6" fill="#1A1A1A"/>
+  </g>
+
+  <!-- Wordmark below cart -->
+  <text x="400" y="620"
+        class="word"
+        font-size="80"
+        fill="#1A1A1A"
+        text-anchor="middle"
+        dominant-baseline="middle">AMBULANTE</text>
+
+  <!-- Tagline -->
+  <text x="400" y="675"
+        class="sub"
+        font-size="18"
+        fill="#1A1A1A"
+        text-anchor="middle">ROSARIO · 2026</text>
+</svg>

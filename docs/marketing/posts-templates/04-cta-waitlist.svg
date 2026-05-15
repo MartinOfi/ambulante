@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plantilla 04 — CTA WAITLIST (sin foto)
+  ============================================
+  Uso: posts puramente tipográficos para empujar el waitlist.
+       Ejemplo: "¿Estás en la lista? Anotate antes del 20J."
+       Funciona bien cuando no tenés foto del día.
+  Formato: 1080x1080 (Instagram feed cuadrado).
+
+  Cómo usar:
+  1. Abrí en Figma o Illustrator
+  2. Cambiá las 3 líneas de texto principal si querés otro CTA
+  3. Exportá
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;700;900&amp;display=swap');
+    .display { font-family: 'Anton', Impact, sans-serif; letter-spacing: 0.02em; }
+    .word { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: -0.02em; }
+    .label { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.3em; }
+    .small { font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 0.2em; }
+  </style>
+
+  <!-- Background naranja sólido -->
+  <rect width="1080" height="1080" fill="#F26B1F"/>
+
+  <!-- HEADER: logo en cream sobre naranja -->
+  <g transform="translate(40, 50) scale(0.10)">
+    <rect x="335" y="395" width="330" height="200" rx="6" fill="#FAF6EE"/>
+    <g stroke="#FAF6EE" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <circle cx="200" cy="280" r="48"/>
+      <path d="M 200 328 L 200 355"/>
+      <path d="M 200 505 L 145 675"/>
+      <path d="M 220 505 L 280 675"/>
+    </g>
+    <g fill="#F26B1F" stroke="#FAF6EE" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M 178 360 L 244 360 L 258 510 L 162 510 Z"/>
+      <path d="M 182 360 Q 210 330 240 360" fill="none"/>
+    </g>
+    <g stroke="#FAF6EE" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 245 400 L 345 400"/>
+      <rect x="335" y="395" width="330" height="200" rx="6"/>
+      <path d="M 320 360 Q 500 180 680 360"/>
+      <line x1="500" y1="270" x2="500" y2="395"/>
+    </g>
+    <g>
+      <circle cx="410" cy="625" r="50" fill="#F26B1F" stroke="#FAF6EE" stroke-width="50"/>
+      <circle cx="590" cy="625" r="50" fill="#F26B1F" stroke="#FAF6EE" stroke-width="50"/>
+    </g>
+  </g>
+  <text x="155" y="105" class="word" font-size="38" fill="#FAF6EE">TUPUESTO</text>
+
+  <!-- BLOQUE PRINCIPAL DE TEXTO (centrado) -->
+  <text x="540" y="420" class="display" font-size="120" fill="#FAF6EE" text-anchor="middle">¿ESTÁS EN</text>
+  <text x="540" y="540" class="display" font-size="120" fill="#FAF6EE" text-anchor="middle">LA LISTA?</text>
+
+  <!-- Separador -->
+  <rect x="440" y="610" width="200" height="6" fill="#FAF6EE"/>
+
+  <!-- Detalles -->
+  <text x="540" y="700" class="word" font-size="48" fill="#FAF6EE" text-anchor="middle">SÁBADO 20 JUN · 16HS</text>
+  <text x="540" y="760" class="word" font-size="48" fill="#FAF6EE" text-anchor="middle">COSTANERA · ROSARIO</text>
+
+  <!-- CTA cream box -->
+  <rect x="200" y="850" width="680" height="100" fill="#FAF6EE" rx="8"/>
+  <text x="540" y="900" class="display" font-size="50" fill="#1A1A1A" text-anchor="middle" dominant-baseline="middle">ANOTATE EN EL LINK</text>
+
+  <!-- Tagline final -->
+  <text x="540" y="1015" class="small" font-size="20" fill="#FAF6EE" text-anchor="middle">EL MAPA DE LOS CARRITOS DE ROSARIO · GRATIS</text>
+</svg>
