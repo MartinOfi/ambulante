@@ -1,5 +1,16 @@
 import type { Page } from "@playwright/test";
 
+// Day labels rendered by StepHours (abbreviated, from es-AR i18n)
+const DAY_ABBREVIATIONS: Record<string, string> = {
+  lunes: "Lun",
+  martes: "Mar",
+  miercoles: "Mié",
+  jueves: "Jue",
+  viernes: "Vie",
+  sabado: "Sáb",
+  domingo: "Dom",
+};
+
 export class StoreOnboardingPage {
   constructor(private readonly page: Page) {}
 
@@ -37,8 +48,10 @@ export class StoreOnboardingPage {
 
   // ── Paso 3: Horarios ──────────────────────────────────────────────────────
 
-  dayCheckbox(day: string) {
-    return this.page.getByRole("checkbox", { name: new RegExp(day, "i") });
+  // Days render as <button aria-pressed> with abbreviated labels (e.g. "Lun", not "lunes")
+  dayButton(day: string) {
+    const label = DAY_ABBREVIATIONS[day] ?? day;
+    return this.page.getByRole("button", { name: new RegExp(label, "i") });
   }
 
   get openTimeInput() {
@@ -60,7 +73,7 @@ export class StoreOnboardingPage {
   }
 
   get backButton() {
-    return this.page.getByRole("button", { name: /anterior|volver/i });
+    return this.page.getByRole("button", { name: /atrás|anterior|volver/i });
   }
 
   get submitButton() {
@@ -68,7 +81,7 @@ export class StoreOnboardingPage {
   }
 
   get stepIndicator() {
-    return this.page.getByRole("navigation", { name: /pasos|progreso/i });
+    return this.page.getByTestId("step-indicator");
   }
 
   // ── Post-onboarding ───────────────────────────────────────────────────────

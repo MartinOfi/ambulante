@@ -80,7 +80,7 @@ test.describe("UC-STO-03 — onboarding paso 3: horarios y envío", () => {
 
   test("cierre anterior a apertura muestra error", async ({ page }) => {
     const onboarding = await goToStep3(page);
-    await onboarding.dayCheckbox(ONBOARDING_DATA.step3.days[0]).check();
+    await onboarding.dayButton(ONBOARDING_DATA.step3.days[0]).click();
     await onboarding.openTimeInput.fill("18:00");
     await onboarding.closeTimeInput.fill("10:00");
     await onboarding.submitButton.click();
@@ -90,7 +90,7 @@ test.describe("UC-STO-03 — onboarding paso 3: horarios y envío", () => {
   test("envío exitoso muestra mensaje de solicitud pendiente", async ({ page }) => {
     const onboarding = await goToStep3(page);
     for (const day of ONBOARDING_DATA.step3.days) {
-      await onboarding.dayCheckbox(day).check();
+      await onboarding.dayButton(day).click();
     }
     await onboarding.openTimeInput.fill(ONBOARDING_DATA.step3.openTime);
     await onboarding.closeTimeInput.fill(ONBOARDING_DATA.step3.closeTime);

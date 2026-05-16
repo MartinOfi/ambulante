@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/shared/constants/routes";
+import { RejectionReasonDisplay } from "./RejectionReasonDisplay";
 
 export const metadata = { title: "Solicitud rechazada — Ambulante" };
 
@@ -19,6 +20,7 @@ export default async function StoreRejectedPage() {
         <h1 className="text-xl font-semibold">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
+      <RejectionReasonDisplay />
       <p className="text-xs text-muted-foreground">
         {t("needHelp")}{" "}
         <Link

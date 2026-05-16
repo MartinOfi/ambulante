@@ -106,6 +106,7 @@ export interface DbStoreViewRow {
   distance_meters?: number | null;
   cuit?: string | null;
   validation_status?: string | null;
+  rejection_reason?: string | null;
 }
 
 export function mapStoreRow(row: DbStoreViewRow): Store {
@@ -122,6 +123,7 @@ export function mapStoreRow(row: DbStoreViewRow): Store {
     hours: row.hours ?? undefined,
     cuit: row.cuit ?? undefined,
     validationStatus: dbValidationStatusToDomain(row.validation_status),
+    rejectionReason: row.rejection_reason ?? undefined,
     location: row.lat !== null && row.lng !== null ? { lat: row.lat, lng: row.lng } : null,
     distanceMeters:
       row.distance_meters !== null && row.distance_meters !== undefined ? row.distance_meters : 0,

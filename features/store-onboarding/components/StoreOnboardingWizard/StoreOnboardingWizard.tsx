@@ -25,7 +25,7 @@ export function StoreOnboardingWizard({
       <div className="space-y-1">
         <p className="text-xs text-muted-foreground">{t("stepIndicator", { step })}</p>
         <h2 className="text-lg font-semibold">{t(`stepTitles.${step}`)}</h2>
-        <nav aria-label="Progreso del registro" className="flex gap-1">
+        <nav data-testid="step-indicator" aria-label="Progreso del registro" className="flex gap-1">
           {([1, 2, 3] as const).map((n) => (
             <div
               key={n}
