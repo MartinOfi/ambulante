@@ -84,7 +84,8 @@ export function createMiddlewareClient(request: NextRequest, response: NextRespo
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, {
-              httpOnly: true,
+              // httpOnly omitted: @supabase/ssr browser client reads auth cookies via
+              // document.cookie — marking them httpOnly makes the session invisible to JS.
               secure,
               sameSite: "lax",
               path: "/",

@@ -1,0 +1,84 @@
+- generic [active] [ref=e1]:
+    - generic [ref=e2]:
+        - generic [ref=e4]:
+            - generic [ref=e5]:
+                - paragraph [ref=e6]: Ambulante
+                - paragraph [ref=e7]: Tu mercado en movimiento
+            - heading "Iniciá sesión" [level=1] [ref=e8]
+            - generic [ref=e9]:
+                - generic [ref=e10]:
+                    - text: Correo electrónico
+                    - textbox "Correo electrónico" [ref=e11]:
+                        - /placeholder: tu@email.com
+                - generic [ref=e12]:
+                    - text: Contraseña
+                    - textbox "Contraseña" [ref=e13]:
+                        - /placeholder: ••••••••
+                - button "Iniciar sesión" [ref=e14] [cursor=pointer]
+                - paragraph [ref=e15]:
+                    - link "¿Olvidaste tu contraseña?" [ref=e16] [cursor=pointer]:
+                        - /url: /forgot-password
+                - paragraph [ref=e17]:
+                    - text: ¿No tenés cuenta?
+                    - link "Registrate" [ref=e18] [cursor=pointer]:
+                        - /url: /register
+        - generic [ref=e19]:
+            - img
+            - generic [ref=e22]:
+                - paragraph [ref=e23]: Todo lo ambulante, cerca tuyo.
+                - paragraph [ref=e24]: Tiendas activas en tu zona, ahora mismo.
+            - generic [ref=e26]:
+                - generic [ref=e27]:
+                    - generic [ref=e28]:
+                        - generic [ref=e32]: En vivo
+                        - generic [ref=e33]: · actualizado ahora
+                    - generic [ref=e34]: Radio 2 km
+                - generic [ref=e35]:
+                    - img [ref=e36]
+                    - generic:
+                        - generic:
+                            - generic:
+                                - img
+                            - generic:
+                                - text: El Rey
+                                - generic: · 320 m
+                    - generic:
+                        - generic:
+                            - generic:
+                                - img
+                            - generic:
+                                - text: Flores de
+                                - generic: · 1.2 km
+                    - generic:
+                        - generic:
+                            - generic:
+                                - img
+                            - generic:
+                                - text: Heladería Rodante
+                                - generic: · 450 m
+                    - generic:
+                        - generic:
+                            - generic:
+                                - img
+                            - generic:
+                                - text: Artesanías Don
+                                - generic: · 800 m
+                    - generic:
+                        - generic:
+                            - generic:
+                                - img
+                            - generic:
+                                - text: Café Móvil
+                                - generic: · 1.5 km
+                - generic [ref=e44]:
+                    - generic [ref=e45]: Sin pagos
+                    - generic [ref=e46]: PWA
+                    - generic [ref=e47]: Gratis
+    - region "Notifications alt+T"
+    - generic [ref=e48]:
+        - img [ref=e50]
+        - button "Open Tanstack query devtools" [ref=e98] [cursor=pointer]:
+            - img [ref=e99]
+    - button "Open Next.js Dev Tools" [ref=e152] [cursor=pointer]:
+        - img [ref=e153]
+    - alert [ref=e156]

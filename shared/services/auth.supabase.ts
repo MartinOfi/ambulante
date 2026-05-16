@@ -51,22 +51,28 @@ async function resolvePublicId(client: BrowserClient, authUserId: string): Promi
   if (existing !== undefined) return existing;
 
   const promise: Promise<string> = (async () => {
-    const { data, error } = await client
-      .from("users")
-      .select("public_id")
-      .eq("auth_user_id", authUserId)
-      .maybeSingle();
+    try {
+      const { data, error } = await client
+        .from("users")
+        .select("public_id")
+        .eq("auth_user_id", authUserId)
+        .maybeSingle();
 
-    publicIdInFlight.delete(authUserId);
+      publicIdInFlight.delete(authUserId);
 
-    if (error !== null || data === null) {
-      logger.error("resolvePublicId failed — falling back to auth.uid()", { authUserId, error });
+      if (error !== null || data === null) {
+        logger.error("resolvePublicId failed — falling back to auth.uid()", { authUserId, error });
+        return authUserId;
+      }
+
+      const publicId = (data as { public_id: string }).public_id;
+      publicIdCache.set(authUserId, publicId);
+      return publicId;
+    } catch (err) {
+      publicIdInFlight.delete(authUserId);
+      logger.error("resolvePublicId threw — falling back to auth.uid()", { authUserId, err });
       return authUserId;
     }
-
-    const publicId = (data as { public_id: string }).public_id;
-    publicIdCache.set(authUserId, publicId);
-    return publicId;
   })();
 
   publicIdInFlight.set(authUserId, promise);

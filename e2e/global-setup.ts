@@ -1,6 +1,6 @@
 import { chromium, type FullConfig } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { mkdirSync } from "fs";
+import { existsSync, mkdirSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { E2E_USERS } from "./use-cases/fixtures/users";
 import { E2E_STORES } from "./use-cases/fixtures/stores";
@@ -133,6 +133,29 @@ async function seedE2EOnlyUsers(): Promise<void> {
   }
 }
 
+// Returns true if the auth file has a non-expired Supabase session (with >5 min buffer).
+function hasValidSession(filePath: string): boolean {
+  if (!existsSync(filePath)) return false;
+  try {
+    const state = JSON.parse(readFileSync(filePath, "utf-8")) as {
+      cookies?: Array<{ name: string; value: string }>;
+    };
+    const authCookie = state.cookies?.find(
+      ({ name }) => name.startsWith("sb-") && name.endsWith("-auth-token"),
+    );
+    if (!authCookie) return false;
+
+    const raw = authCookie.value.startsWith("base64-")
+      ? Buffer.from(authCookie.value.slice("base64-".length), "base64url").toString("utf-8")
+      : authCookie.value;
+    const session = JSON.parse(raw) as { expires_at?: number };
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    return typeof session.expires_at === "number" && session.expires_at > nowSeconds + 5 * 60;
+  } catch {
+    return false;
+  }
+}
+
 export default async function globalSetup(config: FullConfig) {
   const baseURL =
     process.env.PLAYWRIGHT_BASE_URL ?? config.projects[0]?.use.baseURL ?? "http://localhost:3100";
@@ -144,6 +167,11 @@ export default async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
 
   for (const role of ROLES) {
+    if (hasValidSession(role.file)) {
+      console.log(`[global-setup] reusing valid session for ${role.user.email}`);
+      continue;
+    }
+
     const context = await browser.newContext({ baseURL });
     const page = await context.newPage();
 
@@ -151,7 +179,7 @@ export default async function globalSetup(config: FullConfig) {
     await page.getByLabel(/correo electrónico/i).fill(role.user.email);
     await page.getByLabel(/contraseña/i).fill(role.user.password);
     await page.getByRole("button", { name: /iniciar sesión/i }).click();
-    await page.waitForURL(role.waitUrl, { timeout: 20_000 });
+    await page.waitForURL(role.waitUrl, { timeout: 30_000 });
     await context.storageState({ path: role.file });
     await context.close();
   }

@@ -51,7 +51,7 @@ test.describe("UC-FLOW-06 — alta completa de tienda: onboarding → aprobació
         // Paso 3: horarios
         await expect(onboarding.openTimeInput).toBeVisible({ timeout: 5_000 });
         for (const day of ONBOARDING_DATA.step3.days) {
-          await onboarding.dayCheckbox(day).check();
+          await onboarding.dayButton(day).click();
         }
         await onboarding.openTimeInput.fill(ONBOARDING_DATA.step3.openTime);
         await onboarding.closeTimeInput.fill(ONBOARDING_DATA.step3.closeTime);

@@ -41,6 +41,7 @@ export const storeSchema = z
       .regex(/^\d{11}$/)
       .optional(),
     validationStatus: storeValidationStatusSchema.optional(),
+    rejectionReason: z.string().optional(),
   })
   .strict();
 

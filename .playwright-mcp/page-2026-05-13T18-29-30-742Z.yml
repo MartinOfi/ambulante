@@ -1,0 +1,92 @@
+- generic [active] [ref=e1]:
+    - generic [ref=e157]:
+        - complementary [ref=e158]:
+            - navigation "Admin navigation" [ref=e159]:
+                - list [ref=e160]:
+                    - listitem [ref=e161]:
+                        - link "Dashboard" [ref=e162] [cursor=pointer]:
+                            - /url: /admin/dashboard
+                            - img [ref=e163]
+                            - generic [ref=e168]: Dashboard
+                    - listitem [ref=e169]:
+                        - link "Pedidos" [ref=e170] [cursor=pointer]:
+                            - /url: /admin/orders
+                            - img [ref=e171]
+                            - generic [ref=e174]: Pedidos
+                    - listitem [ref=e175]:
+                        - link "Moderación" [ref=e176] [cursor=pointer]:
+                            - /url: /admin/moderation
+                            - img [ref=e177]
+                            - generic [ref=e179]: Moderación
+                    - listitem [ref=e180]:
+                        - link "Validación de tiendas" [ref=e181] [cursor=pointer]:
+                            - /url: /admin/stores
+                            - img [ref=e182]
+                            - generic [ref=e185]: Validación de tiendas
+                    - listitem [ref=e186]:
+                        - link "Usuarios" [ref=e187] [cursor=pointer]:
+                            - /url: /admin/users
+                            - img [ref=e188]
+                            - generic [ref=e193]: Usuarios
+        - generic [ref=e194]:
+            - banner [ref=e195]:
+                - generic [ref=e196]:
+                    - button "Cerrar menú" [expanded] [ref=e197] [cursor=pointer]:
+                        - img [ref=e198]
+                    - generic [ref=e199]:
+                        - generic [ref=e200]: Sistema Admin
+                        - button "Cerrar sesión" [ref=e201] [cursor=pointer]:
+                            - img [ref=e202]
+                            - generic [ref=e205]: Cerrar sesión
+            - main [ref=e206]:
+                - main [ref=e207]:
+                    - generic [ref=e208]:
+                        - heading "Panel de administración" [level=1] [ref=e209]
+                        - paragraph [ref=e210]: Métricas clave del producto.
+                    - generic [ref=e211]:
+                        - generic [ref=e212]:
+                            - generic [ref=e213]:
+                                - paragraph [ref=e214]: Pedidos / día
+                                - heading "18" [level=3] [ref=e215]
+                            - generic [ref=e217]: Midiendo
+                        - generic [ref=e218]:
+                            - generic [ref=e219]:
+                                - paragraph [ref=e220]: Tasa de aceptación
+                                - heading "0%" [level=3] [ref=e221]
+                            - generic [ref=e222]:
+                                - generic [ref=e223]: "objetivo: ≥ 60%"
+                                - generic [ref=e224]: Bajo objetivo
+                        - generic [ref=e225]:
+                            - generic [ref=e226]:
+                                - paragraph [ref=e227]: Tasa de finalización
+                                - heading "100%" [level=3] [ref=e228]
+                            - generic [ref=e229]:
+                                - generic [ref=e230]: "objetivo: ≥ 70%"
+                                - generic [ref=e231]: En objetivo
+                        - generic [ref=e232]:
+                            - generic [ref=e233]:
+                                - paragraph [ref=e234]: Tiempo de respuesta
+                                - heading "0s" [level=3] [ref=e235]
+                            - generic [ref=e236]:
+                                - generic [ref=e237]: "objetivo: < 3 min"
+                                - generic [ref=e238]: En objetivo
+                        - generic [ref=e239]:
+                            - generic [ref=e240]:
+                                - paragraph [ref=e241]: Tasa de expiración
+                                - heading "79%" [level=3] [ref=e242]
+                            - generic [ref=e243]:
+                                - generic [ref=e244]: "objetivo: < 15%"
+                                - generic [ref=e245]: Bajo objetivo
+                        - generic [ref=e246]:
+                            - generic [ref=e247]:
+                                - paragraph [ref=e248]: Tiendas activas
+                                - heading "4" [level=3] [ref=e249]
+                            - generic [ref=e251]: Midiendo
+    - region "Notifications alt+T"
+    - generic [ref=e48]:
+        - img [ref=e50]
+        - button "Open Tanstack query devtools" [ref=e98] [cursor=pointer]:
+            - img [ref=e99]
+    - button "Open Next.js Dev Tools" [ref=e152] [cursor=pointer]:
+        - img [ref=e153]
+    - alert [ref=e156]: Ambulante — Tiendas ambulantes cerca tuyo en tiempo real

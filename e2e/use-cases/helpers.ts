@@ -17,8 +17,12 @@ export async function loginAsStore(page: Page): Promise<void> {
 }
 
 export async function loginAsAdmin(page: Page): Promise<void> {
-  await page.goto("/admin/dashboard");
-  await page.waitForURL("**/admin/**", { timeout: 10_000 });
+  await page.context().clearCookies();
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
+  await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.admin.email);
+  await page.getByLabel(/contraseña/i).fill(E2E_USERS.admin.password);
+  await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
+  await page.waitForURL("**/admin/**", { timeout: 20_000 });
 }
 
 // These two roles have no pre-built storageState. Clear any existing session
