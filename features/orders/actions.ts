@@ -459,6 +459,66 @@ export async function receiveOrder(input: StoreOrderTransitionInput): Promise<Re
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Client: confirm on the way (ACEPTADO → EN_CAMINO)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ConfirmOnTheWayResult =
+  | { readonly ok: true; readonly publicId: string; readonly status: typeof ORDER_STATUS.EN_CAMINO }
+  | { readonly ok: false; readonly errorCode: string; readonly message: string };
+
+export async function confirmOnTheWay(publicId: string): Promise<ConfirmOnTheWayResult> {
+  const parsed = z.string().uuid().safeParse(publicId);
+  if (!parsed.success) {
+    return { ok: false, errorCode: "VALIDATION_ERROR", message: "ID de pedido inválido" };
+  }
+
+  try {
+    const client = await createRouteHandlerClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+    if (authError !== null || user === null) {
+      return { ok: false, errorCode: "UNAUTHENTICATED", message: "No autenticado" };
+    }
+
+    const { data, error } = await client.rpc("confirm_on_the_way_by_customer", {
+      p_public_id: publicId,
+    });
+    if (error !== null) {
+      serverLogger.error("confirmOnTheWay: RPC failed", { publicId, error });
+      return { ok: false, errorCode: "INTERNAL_ERROR", message: "Error interno del servidor" };
+    }
+
+    const parseResult = storeRpcResultSchema.safeParse(data);
+    if (!parseResult.success) {
+      serverLogger.error("confirmOnTheWay: unexpected RPC shape", { publicId, data });
+      return { ok: false, errorCode: "INTERNAL_ERROR", message: "Error interno del servidor" };
+    }
+
+    const payload = parseResult.data;
+    if (!payload.ok) {
+      if (payload.error === "unauthenticated")
+        return { ok: false, errorCode: "UNAUTHENTICATED", message: "No autenticado" };
+      if (payload.error === "not_found")
+        return { ok: false, errorCode: "ORDER_NOT_FOUND", message: "Pedido no encontrado" };
+      if (payload.error === "invalid_transition")
+        return {
+          ok: false,
+          errorCode: "INVALID_TRANSITION",
+          message: "Solo se puede confirmar en camino desde estado Aceptado",
+        };
+      return { ok: false, errorCode: "INTERNAL_ERROR", message: "Error interno del servidor" };
+    }
+
+    return { ok: true, publicId, status: ORDER_STATUS.EN_CAMINO };
+  } catch (error) {
+    serverLogger.error("confirmOnTheWay failed", { publicId, error });
+    return { ok: false, errorCode: "INTERNAL_ERROR", message: "Error interno del servidor" };
+  }
+}
+
 export async function finalizeOrder(
   input: StoreOrderTransitionInput,
 ): Promise<FinalizeOrderResult> {
