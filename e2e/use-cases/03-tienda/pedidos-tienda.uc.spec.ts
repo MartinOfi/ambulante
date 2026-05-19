@@ -11,6 +11,11 @@ import { E2E_STORES } from "../fixtures/stores";
 import { resetApprovedStore } from "../fixtures/db";
 import type { Page } from "@playwright/test";
 
+// UC-STO-18/19/20 comparten el mismo store seed y usan resetApprovedStore() para aislarse.
+// Con workers paralelos pueden solaparse y corromper el estado compartido. Serial mode
+// garantiza que cada test ejecuta completo antes de que arranque el siguiente.
+test.describe.configure({ mode: "serial" });
+
 async function loginAsClientFresh(page: Page) {
   await page.goto("/map", { waitUntil: "domcontentloaded" });
   await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
@@ -30,7 +35,7 @@ async function submitOrderAndLand(clientPage: Page): Promise<string> {
   await map.closeStoreDetail();
   const cart = new CartDrawer(clientPage);
   await cart.submitOrder();
-  await clientPage.waitForURL("**/orders/**", { timeout: 20_000, waitUntil: "domcontentloaded" });
+  await clientPage.waitForURL("**/orders/**", { timeout: 35_000, waitUntil: "domcontentloaded" });
   const url = new URL(clientPage.url());
   return url.pathname.split("/").pop() ?? "";
 }

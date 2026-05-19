@@ -7,6 +7,11 @@ import {
   INVALID_PRODUCT_PRICE,
 } from "../fixtures/products";
 
+// UC-STO-12/13/14 crean, editan y eliminan el mismo primer artículo del catálogo.
+// Con workers paralelos UC-STO-14 borra el producto antes de que UC-STO-13 complete
+// su mutación, lo que rompe la secuencia. Serial mode elimina esa condición de carrera.
+test.describe.configure({ mode: "serial" });
+
 // UC-STO-11: Ver catálogo de productos
 test.describe("UC-STO-11 — ver catálogo", () => {
   test("catálogo muestra productos existentes de la tienda", async ({ page }) => {
@@ -66,6 +71,7 @@ test.describe("UC-STO-13 — editar producto", () => {
     // Usar el primer producto del catálogo seed
     const firstProductCard = page.getByRole("article").first();
     await firstProductCard.getByRole("button", { name: /editar/i }).click();
+    await catalog.waitForEditPage();
     const newName = CATALOG_TEST_PRODUCT.updated.name;
     await catalog.nameInput.clear();
     await catalog.nameInput.fill(newName);
@@ -82,15 +88,15 @@ test.describe("UC-STO-14 — eliminar producto", () => {
     await loginAsStore(page);
     const catalog = new CatalogPage(page);
     await catalog.goto();
-    // Usar el primer producto
+    // Esperar que carguen los artículos antes de contar (SSR + hydration puede devolver 0 inmediatamente)
+    await expect(page.getByRole("article").first()).toBeVisible({ timeout: 8_000 });
+    const initialCount = await page.getByRole("article").count();
     const firstCard = page.getByRole("article").first();
-    const productName = (await firstCard.getByRole("heading").textContent()) ?? "";
     await firstCard.getByRole("button", { name: /eliminar/i }).click();
     await catalog.deleteConfirmButton.click();
     await expect(catalog.successToast).toBeVisible({ timeout: 10_000 });
-    if (productName) {
-      await expect(catalog.productCard(productName)).not.toBeVisible({ timeout: 5_000 });
-    }
+    // Verificar por conteo: debe haber un artículo menos
+    await expect(page.getByRole("article")).toHaveCount(initialCount - 1, { timeout: 5_000 });
   });
 });
 

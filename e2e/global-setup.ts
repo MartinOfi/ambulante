@@ -1,7 +1,10 @@
+import { config } from "dotenv";
+import { resolve } from "path";
 import { chromium, type FullConfig } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { existsSync, mkdirSync, readFileSync } from "fs";
-import { resolve } from "path";
+import { existsSync, mkdirSync, statSync } from "fs";
+
+config({ path: resolve(__dirname, "../.env") });
 import { E2E_USERS } from "./use-cases/fixtures/users";
 import { E2E_STORES } from "./use-cases/fixtures/stores";
 
@@ -12,6 +15,15 @@ const AUTH_DIR = resolve(__dirname, ".auth");
 const E2E_ONLY_STORE_IDS = {
   pending: "50000000-0000-0000-0000-000000000001",
   rejected: "50000000-0000-0000-0000-000000000002",
+} as const;
+
+// Range 10000000-… is used by seed.sql for the approved store.
+const APPROVED_STORE_PUBLIC_ID = "10000000-0000-0000-0000-000000000001";
+
+// Range 40000000-… is reserved for client history orders seeded by global-setup.
+const E2E_HISTORY_ORDER_IDS = {
+  finalizado: "40000000-0000-0000-0000-000000000001",
+  cancelado: "40000000-0000-0000-0000-000000000002",
 } as const;
 
 const ROLES = [
@@ -133,26 +145,159 @@ async function seedE2EOnlyUsers(): Promise<void> {
   }
 }
 
-// Returns true if the auth file has a non-expired Supabase session (with >5 min buffer).
-function hasValidSession(filePath: string): boolean {
-  if (!existsSync(filePath)) return false;
-  try {
-    const state = JSON.parse(readFileSync(filePath, "utf-8")) as {
-      cookies?: Array<{ name: string; value: string }>;
-    };
-    const authCookie = state.cookies?.find(
-      ({ name }) => name.startsWith("sb-") && name.endsWith("-auth-token"),
-    );
-    if (!authCookie) return false;
+// Products seeded for the approved store — must match seed.sql.
+// Upsert in reset ensures they exist even if a previous run deleted them
+// (seed uses ON CONFLICT DO NOTHING and won't recreate deleted rows).
+const APPROVED_STORE_PRODUCTS = [
+  {
+    public_id: "20000000-0000-0000-0000-000000000001",
+    name: "Choripán simple",
+    description: "Pan francés con chorizo criollo",
+    price: 1500.0,
+  },
+  {
+    public_id: "20000000-0000-0000-0000-000000000002",
+    name: "Choripán con chimichurri",
+    description: "Pan artesanal, chorizo y chimichurri casero",
+    price: 1800.0,
+  },
+  {
+    public_id: "20000000-0000-0000-0000-000000000003",
+    name: "Morcipán",
+    description: "Pan con morcilla criolla a la plancha",
+    price: 1600.0,
+  },
+  {
+    public_id: "20000000-0000-0000-0000-000000000004",
+    name: "Bondiola a la plancha",
+    description: "Bondiola de cerdo con mostaza y lechuga",
+    price: 2200.0,
+  },
+] as const;
 
-    const raw = authCookie.value.startsWith("base64-")
-      ? Buffer.from(authCookie.value.slice("base64-".length), "base64url").toString("utf-8")
-      : authCookie.value;
-    const session = JSON.parse(raw) as { expires_at?: number };
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    return typeof session.expires_at === "number" && session.expires_at > nowSeconds + 5 * 60;
-  } catch {
-    return false;
+async function resetApprovedStore(): Promise<void> {
+  const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) {
+    throw new Error("[global-setup] SUPABASE_SERVICE_ROLE_KEY is required for test data setup");
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { latitude, longitude } = E2E_STORES.approved.geo;
+  const { error: storeError } = await supabase
+    .from("stores")
+    .update({
+      available: true,
+      validation_status: "approved",
+      current_location: `SRID=4326;POINT(${longitude} ${latitude})`,
+    })
+    .eq("public_id", APPROVED_STORE_PUBLIC_ID);
+
+  if (storeError) {
+    throw new Error(`[global-setup] failed to reset approved store: ${storeError.message}`);
+  }
+
+  const { data: storeRow, error: storeRowError } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("public_id", APPROVED_STORE_PUBLIC_ID)
+    .single();
+
+  if (storeRowError !== null || storeRow === null) {
+    throw new Error(`[global-setup] could not fetch store id: ${storeRowError?.message}`);
+  }
+
+  const { error: productsError } = await supabase.from("products").upsert(
+    APPROVED_STORE_PRODUCTS.map((p) => ({ ...p, store_id: storeRow.id, available: true })),
+    { onConflict: "public_id" },
+  );
+
+  if (productsError) {
+    throw new Error(
+      `[global-setup] failed to reset approved store products: ${productsError.message}`,
+    );
+  }
+}
+
+async function seedClientHistoryOrders(): Promise<void> {
+  const supabaseUrl = process.env.SUPABASE_URL ?? "http://127.0.0.1:54321";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) {
+    throw new Error("[global-setup] SUPABASE_SERVICE_ROLE_KEY is required for test data setup");
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  // Resolve bigint IDs from stable UUIDs in seed.sql
+  const { data: clientUser, error: clientErr } = await supabase
+    .from("users")
+    .select("id")
+    .eq("auth_user_id", "00000000-0000-0000-0000-000000000001")
+    .single();
+  if (clientErr ?? !clientUser) {
+    throw new Error(`[global-setup] client user not found: ${clientErr?.message}`);
+  }
+
+  const { data: approvedStore, error: storeErr } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("public_id", APPROVED_STORE_PUBLIC_ID)
+    .single();
+  if (storeErr ?? !approvedStore) {
+    throw new Error(`[global-setup] approved store not found: ${storeErr?.message}`);
+  }
+
+  const now = new Date().toISOString();
+  const { data: upsertedOrders, error: ordersErr } = await supabase
+    .from("orders")
+    .upsert(
+      [
+        {
+          public_id: E2E_HISTORY_ORDER_IDS.finalizado,
+          store_id: approvedStore.id,
+          customer_id: clientUser.id,
+          status: "finalizado",
+        },
+        {
+          public_id: E2E_HISTORY_ORDER_IDS.cancelado,
+          store_id: approvedStore.id,
+          customer_id: clientUser.id,
+          status: "cancelado",
+          cancelled_at: now,
+          cancel_reason: "Pedido cancelado por el cliente (E2E seed)",
+        },
+      ],
+      { onConflict: "public_id" },
+    )
+    .select("id, public_id");
+
+  if (ordersErr ?? !upsertedOrders) {
+    throw new Error(`[global-setup] failed to upsert history orders: ${ordersErr?.message}`);
+  }
+
+  const productSnapshot = {
+    name: E2E_STORES.approved.product.name,
+    priceArs: E2E_STORES.approved.product.priceArs,
+  };
+
+  for (const order of upsertedOrders) {
+    await supabase.from("order_items").delete().eq("order_id", order.id);
+    const { error: itemsErr } = await supabase.from("order_items").insert({
+      order_id: order.id,
+      product_snapshot: productSnapshot,
+      quantity: 1,
+      unit_price: E2E_STORES.approved.product.priceArs,
+    });
+    if (itemsErr) {
+      throw new Error(
+        `[global-setup] failed to insert order_items for order ${order.public_id}: ${itemsErr.message}`,
+      );
+    }
   }
 }
 
@@ -161,25 +306,28 @@ export default async function globalSetup(config: FullConfig) {
     process.env.PLAYWRIGHT_BASE_URL ?? config.projects[0]?.use.baseURL ?? "http://localhost:3100";
 
   await seedE2EOnlyUsers();
+  await resetApprovedStore();
+  await seedClientHistoryOrders();
 
   mkdirSync(AUTH_DIR, { recursive: true });
 
   const browser = await chromium.launch();
 
   for (const role of ROLES) {
-    if (hasValidSession(role.file)) {
-      console.log(`[global-setup] reusing valid session for ${role.user.email}`);
+    // Reutilizar sesión si el archivo tiene menos de 1 hora — evita rate limiting de Supabase
+    // cuando se corre el suite varias veces seguidas en desarrollo local.
+    if (existsSync(role.file) && Date.now() - statSync(role.file).mtimeMs < 60 * 60 * 1000) {
       continue;
     }
 
     const context = await browser.newContext({ baseURL });
     const page = await context.newPage();
 
-    await page.goto("/login");
+    await page.goto("/login", { waitUntil: "domcontentloaded" });
     await page.getByLabel(/correo electrónico/i).fill(role.user.email);
     await page.getByLabel(/contraseña/i).fill(role.user.password);
     await page.getByRole("button", { name: /iniciar sesión/i }).click();
-    await page.waitForURL(role.waitUrl, { timeout: 30_000 });
+    await page.waitForURL(role.waitUrl, { timeout: 30_000, waitUntil: "domcontentloaded" });
     await context.storageState({ path: role.file });
     await context.close();
   }

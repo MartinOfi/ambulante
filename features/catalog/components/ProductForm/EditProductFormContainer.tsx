@@ -30,6 +30,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
   const { data: products, isLoading } = useCatalogQuery(storeId);
   const updateMutation = useUpdateProductMutation();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isFormReady, setIsFormReady] = useState(false);
 
   const product = products?.find((item) => item.id === productId);
 
@@ -47,6 +48,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
         photoUrl: product.photoUrl ?? "",
         isAvailable: product.isAvailable,
       });
+      setIsFormReady(true);
     }
   }, [product, form]);
 
@@ -83,7 +85,7 @@ export function EditProductFormContainer({ productId }: EditProductFormContainer
     <ProductForm
       form={form}
       onSubmit={handleSubmit}
-      isLoading={updateMutation.isPending}
+      isLoading={updateMutation.isPending || !isFormReady}
       serverError={serverError}
       submitLabel={t("submit")}
       imageUploadSlot={

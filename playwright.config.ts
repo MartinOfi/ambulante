@@ -8,13 +8,15 @@ const E2E_RETRIES_CI = 2;
 const E2E_RETRIES_LOCAL = 0;
 // serial in CI: shared runner has no guarantee of free ports for parallel workers
 const E2E_WORKERS_CI = 1;
-// cap local workers to avoid Supabase auth rate limiting under parallel load
-const E2E_WORKERS_LOCAL = 2;
+// cap local workers to 1: store tests share a single Supabase account and
+// competing workers cause catalog + pedidos files to interfere under parallel load
+const E2E_WORKERS_LOCAL = 1;
 const E2E_WEBSERVER_TIMEOUT_MS = 120_000;
 const E2E_HTML_REPORT_OPEN = "never" as const;
 
 const isCi = Boolean(process.env.CI);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? E2E_DEFAULT_BASE_URL;
+const serverPort = new URL(baseURL).port || String(E2E_DEFAULT_PORT);
 
 export default defineConfig({
   globalSetup: "./e2e/global-setup.ts",
@@ -73,7 +75,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm dev --port ${E2E_DEFAULT_PORT}`,
+    command: `pnpm dev --port ${serverPort}`,
     url: baseURL,
     reuseExistingServer: !isCi,
     stdout: "ignore",

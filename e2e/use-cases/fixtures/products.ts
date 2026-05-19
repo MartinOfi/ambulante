@@ -4,12 +4,12 @@
 
 export const CATALOG_TEST_PRODUCT = {
   new: {
-    name: "Empanada de carne",
+    name: "Empanada criolla E2E",
     description: "Jugosa empanada de carne cortada a cuchillo",
     priceArs: 800,
   },
   updated: {
-    name: "Empanada de carne (grande)",
+    name: "Empanada editada E2E",
     description: "Versión grande de la empanada de carne",
     priceArs: 1200,
   },
