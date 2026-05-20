@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
+import { useTableChangesInvalidation } from "@/shared/query/useTableChangesInvalidation";
 import { orderRepository } from "@/shared/repositories";
 import type { OrderHistoryPage } from "@/shared/repositories/order";
 import type { OrderStatus } from "@/shared/constants/order";
@@ -15,6 +16,13 @@ export interface UseOrderHistoryInput {
 }
 
 export function useOrderHistory({ clientId, status, pageSize }: UseOrderHistoryInput) {
+  useTableChangesInvalidation({
+    table: "orders",
+    filter: null,
+    queryKey: clientId ? queryKeys.orders.byUser(clientId) : [],
+    enabled: clientId !== null,
+  });
+
   return useInfiniteQuery({
     queryKey: clientId
       ? [

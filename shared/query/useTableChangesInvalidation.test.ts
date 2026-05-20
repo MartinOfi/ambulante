@@ -104,6 +104,22 @@ describe("useTableChangesInvalidation", () => {
     expect(unsubscribe).toHaveBeenCalledOnce();
   });
 
+  it("does not subscribe when enabled is false", () => {
+    const { wrapper } = createWrapper();
+    renderHook(
+      () =>
+        useTableChangesInvalidation({
+          table: "orders",
+          filter: null,
+          queryKey: ["orders"],
+          enabled: false,
+        }),
+      { wrapper },
+    );
+
+    expect(mockSubscribeToTableChanges).not.toHaveBeenCalled();
+  });
+
   it("re-subscribes when the filter changes", () => {
     const unsubscribe = vi.fn();
     mockSubscribeToTableChanges.mockReturnValue(unsubscribe);

@@ -7,6 +7,8 @@ import { orderRepository } from "@/shared/repositories";
 import type { OrderHistoryPage } from "@/shared/repositories/order";
 import { ORDER_STATUS } from "@/shared/constants/order";
 import type { Order } from "@/shared/schemas/order";
+import { useTableChangesInvalidation } from "@/shared/query/useTableChangesInvalidation";
+import { queryKeys } from "@/shared/query/keys";
 import { useOrderHistory } from "./useOrderHistory";
 
 vi.mock("@/shared/repositories", () => ({
@@ -14,6 +16,12 @@ vi.mock("@/shared/repositories", () => ({
     findByCustomer: vi.fn(),
   },
 }));
+
+vi.mock("@/shared/query/useTableChangesInvalidation", () => ({
+  useTableChangesInvalidation: vi.fn(),
+}));
+
+const mockUseTableChangesInvalidation = vi.mocked(useTableChangesInvalidation);
 
 const findByCustomerMock = vi.mocked(orderRepository.findByCustomer);
 
@@ -43,6 +51,7 @@ function createWrapper() {
 
 beforeEach(() => {
   findByCustomerMock.mockReset();
+  mockUseTableChangesInvalidation.mockReset();
 });
 
 describe("useOrderHistory", () => {
@@ -159,6 +168,29 @@ describe("useOrderHistory", () => {
     expect(findByCustomerMock).toHaveBeenCalledWith(
       CLIENT_ID,
       expect.objectContaining({ limit: 10 }),
+    );
+  });
+
+  it("suscribe a cambios de orders cuando clientId está presente", () => {
+    const wrapper = createWrapper();
+    renderHook(() => useOrderHistory({ clientId: CLIENT_ID }), { wrapper });
+
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        table: "orders",
+        filter: null,
+        queryKey: queryKeys.orders.byUser(CLIENT_ID),
+        enabled: true,
+      }),
+    );
+  });
+
+  it("no suscribe a cambios cuando clientId es null", () => {
+    const wrapper = createWrapper();
+    renderHook(() => useOrderHistory({ clientId: null }), { wrapper });
+
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledWith(
+      expect.objectContaining({ enabled: false }),
     );
   });
 });
