@@ -4,46 +4,11 @@ import { useRef } from "react";
 import Image from "next/image";
 import { X, Clock } from "lucide-react";
 import type { StoreDetailSheetProps } from "./StoreDetailSheet.types";
-import type { Product } from "@/shared/schemas/product";
-import { formatPrice } from "@/shared/utils/format";
 import { useFocusTrap } from "@/shared/hooks/useFocusTrap";
 import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
+import { ProductRow } from "./ProductRow";
 
-function ProductRow({
-  product,
-  onAddToCart,
-}: {
-  readonly product: Product;
-  readonly onAddToCart: (product: Product) => void;
-}) {
-  return (
-    <li className="flex items-center justify-between gap-3 py-3 border-b border-border last:border-0">
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-        {product.description && (
-          <p className="text-xs text-muted mt-0.5 line-clamp-1">{product.description}</p>
-        )}
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        {!product.isAvailable ? (
-          <span className="text-xs text-destructive font-medium">Sin stock</span>
-        ) : (
-          <button
-            type="button"
-            aria-label={`Agregar ${product.name}`}
-            onClick={() => onAddToCart(product)}
-            className="text-xs font-semibold text-brand-primary border border-brand-primary rounded-md px-2 py-1 hover:bg-brand-primary/10 transition-colors"
-          >
-            Agregar
-          </button>
-        )}
-        <span className="text-sm font-semibold text-foreground">
-          {formatPrice(product.priceArs)}
-        </span>
-      </div>
-    </li>
-  );
-}
+const NOOP = () => {};
 
 export function StoreDetailSheet({
   store,
@@ -51,6 +16,9 @@ export function StoreDetailSheet({
   isLoadingProducts,
   onDismiss,
   onAddToCart,
+  quantitiesByProductId,
+  onIncrement = NOOP,
+  onDecrement = NOOP,
 }: StoreDetailSheetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -109,7 +77,14 @@ export function StoreDetailSheet({
           ) : (
             <ul className="divide-y divide-border">
               {products.map((product) => (
-                <ProductRow key={product.id} product={product} onAddToCart={onAddToCart} />
+                <ProductRow
+                  key={product.id}
+                  product={product}
+                  quantity={quantitiesByProductId?.[product.id] ?? 0}
+                  onAdd={onAddToCart}
+                  onIncrement={onIncrement}
+                  onDecrement={onDecrement}
+                />
               ))}
             </ul>
           )}

@@ -10,7 +10,7 @@ import { NearbyBottomSheet } from "./NearbyBottomSheet";
 import { RecenterFAB } from "./RecenterFAB";
 import { LocationDenied } from "./LocationDenied";
 import { StoreDetailSheetContainer } from "./StoreDetailSheet";
-import { CartDrawerContainer } from "@/features/cart/components/CartDrawer";
+import { CartSummaryBarContainer } from "@/features/cart/components/CartSummaryBar";
 
 // maplibre-gl accesses browser APIs (window, WebGL) at module evaluation time;
 // dynamic + ssr:false ensures the module is never loaded on the server
@@ -76,16 +76,15 @@ export function MapScreen({
       {selectedStoreId ? (
         <StoreDetailSheetContainer storeId={selectedStoreId} onDismiss={onDismissStoreDetail} />
       ) : (
-        <>
-          <NearbyBottomSheet
-            stores={stores}
-            radius={radius}
-            onExpandRadius={onExpandRadius}
-            onSelectStore={onSelectStore}
-          />
-          <CartDrawerContainer isLoading={isCheckingOut} onCheckout={onCheckout} />
-        </>
+        <NearbyBottomSheet
+          stores={stores}
+          radius={radius}
+          onExpandRadius={onExpandRadius}
+          onSelectStore={onSelectStore}
+        />
       )}
+
+      <CartSummaryBarContainer isLoading={isCheckingOut} onCheckout={onCheckout} />
 
       {isDenied && <LocationDenied onRetry={onRetryGeolocation} onManualSearch={onManualSearch} />}
     </main>
