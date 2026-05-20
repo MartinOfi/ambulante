@@ -21,6 +21,7 @@ export function StoreDashboardContainer() {
       incomingOrders={ordersQuery.data ?? []}
       isLoadingOrders={ordersQuery.isPending && storeId !== null}
       onToggleAvailability={toggle}
+      toggleDisabled={storeId === null || storeQuery.isPending}
       notificationOptInSlot={<NotificationOptInContainer />}
     />
   );

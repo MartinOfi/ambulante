@@ -1,18 +1,20 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockAppend, mockPublish, mockRpc } = vi.hoisted(() => ({
+const { envState, mockAppend, mockPublish, mockRpc } = vi.hoisted(() => ({
+  envState: {
+    CRON_SECRET: "test-cron-secret-min-16",
+    NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+    SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
+    E2E_TEST_MODE: undefined as string | undefined,
+  },
   mockRpc: vi.fn(),
   mockPublish: vi.fn(),
   mockAppend: vi.fn(),
 }));
 
 vi.mock("@/shared/config/env", () => ({
-  env: {
-    CRON_SECRET: "test-cron-secret-min-16",
-    NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
-    SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
-  },
+  env: envState,
 }));
 
 vi.mock("@/shared/repositories/supabase/client", () => ({
@@ -44,10 +46,13 @@ import { POST } from "./route";
 
 const VALID_TOKEN = "Bearer test-cron-secret-min-16";
 
-function makeRequest(authHeader?: string) {
+function makeRequest(authHeader?: string, extraHeaders?: Record<string, string>) {
+  const headers: Record<string, string> = {};
+  if (authHeader !== undefined) headers.Authorization = authHeader;
+  if (extraHeaders !== undefined) Object.assign(headers, extraHeaders);
   return new NextRequest("http://localhost/api/cron/auto-close-orders", {
     method: "POST",
-    headers: authHeader !== undefined ? { Authorization: authHeader } : {},
+    headers,
   });
 }
 
@@ -184,6 +189,47 @@ describe("POST /api/cron/auto-close-orders", () => {
       expect(await res.json()).toEqual({ count: 100, auditFailures: 0 });
       expect(mockPublish).toHaveBeenCalledTimes(100);
       expect(mockAppend).toHaveBeenCalledTimes(100);
+    });
+  });
+
+  describe("E2E override of autoclose hours", () => {
+    beforeEach(() => {
+      mockRpc.mockResolvedValue({ data: [], error: null });
+    });
+    afterEach(() => {
+      envState.E2E_TEST_MODE = undefined;
+    });
+
+    it("uses override when E2E_TEST_MODE=1 and header is a non-negative number", async () => {
+      envState.E2E_TEST_MODE = "1";
+      await POST(makeRequest(VALID_TOKEN, { "x-e2e-autoclose-hours": "0" }));
+      expect(mockRpc).toHaveBeenCalledWith("claim_auto_closeable_orders", {
+        p_autoclose_hours: 0,
+      });
+    });
+
+    it("accepts negative override to bypass the updated_at boundary race", async () => {
+      envState.E2E_TEST_MODE = "1";
+      await POST(makeRequest(VALID_TOKEN, { "x-e2e-autoclose-hours": "-1" }));
+      expect(mockRpc).toHaveBeenCalledWith("claim_auto_closeable_orders", {
+        p_autoclose_hours: -1,
+      });
+    });
+
+    it("falls back to ORDER_AUTOCLOSE_HOURS when override is not a number", async () => {
+      envState.E2E_TEST_MODE = "1";
+      await POST(makeRequest(VALID_TOKEN, { "x-e2e-autoclose-hours": "abc" }));
+      expect(mockRpc).toHaveBeenCalledWith("claim_auto_closeable_orders", {
+        p_autoclose_hours: ORDER_AUTOCLOSE_HOURS,
+      });
+    });
+
+    it("ignores override outside E2E mode even when header is present", async () => {
+      envState.E2E_TEST_MODE = undefined;
+      await POST(makeRequest(VALID_TOKEN, { "x-e2e-autoclose-hours": "0" }));
+      expect(mockRpc).toHaveBeenCalledWith("claim_auto_closeable_orders", {
+        p_autoclose_hours: ORDER_AUTOCLOSE_HOURS,
+      });
     });
   });
 });

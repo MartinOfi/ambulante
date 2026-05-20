@@ -1,4 +1,4 @@
-import { createBrowserClient as _createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
 import { logger } from "@/shared/utils/logger";
 import { extractRole } from "@/shared/utils/auth-helpers";
 import type { Session, User } from "@/shared/types/user";
@@ -12,13 +12,6 @@ import type {
   SignUpInput,
 } from "./auth.types";
 import { USER_ROLES } from "@/shared/constants/user";
-
-function createBrowserClient() {
-  return _createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-}
 
 type BrowserClient = ReturnType<typeof createBrowserClient>;
 
@@ -130,7 +123,16 @@ export const supabaseAuthService: AuthService = {
     });
     if (error) {
       logger.error("signUp failed", { error });
+      const msg = error.message ?? "";
+      if (/already registered|already exists|email.*in use/i.test(msg)) {
+        return { success: false, error: "El correo electrónico ya está en uso." };
+      }
       return { success: false, error: "No se pudo registrar la cuenta. Intentá de nuevo." };
+    }
+    // Supabase with email confirmation enabled silently "succeeds" for duplicate emails
+    // but returns an empty identities array — detect this to surface a clear error.
+    if (data.user?.identities !== undefined && data.user.identities.length === 0) {
+      return { success: false, error: "El correo electrónico ya está en uso." };
     }
     // session is null when Supabase email confirmation is enabled — registration succeeded
     // but the user must confirm before a session is issued.
@@ -169,7 +171,11 @@ export const supabaseAuthService: AuthService = {
 
   async signOut(): Promise<AuthResult<void>> {
     const client = createBrowserClient();
-    const { error } = await client.auth.signOut();
+    // scope: "local" revoca solo la sesión del browser actual. El default ("global")
+    // invalida todas las sesiones del usuario en Supabase, lo que rompe los tests E2E
+    // que comparten storageState entre tests (UC-CLI-19 dejaba inutilizable client.json
+    // para UC-STO-18 y otros). Para una PWA "log out de este dispositivo" es la UX correcta.
+    const { error } = await client.auth.signOut({ scope: "local" });
     if (error) {
       logger.error("signOut failed", { error });
       return { success: false, error: "No se pudo cerrar la sesión. Intentá de nuevo." };
@@ -205,8 +211,18 @@ export const supabaseAuthService: AuthService = {
         callback(null);
         return;
       }
+      const cached = publicIdCache.get(session.user.id);
+      if (cached !== undefined) {
+        callback(toSession(cached, session));
+        return;
+      }
+      // Emit immediately with authUserId so consumers exit "loading" without
+      // waiting for the DB lookup. A second emit follows once publicId resolves.
+      callback(toSession(session.user.id, session));
       const publicId = await resolvePublicId(client, session.user.id);
-      callback(toSession(publicId, session));
+      if (publicId !== session.user.id) {
+        callback(toSession(publicId, session));
+      }
     });
     return () => subscription.unsubscribe();
   },

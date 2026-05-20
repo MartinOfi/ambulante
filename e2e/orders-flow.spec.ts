@@ -37,8 +37,9 @@ test.describe("orders flow — client golden path", () => {
     });
     await page.getByRole("button", { name: /enviar pedido/i }).click();
 
-    await page.waitForURL("**/orders/**", { timeout: 20_000 });
+    await page.waitForURL("**/orders/**", { timeout: 20_000, waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toMatch(/^\/orders\/[^/]+$/);
+    const orderId = new URL(page.url()).pathname.split("/")[2];
 
     const enviadoStep = page.getByTestId("step-ENVIADO");
     await expect(enviadoStep).toBeVisible();
@@ -47,7 +48,9 @@ test.describe("orders flow — client golden path", () => {
     await page.getByRole("button", { name: /cancelar pedido/i }).click();
     await expect(page.getByText("Pedido cancelado")).toBeVisible({ timeout: 15_000 });
 
-    await page.goto("/orders");
-    await expect(page.locator("[data-order-status='CANCELADO']")).toBeVisible({ timeout: 10_000 });
+    await page.goto("/orders", { waitUntil: "domcontentloaded" });
+    const orderCard = page.locator(`[data-testid="order-card-${orderId}"]`);
+    await expect(orderCard).toBeVisible({ timeout: 10_000 });
+    await expect(orderCard).toHaveAttribute("data-order-status", "CANCELADO");
   });
 });

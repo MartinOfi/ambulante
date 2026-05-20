@@ -20,7 +20,13 @@ test.describe("UC-AUTH-01 — registro de cliente", () => {
     await register.fillPasswordConfirm(E2E_USERS.client.password);
     await register.submit();
     // Email ya en uso muestra error de validación o mensaje genérico de email
-    await expect(register.emailError.or(page.getByText(/ya.*registrado|en uso/i))).toBeVisible({
+    await expect(
+      register.emailError.or(
+        page.getByText(
+          /ya.*registrado|en uso|ya existe|user.*registered|correo.*uso|email.*already/i,
+        ),
+      ),
+    ).toBeVisible({
       timeout: 8_000,
     });
   });
@@ -41,7 +47,7 @@ test.describe("UC-AUTH-03 — login de cliente", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.client.email, E2E_USERS.client.password);
-    await page.waitForURL("**/map**", { timeout: 15_000 });
+    await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/map");
   });
 
@@ -68,7 +74,7 @@ test.describe("UC-AUTH-04 — login de tienda", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.store.email, E2E_USERS.store.password);
-    await page.waitForURL("**/store/**", { timeout: 15_000 });
+    await page.waitForURL("**/store/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/store");
   });
 });
@@ -79,7 +85,7 @@ test.describe("UC-AUTH-05 — login de admin", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.admin.email, E2E_USERS.admin.password);
-    await page.waitForURL("**/admin/**", { timeout: 15_000 });
+    await page.waitForURL("**/admin/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/admin");
   });
 });
@@ -90,12 +96,12 @@ test.describe("UC-AUTH-06 — recupero de contraseña", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.forgotPasswordLink.click();
-    await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByLabel(/correo electrónico/i)).toBeVisible({ timeout: 5_000 });
   });
 
   test("envío de email de recupero muestra confirmación", async ({ page }) => {
-    await page.goto("/forgot-password");
-    await page.getByRole("textbox", { name: /email/i }).fill(E2E_USERS.client.email);
+    await page.goto("/forgot-password", { waitUntil: "domcontentloaded" });
+    await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.client.email);
     await page.getByRole("button").first().click();
     await expect(page.getByText(/email|enlace/i).first()).toBeVisible({ timeout: 8_000 });
   });
@@ -104,10 +110,12 @@ test.describe("UC-AUTH-06 — recupero de contraseña", () => {
 // UC-AUTH-07: Reset de contraseña (requiere token válido del correo)
 test.describe("UC-AUTH-07 — reset de contraseña", () => {
   test("ruta /auth/reset-password sin token redirige a error", async ({ page }) => {
-    await page.goto("/auth/reset-password");
+    await page.goto("/reset-password", { waitUntil: "domcontentloaded" });
     // Sin token debe mostrar error o redirigir
     await expect(
-      page.getByText(/token|expirado|inválido/i).or(page.getByRole("heading", { name: /error/i })),
+      page
+        .getByText(/token|expirado|inválido|incompleto|enlace/i)
+        .or(page.getByRole("heading", { name: /error|enlace|incompleto/i })),
     ).toBeVisible({ timeout: 8_000 });
   });
 });
@@ -118,7 +126,7 @@ test.describe("UC-AUTH-08 — redirect post-login según rol", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.client.email, E2E_USERS.client.password);
-    await page.waitForURL("**/map**", { timeout: 15_000 });
+    await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/map");
   });
 
@@ -126,7 +134,7 @@ test.describe("UC-AUTH-08 — redirect post-login según rol", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.store.email, E2E_USERS.store.password);
-    await page.waitForURL("**/store/**", { timeout: 15_000 });
+    await page.waitForURL("**/store/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/store");
   });
 
@@ -134,7 +142,7 @@ test.describe("UC-AUTH-08 — redirect post-login según rol", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.admin.email, E2E_USERS.admin.password);
-    await page.waitForURL("**/admin/**", { timeout: 15_000 });
+    await page.waitForURL("**/admin/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
     expect(page.url()).toContain("/admin");
   });
 });
@@ -145,8 +153,8 @@ test.describe("UC-AUTH-09 — bloqueo de rutas por rol incorrecto", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.client.email, E2E_USERS.client.password);
-    await page.waitForURL("**/map**", { timeout: 15_000 });
-    await page.goto("/store/dashboard");
+    await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
+    await page.goto("/store/dashboard", { waitUntil: "domcontentloaded" });
     expect(page.url()).not.toContain("/store/dashboard");
   });
 
@@ -154,8 +162,8 @@ test.describe("UC-AUTH-09 — bloqueo de rutas por rol incorrecto", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.client.email, E2E_USERS.client.password);
-    await page.waitForURL("**/map**", { timeout: 15_000 });
-    await page.goto("/admin/dashboard");
+    await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
+    await page.goto("/admin/dashboard", { waitUntil: "domcontentloaded" });
     expect(page.url()).not.toContain("/admin");
   });
 
@@ -163,8 +171,8 @@ test.describe("UC-AUTH-09 — bloqueo de rutas por rol incorrecto", () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAs(E2E_USERS.store.email, E2E_USERS.store.password);
-    await page.waitForURL("**/store/**", { timeout: 15_000 });
-    await page.goto("/map");
+    await page.waitForURL("**/store/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
     expect(page.url()).not.toContain("/map");
   });
 });

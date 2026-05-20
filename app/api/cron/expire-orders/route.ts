@@ -55,14 +55,30 @@ function buildOrderForTransition(row: ClaimRow): OrderEnviado | OrderRecibido {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const cronSecret = env.CRON_SECRET;
-  if (cronSecret === undefined) {
-    logger.error("expire-orders: CRON_SECRET not configured");
-    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+  const isE2E = env.E2E_TEST_MODE === "1";
+
+  if (!isE2E) {
+    const cronSecret = env.CRON_SECRET;
+    if (cronSecret === undefined) {
+      logger.error("expire-orders: CRON_SECRET not configured");
+      return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    }
+    if (request.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
-  if (request.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Number.isFinite (not parsed >= 0) keeps parity with auto-close-orders and lets
+  // E2E pass negative minutes to dodge the boundary race on freshly-sent orders.
+  let expirationMinutes: number = ORDER_EXPIRATION_MINUTES;
+  if (isE2E) {
+    const override = request.headers.get("x-e2e-expiration-minutes");
+    if (override !== null) {
+      const parsed = parseInt(override, 10);
+      if (Number.isFinite(parsed)) {
+        expirationMinutes = parsed;
+      }
+    }
   }
 
   const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
@@ -76,7 +92,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const auditLog = new SupabaseAuditLogService(client);
 
   const { data, error: rpcError } = await client.rpc("claim_expirable_orders", {
-    p_expiration_minutes: ORDER_EXPIRATION_MINUTES,
+    p_expiration_minutes: expirationMinutes,
   });
 
   if (rpcError !== null) {

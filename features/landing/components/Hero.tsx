@@ -109,7 +109,7 @@ export function Hero() {
             <div className="amb-fade-in amb-delay-400 flex flex-col gap-4 sm:flex-row">
               <Link
                 href="#tiendas"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-white shadow-pin transition-all hover:scale-[1.02] hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand px-8 py-4 font-display text-sm font-bold uppercase tracking-wide text-zinc-900 shadow-pin transition-all hover:scale-[1.02] hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
               >
                 <Radio className="size-4" aria-hidden="true" />
                 Registrá tu tienda · Gratis

@@ -90,7 +90,7 @@ export class SupabaseProductRepository implements ProductRepository {
 
   private async resolveStoreInternalId(storePublicId: string): Promise<number> {
     const { data, error } = await this.client
-      .from("stores")
+      .from("stores_view")
       .select("id")
       .eq("public_id", storePublicId)
       .single();

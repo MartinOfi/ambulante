@@ -13,8 +13,8 @@ import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export function ResetPasswordFormContainer() {
   const { push } = useRouter();
-  const { get } = useSearchParams();
-  const token = get("token") ?? "";
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
   const [isLoading, startTransition] = useTransition();
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);

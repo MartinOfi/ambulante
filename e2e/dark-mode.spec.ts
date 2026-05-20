@@ -5,7 +5,7 @@ const DARK_MODE_ROUTES = ["/", "/login", "/register"] as const;
 const LIGHT_SURFACE_RGB = "rgb(255, 247, 237)";
 const WHITE_RGB = "rgb(255, 255, 255)";
 const BLACK_RGB = "rgb(0, 0, 0)";
-const DARK_CLASS = "dark";
+const DARK_ATTR = "dark";
 
 async function createDarkContext(page: Page): Promise<BrowserContext> {
   const browser = page.context().browser();
@@ -15,12 +15,13 @@ async function createDarkContext(page: Page): Promise<BrowserContext> {
 
 async function visitInDark(context: BrowserContext, route: string): Promise<Page> {
   const darkPage = await context.newPage();
-  await darkPage.goto(route);
-  await darkPage.waitForLoadState("networkidle");
-  // next-themes applies .dark after JS hydration — wait for it explicitly
-  await darkPage.waitForFunction(() => document.documentElement.classList.contains("dark"), {
+  await darkPage.goto(route, { waitUntil: "domcontentloaded" });
+  // Theme is applied via dataset.theme (Tailwind config: darkMode: ["selector", "[data-theme='dark']"]).
+  // The render-blocking init script in <head> sets it before body paint.
+  await darkPage.waitForFunction(() => document.documentElement.dataset.theme === "dark", {
     timeout: 5_000,
   });
+
   return darkPage;
 }
 
@@ -30,10 +31,10 @@ test.describe("Dark mode audit", () => {
       const darkContext = await createDarkContext(page);
       try {
         const darkPage = await visitInDark(darkContext, route);
-        const htmlClasses = await darkPage.locator("html").getAttribute("class");
-        expect(htmlClasses, `Expected .dark on html at ${route}`).toContain(DARK_CLASS);
+        const themeAttr = await darkPage.locator("html").getAttribute("data-theme");
+        expect(themeAttr, `Expected data-theme="dark" on html at ${route}`).toBe(DARK_ATTR);
       } finally {
-        await darkContext.close();
+        await darkContext.close().catch(() => {});
       }
     });
 
@@ -48,7 +49,7 @@ test.describe("Dark mode audit", () => {
           WHITE_RGB,
         );
       } finally {
-        await darkContext.close();
+        await darkContext.close().catch(() => {});
       }
     });
 
@@ -64,7 +65,7 @@ test.describe("Dark mode audit", () => {
           `Expected light text color in dark mode at ${route}, got: ${textColor}`,
         ).not.toBe(BLACK_RGB);
       } finally {
-        await darkContext.close();
+        await darkContext.close().catch(() => {});
       }
     });
   }
@@ -80,7 +81,7 @@ test.describe("Dark mode audit", () => {
         LIGHT_SURFACE_RGB,
       );
     } finally {
-      await darkContext.close();
+      await darkContext.close().catch(() => {});
     }
   });
 
@@ -94,7 +95,7 @@ test.describe("Dark mode audit", () => {
       });
       expect(mainText.bg).not.toBe(mainText.fg);
     } finally {
-      await darkContext.close();
+      await darkContext.close().catch(() => {});
     }
   });
 
@@ -107,7 +108,7 @@ test.describe("Dark mode audit", () => {
       });
       await expect(themeToggle.first()).toBeVisible();
     } finally {
-      await darkContext.close();
+      await darkContext.close().catch(() => {});
     }
   });
 });

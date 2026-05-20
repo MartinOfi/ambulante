@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+
 import { queryKeys } from "@/shared/query/keys";
-import { getUserManagementService } from "@/features/user-management/services/userManagement.factory";
-import { USERS_PAGE_SIZE } from "@/features/user-management/constants";
 import type { UserRole } from "@/shared/schemas/user";
 import type { SuspensionStatus } from "@/shared/domain/user-suspension";
+import type { User } from "@/shared/schemas/user";
 
 export interface UseUsersQueryInput {
   readonly role?: UserRole;
@@ -13,16 +13,29 @@ export interface UseUsersQueryInput {
   readonly page?: number;
 }
 
+async function fetchUsers(
+  role: UserRole | undefined,
+  status: SuspensionStatus | undefined,
+  page: number,
+): Promise<readonly User[]> {
+  const params = new URLSearchParams();
+  if (role !== undefined) params.set("role", role);
+  if (status !== undefined) params.set("status", status);
+  params.set("page", String(page));
+
+  const res = await fetch(`/api/admin/users?${params.toString()}`, { credentials: "include" });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? "Error obteniendo usuarios.");
+  }
+  const body = (await res.json()) as { data: readonly User[] };
+  return body.data;
+}
+
 export function useUsersQuery({ role, status, page = 1 }: UseUsersQueryInput = {}) {
-  const offset = (page - 1) * USERS_PAGE_SIZE;
   return useQuery({
     queryKey: [...queryKeys.users.all(), { role, status, page }] as const,
-    queryFn: () =>
-      getUserManagementService().listUsers({
-        role,
-        status,
-        limit: USERS_PAGE_SIZE,
-        offset,
-      }),
+    queryFn: () => fetchUsers(role, status, page),
+    placeholderData: (prev) => prev,
   });
 }

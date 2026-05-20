@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { ordersService } from "@/features/orders/services";
 import { queryKeys } from "@/shared/query/keys";
 import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
 import { REALTIME_CHANNELS } from "@/shared/constants/realtime";
@@ -31,8 +30,13 @@ export function useStoreOrdersQuery({ storeId, status }: UseStoreOrdersQueryInpu
     enabled: storeId !== null,
     queryFn: async () => {
       try {
-        const orders = await ordersService.findByStore({ storeId: storeId!, status });
-        return sortByCreatedAtDesc(orders);
+        const url = new URL("/api/store/orders", window.location.origin);
+        if (status !== undefined) url.searchParams.set("status", status);
+        const res = await fetch(url.toString(), { credentials: "include" });
+        if (res.status === 401) return [];
+        if (!res.ok) throw new Error(`store/orders: ${res.status}`);
+        const json = (await res.json()) as { data: readonly Order[] };
+        return sortByCreatedAtDesc(json.data);
       } catch (err) {
         logger.error("useStoreOrdersQuery: fetch failed", {
           error: err instanceof Error ? err.message : String(err),

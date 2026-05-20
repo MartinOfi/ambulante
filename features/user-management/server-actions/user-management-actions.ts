@@ -6,11 +6,15 @@ import { z } from "zod";
 
 import { suspendUserSchema, reactivateUserSchema } from "@/shared/schemas/user-management";
 import type { SuspendUserInput, ReactivateUserInput } from "@/shared/schemas/user-management";
-import { createRouteHandlerClient } from "@/shared/repositories/supabase/client";
+import {
+  createRouteHandlerClient,
+  createServiceRoleClient,
+} from "@/shared/repositories/supabase/client";
 import { SupabaseUserRepository, SupabaseOrderRepository } from "@/shared/repositories";
 import { createUserManagementService } from "@/features/user-management/services/userManagement.service";
 import { UserManagementDomainError } from "@/shared/domain/user-suspension";
 import { serverLogger } from "@/shared/utils/server-logger";
+import { env } from "@/shared/config/env";
 
 export type UserManagementActionResult =
   | { readonly ok: true }
@@ -65,9 +69,15 @@ export async function suspendUserAction(
 
   try {
     const parsed = suspendUserSchema.parse(input);
+    const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceRoleKey) {
+      return { ok: false, error: GENERIC_ERROR_MESSAGE };
+    }
+    const serviceClient = createServiceRoleClient(supabaseUrl, serviceRoleKey);
     const service = createUserManagementService({
-      userRepository: new SupabaseUserRepository(gate.client),
-      orderRepository: new SupabaseOrderRepository(gate.client),
+      userRepository: new SupabaseUserRepository(serviceClient),
+      orderRepository: new SupabaseOrderRepository(serviceClient),
     });
     await service.suspendUser(parsed);
     return { ok: true };
@@ -88,9 +98,15 @@ export async function reactivateUserAction(
 
   try {
     const parsed = reactivateUserSchema.parse(input);
+    const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceRoleKey) {
+      return { ok: false, error: GENERIC_ERROR_MESSAGE };
+    }
+    const serviceClient = createServiceRoleClient(supabaseUrl, serviceRoleKey);
     const service = createUserManagementService({
-      userRepository: new SupabaseUserRepository(gate.client),
-      orderRepository: new SupabaseOrderRepository(gate.client),
+      userRepository: new SupabaseUserRepository(serviceClient),
+      orderRepository: new SupabaseOrderRepository(serviceClient),
     });
     await service.reactivateUser(parsed);
     return { ok: true };

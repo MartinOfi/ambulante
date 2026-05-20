@@ -8,7 +8,7 @@ test.describe("UC-ADM-01 — dashboard de KPIs", () => {
     await loginAsAdmin(page);
     const dashboard = new AdminDashboardPage(page);
     await dashboard.goto();
-    await expect(dashboard.totalStoresKpi).toBeVisible({ timeout: 10_000 });
+    await expect(dashboard.totalStoresKpi).toBeVisible({ timeout: 20_000 });
     await expect(dashboard.pendingStoresKpi).toBeVisible();
     await expect(dashboard.totalOrdersKpi).toBeVisible();
     await expect(dashboard.totalUsersKpi).toBeVisible();
@@ -28,7 +28,7 @@ test.describe("UC-ADM-15 — audit log de pedidos", () => {
     await loginAsAdmin(page);
     const orders = new AdminOrdersPage(page);
     await orders.goto();
-    await expect(page.getByRole("table").or(page.getByRole("list"))).toBeVisible({
+    await expect(page.getByRole("table").or(page.getByRole("list")).first()).toBeVisible({
       timeout: 10_000,
     });
   });

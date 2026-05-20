@@ -14,6 +14,7 @@ test.describe("UC-STO-07 — toggle de disponibilidad", () => {
     const dashboard = new StoreDashboardPage(page);
     await dashboard.goto();
     await expect(dashboard.availabilityToggle).toBeVisible({ timeout: 8_000 });
+    await expect(dashboard.availabilityToggle).toBeEnabled({ timeout: 8_000 });
     const labelBefore = await dashboard.availabilityLabel.textContent();
     await dashboard.availabilityToggle.click();
     // El label debe cambiar tras el toggle

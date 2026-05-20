@@ -52,7 +52,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
     <div className="flex min-h-dvh flex-col items-center justify-center bg-zinc-50 dark:bg-surface px-6 py-12">
       <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-zinc-900 p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 text-center">
         <p className="font-display text-3xl font-bold text-brand mb-1">Ambulante</p>
-        <p className="text-xs font-medium tracking-widest uppercase text-zinc-400 mb-8">
+        <p className="text-xs font-medium tracking-widest uppercase text-zinc-600 mb-8">
           Tu mercado en movimiento
         </p>
 

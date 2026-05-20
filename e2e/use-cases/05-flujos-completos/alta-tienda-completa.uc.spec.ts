@@ -25,12 +25,15 @@ test.describe("UC-FLOW-06 — alta completa de tienda: onboarding → aprobació
 
     try {
       // ── Paso 1: Tienda nueva completa el onboarding ───────────────────────
-      await storePage.goto("/login");
+      await storePage.goto("/login", { waitUntil: "domcontentloaded" });
       await storePage.getByLabel(/correo electrónico/i).fill(E2E_USERS.storePending.email);
       await storePage.getByLabel(/contraseña/i).fill(E2E_USERS.storePending.password);
       await storePage.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
       // La tienda pendiente llega al wizard o a la pantalla de espera
-      await storePage.waitForURL(/\/(store|register)\//, { timeout: 15_000 });
+      await storePage.waitForURL(/\/(store|register)\//, {
+        timeout: 15_000,
+        waitUntil: "domcontentloaded",
+      });
 
       const onboarding = new StoreOnboardingPage(storePage);
       // Si ya tiene el formulario, lo completa; si ya está en espera, el test termina aquí
@@ -59,16 +62,24 @@ test.describe("UC-FLOW-06 — alta completa de tienda: onboarding → aprobació
 
         await expect(onboarding.pendingApprovalMessage).toBeVisible({ timeout: 15_000 });
       } else {
-        // La tienda ya completó el onboarding en una corrida anterior — OK
+        // La tienda ya completó el onboarding en una corrida anterior
+        const hasPendingMessage = (await onboarding.pendingApprovalMessage.count()) > 0;
+        if (!hasPendingMessage) {
+          // Ya fue aprobada en un run previo — verificar dashboard directamente
+          const dashboard = new StoreDashboardPage(storePage);
+          await dashboard.goto();
+          await expect(dashboard.availabilityToggle).toBeVisible({ timeout: 10_000 });
+          return;
+        }
         await expect(onboarding.pendingApprovalMessage).toBeVisible({ timeout: 8_000 });
       }
 
       // ── Paso 2: Admin aprueba la tienda ───────────────────────────────────
-      await adminPage.goto("/login");
+      await adminPage.goto("/login", { waitUntil: "domcontentloaded" });
       await adminPage.getByLabel(/correo electrónico/i).fill(E2E_USERS.admin.email);
       await adminPage.getByLabel(/contraseña/i).fill(E2E_USERS.admin.password);
       await adminPage.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
-      await adminPage.waitForURL("**/admin/**", { timeout: 15_000 });
+      await adminPage.waitForURL("**/admin/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
 
       const adminStores = new AdminStoresPage(adminPage);
       await adminStores.goto();
@@ -85,7 +96,7 @@ test.describe("UC-FLOW-06 — alta completa de tienda: onboarding → aprobació
       // ── Paso 3: Tienda aprobada accede a su dashboard operativo ───────────
       await storePage.reload();
       const dashboard = new StoreDashboardPage(storePage);
-      await storePage.waitForURL("**/store/**", { timeout: 15_000 });
+      await storePage.waitForURL("**/store/**", { timeout: 15_000, waitUntil: "domcontentloaded" });
       await dashboard.goto();
       await expect(dashboard.availabilityToggle).toBeVisible({ timeout: 10_000 });
     } finally {

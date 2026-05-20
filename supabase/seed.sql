@@ -85,7 +85,7 @@ select
   true,
   'El clásico del barrio desde 2010',
   1500.00,
-  'Lun–Vie 12–20hs · Sab 11–21hs',
+  'lunes, martes, miercoles, jueves, viernes: 12:00–20:00',
   extensions.st_setsrid(extensions.st_makepoint(-58.4328, -34.5779), 4326)
 from public.users where auth_user_id = '00000000-0000-0000-0000-000000000002'
 on conflict (public_id) do nothing;

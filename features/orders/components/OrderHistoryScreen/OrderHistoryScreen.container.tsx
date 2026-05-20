@@ -13,15 +13,20 @@ export function OrderHistoryScreenContainer() {
 
   const clientId = sessionState.status === "authenticated" ? sessionState.session.user.id : null;
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useOrderHistory({
+  const {
+    data,
+    isLoading: isQueryLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useOrderHistory({
     clientId,
     status: activeStatus ?? undefined,
   });
 
-  const orders = useMemo(
-    () => (data?.pages ?? []).flatMap((page) => page.orders),
-    [data?.pages],
-  );
+  const isLoading = sessionState.status === "loading" || isQueryLoading;
+
+  const orders = useMemo(() => (data?.pages ?? []).flatMap((page) => page.orders), [data?.pages]);
 
   return (
     <OrderHistoryScreen

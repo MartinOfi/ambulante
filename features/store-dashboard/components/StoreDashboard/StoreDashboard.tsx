@@ -21,6 +21,7 @@ export function StoreDashboard({
   incomingOrders,
   isLoadingOrders,
   onToggleAvailability,
+  toggleDisabled,
   notificationOptInSlot,
 }: StoreDashboardProps) {
   const activeOrders = incomingOrders.filter((o) => ACTIVE_STATUSES.has(o.status));
@@ -39,6 +40,7 @@ export function StoreDashboard({
             isAvailable={isAvailable}
             locationStatus={locationStatus}
             onToggle={onToggleAvailability}
+            disabled={toggleDisabled}
           />
         </div>
       </section>

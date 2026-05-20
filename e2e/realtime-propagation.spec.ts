@@ -36,15 +36,15 @@ test("order acceptance propagates to client view within 5 s (PRD §7.2 SLA)", as
 
     // Client filters orders to RECIBIDO — capture current count (may be >1 if both
     // RECIBIDO seeds are still present when this spec runs before realtime.spec.ts).
-    await clientPage.goto("/orders");
-    await clientPage.waitForLoadState("networkidle");
+    await clientPage.goto("/orders", { waitUntil: "domcontentloaded" });
+    await clientPage.waitForLoadState("domcontentloaded");
     await clientPage.getByRole("button", { name: "Recibido" }).click();
     const recibidoLocator = clientPage.locator('[data-order-status="RECIBIDO"]');
     await expect(recibidoLocator.first()).toBeVisible({ timeout: REALTIME_SLA_MS });
     const countBefore = await recibidoLocator.count();
 
     // Store navigates to inbox and accepts the pending B6.4 order (Taco E2E B6.4)
-    await storePage.goto("/store/orders");
+    await storePage.goto("/store/orders", { waitUntil: "domcontentloaded" });
     const acceptButton = storePage.getByRole("button", { name: "Aceptar" }).first();
     await expect(acceptButton).toBeVisible({ timeout: REALTIME_SLA_MS });
     await acceptButton.click();

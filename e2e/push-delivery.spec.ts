@@ -105,8 +105,8 @@ test("push delivery loop: store accept dispatches push to subscribed client", as
     ]);
 
     const storePage = await storeContext.newPage();
-    await storePage.goto("/store/orders");
-    await storePage.waitForLoadState("networkidle");
+    await storePage.goto("/store/orders", { waitUntil: "domcontentloaded" });
+    await storePage.waitForLoadState("domcontentloaded");
 
     const orderRow = storePage.locator("li", { hasText: orderIdForDom }).first();
     await expect(orderRow).toBeVisible({ timeout: PUSH_DELIVERY_SLA_MS });

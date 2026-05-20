@@ -1593,3 +1593,282 @@ UC-STO-11 a UC-STO-21 todos pasan en una sola corrida con `workers: 1`.
 4. **`mode: "serial"` no previene paralelismo cross-file**: serializa tests dentro de un archivo en el mismo worker. Con `workers: 2`, dos archivos distintos pueden correr simultáneamente. Para garantizar ejecución secuencial entre archivos del mismo proyecto, la única opción es `workers: 1`.
 
 5. **El global-setup de Playwright no cachea sesiones por default**: re-ejecuta el flujo de login completo en cada corrida. Con rate limiting de Supabase (`sign_in_sign_ups = 30 / 5 min`), las corridas frecuentes en desarrollo local agotan el límite. El patrón correcto es verificar si el `.auth/*.json` es reciente y saltear el login si lo es.
+
+---
+
+---
+
+# Postmortem #8: Flujos completos — UC-FLOW-01–05 fallaban por RLS en `resolveStoreInternalId`
+
+**Fecha:** 2026-05-19  
+**Tests afectados:** UC-FLOW-01 (happy path), UC-FLOW-02 (pedido cancelado), UC-FLOW-03 (pedido expirado), UC-FLOW-04 (pedido rechazado), UC-FLOW-05 (variante del flujo completo)  
+**Archivo:** `e2e/use-cases/05-flujos-completos/flujos-pedido.uc.spec.ts`  
+**Síntoma:** `clientPage.waitForURL("**/orders/**")` agotaba el timeout (20 s) después de que el cliente hacía submit del carrito. La navegación a `/orders/[id]` nunca ocurría.  
+**Resolución:** `resolveStoreInternalId` en `shared/repositories/supabase/products.supabase.ts` consultaba `from("stores")` — bloqueado por RLS con el JWT del cliente. Cambio a `from("stores_view")`.
+
+---
+
+## 1. Síntoma exacto
+
+- **En E2E:** `submitOrderAndLand` → `cart.submitOrder()` → `clientPage.waitForURL("**/orders/**", { timeout: 20_000 })` → timeout.
+- **El carrito se abría y el botón "Confirmar pedido" era clickeable**, pero la acción de submit no producía la navegación esperada.
+- **En el servidor:** la Server Action `submitOrder` en `features/orders/actions.ts` devolvía `{ ok: false }` silenciosamente — la mutación de React Query recibía el error pero el test no lo veía porque solo esperaba la URL.
+- **Sin error visible en la UI:** el toast de error eventualmente podría haber aparecido, pero el test hacía timeout antes.
+
+---
+
+## 2. Causa raíz
+
+`shared/repositories/supabase/products.supabase.ts` → `resolveStoreInternalId`:
+
+```ts
+// ANTES — consultaba la tabla stores directamente
+private async resolveStoreInternalId(storePublicId: string): Promise<number> {
+  const { data, error } = await this.client
+    .from("stores")       // PROBLEMA
+    .select("id")
+    .eq("public_id", storePublicId)
+    .single();
+  // ...
+}
+```
+
+`resolveStoreInternalId` se llama desde `ProductRepository.findAll({ storeId })` para resolver el `public_id` de la tienda a su FK interna antes de filtrar productos. En el contexto de `submitOrder` (Server Action), el cliente Supabase usa la sesión del usuario cliente (JWT del cliente autenticado, no el dueño de la tienda).
+
+La tabla `stores` tiene RLS. La política permite que el dueño de la tienda y los admins lean su propia tienda. Un cliente normal (`role = "cliente"`) **no tiene acceso** a leer filas de `stores` directamente — RLS devuelve PGRST116 (no rows returned), impidiendo que la query de resolución devuelva el ID interno.
+
+Sin el ID interno, `productRepository.findAll({ storeId })` falla → `submitOrder` devuelve `{ ok: false }` → el cliente nunca navega a `/orders/[id]`.
+
+**Por qué `stores_view` funciona:** `stores_view` incluye `available = true` como condición pública. Las tiendas activas (que son exactamente las que el cliente puede ver en el mapa y agregar al carrito) son visibles para cualquier usuario autenticado vía la vista.
+
+---
+
+## 3. Fix aplicado
+
+**Archivo:** `shared/repositories/supabase/products.supabase.ts`
+
+```ts
+// DESPUES — usa la vista pública
+private async resolveStoreInternalId(storePublicId: string): Promise<number> {
+  const { data, error } = await this.client
+    .from("stores_view")   // vista con política permisiva para tiendas disponibles
+    .select("id")
+    .eq("public_id", storePublicId)
+    .single();
+  // ...
+}
+```
+
+Un cambio de una palabra. Los 5 tests pasaron inmediatamente.
+
+---
+
+## 4. Lecciones
+
+1. **La tabla `stores` con RLS y la vista `stores_view` tienen políticas distintas**: la tabla base requiere ser dueño o admin. La vista expone tiendas con `available = true` al público autenticado. Para operaciones que el cliente (no el dueño) necesita realizar sobre datos de la tienda, usar `stores_view`.
+
+2. **`PGRST116` en un helper de resolución de IDs falla silenciosamente aguas arriba**: `resolveStoreInternalId` lanzaba un error que era capturado en la capa de la Server Action. El usuario no veía error en la UI — solo se evitaba la navegación. La ausencia de navegación es un síntoma débil; hay que agregar logs explícitos en los Server Actions.
+
+3. **El scope de `findAll` con filtros depende del JWT del caller**: el mismo método con el mismo `storeId` funciona diferente según quién sea el usuario autenticado. Lo que funciona con el JWT del dueño falla con el JWT del cliente. Los tests E2E de flujos completos (dos contextos de usuario) son el único lugar donde esta diferencia se vuelve visible.
+
+---
+
+---
+
+# Postmortem #9: UC-FLOW-06 — investigación de `alta-tienda-completa` sin cambio de código
+
+**Fecha:** 2026-05-19  
+**Test afectado:** UC-FLOW-06 (`e2e/use-cases/05-flujos-completos/alta-tienda-completa.uc.spec.ts`)  
+**Síntoma reportado:** `TimeoutError: page.waitForURL: Timeout 15000ms exceeded` en línea 33, después del click en el botón de login como usuario `storePending`.  
+**Resolución:** El test estaba pasando sin cambios de código. El error original era transitorio (servidor frío o Supabase no levantado).
+
+---
+
+## 1. Síntoma reportado
+
+```
+TimeoutError: page.waitForURL: Timeout 15000ms exceeded.
+waiting for navigation to match /(store|register)\// until "domcontentloaded"
+```
+
+La línea fallida:
+
+```ts
+// alta-tienda-completa.uc.spec.ts:33
+await storePage.waitForURL(/\/(store|register)\//, { timeout: 15_000, waitUntil: "domcontentloaded" });
+```
+
+El test usa `browser.newContext()` (sin `storageState`) — login desde cero para `storePending` (role `"tienda"`, tienda con `validation_status = "pending"`).
+
+---
+
+## 2. Flujo de auth trazado
+
+```
+LoginForm.container
+  └─ signIn() → createBrowserClient (con no-op lock) → signInWithPassword
+       └─ onAuthStateChange emite
+            └─ extractRole(appMetadata, userMetadata)
+                 → appMetadata.role = undefined
+                 → fallback a userMetadata.role = "tienda"
+                 → getRoleRedirect("tienda") = "/store/dashboard"
+                 → router.push("/store/dashboard")
+
+StoreShellContainer monta en /store/dashboard
+  └─ useCurrentStoreQuery → GET /api/store/me (Route Handler, server-side)
+       └─ validation_status = "pending"
+            → router.replace("/store/pending-approval")
+
+waitForURL(/\/(store|register)\//) matchea /store/pending-approval ✓
+```
+
+Todo el flujo era teóricamente correcto. No había nada que arreglar.
+
+---
+
+## 3. Verificaciones realizadas
+
+| Componente | Verificación | Resultado |
+|-----------|-------------|-----------|
+| No-op lock en `client.browser.ts` | `lock: async <R>(..., fn) => fn()` | ✅ Ya aplicado |
+| `extractRole` para `storePending` | `appMetadata.role` undefined → fallback a `userMetadata.role` | ✅ Correcto |
+| `getRoleRedirect("tienda")` | Retorna `ROUTES.store.dashboard` | ✅ Correcto |
+| Middleware para rol `"tienda"` | `public.users.role = "tienda"`, `requiredRole = "tienda"` → acceso permitido | ✅ Correcto |
+| Trigger `handle_new_auth_user` | `raw_user_meta_data->>'role' = "tienda"` → `public.users.role = "tienda"` | ✅ Correcto |
+| Estado DB `storePending` | `validation_status = "pending"`, `available = false` | ✅ Confirmado |
+| `useCurrentStoreQuery` | Fetch a `GET /api/store/me` (Route Handler, no Web Locks) | ✅ Correcto |
+| regex `waitForURL` | `/(store|register)\/` matchea `/store/pending-approval` | ✅ Correcto |
+
+### Resultado de corridas durante la investigación
+
+```
+✓ UC-FLOW-06 — alta de tienda completa [1.8s]
+✓ UC-FLOW-06 — alta de tienda completa [3.2s]
+```
+
+El test pasó dos veces seguidas sin ningún cambio de código.
+
+---
+
+## 4. Causa probable del error original
+
+El error era transitorio. Causas más probables en orden de probabilidad:
+
+1. **Servidor Next.js frío**: el dev server tarda varios segundos en compilar la primera ruta tras arrancar. Si el test corre antes de que `/store/dashboard` compile, el redirect del middleware supera el timeout de 15 s.
+2. **Supabase local no levantado**: sin `pnpm supabase:start`, la auth falla silenciosamente y no hay redirect.
+3. **Fila `public.users` faltante**: si el trigger `handle_new_auth_user` no se ejecutó (reset de DB sin re-aplicar el fixture de `storePending`), el middleware bloqueaba el acceso y no había redirect a `/store/*`.
+
+---
+
+## 5. Patrón documentado: `useCurrentStoreQuery` como referencia del patrón correcto
+
+El test UC-FLOW-06 usa un contexto de browser fresco sin `storageState`. Aun así pasa limpio porque `useCurrentStoreQuery` ya aplica el patrón correcto:
+
+```ts
+// shared/hooks/useCurrentStoreQuery.ts
+queryFn: async (): Promise<Store | null> => {
+  const res = await fetch("/api/store/me", { credentials: "include" });
+  if (res.status === 401) return null;   // no autenticado → null, no throw
+  if (!res.ok) throw new Error("Error obteniendo tienda del servidor");
+  return (await res.json() as { data: Store | null }).data;
+},
+```
+
+Por qué es correcto para contextos de browser fresco:
+- **Fetch HTTP → Route Handler** (`GET /api/store/me`): el servidor Node no tiene `navigator`, no puede adquirir Web Locks, no puede colgar.
+- **Sin `enabled` condicional**: no depende de que el hook de sesión resuelva primero. El Route Handler maneja el 401 si no hay sesión.
+- **`credentials: "include"`**: las cookies de sesión se mandan automáticamente, el servidor puede leer la sesión via `createRouteHandlerClient()`.
+
+---
+
+## 6. Lecciones
+
+1. **Antes de buscar el bug, correr el test dos veces**: un error transitorio (servidor frío, Supabase no iniciado) se ve diferente a un error determinista. Si el test pasa en la segunda corrida sin cambios, el problema era ambiental.
+
+2. **El no-op lock en `client.browser.ts` es condición necesaria para todo login E2E con `browser.newContext()`**: sin él, cualquier test que haga login desde cero puede colgar en Chromium headless si el browser intenta adquirir el Web Lock de auth. El invariante: todos los usos de `createBrowserClient` en el browser deben pasar por `shared/repositories/supabase/client.browser.ts`.
+
+3. **`useCurrentStoreQuery` con Route Handler es el patrón definitivo para datos de tienda en contextos de browser frescos**: funciona tanto con `storageState` pre-cargado (Postmortem #4) como sin él (este test).
+
+---
+
+# Postmortem #7 — UC-FLOW-05 "cron auto-close-orders" colgado en `waitForURL`
+
+**Fecha:** 2026-05-19
+**Síntoma:** `e2e/use-cases/05-flujos-completos/flujos-pedido.uc.spec.ts:344` falla con `page.waitForURL("**/orders/**") Timeout 20000ms` después de `cart.submitOrder()`. Los otros 6 sub-tests del archivo pasan, incluido el gemelo de `expire-orders` (línea 309) que hace exactamente el mismo flujo de envío.
+
+## 1. Causa raíz: tres bugs apilados
+
+Lo que parecía un único síntoma eran tres problemas independientes:
+
+### 1.1 Contaminación de DB entre sub-tests serializados
+`resetApprovedStore` (`e2e/use-cases/fixtures/db.ts`) sólo limpiaba `stores` y `products`. No tocaba `orders`. El sub-test "expire-orders" dejaba una orden EXPIRADA del mismo cliente; cuando "auto-close-orders" intentaba crear otra orden, el flujo de submit se rompía silenciosamente y la navegación a `/orders/{id}` nunca ocurría.
+
+### 1.2 Cron sin override E2E
+`app/api/cron/auto-close-orders/route.ts` hardcodeaba `ORDER_AUTOCLOSE_HOURS=2`. No tenía el patrón `x-e2e-*` que `expire-orders` sí implementaba (`x-e2e-expiration-minutes`). El SQL `claim_auto_closeable_orders(p_autoclose_hours integer default 2)` ya aceptaba el parámetro — sólo faltaba el cableado.
+
+### 1.3 Test estructuralmente incompleto
+El sub-test ni siquiera ejercitaba el cron: enviaba un pedido (queda en `ENVIADO`), no lo aceptaba como tienda, e invocaba `auto-close-orders` que sólo cierra pedidos en `ACEPTADO`. Aún si el `waitForURL` hubiera pasado, el cron habría devuelto `count=0` y el test no se daría cuenta porque sólo asertaba `response.ok()`.
+
+## 2. Fixes aplicados
+
+### 2.1 `e2e/use-cases/fixtures/db.ts`
+Después del upsert de productos, agregar DELETE de orders del store aprobado preservando las history orders sembradas por `global-setup.ts` (UUIDs `40000000-...`):
+
+```ts
+const E2E_HISTORY_ORDER_PUBLIC_IDS = [
+  "40000000-0000-0000-0000-000000000001", // finalizado
+  "40000000-0000-0000-0000-000000000002", // cancelado
+] as const;
+
+await supabase
+  .from("orders")
+  .delete()
+  .eq("store_id", storeRow.id)
+  .not("public_id", "in", `(${E2E_HISTORY_ORDER_PUBLIC_IDS.join(",")})`);
+```
+
+`order_items` cascadea por FK; `audit_log` es soft-reference y se deja append-only.
+
+### 2.2 `app/api/cron/auto-close-orders/route.ts`
+Antes de la llamada al RPC, parsear header `x-e2e-autoclose-hours` cuando `env.E2E_TEST_MODE === "1"`:
+
+```ts
+let autocloseHours: number = ORDER_AUTOCLOSE_HOURS;
+if (isE2E) {
+  const override = request.headers.get("x-e2e-autoclose-hours");
+  if (override !== null) {
+    const parsed = parseInt(override, 10);
+    if (Number.isFinite(parsed)) autocloseHours = parsed;
+  }
+}
+```
+
+Permite negativos (`Number.isFinite`) para esquivar el race con `updated_at < now() - interval '0 hours'` cuando la orden recién se aceptó. Se aplicó la misma relajación al override de `expire-orders` por paridad.
+
+### 2.3 Reestructuración del sub-test (`flujos-pedido.uc.spec.ts:344`)
+- Abrir `storeContext` con `STORE_AUTH` además del `clientContext`.
+- Cliente envía → tienda acepta vía `StoreOrderDetailPage.acceptButton.click()` (recipe copiada de UC-FLOW-04).
+- Esperar `tracking.statusStep("ACEPTADO")` visible en el cliente.
+- POST `/api/cron/auto-close-orders` con header `x-e2e-autoclose-hours: -1`.
+- Asserts: `response.ok()` Y `body.count > 0` (mismo patrón que el gemelo de expire-orders).
+- Esperar `tracking.statusStep("FINALIZADO")` visible via Realtime.
+
+### 2.4 Cobertura unit del override
+Cuatro tests nuevos en `app/api/cron/auto-close-orders/route.test.ts` y otros cuatro en `expire-orders/route.test.ts`: header en E2E mode con valor positivo, negativo, no-numérico, y fuera de E2E mode. Necesitó refactorear el mock de `env` con `vi.hoisted` para mutar `E2E_TEST_MODE` por test.
+
+## 3. Verificación
+
+- Unit: `pnpm vitest run app/api/cron/auto-close-orders/route.test.ts app/api/cron/expire-orders/route.test.ts` → 31/31 ✅
+- E2E aislado: `pnpm test:e2e flujos-pedido.uc.spec.ts -g "auto-close-orders"` → 1/1 ✅
+- E2E archivo completo: `pnpm test:e2e flujos-pedido.uc.spec.ts` → 6/6 ✅
+- Typecheck: `pnpm typecheck` → ok
+
+## 4. Lecciones
+
+1. **El síntoma (`waitForURL` timeout) estaba a dos saltos de la causa raíz**. El timeout no era por el cron ni por la red — era por el reset de DB compartido que no limpiaba `orders`. Buscar "qué cambió entre el sub-test que pasa y el que falla" reveló que el orden de ejecución importaba, lo cual apuntaba a estado compartido.
+
+2. **Cuando un sub-test E2E "pasa" sin asertar nada útil, está mintiendo**. El test original asertaba `response.ok()` después de invocar el cron — pero el cron devolvía `count=0` porque no había pedido en `ACEPTADO`. Hubiera pasado verde para siempre sin haber probado nunca el código de auto-close. La firma de un test que dice algo: `expect(body.count).toBeGreaterThan(0)`.
+
+3. **Paridad simétrica entre crons hermanos**. Si dos endpoints comparten estructura (auth, RPC, mismo patrón de override), cualquier divergencia es una bug en potencia. `expire-orders` tenía el patrón, `auto-close-orders` no — y nadie lo había detectado porque el test del segundo no lo ejercía. Auditar los pares hermanos cuando uno se rompe.
+
+4. **`Number.isFinite` > `!isNaN && >= 0` cuando el SQL filtra por timestamp**. `updated_at < now() - interval '0 hours'` es `updated_at < now()`, que excluye filas recién escritas por race de microsegundos. Permitir negativos resuelve el caso de "cerrar lo recién aceptado" sin tocar la SQL.

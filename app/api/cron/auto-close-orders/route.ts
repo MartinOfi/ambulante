@@ -97,14 +97,30 @@ async function processClaimRow(
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
-  const cronSecret = env.CRON_SECRET;
-  if (cronSecret === undefined) {
-    logger.error("auto-close-orders: CRON_SECRET not configured");
-    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+  const isE2E = env.E2E_TEST_MODE === "1";
+
+  if (!isE2E) {
+    const cronSecret = env.CRON_SECRET;
+    if (cronSecret === undefined) {
+      logger.error("auto-close-orders: CRON_SECRET not configured");
+      return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+    }
+    if (request.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
-  if (request.headers.get("Authorization") !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Number.isFinite (not parsed >= 0) lets E2E pass negative hours to dodge the
+  // updated_at < now() - interval boundary race on freshly accepted orders.
+  let autocloseHours: number = ORDER_AUTOCLOSE_HOURS;
+  if (isE2E) {
+    const override = request.headers.get("x-e2e-autoclose-hours");
+    if (override !== null) {
+      const parsed = parseInt(override, 10);
+      if (Number.isFinite(parsed)) {
+        autocloseHours = parsed;
+      }
+    }
   }
 
   const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
@@ -118,7 +134,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const auditLog = new SupabaseAuditLogService(client);
 
   const { data, error: rpcError } = await client.rpc("claim_auto_closeable_orders", {
-    p_autoclose_hours: ORDER_AUTOCLOSE_HOURS,
+    p_autoclose_hours: autocloseHours,
   });
 
   if (rpcError !== null) {

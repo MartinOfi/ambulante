@@ -9,7 +9,14 @@ export function createBrowserClient(url?: string, anonKey?: string) {
   const resolvedAnonKey = anonKey ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!resolvedUrl?.trim()) throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
   if (!resolvedAnonKey?.trim()) throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is not set");
-  return createSupabaseBrowserClient(resolvedUrl.trim(), resolvedAnonKey.trim());
+  return createSupabaseBrowserClient(resolvedUrl.trim(), resolvedAnonKey.trim(), {
+    auth: {
+      // navigator.locks.request() hangs in headless Chromium when storageState
+      // pre-loads auth tokens (E2E). No-op lock is safe for single-tab use.
+      lock: async <R>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> =>
+        fn(),
+    },
+  });
 }
 
 // Repositories accept any Supabase client variant (browser, server, route handler).

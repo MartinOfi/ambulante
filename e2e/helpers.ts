@@ -48,9 +48,9 @@ const E2E_CLIENT_PASSWORD = process.env.E2E_CLIENT_PASSWORD ?? "Ambulante123!";
 
 /** Performs real Supabase authentication via the login page with seed credentials. */
 export async function loginAsClient(page: Page): Promise<void> {
-  await page.goto("/login");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
   await page.getByLabel(/correo electrónico/i).fill(E2E_CLIENT_EMAIL);
   await page.getByLabel(/contraseña/i).fill(E2E_CLIENT_PASSWORD);
   await page.getByRole("button", { name: /iniciar sesión/i }).click();
-  await page.waitForURL("**/map**", { timeout: 15_000 });
+  await page.waitForURL("**/map**", { timeout: 15_000, waitUntil: "domcontentloaded" });
 }

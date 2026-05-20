@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@/shared/repositories/supabase/client";
-import { mapStoreRow, type DbStoreViewRow } from "@/shared/repositories/supabase/mappers";
+import { dbCategoryToKind } from "@/shared/repositories/supabase/mappers";
 import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
+import { PLACEHOLDER_STORE_PHOTO_URL } from "@/shared/constants/store";
 import type { StoreValidationService } from "@/features/store-validation/services/store-validation.service";
 import type {
   GetValidationDocInput,
@@ -10,24 +11,49 @@ import type {
   ValidationStatus,
 } from "@/features/store-validation/types/store-validation.types";
 
-// Includes internal `id` (bigint) needed to build the validation-docs storage path.
+// Queries stores directly (bypasses stores_view which filters by is_admin() — broken with service role).
+// lat/lng not needed in admin validation context.
 const VALIDATION_SELECT =
-  "id, public_id, owner_public_id, name, description, category, available, " +
-  "photo_url, tagline, price_from_ars, hours, lat, lng, cuit, " +
-  "validation_status, rejection_reason, created_at";
+  "id, public_id, name, description, category, available, " +
+  "photo_url, tagline, price_from_ars, hours, cuit, " +
+  "validation_status, rejection_reason, created_at, " +
+  "users!stores_owner_id_fkey(public_id)";
 
-interface DbValidationStoreRow extends DbStoreViewRow {
+interface DbStoreDirectRow {
   readonly id: number;
+  readonly public_id: string;
+  readonly name: string;
+  readonly description: string | null;
+  readonly category: string | null;
+  readonly available: boolean;
+  readonly photo_url: string | null;
+  readonly tagline: string | null;
+  readonly price_from_ars: number | string | null;
+  readonly hours: string | null;
+  readonly cuit: string | null;
   readonly validation_status: string;
   readonly rejection_reason: string | null;
   readonly created_at: string;
+  readonly users: { readonly public_id: string } | null;
 }
 
-function mapValidationRow(row: DbValidationStoreRow): PendingStore {
+function mapStoreDirectRow(row: DbStoreDirectRow): PendingStore {
   return {
-    ...mapStoreRow(row),
+    id: row.public_id,
+    ownerId: row.users?.public_id ?? "",
+    name: row.name,
+    description: row.description ?? undefined,
+    kind: dbCategoryToKind(row.category),
+    status: row.available ? "open" : "closed",
+    photoUrl: row.photo_url ?? PLACEHOLDER_STORE_PHOTO_URL,
+    tagline: row.tagline ?? "",
+    priceFromArs: row.price_from_ars !== null ? Number(row.price_from_ars) : 0,
+    hours: row.hours ?? undefined,
+    cuit: row.cuit ?? undefined,
     validationStatus: row.validation_status as ValidationStatus,
     rejectionReason: row.rejection_reason ?? undefined,
+    location: null,
+    distanceMeters: 0,
   };
 }
 
@@ -40,25 +66,25 @@ export class SupabaseStoreValidationService implements StoreValidationService {
 
   async getStoresByStatus(status: ValidationStatus): Promise<readonly PendingStore[]> {
     const { data, error } = await this.client
-      .from("stores_view")
+      .from("stores")
       .select(VALIDATION_SELECT)
       .eq("validation_status", status)
       .order("created_at", { ascending: true });
 
     if (error !== null) throw new Error(`getStoresByStatus: ${error.message}`);
-    return (data as unknown as DbValidationStoreRow[]).map(mapValidationRow);
+    return (data as unknown as DbStoreDirectRow[]).map(mapStoreDirectRow);
   }
 
   async getStoreById(id: string): Promise<PendingStore | null> {
     const { data, error } = await this.client
-      .from("stores_view")
+      .from("stores")
       .select(VALIDATION_SELECT)
       .eq("public_id", id)
       .maybeSingle();
 
     if (error !== null) throw new Error(`getStoreById: ${error.message}`);
     if (data === null) return null;
-    return mapValidationRow(data as unknown as DbValidationStoreRow);
+    return mapStoreDirectRow(data as unknown as DbStoreDirectRow);
   }
 
   async approveStore(storeId: string): Promise<PendingStore> {

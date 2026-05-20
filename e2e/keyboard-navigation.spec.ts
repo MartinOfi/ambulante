@@ -6,8 +6,7 @@ const ARIA_LABEL_NEARBY = "Tiendas cercanas";
 
 test.describe("keyboard navigation — landing page", () => {
   test("all interactive elements are reachable via Tab", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     const focusableCount = await page.evaluate(() => {
       const selector =
@@ -19,8 +18,7 @@ test.describe("keyboard navigation — landing page", () => {
   });
 
   test("Tab moves focus forward through nav links", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     await page.keyboard.press("Tab");
 
@@ -29,8 +27,7 @@ test.describe("keyboard navigation — landing page", () => {
   });
 
   test("skip-to-content link is the first focusable element if present", async ({ page }) => {
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     await page.keyboard.press("Tab");
 
@@ -51,8 +48,7 @@ test.describe("keyboard navigation — client nav", () => {
   test.use({ storageState: "e2e/.auth/client.json" });
 
   test("bottom nav links are keyboard accessible on /map", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const navLinks = page
       .getByRole("navigation", { name: "Navegación principal" })
@@ -68,8 +64,7 @@ test.describe("keyboard navigation — client nav", () => {
   });
 
   test("active nav link has aria-current=page", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const activeLink = page
       .getByRole("navigation", { name: "Navegación principal" })
@@ -83,8 +78,7 @@ test.describe("keyboard navigation — NearbyBottomSheet", () => {
   test.use({ storageState: "e2e/.auth/client.json" });
 
   test("sheet handle button is focusable and has aria-expanded", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const section = page.getByRole("region", { name: ARIA_LABEL_NEARBY });
     await expect(section).toBeVisible();
@@ -95,8 +89,7 @@ test.describe("keyboard navigation — NearbyBottomSheet", () => {
   });
 
   test("sheet handle button can be activated via keyboard Enter", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const handleButton = page.getByRole("button", { name: ARIA_LABEL_EXPAND_SHEET });
     const initialExpanded = await handleButton.getAttribute("aria-expanded");
@@ -118,8 +111,7 @@ test.describe("keyboard navigation — StoreDetailSheet", () => {
   test.use({ storageState: "e2e/.auth/client.json" });
 
   test("close button is focused when sheet opens", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const storeCards = page.getByRole("button").filter({ hasText: /empanadas|tacos|pizza/i });
     const cardCount = await storeCards.count();
@@ -137,8 +129,7 @@ test.describe("keyboard navigation — StoreDetailSheet", () => {
   });
 
   test("Escape key closes the store detail sheet", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const storeCards = page.getByRole("button").filter({ hasText: /empanadas|tacos|pizza/i });
     const cardCount = await storeCards.count();
@@ -158,8 +149,7 @@ test.describe("keyboard navigation — StoreDetailSheet", () => {
   });
 
   test("dialog has role=dialog, aria-modal=true and accessible label", async ({ page }) => {
-    await page.goto("/map");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/map", { waitUntil: "domcontentloaded" });
 
     const storeCards = page.getByRole("button").filter({ hasText: /empanadas|tacos|pizza/i });
     const cardCount = await storeCards.count();

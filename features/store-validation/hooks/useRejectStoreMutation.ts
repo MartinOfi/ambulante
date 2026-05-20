@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { storeValidationService } from "@/features/store-validation/services";
+import { rejectStoreAction } from "@/features/store-validation/server-actions/store-validation-actions";
 import type {
   PendingStore,
   RejectStoreInput,
@@ -15,8 +15,11 @@ interface MutateContext {
 export function useRejectStoreMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<PendingStore, Error, RejectStoreInput, MutateContext>({
-    mutationFn: (input: RejectStoreInput) => storeValidationService.rejectStore(input),
+  return useMutation<void, Error, RejectStoreInput, MutateContext>({
+    mutationFn: async (input: RejectStoreInput) => {
+      const result = await rejectStoreAction(input);
+      if (!result.ok) throw new Error(result.error);
+    },
 
     onMutate: async (input: RejectStoreInput): Promise<MutateContext> => {
       await queryClient.cancelQueries({ queryKey: queryKeys.stores.pending() });

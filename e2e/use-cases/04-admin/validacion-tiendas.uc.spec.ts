@@ -1,7 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
 import { loginAsAdmin } from "../helpers";
 import { AdminStoresPage } from "../page-objects/AdminPages";
 import { E2E_STORES } from "../fixtures/stores";
+
+// Tests share the same "Empanadas La Porteña" store fixture whose validation_status
+// is mutated across cases (pending → approved → pending → rejected). Serial mode
+// prevents race conditions when fullyParallel is enabled at the project level.
+test.describe.configure({ mode: "serial" });
 
 // UC-ADM-02: Ver tiendas pendientes
 test.describe("UC-ADM-02 — ver tiendas pendientes de validación", () => {
@@ -57,6 +63,20 @@ test.describe("UC-ADM-05 — aprobar tienda", () => {
 
 // UC-ADM-06: Rechazar tienda con motivo
 test.describe("UC-ADM-06 — rechazar tienda con motivo", () => {
+  test.beforeEach(async () => {
+    const supabase = createClient(
+      process.env.PLAYWRIGHT_SUPABASE_URL ??
+        process.env.NEXT_PUBLIC_SUPABASE_URL ??
+        "http://127.0.0.1:54321",
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } },
+    );
+    await supabase
+      .from("stores")
+      .update({ validation_status: "pending", rejection_reason: null })
+      .eq("name", E2E_STORES.pending.name);
+  });
+
   test("motivo demasiado corto muestra error de validación", async ({ page }) => {
     await loginAsAdmin(page);
     const stores = new AdminStoresPage(page);

@@ -8,5 +8,6 @@ export interface StoreDashboardProps {
   readonly incomingOrders: readonly Order[];
   readonly isLoadingOrders: boolean;
   readonly onToggleAvailability: () => void;
+  readonly toggleDisabled?: boolean;
   readonly notificationOptInSlot?: ReactNode;
 }

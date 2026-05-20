@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { storeValidationService } from "@/features/store-validation/services";
+import { approveStoreAction } from "@/features/store-validation/server-actions/store-validation-actions";
 import type { PendingStore } from "@/features/store-validation/types/store-validation.types";
 
 interface MutateContext {
@@ -12,8 +12,11 @@ interface MutateContext {
 export function useApproveStoreMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<PendingStore, Error, string, MutateContext>({
-    mutationFn: (storeId: string) => storeValidationService.approveStore(storeId),
+  return useMutation<void, Error, string, MutateContext>({
+    mutationFn: async (storeId: string) => {
+      const result = await approveStoreAction(storeId);
+      if (!result.ok) throw new Error(result.error);
+    },
 
     onMutate: async (storeId: string): Promise<MutateContext> => {
       await queryClient.cancelQueries({ queryKey: queryKeys.stores.pending() });

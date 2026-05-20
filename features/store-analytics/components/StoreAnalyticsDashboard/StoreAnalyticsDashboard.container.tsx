@@ -24,9 +24,9 @@ export function StoreAnalyticsDashboardContainer() {
   const storeQuery = useCurrentStoreQuery();
   const storeId = storeQuery.data?.id ?? "";
 
-  const { data, isLoading, isError, period, setPeriod } = useStoreKpiQuery(storeId);
+  const { data, isPending: isKpiPending, isError, period, setPeriod } = useStoreKpiQuery(storeId);
 
-  if (storeQuery.isPending || isLoading) {
+  if (storeQuery.isPending || isKpiPending) {
     return <LoadingState />;
   }
 

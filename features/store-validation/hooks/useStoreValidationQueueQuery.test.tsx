@@ -1,20 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { createTestQueryClient } from "@/shared/test-utils/render";
-import { storeValidationService } from "@/features/store-validation/services/store-validation.service.mock";
 import { useStoreValidationQueueQuery } from "./useStoreValidationQueueQuery";
 import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
-
-vi.mock("@/features/store-validation/services/store-validation.service.mock", () => ({
-  storeValidationService: {
-    getPendingStores: vi.fn(),
-    getStoreById: vi.fn(),
-    approveStore: vi.fn(),
-    rejectStore: vi.fn(),
-  },
-}));
 
 const PENDING_STORE = {
   id: "store-pending-1",
@@ -39,7 +29,17 @@ function buildWrapper() {
 
 describe("useStoreValidationQueueQuery", () => {
   beforeEach(() => {
-    vi.mocked(storeValidationService.getPendingStores).mockResolvedValue([PENDING_STORE]);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ data: [PENDING_STORE] }),
+      }),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("returns pending stores on success", async () => {

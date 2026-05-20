@@ -3,19 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
-import { useSession } from "@/shared/hooks/useSession";
-import { storesService } from "@/shared/services/stores";
+import type { Store } from "@/shared/schemas/store";
 
 export function useCurrentStoreQuery() {
-  const sessionResult = useSession();
-  const userId = sessionResult.status === "authenticated" ? sessionResult.session.user.id : null;
-
   return useQuery({
-    queryKey: userId ? queryKeys.stores.byOwner(userId) : queryKeys.stores.all(),
-    queryFn: async () => {
-      if (!userId) throw new Error("userId required");
-      return storesService.findByOwnerId(userId);
+    queryKey: queryKeys.stores.me(),
+    queryFn: async (): Promise<Store | null> => {
+      const res = await fetch("/api/store/me", { credentials: "include" });
+      if (res.status === 401) return null;
+      if (!res.ok) throw new Error("Error obteniendo tienda del servidor");
+      const json = (await res.json()) as { data: Store | null };
+      return json.data;
     },
-    enabled: userId !== null,
   });
 }

@@ -63,3 +63,4 @@ yarn-error.log*
 # supabase local dev — generated / temp files only; config and migrations are committed
 supabase/.branches
 supabase/.temp
+.playwright-mcp

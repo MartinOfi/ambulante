@@ -6,7 +6,7 @@ export class AdminDashboardPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/admin/dashboard");
+    await this.page.goto("/admin/dashboard", { waitUntil: "domcontentloaded" });
   }
 
   get totalStoresKpi(): Locator {
@@ -36,13 +36,11 @@ export class AdminStoresPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/admin/stores");
-    await this.page.waitForLoadState("networkidle");
+    await this.page.goto("/admin/stores", { waitUntil: "domcontentloaded" });
   }
 
   async gotoStoreDetail(storeId: string) {
-    await this.page.goto(`/admin/stores/${storeId}`);
-    await this.page.waitForLoadState("networkidle");
+    await this.page.goto(`/admin/stores/${storeId}`, { waitUntil: "domcontentloaded" });
   }
 
   get pendingTab(): Locator {
@@ -64,7 +62,10 @@ export class AdminStoresPage {
   }
 
   storeRow(storeName: string): Locator {
-    return this.page.getByRole("row").filter({ hasText: storeName });
+    return this.page
+      .getByRole("row")
+      .or(this.page.getByRole("listitem"))
+      .filter({ hasText: storeName });
   }
 
   viewStoreButton(storeName: string): Locator {
@@ -92,7 +93,9 @@ export class AdminStoresPage {
   }
 
   get successToast(): Locator {
-    return this.page.getByText(/tienda.*aprobada|tienda.*rechazada/i);
+    return this.page
+      .locator("[data-sonner-toast]")
+      .filter({ hasText: /tienda.*aprobada|tienda.*rechazada/i });
   }
 }
 
@@ -102,15 +105,14 @@ export class AdminUsersPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/admin/users");
+    await this.page.goto("/admin/users", { waitUntil: "domcontentloaded" });
     await this.page
       .getByRole("heading", { name: /gestión de usuarios/i })
       .waitFor({ timeout: 15_000 });
   }
 
   async gotoUserDetail(userId: string) {
-    await this.page.goto(`/admin/users/${userId}`);
-    await this.page.waitForLoadState("networkidle");
+    await this.page.goto(`/admin/users/${userId}`, { waitUntil: "domcontentloaded" });
   }
 
   get searchInput(): Locator {
@@ -127,6 +129,10 @@ export class AdminUsersPage {
 
   get suspendButton(): Locator {
     return this.page.getByRole("button", { name: /^suspender$/i });
+  }
+
+  get suspendReasonInput(): Locator {
+    return this.page.getByLabel(/motivo.*suspensión/i);
   }
 
   get confirmSuspendButton(): Locator {
@@ -156,12 +162,11 @@ export class AdminModerationPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/admin/moderation");
-    await this.page
-      .getByRole("article")
-      .first()
-      .or(this.page.getByText(/no hay reportes pendientes/i))
-      .waitFor({ timeout: 10_000 });
+    await this.page.goto("/admin/moderation", { waitUntil: "domcontentloaded" });
+    await this.page.getByRole("main").first().waitFor({
+      state: "visible",
+      timeout: 15_000,
+    });
   }
 
   get reportCard(): Locator {
@@ -191,7 +196,7 @@ export class AdminOrdersPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/admin/orders");
+    await this.page.goto("/admin/orders", { waitUntil: "domcontentloaded" });
   }
 
   orderRow(orderId: string): Locator {

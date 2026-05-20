@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/shared/query/keys";
-import { contentModerationService } from "@/features/content-moderation/services/content-moderation.adapter";
+import { removeContentAction } from "@/features/content-moderation/server-actions/content-moderation-actions";
 
 export function useRemoveContentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (reportId: string) => contentModerationService.removeContent(reportId),
+    mutationFn: async (reportId: string) => {
+      const result = await removeContentAction(reportId);
+      if (!result.ok) throw new Error(result.error);
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.reports.all() });
-    },
-    onError: (error: unknown) => {
-      console.error("[useRemoveContentMutation] removeContent failed", { error });
     },
   });
 }

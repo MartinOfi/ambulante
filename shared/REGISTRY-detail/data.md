@@ -116,7 +116,7 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 
 | Nombre                 | Ruta                                                     | Descripción                                                                                                                                                              |
 | ---------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `useCurrentStoreQuery` | `features/store-dashboard/hooks/useCurrentStoreQuery.ts` | Resuelve la tienda del usuario autenticado via `useSession` → `storesService.findByOwnerId`. Key: `queryKeys.stores.byOwner(userId)`. Disabled cuando `userId === null`. |
+| `useCurrentStoreQuery` | `shared/hooks/useCurrentStoreQuery.ts` | Resuelve la tienda del usuario autenticado via `GET /api/store/me` (Route Handler, sin Web Locks). Key: `queryKeys.stores.me()`. Siempre habilitado; devuelve `null` si el usuario no está autenticado (401). |
 | `useStoreOrdersQuery`  | `features/orders/hooks/useStoreOrdersQuery.ts`           | `useStoreOrdersQuery({ storeId, status? })` — fetches orders for a store. Key: `queryKeys.orders.byStore(storeId)`. Disabled cuando `storeId === null`.                  |
 
 

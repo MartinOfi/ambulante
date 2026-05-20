@@ -44,6 +44,7 @@ export function OrderCard({ order }: OrderCardProps) {
     <article
       className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"
       data-order-status={order.status}
+      data-testid={`order-card-${order.id}`}
     >
       <div className="flex items-center justify-between">
         <span className="font-mono text-sm text-zinc-500">{formatOrderId(order.id)}</span>

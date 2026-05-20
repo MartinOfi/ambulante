@@ -33,15 +33,15 @@ test("store accepting an order reflects in client view within 5 s (PRD §7.2)", 
     ]);
 
     // Load client orders and filter to RECIBIDO
-    await clientPage.goto("/orders");
-    await clientPage.waitForLoadState("networkidle");
+    await clientPage.goto("/orders", { waitUntil: "domcontentloaded" });
+    await clientPage.waitForLoadState("domcontentloaded");
     await clientPage.getByRole("button", { name: "Recibido" }).click();
     await expect(clientPage.locator('[data-order-status="RECIBIDO"]')).toHaveCount(1, {
       timeout: REALTIME_SLA_MS,
     });
 
     // Load store inbox — newest order (E2E seed) is first
-    await storePage.goto("/store/orders");
+    await storePage.goto("/store/orders", { waitUntil: "domcontentloaded" });
     const firstAcceptButton = storePage.getByRole("button", { name: "Aceptar" }).first();
     await expect(firstAcceptButton).toBeVisible({ timeout: REALTIME_SLA_MS });
     await firstAcceptButton.click();
@@ -77,16 +77,16 @@ test("store toggles availability → client map reflects change within 2 s (B6.3
     ]);
 
     // Client opens the map — NearbyBottomSheet renders store cards with "Abierto ahora" badges
-    await clientPage.goto("/map");
-    await clientPage.waitForLoadState("networkidle");
+    await clientPage.goto("/map", { waitUntil: "domcontentloaded" });
+    await clientPage.waitForLoadState("domcontentloaded");
     const openBadges = clientPage.getByText("Abierto ahora");
     await expect(openBadges.first()).toBeVisible({ timeout: REALTIME_SLA_MS });
     const initialOpenCount = await openBadges.count();
     expect(initialOpenCount).toBeGreaterThan(0);
 
     // Store toggles availability to unavailable via the role="switch" toggle
-    await storePage.goto("/store/dashboard");
-    await storePage.waitForLoadState("networkidle");
+    await storePage.goto("/store/dashboard", { waitUntil: "domcontentloaded" });
+    await storePage.waitForLoadState("domcontentloaded");
     const availabilityToggle = storePage.getByRole("switch");
     await expect(availabilityToggle).toBeVisible({ timeout: REALTIME_SLA_MS });
     await availabilityToggle.click();

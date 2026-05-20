@@ -4,8 +4,7 @@ export class StoreOrderDetailPage {
   constructor(private readonly page: Page) {}
 
   async goto(orderId: string) {
-    await this.page.goto(`/store/order/${orderId}`);
-    await this.page.waitForLoadState("networkidle");
+    await this.page.goto(`/store/order/${orderId}`, { waitUntil: "domcontentloaded" });
   }
 
   get acceptButton(): Locator {

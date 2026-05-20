@@ -1,7 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
 import { loginAsAdmin } from "../helpers";
 import { AdminUsersPage } from "../page-objects/AdminPages";
 import { E2E_USERS } from "../fixtures/users";
+
+// UC-ADM-10 and UC-ADM-11 share the same E2E_USERS.client fixture whose suspended
+// state is mutated across cases (active → suspended → active). Serial mode prevents
+// race conditions when fullyParallel is enabled at the project level.
+test.describe.configure({ mode: "serial" });
 
 // UC-ADM-07: Ver lista de usuarios
 test.describe("UC-ADM-07 — lista de usuarios", () => {
@@ -9,7 +15,7 @@ test.describe("UC-ADM-07 — lista de usuarios", () => {
     await loginAsAdmin(page);
     const users = new AdminUsersPage(page);
     await users.goto();
-    await expect(page.getByRole("table").or(page.getByRole("list"))).toBeVisible({
+    await expect(page.getByRole("table").or(page.getByRole("list")).first()).toBeVisible({
       timeout: 10_000,
     });
   });
@@ -40,6 +46,17 @@ test.describe("UC-ADM-09 — filtrar por rol", () => {
 
 // UC-ADM-10: Suspender usuario
 test.describe("UC-ADM-10 — suspender usuario", () => {
+  test.beforeEach(async () => {
+    const supabase = createClient(
+      process.env.PLAYWRIGHT_SUPABASE_URL ??
+        process.env.NEXT_PUBLIC_SUPABASE_URL ??
+        "http://127.0.0.1:54321",
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } },
+    );
+    await supabase.from("users").update({ suspended: false }).eq("email", E2E_USERS.client.email);
+  });
+
   test("suspender usuario muestra badge de suspendido", async ({ page }) => {
     await loginAsAdmin(page);
     const users = new AdminUsersPage(page);
@@ -47,6 +64,7 @@ test.describe("UC-ADM-10 — suspender usuario", () => {
     await users.userRow(E2E_USERS.client.name).click();
     await expect(users.suspendButton).toBeVisible({ timeout: 8_000 });
     await users.suspendButton.click();
+    await users.suspendReasonInput.fill("Comportamiento abusivo");
     await users.confirmSuspendButton.click();
     await expect(users.suspendedBadge).toBeVisible({ timeout: 8_000 });
   });
@@ -54,19 +72,25 @@ test.describe("UC-ADM-10 — suspender usuario", () => {
 
 // UC-ADM-11: Reactivar usuario suspendido
 test.describe("UC-ADM-11 — reactivar usuario", () => {
+  test.beforeEach(async () => {
+    const supabase = createClient(
+      process.env.PLAYWRIGHT_SUPABASE_URL ??
+        process.env.NEXT_PUBLIC_SUPABASE_URL ??
+        "http://127.0.0.1:54321",
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+      { auth: { autoRefreshToken: false, persistSession: false } },
+    );
+    await supabase.from("users").update({ suspended: true }).eq("email", E2E_USERS.client.email);
+  });
+
   test("reactivar usuario suspendido muestra badge activo", async ({ page }) => {
     await loginAsAdmin(page);
     const users = new AdminUsersPage(page);
     await users.goto();
     await users.userRow(E2E_USERS.client.name).click();
-    // Si está suspendido, reactivar; si no, verificar que el botón de reactivar existe como fallback
-    const isSuspended = (await users.reactivateButton.count()) > 0;
-    if (isSuspended) {
-      await users.reactivateButton.click();
-      await expect(users.activeStatusBadge).toBeVisible({ timeout: 8_000 });
-    } else {
-      await expect(users.suspendButton).toBeVisible({ timeout: 5_000 });
-    }
+    await expect(users.reactivateButton).toBeVisible({ timeout: 8_000 });
+    await users.reactivateButton.click();
+    await expect(users.activeStatusBadge).toBeVisible({ timeout: 8_000 });
   });
 });
 

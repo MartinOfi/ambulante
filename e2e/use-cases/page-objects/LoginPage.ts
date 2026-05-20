@@ -4,7 +4,7 @@ export class LoginPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/login");
+    await this.page.goto("/login", { waitUntil: "domcontentloaded" });
   }
 
   async fillEmail(email: string) {

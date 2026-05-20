@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
 
 import {
   STORAGE_ALLOWED_MIME_TYPES,

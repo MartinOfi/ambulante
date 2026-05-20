@@ -40,6 +40,7 @@ export class CartDrawer {
   }
 
   async submitOrder() {
+    await this.cartSummary.waitFor({ state: "visible", timeout: 5_000 });
     await this.submitButton.click();
   }
 }

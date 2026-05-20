@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
@@ -9,5 +11,6 @@ export function useOrderQuery(orderId: string) {
     queryKey: queryKeys.orders.byId(orderId),
     queryFn: () => orderRepository.findById(orderId),
     staleTime: 30_000,
+    refetchInterval: 5_000,
   });
 }

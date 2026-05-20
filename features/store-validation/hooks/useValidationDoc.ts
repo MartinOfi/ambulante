@@ -1,13 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { STORAGE_BUCKETS } from "@/shared/constants/storage";
 import { queryKeys } from "@/shared/query/keys";
-import { storageService } from "@/shared/services";
-import {
-  VALIDATION_DOC_SIGNED_URL_EXPIRES_IN_S,
-  VALIDATION_DOC_STALE_TIME_MS,
-} from "@/features/store-validation/constants";
-import { storeValidationService } from "@/features/store-validation/services";
+import { VALIDATION_DOC_STALE_TIME_MS } from "@/features/store-validation/constants";
 import type { ValidationDocType } from "@/features/store-validation/types/store-validation.types";
 
 export interface ValidationDocResult {
@@ -20,24 +14,14 @@ async function fetchValidationDoc(
   storeId: string,
   docType: ValidationDocType,
 ): Promise<ValidationDocResult | null> {
-  const meta = await storeValidationService.getValidationDoc({ storeId, docType });
-  if (meta === null) return null;
-
-  const result = await storageService.getSignedUrl({
-    bucket: STORAGE_BUCKETS.VALIDATION_DOCS,
-    path: meta.path,
-    expiresIn: VALIDATION_DOC_SIGNED_URL_EXPIRES_IN_S,
-  });
-
-  if (!result.success) {
-    throw new Error(result.error);
+  const url = `/api/admin/stores/${encodeURIComponent(storeId)}/validation-doc?docType=${encodeURIComponent(docType)}`;
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? "Error obteniendo documento.");
   }
-
-  return {
-    url: result.data,
-    mimeType: meta.mimeType,
-    filename: meta.filename,
-  };
+  const body = (await res.json()) as { data: ValidationDocResult | null };
+  return body.data;
 }
 
 export function useValidationDoc(storeId: string, docType: ValidationDocType) {

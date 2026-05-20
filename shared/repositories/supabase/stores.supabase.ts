@@ -47,11 +47,12 @@ export class SupabaseStoreRepository implements StoreRepository {
       .from("stores_view")
       .select(STORES_VIEW_SELECT)
       .eq("owner_public_id", userId)
-      .maybeSingle();
+      .order("id", { ascending: true })
+      .limit(1);
 
     if (error !== null) throw new Error(`SupabaseStoreRepository.findByOwnerId: ${error.message}`);
-    if (data === null) return null;
-    return mapStoreRow(data as DbStoreViewRow);
+    const row = (data as DbStoreViewRow[])[0] ?? null;
+    return row !== null ? mapStoreRow(row) : null;
   }
 
   async findNearby({ coords, radiusMeters }: FindNearbyInput): Promise<readonly Store[]> {

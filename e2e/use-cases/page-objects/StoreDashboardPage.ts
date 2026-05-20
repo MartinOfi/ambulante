@@ -4,16 +4,19 @@ export class StoreDashboardPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/store/dashboard");
-    await this.page.waitForLoadState("networkidle");
+    await this.page.goto("/store/dashboard", { waitUntil: "domcontentloaded" });
+  }
+
+  private get statusSection() {
+    return this.page.getByRole("region", { name: /estado/i });
   }
 
   get availabilityToggle() {
-    return this.page.getByRole("switch", { name: /disponible/i });
+    return this.statusSection.getByRole("switch");
   }
 
   get availabilityLabel() {
-    return this.page.getByTestId("availability-status");
+    return this.statusSection.getByTestId("availability-status");
   }
 
   get notificationOptInButton() {
@@ -41,7 +44,7 @@ export class StoreProfilePage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/store/profile");
+    await this.page.goto("/store/profile", { waitUntil: "domcontentloaded" });
   }
 
   get storeNameDisplay() {
@@ -73,7 +76,7 @@ export class StoreAnalyticsPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/store/analytics");
+    await this.page.goto("/store/analytics", { waitUntil: "domcontentloaded" });
   }
 
   get totalOrdersKpi() {

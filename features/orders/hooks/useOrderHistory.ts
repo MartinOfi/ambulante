@@ -39,5 +39,8 @@ export function useOrderHistory({ clientId, status, pageSize }: UseOrderHistoryI
     // initialPageParam también es null.
     getNextPageParam: (lastPage: OrderHistoryPage) => lastPage.nextCursor ?? undefined,
     enabled: clientId !== null,
+    // Fail immediately on wrong clientId (e.g. authUserId emitted before publicId resolves)
+    // instead of retrying 3× for 7s. Correct query fires on the next emit.
+    retry: 0,
   });
 }

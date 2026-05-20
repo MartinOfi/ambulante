@@ -68,4 +68,11 @@ export function writeSessionCookie(session: Session): void {
 export function clearSessionCookie(): void {
   if (typeof document === "undefined") return;
   document.cookie = `${SESSION_COOKIE_NAME}=; Path=${SESSION_COOKIE_OPTIONS.path}; Max-Age=0`;
+  // Also clear Supabase auth tokens (e.g. sb-<project-id>-auth-token)
+  document.cookie.split("; ").forEach((cookieStr) => {
+    const name = cookieStr.split("=")[0];
+    if (name.startsWith("sb-") && name.endsWith("-auth-token")) {
+      document.cookie = `${name}=; Path=${SESSION_COOKIE_OPTIONS.path}; Max-Age=0`;
+    }
+  });
 }

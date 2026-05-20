@@ -4,13 +4,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/shared/query/keys";
 import { logger } from "@/shared/utils/logger";
-import { ordersService } from "@/features/orders/services";
+import { confirmOnTheWay } from "@/features/orders/actions";
 
 export function useConfirmOnTheWayMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (orderId: string) => ordersService.confirmOnTheWay(orderId),
+    mutationFn: async (orderId: string) => {
+      const result = await confirmOnTheWay(orderId);
+      if (!result.ok) throw new Error(result.message);
+      return result;
+    },
 
     onError: (error: unknown, orderId: string) => {
       logger.error("useConfirmOnTheWayMutation: confirm failed", {

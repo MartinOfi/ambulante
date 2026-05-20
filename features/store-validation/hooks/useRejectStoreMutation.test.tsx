@@ -3,38 +3,18 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { createTestQueryClient } from "@/shared/test-utils/render";
-import { storeValidationService } from "@/features/store-validation/services/store-validation.service.mock";
 import { useRejectStoreMutation } from "./useRejectStoreMutation";
-import { STORE_VALIDATION_STATUS } from "@/features/store-validation/constants";
 import type { RejectStoreInput } from "@/features/store-validation/types/store-validation.types";
 
-vi.mock("@/features/store-validation/services/store-validation.service.mock", () => ({
-  storeValidationService: {
-    getPendingStores: vi.fn(),
-    getStoreById: vi.fn(),
-    approveStore: vi.fn(),
-    rejectStore: vi.fn(),
-  },
+vi.mock("@/features/store-validation/server-actions/store-validation-actions", () => ({
+  rejectStoreAction: vi.fn(),
 }));
 
 vi.mock("@/shared/utils/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-const REJECTED_STORE = {
-  id: "store-1",
-  name: "Test Store",
-  kind: "food-truck" as const,
-  photoUrl: "https://example.com/photo.jpg",
-  location: { lat: -34.6, lng: -58.38 },
-  distanceMeters: 500,
-  status: "open" as const,
-  priceFromArs: 1000,
-  tagline: "Test tagline",
-  ownerId: "11111111-1111-1111-1111-111111111111",
-  validationStatus: "rejected" as const,
-  rejectionReason: "Documentación incompleta",
-};
+import { rejectStoreAction } from "@/features/store-validation/server-actions/store-validation-actions";
 
 function buildWrapper() {
   const queryClient = createTestQueryClient();
@@ -45,10 +25,10 @@ function buildWrapper() {
 
 describe("useRejectStoreMutation", () => {
   beforeEach(() => {
-    vi.mocked(storeValidationService.rejectStore).mockResolvedValue(REJECTED_STORE);
+    vi.mocked(rejectStoreAction).mockResolvedValue({ ok: true });
   });
 
-  it("calls rejectStore with storeId and reason", async () => {
+  it("calls rejectStoreAction with storeId and reason", async () => {
     const input: RejectStoreInput = { storeId: "store-1", reason: "Documentación incompleta" };
 
     const { result } = renderHook(() => useRejectStoreMutation(), {
@@ -60,10 +40,15 @@ describe("useRejectStoreMutation", () => {
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(storeValidationService.rejectStore).toHaveBeenCalledWith(input);
+    expect(rejectStoreAction).toHaveBeenCalledWith(input);
   });
 
-  it("returns the rejected store with rejection reason", async () => {
+  it("sets error state when the action returns ok:false", async () => {
+    vi.mocked(rejectStoreAction).mockResolvedValue({
+      ok: false,
+      error: "Motivo demasiado corto",
+    });
+
     const { result } = renderHook(() => useRejectStoreMutation(), {
       wrapper: buildWrapper(),
     });
@@ -72,15 +57,11 @@ describe("useRejectStoreMutation", () => {
       result.current.mutate({ storeId: "store-1", reason: "Documentación incompleta" });
     });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.validationStatus).toBe(STORE_VALIDATION_STATUS.rejected);
-    expect(result.current.data?.rejectionReason).toBe("Documentación incompleta");
+    await waitFor(() => expect(result.current.isError).toBe(true));
   });
 
-  it("sets error state when rejectStore throws", async () => {
-    vi.mocked(storeValidationService.rejectStore).mockRejectedValue(
-      new Error("Tienda no encontrada"),
-    );
+  it("sets error state when the action throws", async () => {
+    vi.mocked(rejectStoreAction).mockRejectedValue(new Error("network error"));
 
     const { result } = renderHook(() => useRejectStoreMutation(), {
       wrapper: buildWrapper(),

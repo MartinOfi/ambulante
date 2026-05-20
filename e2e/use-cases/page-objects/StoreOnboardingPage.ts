@@ -15,7 +15,7 @@ export class StoreOnboardingPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/register/store");
+    await this.page.goto("/register/store", { waitUntil: "domcontentloaded" });
   }
 
   // ── Paso 1: Datos fiscales ────────────────────────────────────────────────
@@ -87,11 +87,11 @@ export class StoreOnboardingPage {
   // ── Post-onboarding ───────────────────────────────────────────────────────
 
   get pendingApprovalMessage() {
-    return this.page.getByText(/solicitud.*revisión|pendiente.*aprobación/i);
+    return this.page.getByRole("heading", { name: /solicitud.*revisión|pendiente.*aprobación/i });
   }
 
   get rejectedMessage() {
-    return this.page.getByText(/solicitud.*rechazada/i);
+    return this.page.getByRole("heading", { name: /solicitud.*rechazada/i });
   }
 
   get rejectionReasonText() {

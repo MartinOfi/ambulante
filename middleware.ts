@@ -47,6 +47,11 @@ async function applyRateLimit(request: NextRequest): Promise<NextResponse | null
     return null;
   }
 
+  // Playwright doesn't send reverse-proxy headers — skip rate limiting in E2E mode
+  if (process.env.E2E_TEST_MODE === "1") {
+    return null;
+  }
+
   const ip = extractIp(request);
   if (!ip) {
     return NextResponse.json(
@@ -98,10 +103,30 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const response = NextResponse.next({ request: { headers: forwardedHeaders } });
   const supabase = createMiddlewareClient(request, response);
 
+  // Debug: log cookies received by middleware
+  if (process.env.E2E_TEST_MODE === "1") {
+    const allCookies = request.cookies.getAll();
+    console.log("[MIDDLEWARE-DEBUG]", request.nextUrl.pathname, {
+      cookieCount: allCookies.length,
+      cookieNames: allCookies.map((c) => c.name),
+      cookieHeader: request.headers.get("cookie"),
+    });
+  }
+
   // getUser() validates the JWT server-side on every request — cannot be forged.
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+
+  if (process.env.E2E_TEST_MODE === "1") {
+    console.log("[MIDDLEWARE-DEBUG] getUser() result", {
+      userId: user?.id,
+      email: user?.email,
+      error: error?.message,
+      pathname: request.nextUrl.pathname,
+    });
+  }
 
   const { pathname } = request.nextUrl;
   const requiredRole = getRequiredRole(pathname);

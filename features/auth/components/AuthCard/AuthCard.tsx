@@ -17,7 +17,7 @@ export function AuthCard({ title, children }: AuthCardProps) {
             <p className="font-display text-display-auth font-bold tracking-tight text-brand leading-none">
               Ambulante
             </p>
-            <p className="text-xs-tight font-medium tracking-tag uppercase text-zinc-400 dark:text-zinc-500 pt-2">
+            <p className="text-xs-tight font-medium tracking-tag uppercase text-zinc-600 dark:text-zinc-400 pt-2">
               Tu mercado en movimiento
             </p>
           </div>

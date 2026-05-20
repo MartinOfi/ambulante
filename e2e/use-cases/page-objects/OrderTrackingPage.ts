@@ -4,7 +4,7 @@ export class OrderTrackingPage {
   constructor(private readonly page: Page) {}
 
   async gotoOrder(orderId: string) {
-    await this.page.goto(`/orders/${orderId}`);
+    await this.page.goto(`/orders/${orderId}`, { waitUntil: "domcontentloaded" });
   }
 
   statusStep(status: string): Locator {
@@ -52,11 +52,30 @@ export class OrderHistoryPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto("/orders");
+    await this.page.goto("/orders", { waitUntil: "domcontentloaded" });
   }
 
+  async waitForReady(): Promise<void> {
+    // Toolbar only renders when isLoading === false; dev-mode compilation can add ~5s
+    await this.page
+      .getByRole("toolbar", { name: /filtrar por estado/i })
+      .waitFor({ state: "visible", timeout: 20_000 });
+    // After toolbar appears the fetch may still be in-flight (two-step auth emits two
+    // clientIds in quick succession). Wait for any loading skeleton to disappear so we
+    // don't resolve during the brief isLoading=false window between the two emits.
+    await this.page
+      .locator('[data-testid="orders-loading"]')
+      .waitFor({ state: "hidden", timeout: 15_000 })
+      .catch(() => {});
+  }
+
+  /**
+   * Returns the FIRST card matching a given status. The DB seed accumulates
+   * cards across runs, so this selector can match many. Caller can re-scope if
+   * a specific orderId is known.
+   */
   orderCard(status: string): Locator {
-    return this.page.locator(`[data-order-status='${status}']`);
+    return this.page.locator(`[data-order-status='${status}']`).first();
   }
 
   async filterByStatus(status: string): Promise<void> {

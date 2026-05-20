@@ -7,22 +7,18 @@ import { E2E_USERS } from "./fixtures/users";
 // is active before each test body runs.
 
 export async function loginAsClient(page: Page): Promise<void> {
-  await page.goto("/map");
-  await page.waitForURL("**/map**", { timeout: 10_000 });
+  await page.goto("/map", { waitUntil: "domcontentloaded" });
+  await page.waitForURL("**/map**", { timeout: 10_000, waitUntil: "domcontentloaded" });
 }
 
 export async function loginAsStore(page: Page): Promise<void> {
-  await page.goto("/store/dashboard");
-  await page.waitForURL("**/store/**", { timeout: 10_000 });
+  await page.goto("/store/dashboard", { waitUntil: "domcontentloaded" });
+  await page.waitForURL("**/store/**", { timeout: 10_000, waitUntil: "domcontentloaded" });
 }
 
 export async function loginAsAdmin(page: Page): Promise<void> {
-  await page.context().clearCookies();
-  await page.goto("/login", { waitUntil: "domcontentloaded" });
-  await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.admin.email);
-  await page.getByLabel(/contraseña/i).fill(E2E_USERS.admin.password);
-  await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
-  await page.waitForURL("**/admin/**", { timeout: 20_000 });
+  await page.goto("/admin/dashboard", { waitUntil: "domcontentloaded" });
+  await page.waitForURL("**/admin/**", { timeout: 10_000, waitUntil: "domcontentloaded" });
 }
 
 // These two roles have no pre-built storageState. Clear any existing session
@@ -30,18 +26,18 @@ export async function loginAsAdmin(page: Page): Promise<void> {
 
 export async function loginAsStorePending(page: Page): Promise<void> {
   await page.context().clearCookies();
-  await page.goto("/login");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
   await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.storePending.email);
   await page.getByLabel(/contraseña/i).fill(E2E_USERS.storePending.password);
   await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
-  await page.waitForURL(/\/(store|register)\//, { timeout: 15_000 });
+  await page.waitForURL(/\/(store|register)\//, { timeout: 15_000, waitUntil: "domcontentloaded" });
 }
 
 export async function loginAsStoreRejected(page: Page): Promise<void> {
   await page.context().clearCookies();
-  await page.goto("/login");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
   await page.getByLabel(/correo electrónico/i).fill(E2E_USERS.storeRejected.email);
   await page.getByLabel(/contraseña/i).fill(E2E_USERS.storeRejected.password);
   await page.getByRole("button", { name: /iniciar sesión|ingresar/i }).click();
-  await page.waitForURL(/\/(store|register)\//, { timeout: 15_000 });
+  await page.waitForURL(/\/(store|register)\//, { timeout: 15_000, waitUntil: "domcontentloaded" });
 }

@@ -4,11 +4,11 @@ export class RegisterPage {
   constructor(private readonly page: Page) {}
 
   async gotoClient() {
-    await this.page.goto("/register");
+    await this.page.goto("/register", { waitUntil: "domcontentloaded" });
   }
 
   async gotoStore() {
-    await this.page.goto("/register/store");
+    await this.page.goto("/register/store", { waitUntil: "domcontentloaded" });
   }
 
   async fillEmail(email: string) {
@@ -32,7 +32,9 @@ export class RegisterPage {
   }
 
   get emailError() {
-    return this.page.getByText(/email válido/i);
+    return this.page.getByText(
+      /email válido|ya.*registrado|en uso|ya existe|email.*already|user.*registered|correo.*uso/i,
+    );
   }
 
   get passwordMismatchError() {

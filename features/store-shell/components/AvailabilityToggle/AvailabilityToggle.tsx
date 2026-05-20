@@ -15,12 +15,14 @@ export interface AvailabilityToggleProps {
   readonly isAvailable: boolean;
   readonly locationStatus?: LocationPublishingStatus;
   readonly onToggle: () => void;
+  readonly disabled?: boolean;
 }
 
 export function AvailabilityToggle({
   isAvailable,
   locationStatus,
   onToggle,
+  disabled = false,
 }: AvailabilityToggleProps) {
   const t = useTranslations("StoreShell.AvailabilityToggle");
 
@@ -36,9 +38,11 @@ export function AvailabilityToggle({
           aria-checked={isAvailable}
           aria-label={isAvailable ? t("ariaAvailable") : t("ariaUnavailable")}
           onClick={onToggle}
+          disabled={disabled}
           className={cn(
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             isAvailable ? "bg-green-500" : "bg-muted",
+            disabled && "cursor-not-allowed opacity-50",
           )}
         >
           <span

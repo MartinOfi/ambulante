@@ -8,6 +8,13 @@ config({ path: resolve(__dirname, "../../../.env") });
 // Stable public UUID for the approved store — must match seed.sql and global-setup.ts
 export const APPROVED_STORE_PUBLIC_ID = "10000000-0000-0000-0000-000000000001";
 
+// Orders seeded by global-setup.ts (seedClientHistoryOrders). Preserved across resets
+// so the client history view stays populated between sub-tests in serial mode.
+const E2E_HISTORY_ORDER_PUBLIC_IDS = [
+  "40000000-0000-0000-0000-000000000001", // finalizado
+  "40000000-0000-0000-0000-000000000002", // cancelado
+] as const;
+
 // Products seeded for the approved store — must match seed.sql
 // Upsert ensures they exist even if a previous test or manual operation deleted them.
 // seed.sql uses ON CONFLICT DO NOTHING so it won't recreate deleted rows.
@@ -87,5 +94,19 @@ export async function resetApprovedStore(): Promise<void> {
 
   if (productsError) {
     throw new Error(`[e2e] resetApprovedStore (products) failed: ${productsError.message}`);
+  }
+
+  // Wipe orders for the approved store so serial sub-tests don't leak EXPIRADO/ACEPTADO
+  // rows into the next submit flow. Preserve the history orders seeded by global-setup
+  // (UC-CLI-* relies on a populated history view). order_items cascades; audit_log is a
+  // soft-reference and intentionally left as append-only history.
+  const { error: ordersError } = await supabase
+    .from("orders")
+    .delete()
+    .eq("store_id", storeRow.id)
+    .not("public_id", "in", `(${E2E_HISTORY_ORDER_PUBLIC_IDS.join(",")})`);
+
+  if (ordersError) {
+    throw new Error(`[e2e] resetApprovedStore (orders) failed: ${ordersError.message}`);
   }
 }

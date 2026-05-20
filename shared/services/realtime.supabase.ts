@@ -1,4 +1,4 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
 import { REALTIME_LISTEN_TYPES } from "@supabase/supabase-js";
 import type { RealtimeChannel as SupabaseChannel } from "@supabase/supabase-js";
 
