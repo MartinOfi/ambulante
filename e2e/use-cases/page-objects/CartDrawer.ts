@@ -7,6 +7,10 @@ export class CartDrawer {
     return this.page.getByRole("region", { name: /resumen del carrito/i });
   }
 
+  get openCartButton() {
+    return this.cartSummary.getByRole("button", { name: /ver pedido/i });
+  }
+
   get submitButton() {
     return this.page.getByRole("button", { name: /enviar pedido/i });
   }
@@ -20,15 +24,15 @@ export class CartDrawer {
   }
 
   increaseButton(productName: string) {
-    return this.itemRow(productName).getByRole("button", { name: /aumentar|más|\+/i });
+    return this.itemRow(productName).getByRole("button", { name: /aumentar/i });
   }
 
   decreaseButton(productName: string) {
-    return this.itemRow(productName).getByRole("button", { name: /disminuir|menos|-/i });
+    return this.itemRow(productName).getByRole("button", { name: /disminuir/i });
   }
 
   removeButton(productName: string) {
-    return this.itemRow(productName).getByRole("button", { name: /eliminar|quitar/i });
+    return this.itemRow(productName).getByRole("button", { name: /eliminar/i });
   }
 
   get clearCartButton() {
@@ -39,7 +43,14 @@ export class CartDrawer {
     return this.page.getByTestId("cart-total");
   }
 
+  async open() {
+    if (await this.submitButton.isVisible().catch(() => false)) return;
+    await this.openCartButton.click();
+    await this.submitButton.waitFor({ state: "visible" });
+  }
+
   async submitOrder() {
+    await this.open();
     await this.submitButton.click();
   }
 }
