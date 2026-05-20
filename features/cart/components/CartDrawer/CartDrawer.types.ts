@@ -14,4 +14,5 @@ export interface CartDrawerProps {
   readonly onRemove: (productId: string) => void;
   readonly onClearCart: () => void;
   readonly onCheckout: () => void;
+  readonly onClose?: () => void;
 }

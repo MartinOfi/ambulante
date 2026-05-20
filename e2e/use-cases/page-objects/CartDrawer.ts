@@ -36,7 +36,7 @@ export class CartDrawer {
   }
 
   get clearCartButton() {
-    return this.page.getByRole("button", { name: /vaciar carrito/i });
+    return this.page.getByRole("button", { name: /vaciar (carrito|pedido)/i });
   }
 
   get totalPrice() {

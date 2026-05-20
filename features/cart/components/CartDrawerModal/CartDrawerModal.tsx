@@ -1,18 +1,20 @@
 "use client";
 
+import { useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import { CartDrawer } from "@/features/cart/components/CartDrawer/CartDrawer";
 import { cn } from "@/shared/utils/cn";
 import type { CartDrawerModalProps } from "./CartDrawerModal.types";
 
 export function CartDrawerModal({ open, onOpenChange, ...drawerProps }: CartDrawerModalProps) {
+  const handleClose = useCallback(() => onOpenChange(false), [onOpenChange]);
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
           className={cn(
-            "fixed inset-0 z-[60] bg-black/55 backdrop-blur-[2px]",
+            "fixed inset-0 z-[60] bg-black/55",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
             "motion-reduce:animate-none",
@@ -32,26 +34,14 @@ export function CartDrawerModal({ open, onOpenChange, ...drawerProps }: CartDraw
           )}
         >
           <div
-            className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-border"
+            className="mx-auto mt-2.5 mb-1 h-1 w-9 shrink-0 rounded-full bg-muted/40"
             aria-hidden="true"
           />
 
           <DialogPrimitive.Title className="sr-only">Tu pedido</DialogPrimitive.Title>
 
-          <DialogPrimitive.Close
-            aria-label="Cerrar pedido"
-            className={cn(
-              "absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full",
-              "bg-muted/10 text-muted transition-colors",
-              "hover:bg-muted/20 hover:text-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
-            )}
-          >
-            <X size={16} aria-hidden="true" />
-          </DialogPrimitive.Close>
-
           <div className="flex min-h-0 flex-1 flex-col">
-            <CartDrawer {...drawerProps} />
+            <CartDrawer {...drawerProps} onClose={handleClose} />
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
