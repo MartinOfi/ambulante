@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { ORDER_STATUS, type OrderStatus } from "@/shared/constants/order";
+import { ROUTES, buildHref } from "@/shared/constants/routes";
 import { OrderCard } from "@/features/orders/components/OrderCard";
 import type { OrderHistoryScreenProps } from "./OrderHistoryScreen.types";
 
@@ -67,7 +69,9 @@ export function OrderHistoryScreen({
         <ul className="flex flex-col gap-3 px-4 py-3">
           {orders.map((order) => (
             <li key={order.id}>
-              <OrderCard order={order} />
+              <Link href={buildHref(ROUTES.client.order, { orderId: order.id })}>
+                <OrderCard order={order} />
+              </Link>
             </li>
           ))}
         </ul>

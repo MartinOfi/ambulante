@@ -1,6 +1,12 @@
 import { createBrowserClient } from "@/shared/repositories/supabase/client.browser";
-import { REALTIME_LISTEN_TYPES } from "@supabase/supabase-js";
-import type { RealtimeChannel as SupabaseChannel } from "@supabase/supabase-js";
+import {
+  REALTIME_LISTEN_TYPES,
+  REALTIME_POSTGRES_CHANGES_LISTEN_EVENT,
+} from "@supabase/supabase-js";
+import type {
+  RealtimeChannel as SupabaseChannel,
+  RealtimePostgresChangesFilter,
+} from "@supabase/supabase-js";
 
 import {
   RECONNECT_BACKOFF_FACTOR,
@@ -228,6 +234,36 @@ export function createSupabaseRealtimeService(client?: SupabaseRealtimeClient): 
         activeChannels.delete(channelName);
       }
       channelHandlers.delete(channelName);
+    },
+
+    subscribeToTableChanges(
+      table: string,
+      filter: string | null,
+      callback: () => void,
+    ): () => void {
+      if (destroyed) return () => {};
+      const channelName = `pgc:${table}:${filter ?? "all"}`;
+      const pgFilter: RealtimePostgresChangesFilter<`${REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.ALL}`> =
+        {
+          event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.ALL,
+          schema: "public",
+          table,
+        };
+      if (filter !== null) pgFilter.filter = filter;
+      const ch = getClient()
+        .channel(channelName)
+        .on(REALTIME_LISTEN_TYPES.POSTGRES_CHANGES, pgFilter, () => callback())
+        .subscribe();
+      return () => {
+        getClient()
+          .removeChannel(ch)
+          .catch((error: unknown) => {
+            logger.error("Realtime: removeChannel failed on table changes unsubscribe", {
+              channelName,
+              error,
+            });
+          });
+      };
     },
 
     broadcast(channelName: string, event: string, payload: unknown): void {

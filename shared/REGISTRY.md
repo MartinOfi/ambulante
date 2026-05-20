@@ -212,6 +212,7 @@
 | useStoreOrdersQuery | hook | `features/orders/hooks/useStoreOrdersQuery.ts` | data.md §3 |
 | useOrdersQuery | hook | `features/orders/hooks/useOrdersQuery.ts` | features.md §13 |
 | useRealtimeInvalidation | hook | `shared/query/useRealtimeInvalidation.ts` | data.md §2b |
+| useTableChangesInvalidation | hook | `shared/query/useTableChangesInvalidation.ts` | data.md §2b |
 | useRealtimeStatus | hook | `shared/hooks/useRealtimeStatus.ts` | data.md §3 |
 | useSendOrderMutation | hook | `features/orders/hooks/useSendOrderMutation.ts` | data.md §3 |
 | useSession | hook | `shared/hooks/useSession.ts` | data.md §3 |

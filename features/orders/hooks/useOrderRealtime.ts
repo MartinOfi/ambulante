@@ -1,12 +1,12 @@
 "use client";
 
-import { REALTIME_CHANNELS } from "@/shared/constants/realtime";
 import { queryKeys } from "@/shared/query/keys";
-import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
+import { useTableChangesInvalidation } from "@/shared/query/useTableChangesInvalidation";
 
 export function useOrderRealtime(orderId: string): void {
-  useRealtimeInvalidation({
-    channel: REALTIME_CHANNELS.ORDERS,
+  useTableChangesInvalidation({
+    table: "orders",
+    filter: `public_id=eq.${orderId}`,
     queryKey: queryKeys.orders.byId(orderId),
   });
 }

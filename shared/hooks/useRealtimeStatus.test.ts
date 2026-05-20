@@ -18,6 +18,7 @@ function makeMockService(initialStatus: RealtimeStatus = "online"): TestableReal
     subscribe: vi.fn().mockReturnValue(() => {}),
     unsubscribe: vi.fn(),
     broadcast: vi.fn(),
+    subscribeToTableChanges: vi.fn().mockReturnValue(() => {}),
     destroy: vi.fn(),
     reconnect: vi.fn(),
     _testDeliver: vi.fn(),

@@ -14,6 +14,7 @@ export interface RealtimeService {
   subscribe<T = unknown>(channel: string, handler: RealtimeHandler<T>): () => void;
   unsubscribe(channel: string): void;
   broadcast(channel: string, event: string, payload: unknown): void;
+  subscribeToTableChanges(table: string, filter: string | null, callback: () => void): () => void;
   status(): RealtimeStatus;
   onStatusChange(handler: RealtimeStatusHandler): () => void;
   reconnect(): void;

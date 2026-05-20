@@ -1,42 +1,43 @@
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { REALTIME_CHANNELS } from "@/shared/constants/realtime";
 import { queryKeys } from "@/shared/query/keys";
-import { useRealtimeInvalidation } from "@/shared/query/useRealtimeInvalidation";
+import { useTableChangesInvalidation } from "@/shared/query/useTableChangesInvalidation";
 import { useOrderRealtime } from "./useOrderRealtime";
 
-vi.mock("@/shared/query/useRealtimeInvalidation", () => ({
-  useRealtimeInvalidation: vi.fn(),
+vi.mock("@/shared/query/useTableChangesInvalidation", () => ({
+  useTableChangesInvalidation: vi.fn(),
 }));
 
-const mockUseRealtimeInvalidation = vi.mocked(useRealtimeInvalidation);
+const mockUseTableChangesInvalidation = vi.mocked(useTableChangesInvalidation);
 
 describe("useOrderRealtime", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("subscribes to the orders channel for the given orderId", () => {
+  it("subscribes to the orders table filtered by orderId", () => {
     renderHook(() => useOrderRealtime("order-abc"));
 
-    expect(mockUseRealtimeInvalidation).toHaveBeenCalledOnce();
-    expect(mockUseRealtimeInvalidation).toHaveBeenCalledWith({
-      channel: REALTIME_CHANNELS.ORDERS,
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledOnce();
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledWith({
+      table: "orders",
+      filter: "public_id=eq.order-abc",
       queryKey: queryKeys.orders.byId("order-abc"),
     });
   });
 
-  it("uses the correct query key for a different orderId", () => {
+  it("uses the correct filter for a different orderId", () => {
     renderHook(() => useOrderRealtime("order-xyz"));
 
-    expect(mockUseRealtimeInvalidation).toHaveBeenCalledWith({
-      channel: REALTIME_CHANNELS.ORDERS,
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledWith({
+      table: "orders",
+      filter: "public_id=eq.order-xyz",
       queryKey: queryKeys.orders.byId("order-xyz"),
     });
   });
 
-  it("passes updated query key when orderId changes", () => {
+  it("passes updated filter when orderId changes", () => {
     const { rerender } = renderHook(
       ({ orderId }: { readonly orderId: string }) => useOrderRealtime(orderId),
       { initialProps: { orderId: "order-1" } },
@@ -44,9 +45,10 @@ describe("useOrderRealtime", () => {
 
     rerender({ orderId: "order-2" });
 
-    expect(mockUseRealtimeInvalidation).toHaveBeenCalledTimes(2);
-    expect(mockUseRealtimeInvalidation).toHaveBeenLastCalledWith({
-      channel: REALTIME_CHANNELS.ORDERS,
+    expect(mockUseTableChangesInvalidation).toHaveBeenCalledTimes(2);
+    expect(mockUseTableChangesInvalidation).toHaveBeenLastCalledWith({
+      table: "orders",
+      filter: "public_id=eq.order-2",
       queryKey: queryKeys.orders.byId("order-2"),
     });
   });

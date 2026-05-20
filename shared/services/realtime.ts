@@ -177,6 +177,14 @@ export function createMockRealtimeService({
       deliverToChannel(channel, event, payload);
     },
 
+    subscribeToTableChanges(
+      _table: string,
+      _filter: string | null,
+      _callback: () => void,
+    ): () => void {
+      return () => {};
+    },
+
     status(): RealtimeStatus {
       return currentStatus;
     },

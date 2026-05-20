@@ -10,18 +10,22 @@ export const supabasePushService: PushService = {
     return Notification.permission as PushPermissionStatus;
   },
   async requestPermission(): Promise<PushPermissionStatus> {
-    throw new Error("Push B6: not implemented");
+    // B6 pending: returns "denied" so callers treat it as unavailable
+    return "denied";
   },
   async subscribe(): Promise<PushSubscriptionData | null> {
-    throw new Error("Push B6: not implemented");
+    // B6 pending: full Web Push implementation
+    return null;
   },
   async unsubscribe(): Promise<boolean> {
-    throw new Error("Push B6: not implemented");
+    // B6 pending
+    return false;
   },
   async getActiveSubscription(): Promise<PushSubscriptionData | null> {
-    throw new Error("Push B6: not implemented");
+    // B6 pending
+    return null;
   },
   async sendTestNotification(_title: string, _body: string): Promise<void> {
-    throw new Error("Push B6: not implemented");
+    // B6 pending
   },
 };

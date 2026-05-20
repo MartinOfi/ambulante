@@ -66,6 +66,12 @@ Cola de mutations pendientes para operaciones offline. Persiste en IndexedDB. Va
 - **Descripción:** Hook bridge que conecta `realtimeService.subscribe` con `queryClient.invalidateQueries`. Se suscribe en mount, invalida `queryKey` en cada mensaje, desuscribe en unmount. Usa `useRef` para capturar queryKey sin re-disparar el efecto en cada render.
 - **Nota:** solo re-subscribe cuando cambia `channel`. `queryKey` se actualiza via ref — no es dependencia del efecto.
 
+### `shared/query/useTableChangesInvalidation.ts`
+
+- **API:** `useTableChangesInvalidation({ table: string, filter: string | null, queryKey: readonly unknown[] }): void`
+- **Descripción:** Hook bridge que conecta `realtimeService.subscribeToTableChanges` con `queryClient.invalidateQueries`. Escucha cambios Postgres a nivel de fila (INSERT/UPDATE/DELETE) en `table` con `filter` (formato `"col=eq.val"`). Pasar `filter: null` suscribe a toda la tabla (RLS limita el scope en el servidor). Invalida `queryKey` en cada cambio. Usa `useRef` para el mismo patrón que `useRealtimeInvalidation`.
+- **Cuándo usarlo:** suscripciones cross-device (servidor → cliente) donde `useRealtimeInvalidation` no llega porque requiere un WebSocket activo del servidor.
+
 ---
 
 ## §3 — Hooks de datos

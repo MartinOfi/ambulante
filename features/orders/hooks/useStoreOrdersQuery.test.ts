@@ -19,8 +19,8 @@ vi.mock("@/shared/utils/logger", () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-vi.mock("@/shared/query/useRealtimeInvalidation", () => ({
-  useRealtimeInvalidation: vi.fn(),
+vi.mock("@/shared/query/useTableChangesInvalidation", () => ({
+  useTableChangesInvalidation: vi.fn(),
 }));
 
 const STORE_ID = "store-demo-1";
